@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 71                                                      $ #
+//# Revision     : $Rev:: 76                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 71 2024-04-29 03:21:40Z                         $ #
+//# File-ID      : $Id:: main.cpp 76 2024-04-30 09:37:05Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -32,6 +32,9 @@
 	#define DHTPin D7
 #endif
 	uint cycleHT = 0;
+	bool errorHT = false;
+	bool errorHTLast = false;
+	uint16_t publishCountErrorHT = 0;
 	float temperature = 0.0;
 	int temperatureLast = 0;
 	uint16_t publishCountTemperature = 0;
@@ -42,6 +45,9 @@
 #ifdef wpLDR
 	#define LDRPin A0
 	uint cycleLDR = 0;
+	bool errorLDR = false;
+	bool errorLDRLast = false;
+	uint16_t publishCountErrorLDR = 0;
 	uint16_t ldr = 0;
 	uint16_t ldrLast = 0;
 	uint16_t publishCountLDR = 0;
@@ -51,12 +57,16 @@
 	#include <Wire.h>
 	#include <AS_BH1750.h>
 	uint cycleLight = 0;
+	bool errorLight = false;
+	bool errorLightLast = false;
+	uint16_t publishCountErrorLight = 0;
 	uint16_t light = 0;
 	uint16_t lightLast = 0;
 	uint16_t publishCountLight = 0;
 #endif
 #ifdef wpBM
 	#define BMPin D5
+	//bool errorBM = false;
 	bool bm = false;
 	bool bmLast = false;
 	uint16_t publishCountBM = 0;
@@ -65,6 +75,9 @@
 	#define RainPin A0
 	#define RAINDETECTPin D6
 	uint cycleRain = 0;
+	bool errorRain = false;
+	bool errorRainLast = false;
+	uint16_t publishCountErrorRain = 0;
 	double rain = 0.0;
 	double rainLast = 0.0;
 	uint16_t publishCountRain = 0;
@@ -73,6 +86,9 @@
 	#define trigPin D6
 	#define echoPin D5
 	uint cycleDistance = 0;
+	bool errorDistance = false;
+	bool errorDistanceLast = false;
+	uint16_t publishCountErrorDistance = 0;
 	uint16_t volume = 0;
 	uint16_t volumeLast = 0;
 	uint8_t distanceRaw = 0;
@@ -111,6 +127,7 @@ String mqttTopicDebugRest;
 	// values
 	String mqttTopicTemperature;
 	String mqttTopicHumidity;
+	String mqttTopicErrorHT;
 	// settings
 	String mqttTopicMaxCycleHT;
 	String mqttTopicTemperatureCorrection;
@@ -121,6 +138,7 @@ String mqttTopicDebugRest;
 #ifdef wpLDR
 	// values
 	String mqttTopicLDR;
+	String mqttTopicErrorLDR;
 	// settings
 	String mqttTopicMaxCycleLDR;
 	String mqttTopicLdrCorrection;
@@ -130,6 +148,7 @@ String mqttTopicDebugRest;
 #ifdef wpLight
 	// values
 	String mqttTopicLight;
+	String mqttTopicErrorLight;
 	// settings
 	String mqttTopicMaxCycleLight;
 	String mqttTopicLightCorrection;
@@ -150,6 +169,7 @@ String mqttTopicDebugRest;
 #ifdef wpRain
 	// values
 	String mqttTopicRain;
+	String mqttTopicErrorRain;
 	// settings
 	String mqttTopicMaxCycleRain;
 	String mqttTopicRainCorrection;
@@ -161,6 +181,7 @@ String mqttTopicDebugRest;
 	String mqttTopicVolume;
 	String mqttTopicDistanceRaw;
 	String mqttTopicDistanceAvg;
+	String mqttTopicErrorDistance;
 	// settings
 	String mqttTopicMaxCycleDistance;
 	String mqttTopicDistanceCorrection;
@@ -336,6 +357,7 @@ void getVars() {
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
+	mqttTopicErrorHT = wpFZ.DeviceName + "/ERROR/HT";
 	// settings
 	mqttTopicMaxCycleHT = wpFZ.DeviceName + "/settings/HT/maxCycle";
 	mqttTopicTemperatureCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Temperature";
@@ -346,6 +368,7 @@ void getVars() {
 #ifdef wpLDR
 	// values
 	mqttTopicLDR = wpFZ.DeviceName + "/LDR";
+	mqttTopicErrorLDR = wpFZ.DeviceName + "/ERROR/LDR";
 	// settings
 	mqttTopicMaxCycleLDR = wpFZ.DeviceName + "/settings/LDR/maxCycle";
 	mqttTopicLdrCorrection = wpFZ.DeviceName + "/settings/LDR/Correction";
@@ -355,6 +378,7 @@ void getVars() {
 #ifdef wpLight
 	// values
 	mqttTopicLight = wpFZ.DeviceName + "/Light";
+	mqttTopicErrorLight = wpFZ.DeviceName + "/ERROR/Light";
 	// settings
 	mqttTopicMaxCycleLight = wpFZ.DeviceName + "/settings/Light/maxCycle";
 	mqttTopicLightCorrection = wpFZ.DeviceName + "/settings/Light/Correction";
@@ -375,6 +399,7 @@ void getVars() {
 #ifdef wpRain
 	// values
 	mqttTopicRain = wpFZ.DeviceName + "/Rain";
+	mqttTopicErrorRain = wpFZ.DeviceName + "/ERROR/Rain";
 	// settings
 	mqttTopicMaxCycleRain = wpFZ.DeviceName + "/settings/Rain/maxCycle";
 	mqttTopicRainCorrection = wpFZ.DeviceName + "/settings/Rain/Correction";
@@ -386,6 +411,7 @@ void getVars() {
 	mqttTopicVolume = wpFZ.DeviceName + "/Volume";
 	mqttTopicDistanceRaw = wpFZ.DeviceName + "/Distance/raw";
 	mqttTopicDistanceAvg = wpFZ.DeviceName + "/Distance/avg";
+	mqttTopicErrorDistance = wpFZ.DeviceName + "/ERROR/Distance";
 	// settings
 	mqttTopicMaxCycleDistance = wpFZ.DeviceName + "/settings/Distance/maxCycle";
 	mqttTopicDistanceCorrection = wpFZ.DeviceName + "/settings/Distance/Correction";
@@ -594,6 +620,11 @@ void publishInfo() {
 		}
 		publishCountHumidity = 0;
 	}
+	if(errorHTLast != errorHT || ++publishCountErrorHT > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
+		errorHTLast = errorHT;
+		publishCountErrorHT = 0;
+	}
 #endif
 #ifdef wpLDR
 	if(ldrLast != ldr || ++publishCountLDR > wpFZ.publishQoS) {
@@ -605,6 +636,11 @@ void publishInfo() {
 		}
 		publishCountLDR = 0;
 	}
+	if(errorLDRLast != errorLDR || ++publishCountErrorLDR > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorLDR.c_str(), String(errorLDR).c_str());
+		errorLDRLast = errorLDR;
+		publishCountErrorLDR = 0;
+	}
 #endif
 #ifdef wpLight
 	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
@@ -615,6 +651,11 @@ void publishInfo() {
 			publishInfoDebug("Light", String(light), String(publishCountLight));
 		}
 		publishCountLight = 0;
+	}
+	if(errorLightLast != errorLight || ++publishCountErrorLight > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorLight.c_str(), String(errorLight).c_str());
+		errorLightLast = errorLight;
+		publishCountErrorLight = 0;
 	}
 #endif
 #ifdef wpBM
@@ -647,6 +688,11 @@ void publishInfo() {
 		}
 		publishCountRain = 0;
 	}
+	if(errorRainLast != errorRain || ++publishCountErrorRain > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorRain.c_str(), String(errorRain).c_str());
+		errorRainLast = errorRain;
+		publishCountErrorRain = 0;
+	}
 #endif
 #ifdef wpDistance
 	if(distanceRawLast != distanceRaw || ++publishCountDistanceRaw > wpFZ.publishQoS) {
@@ -673,6 +719,11 @@ void publishInfo() {
 			publishInfoDebug("Volume", String(volume), String(publishCountVolume));
 		}
 		publishCountVolume = 0;
+	}
+	if(errorDistanceLast != errorDistance || ++publishCountErrorDistance > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorDistance.c_str(), String(errorDistance).c_str());
+		errorDistanceLast = errorDistance;
+		publishCountErrorDistance = 0;
 	}
 #endif
 	//if(rssi != WiFi.RSSI() || ++publishCountRssi > wpFZ.publishQoS) {
@@ -1022,20 +1073,30 @@ void callbackMqttDebug(String topic, String value) {
 }
 #ifdef wpHT
 	void calcHT() {
+		bool e = false;
 		float newT = dht.readTemperature();
 		float newH = dht.readHumidity();
 		if(!isnan(newT)) {
 			temperature = newT + wpFZ.temperatureCorrection;
-			if(wpFZ.DebugHT)
+			e = e | false;
+			if(wpFZ.DebugHT) {
 				calcHTDebug("Temperature", temperature, newT);
-		} else
+			}
+		} else {
+			e = e | true;
 			calcHTError("Temperature");
+		}
 		if(!isnan(newH)) {
 			humidity = newH + wpFZ.humidityCorrection;
-			if(wpFZ.DebugHT)
+			if(wpFZ.DebugHT) {
+				e = e | false;
 				calcHTDebug("Humidity", humidity, newH);
-		} else
+			}
+		} else {
+			e = e | true;
 			calcHTError("Humidity");
+		}
+		errorHT = e;
 	}
 	void calcHTDebug(String name, float value, float raw) {
 		String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
@@ -1057,11 +1118,13 @@ void callbackMqttDebug(String topic, String value) {
 			newLdr = 1024 - newLdr;
 			//ldr = calcLdrAvg(newLdr) + wpFZ.ldrCorrection;
 			ldr = newLdr + wpFZ.ldrCorrection;
+			errorLDR = false;
 			if(wpFZ.DebugLDR) {
 				String logmessage = "LDR: " + String(ldr) + " (" + String(newLdr) + ")";
 				wpFZ.DebugWS(wpFZ.strDEBUG, "calcLDR", logmessage);
 			}
 		} else {
+			errorLDR = true;
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 		}
@@ -1090,11 +1153,13 @@ void callbackMqttDebug(String topic, String value) {
 		if(!isnan(newLight) || ar < 0) {
 			//light = calcLightAvg(newLight) + wpFZ.lightCorrection;
 			light = newLight + wpFZ.lightCorrection;
+			errorLight = false;
 			if(wpFZ.DebugLight) {
 				String logmessage = "Light: " + String(light) + " (" + String(newLight) + ")";
 				wpFZ.DebugWS(wpFZ.strDEBUG, "calcLight", logmessage);
 			}
 		} else {
+			errorLight = true;
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcLight", logmessage);
 		}
@@ -1138,11 +1203,13 @@ void callbackMqttDebug(String topic, String value) {
 			if(newRain > 1024) newRain = 1024;
 			if(newRain < 0) newRain = 0;
 			rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
+			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
 				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", logmessage);
 			}
 		} else {
+			errorRain = true;
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 		}
@@ -1165,11 +1232,13 @@ void callbackMqttDebug(String topic, String value) {
 			if(distanceAvg > wpFZ.height) distanceAvg = wpFZ.height;
 			volume = wpFZ.maxVolume - round(wpFZ.maxVolume * distanceAvg / wpFZ.height);
 			if(volume > wpFZ.maxVolume) volume = wpFZ.maxVolume;
+			errorDistance = false;
 			if(wpFZ.DebugDistance) {
 				calcDistanceDebug("Distance", distanceAvg, distanceRaw);
 			}
 			delay(loopTime);
 		} else {
+			errorDistance = true;
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcDistance", logmessage);
 		}
