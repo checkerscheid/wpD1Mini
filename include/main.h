@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 71                                                      $ #
+//# Revision     : $Rev:: 79                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 71 2024-04-29 03:21:40Z                           $ #
+//# File-ID      : $Id:: main.h 79 2024-04-30 19:13:23Z                           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -18,6 +18,7 @@
 #include <Arduino.h>
 
 void getVars();
+String getVersion();
 void readStringsFromEEPROM();
 int writeStringToEEPROM(int addrOffset, String &strToWrite);
 void connectMqtt();
@@ -53,6 +54,11 @@ uint8_t calcDistanceAvg(uint8_t raw);
 void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 #endif
 
+String SVNh = "$Rev: 79 $";
+String Revh;
+String Rev;
+int Buildh;
+int Build;
 // counter
 uint16_t publishCountRssi = 0;
 
