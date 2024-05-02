@@ -1230,6 +1230,13 @@ void callbackMqttDebug(String topic, String value) {
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 		}
+		if(wpFZ.DebugRain) {
+			if(digitalRead(RAINDETECTPin) == HIGH) {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", "no rain");
+			} else {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", "rain detect");
+			}
+		}
 	}
 #endif
 #ifdef wpDistance
