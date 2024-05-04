@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 79                                                      $ #
+//# Revision     : $Rev:: 86                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 79 2024-04-30 19:13:23Z                         $ #
+//# File-ID      : $Id:: main.cpp 86 2024-05-04 02:25:09Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -447,7 +447,7 @@ void writeStringsToEEPROM() {
 #endif
 }
 String getVersion() {
-	Rev = "$Rev: 79 $";
+	Rev = "$Rev: 86 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
@@ -683,8 +683,13 @@ void publishInfo() {
 		if(bm && ldr <= wpFZ.threshold) {
 			String lm = "MQTT Set Light (" + String(ldr) + " <= " + String(wpFZ.threshold) + ")";
 			if(!wpFZ.lightToTurnOn.startsWith("_")) {
-				mqttClient.publish(wpFZ.lightToTurnOn.c_str(), String("on").c_str());
-				lm += ", send '" + wpFZ.lightToTurnOn + "': 'On'";
+				if(wpFZ.lightToTurnOn.startsWith("http://")) {
+					wpFZ.sendRawRest(wpFZ.lightToTurnOn);
+					lm += ", send REST '" + wpFZ.lightToTurnOn + "': 'On'";
+				} else {
+					mqttClient.publish(wpFZ.lightToTurnOn.c_str(), String("on").c_str());
+					lm += ", send MQTT '" + wpFZ.lightToTurnOn + "': 'On'";
+				}
 			}
 			wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", lm);
 		}
