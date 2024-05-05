@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 86                                                      $ #
+//# Revision     : $Rev:: 87                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 86 2024-05-04 02:25:09Z                         $ #
+//# File-ID      : $Id:: main.cpp 87 2024-05-05 12:52:25Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -102,6 +102,7 @@
 // values
 String mqttTopicUpdateMode;
 String mqttTopicRestartRequired;
+String mqttTopicOnline;
 // settings
 String mqttTopicDeviceName;
 String mqttTopicDeviceDescription;
@@ -334,6 +335,7 @@ void getVars() {
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
 	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
+	mqttTopicOnline = wpFZ.DeviceName + "/info/Online";
 	// settings
 	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
 	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
@@ -447,7 +449,7 @@ void writeStringsToEEPROM() {
 #endif
 }
 String getVersion() {
-	Rev = "$Rev: 86 $";
+	Rev = "$Rev: 87 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
@@ -471,6 +473,7 @@ void connectMqtt() {
 			// subscribes
 			mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
 			mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
+			mqttClient.subscribe(mqttTopicOnline.c_str());
 			mqttClient.subscribe(mqttTopicRestartDevice.c_str());
 			mqttClient.subscribe(mqttTopicUpdateFW.c_str());
 			mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
@@ -559,6 +562,7 @@ void publishSettings(bool force) {
 	// values
 	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
 	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);
+	mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str(), true);
 	mqttClient.publish(mqttTopicVersion.c_str(), getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicwpFreakaZoneVersion.c_str(), wpFZ.getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid, true);
@@ -788,6 +792,13 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			wpFZ.DeviceDescription = msg;
 			writeStringsToEEPROM();
 			callbackMqttDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
+		}
+	}
+	if(strcmp(topic, mqttTopicOnline.c_str()) == 0) {
+		int readOnline = msg.toInt();
+		if(readOnline != 1) {
+			//reset
+			mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str());
 		}
 	}
 	if(strcmp(topic, mqttTopicRestartDevice.c_str()) == 0) {
