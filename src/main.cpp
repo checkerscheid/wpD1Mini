@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 87                                                      $ #
+//# Revision     : $Rev:: 90                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 87 2024-05-05 12:52:25Z                         $ #
+//# File-ID      : $Id:: main.cpp 90 2024-05-06 09:20:08Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -120,6 +120,7 @@ String mqttTopicSetDeviceDescription;
 String mqttTopicRestartDevice;
 String mqttTopicUpdateFW;
 String mqttTopicForceMqttUpdate;
+String mqttTopicCalcValues;
 String mqttTopicDebugEprom;
 String mqttTopicDebugWiFi;
 String mqttTopicDebugMqtt;
@@ -237,6 +238,8 @@ void setup() {
 int dummy = 0;
 int c = 0;
 void loop() {
+	doTheWebServerCommand();
+	doTheWebserverBlink();
 	if(wpFZ.UpdateFW) ArduinoOTA.handle();
 	if(WiFi.status() == WL_CONNECTED) {
 		digitalWrite(LED_BUILTIN, LOW);
@@ -247,40 +250,43 @@ void loop() {
 	if(!mqttClient.connected()) {
 		connectMqtt();
 	}
+	if(wpFZ.calcValues) {
 #ifdef wpHT
-	if(++cycleHT >= wpFZ.maxCycleHT) {
-		cycleHT = 0;
-		calcHT();
-	}
+		if(++cycleHT >= wpFZ.maxCycleHT) {
+			cycleHT = 0;
+			calcHT();
+		}
 #endif
 #ifdef wpLDR
-	if(++cycleLDR >= wpFZ.maxCycleLDR) {
-		cycleLDR = 0;
-		calcLDR();
-	}
+		if(++cycleLDR >= wpFZ.maxCycleLDR) {
+			cycleLDR = 0;
+			calcLDR();
+		}
 #endif
 #ifdef wpLight
-	if(++cycleLight > wpFZ.maxCycleLight) {
-		cycleLight = 0;
-		calcLight();
-	}
+		if(++cycleLight > wpFZ.maxCycleLight) {
+			cycleLight = 0;
+			calcLight();
+		}
 #endif
 #ifdef wpBM
-	calcBM();
+		calcBM();
 #endif
 #ifdef wpRain
-	if(++cycleRain >= wpFZ.maxCycleRain) {
-		cycleRain = 0;
-		calcRain();
-	}
+		if(++cycleRain >= wpFZ.maxCycleRain) {
+			cycleRain = 0;
+			calcRain();
+		}
 #endif
 #ifdef wpDistance
-	if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
-		cycleDistance = 0;
-		calcDistance();
-	}
+		if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
+			cycleDistance = 0;
+			calcDistance();
+		}
 #endif
-	publishInfo();
+		publishInfo();
+	}
+	wpFZ.loop();
 	mqttClient.loop();
 	delay(250);
 }
@@ -353,6 +359,7 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
+	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
 	mqttTopicDebugWiFi = wpFZ.DeviceName + "/settings/Debug/WiFi";
 	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
@@ -449,7 +456,7 @@ void writeStringsToEEPROM() {
 #endif
 }
 String getVersion() {
-	Rev = "$Rev: 87 $";
+	Rev = "$Rev: 90 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
@@ -526,34 +533,64 @@ void connectMqtt() {
 }
 void setupWebServer() {
 	wpFZ.setupWebServer();
-	
+
 	wpFZ.server.on("/setCmd", HTTP_GET, [](AsyncWebServerRequest *request) {
 		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCmd");
 		if(request->hasParam("cmd")) {
 			if(request->getParam("cmd")->value() == "ForceMqttUpdate") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ForceMqttUpdate");
-				//wpFZ.blink();
-				publishSettings(true);
+				setWebServerCommand(WebServerCommandpublishSettings);
 			}
 			if(request->getParam("cmd")->value() == "UpdateFW") {
-				if(wpFZ.setupOta()) {
-					wpFZ.UpdateFW = true;
-				}
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateFW");
-				//wpFZ.blink();
+				setWebServerCommand(WebServerCommandupdateFW);
 			}
 			if(request->getParam("cmd")->value() == "RestartDevice") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
-				//wpFZ.blink();
-				//ESP.restart();
+				setWebServerCommand(WebServerCommandrestartESP);
+			}
+			if(request->getParam("cmd")->value() == "calcValues") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
+				wpFZ.calcValues = !wpFZ.calcValues;
 			}
 			if(request->getParam("cmd")->value() == "Test") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Test");
-				//wpFZ.blink();
 			}
 		}
 		request->send(200);
+		setWebServerBlink();
 	});
+	wpFZ.server.begin();
+}
+void setWebServerCommand(int8_t command) {
+	doWebServerCommand = command;
+}
+void setWebServerBlink() {
+	doWebServerBlink = WebServerCommandblink;
+}
+void doTheWebServerCommand() {
+	if(doWebServerCommand > 0) {
+		switch(doWebServerCommand) {
+			case WebServerCommandpublishSettings:
+				publishSettings(true);
+				break;
+			case WebServerCommandupdateFW:
+				if(wpFZ.setupOta()) {
+					wpFZ.UpdateFW = true;
+				}
+				break;
+			case WebServerCommandrestartESP:
+				ESP.restart();
+				break;
+		}
+		doWebServerCommand = WebServerCommanddoNothing;
+	}
+}
+void doTheWebserverBlink() {
+	if(doWebServerBlink > 0) {
+		wpFZ.blink();
+		doWebServerBlink = WebServerCommanddoNothing;
+	}
 }
 void publishSettings() {
 	publishSettings(false);
@@ -574,6 +611,7 @@ void publishSettings(bool force) {
 	// settings
 	mqttClient.publish(mqttTopicSetDeviceName.c_str(), wpFZ.DeviceName.c_str());
 	mqttClient.publish(mqttTopicSetDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str());
+	mqttClient.publish(mqttTopicCalcValues.c_str(), String(wpFZ.calcValues).c_str());
 	mqttClient.publish(mqttTopicDebugEprom.c_str(), String(wpFZ.DebugEprom).c_str());
 	mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(wpFZ.DebugWiFi).c_str());
 	mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(wpFZ.DebugMqtt).c_str());
@@ -799,6 +837,13 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		if(readOnline != 1) {
 			//reset
 			mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str());
+		}
+	}
+	if(strcmp(topic, mqttTopicCalcValues.c_str()) == 0) {
+		bool readCalcValues = msg.toInt();
+		if(wpFZ.calcValues != readCalcValues) {
+			wpFZ.calcValues = readCalcValues;
+			callbackMqttDebug(mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
 	if(strcmp(topic, mqttTopicRestartDevice.c_str()) == 0) {
