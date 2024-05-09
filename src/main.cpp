@@ -464,9 +464,8 @@ String getVersion() {
 	Revh.remove(0, 6);
 	Revh.remove(Revh.length() - 2, 2);
 	Buildh = Revh.toInt();
-	String returns = "V " +
-		String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) +
-		" Build " + String(Buildh) + "." + String(Build);
+	String returns = "Build " +
+		String(Buildh) + "." + String(Build);
 	return returns;
 }
 void connectMqtt() {
@@ -1148,6 +1147,7 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 void callbackMqttDebug(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
 	wpFZ.DebugWS(wpFZ.strINFO, "callbackMqtt", logmessage);
+	wpFZ.blink();
 }
 #ifdef wpHT
 	void calcHT() {
