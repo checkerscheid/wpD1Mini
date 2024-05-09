@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 90                                                      $ #
+//# Revision     : $Rev:: 94                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 90 2024-05-06 09:20:08Z                           $ #
+//# File-ID      : $Id:: main.h 94 2024-05-09 20:39:28Z                           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -34,6 +34,8 @@ void setWebServerCommand(int8_t command);
 void setWebServerBlink();
 void doTheWebServerCommand();
 void doTheWebserverBlink();
+void checkOfflineTrigger();
+void setMqttOffline();
 void publishSettings();
 void publishSettings(bool);
 void publishInfo();
@@ -65,7 +67,7 @@ uint8_t calcDistanceAvg(uint8_t raw);
 void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 #endif
 
-String SVNh = "$Rev: 90 $";
+String SVNh = "$Rev: 94 $";
 String Revh;
 String Rev;
 int Buildh;

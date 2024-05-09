@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 92                                                      $ #
+//# Revision     : $Rev:: 94                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 92 2024-05-09 12:59:37Z                         $ #
+//# File-ID      : $Id:: main.cpp 94 2024-05-09 20:39:28Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -102,10 +102,11 @@
 // values
 String mqttTopicUpdateMode;
 String mqttTopicRestartRequired;
-String mqttTopicOnline;
+String mqttTopicOnlineToggler;
 // settings
 String mqttTopicDeviceName;
 String mqttTopicDeviceDescription;
+String mqttTopicOnline;
 String mqttTopicVersion;
 String mqttTopicwpFreakaZoneVersion;
 String mqttTopicSsid;
@@ -240,6 +241,7 @@ int c = 0;
 void loop() {
 	doTheWebServerCommand();
 	doTheWebserverBlink();
+	checkOfflineTrigger();
 	if(wpFZ.UpdateFW) ArduinoOTA.handle();
 	if(WiFi.status() == WL_CONNECTED) {
 		digitalWrite(LED_BUILTIN, LOW);
@@ -341,10 +343,11 @@ void getVars() {
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
 	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
-	mqttTopicOnline = wpFZ.DeviceName + "/info/Online";
+	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	// settings
 	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
 	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
+	mqttTopicOnline = wpFZ.DeviceName + "/ERROR/Online";
 	mqttTopicVersion = wpFZ.DeviceName + "/info/Version";
 	mqttTopicwpFreakaZoneVersion = wpFZ.DeviceName + "/info/wpFreakaZone";
 	mqttTopicSsid = wpFZ.DeviceName + "/info/WiFi/SSID";
@@ -456,7 +459,7 @@ void writeStringsToEEPROM() {
 #endif
 }
 String getVersion() {
-	Rev = "$Rev: 92 $";
+	Rev = "$Rev: 94 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
@@ -479,7 +482,7 @@ void connectMqtt() {
 			// subscribes
 			mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
 			mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
-			mqttClient.subscribe(mqttTopicOnline.c_str());
+			mqttClient.subscribe(mqttTopicOnlineToggler.c_str());
 			mqttClient.subscribe(mqttTopicRestartDevice.c_str());
 			mqttClient.subscribe(mqttTopicUpdateFW.c_str());
 			mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
@@ -579,6 +582,7 @@ void doTheWebServerCommand() {
 				}
 				break;
 			case WebServerCommandrestartESP:
+				setMqttOffline();
 				ESP.restart();
 				break;
 		}
@@ -591,10 +595,21 @@ void doTheWebserverBlink() {
 		doWebServerBlink = WebServerCommanddoNothing;
 	}
 }
+void checkOfflineTrigger() {
+	if(wpFZ.OfflineTrigger) {
+		// set offline for reboot
+		setMqttOffline();
+		wpFZ.OfflineTrigger = false;
+	}
+}
+void setMqttOffline() {
+	mqttClient.publish(mqttTopicOnline.c_str(), String(0).c_str());
+}
 void publishSettings() {
 	publishSettings(false);
 }
 void publishSettings(bool force) {
+	mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str(), true);
 	// values
 	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
 	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);
@@ -831,11 +846,11 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			callbackMqttDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
 		}
 	}
-	if(strcmp(topic, mqttTopicOnline.c_str()) == 0) {
+	if(strcmp(topic, mqttTopicOnlineToggler.c_str()) == 0) {
 		int readOnline = msg.toInt();
 		if(readOnline != 1) {
 			//reset
-			mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str());
+			mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
 		}
 	}
 	if(strcmp(topic, mqttTopicCalcValues.c_str()) == 0) {
@@ -849,6 +864,7 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		int readRestartDevice = msg.toInt();
 		if(readRestartDevice > 0) {
 			callbackMqttDebug(mqttTopicRestartDevice, String(readRestartDevice));
+			setMqttOffline();
 			ESP.restart();
 		}
 	}
