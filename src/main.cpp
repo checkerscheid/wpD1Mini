@@ -553,8 +553,8 @@ void setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
 				wpFZ.calcValues = !wpFZ.calcValues;
 			}
-			if(request->getParam("cmd")->value() == "Test") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Test");
+			if(request->getParam("cmd")->value() == "Blink") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Blink");
 			}
 		}
 		request->send(200);
