@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 79                                                      $ #
+//# Revision     : $Rev:: 90                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 79 2024-04-30 19:13:23Z                           $ #
+//# File-ID      : $Id:: main.h 90 2024-05-06 09:20:08Z                           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -22,7 +22,18 @@ String getVersion();
 void readStringsFromEEPROM();
 int writeStringToEEPROM(int addrOffset, String &strToWrite);
 void connectMqtt();
+const int8_t WebServerCommanddoNothing = -1;
+const int8_t WebServerCommandblink = 1;
+const int8_t WebServerCommandpublishSettings = 2;
+const int8_t WebServerCommandupdateFW = 3;
+const int8_t WebServerCommandrestartESP = 4;
+int8_t doWebServerCommand = WebServerCommanddoNothing;
+int8_t doWebServerBlink = WebServerCommanddoNothing;
 void setupWebServer();
+void setWebServerCommand(int8_t command);
+void setWebServerBlink();
+void doTheWebServerCommand();
+void doTheWebserverBlink();
 void publishSettings();
 void publishSettings(bool);
 void publishInfo();
@@ -54,7 +65,7 @@ uint8_t calcDistanceAvg(uint8_t raw);
 void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 #endif
 
-String SVNh = "$Rev: 79 $";
+String SVNh = "$Rev: 90 $";
 String Revh;
 String Rev;
 int Buildh;
