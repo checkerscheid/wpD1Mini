@@ -603,7 +603,7 @@ void checkOfflineTrigger() {
 	}
 }
 void setMqttOffline() {
-	mqttClient.publish(mqttTopicOnline.c_str(), String(0).c_str(), true);
+	mqttClient.publish(mqttTopicOnline.c_str(), String(0).c_str());
 }
 void publishSettings() {
 	publishSettings(false);
