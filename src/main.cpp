@@ -609,7 +609,7 @@ void publishSettings() {
 	publishSettings(false);
 }
 void publishSettings(bool force) {
-	mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str(), true);
+	mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
 	// values
 	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
 	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);
