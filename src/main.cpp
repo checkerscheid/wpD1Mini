@@ -598,7 +598,7 @@ void publishSettings(bool force) {
 	// values
 	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
 	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);
-	mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str(), true);
+	mqttClient.publish(mqttTopicOnline.c_str(), String(1).c_str());
 	mqttClient.publish(mqttTopicVersion.c_str(), getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicwpFreakaZoneVersion.c_str(), wpFZ.getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid, true);
