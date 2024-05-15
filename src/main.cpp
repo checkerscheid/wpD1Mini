@@ -44,8 +44,8 @@
 	bool errorLDR = false;
 	bool errorLDRLast = false;
 	uint16_t publishCountErrorLDR = 0;
-	uint16_t ldr = 0;
-	uint16_t ldrLast = 0;
+	int16_t ldr = 0;
+	int16_t ldrLast = 0;
 	uint16_t publishCountLDR = 0;
 #endif
 // uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
@@ -1341,13 +1341,12 @@ void callbackMqttDebug(String topic, String value) {
 	}
 #endif
 #ifdef wpLDR
-	const uint16_t avgLdrLength = 240;
-	int LdrValues[avgLdrLength];
 	void calcLDR() {
 		int ar = analogRead(LDRPin);
 		uint16_t newLdr = (uint16_t)ar;
 		if(!isnan(newLdr) && ar > 0) {
-			//ldr = calcLdrAvg(newLdr) + wpFZ.ldrCorrection;
+			if(newLdr > 1023) newLdr = 1023;
+			if(newLdr < 0) newLdr = 0;
 			ldr = (1023 - newLdr) + wpFZ.ldrCorrection;
 			errorLDR = false;
 			if(wpFZ.DebugLDR) {
@@ -1360,7 +1359,9 @@ void callbackMqttDebug(String topic, String value) {
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 		}
 	}
-	// uint16_t calcLdrAvg(uint16_t raw) {
+	// const uint_t avgLdrLength = 240;
+	// int LdrValues[avgLdrLength];
+	// int16_t calcLdrAvg(int16_t raw) {
 	// 	int avg = 0;
 	// 	int avgCount = avgLdrLength;
 	// 	LdrValues[avgLdrLength - 1] = raw;
@@ -1376,8 +1377,6 @@ void callbackMqttDebug(String topic, String value) {
 	// }
 #endif
 #ifdef wpLight
-	const uint16_t avgLightLength = 240;
-	int lightValues[avgLightLength];
 	void calcLight() {
 		float ar = lightMeter.readLightLevel();
 		uint16_t newLight = (uint16_t)ar;
@@ -1395,7 +1394,9 @@ void callbackMqttDebug(String topic, String value) {
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcLight", logmessage);
 		}
 	}
-	// uint16_t calcLightAvg(uint16_t raw) {
+	// const uint8_t avgLightLength = 240;
+	// int lightValues[avgLightLength];
+	// int16_t calcLightAvg(uint16_t raw) {
 	// 	long avg = 0;
 	// 	long avgCount = avgLightLength;
 	// 	lightValues[avgLightLength - 1] = raw;
@@ -1434,8 +1435,7 @@ void callbackMqttDebug(String topic, String value) {
 			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
 			//rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
-			//Divission 0
-			rain = map(newMoisture, 1023, 0, 0, 100)
+			rain = map(newRain, 1023, 0, 0, 10) + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
@@ -1456,8 +1456,6 @@ void callbackMqttDebug(String topic, String value) {
 	}
 #endif
 #ifdef wpDistance
-	const uint16_t avgDistanceLength = 240;
-	int distanceValues[avgDistanceLength];
 	void calcDistance() {
 		uint loopTime = 250;
 		unsigned long duration;
@@ -1483,6 +1481,8 @@ void callbackMqttDebug(String topic, String value) {
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcDistance", logmessage);
 		}
 	}
+	const uint8_t avgDistanceLength = 240;
+	int distanceValues[avgDistanceLength];
 	uint8_t calcDistanceAvg(uint8_t raw) {
 		long avg = 0;
 		long avgCount = avgDistanceLength;
