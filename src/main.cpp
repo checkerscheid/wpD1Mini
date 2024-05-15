@@ -873,8 +873,8 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	if(strcmp(topic, mqttTopicRestartDevice.c_str()) == 0) {
 		int readRestartDevice = msg.toInt();
 		if(readRestartDevice > 0) {
-			callbackMqttDebug(mqttTopicRestartDevice, String(readRestartDevice));
 			setMqttOffline();
+			callbackMqttDebug(mqttTopicRestartDevice, String(readRestartDevice));
 			ESP.restart();
 		}
 	}
