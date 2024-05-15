@@ -101,6 +101,7 @@
 #endif
 bool errorRestLast = false;
 bool trySendRest = false;
+uint16_t publishCountErrorRest = 0;
 // values
 String mqttTopicUpdateMode;
 String mqttTopicRestartRequired;
@@ -834,12 +835,13 @@ void publishInfo() {
 		}
 		publishCountRssi = 0;
 	}
-	if(errorRestLast != wpFZ.ErrorRest && trySendRest) {
+	if((errorRestLast != wpFZ.ErrorRest && trySendRest) || ++publishCountErrorRest > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.ErrorRest).c_str());
 		errorRestLast = wpFZ.ErrorRest;
 		trySendRest = false;
 		if(wpFZ.DebugRest)
-			publishInfoDebug("ErrorRest", String(wpFZ.ErrorRest), "0");
+			publishInfoDebug("ErrorRest", String(wpFZ.ErrorRest), String(publishCountErrorRest));
+		publishCountErrorRest = 0;
 	}
 }
 void publishInfoDebug(String name, String value, String publishCount) {
