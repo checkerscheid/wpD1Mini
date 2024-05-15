@@ -1510,7 +1510,7 @@ void callbackMqttDebug(String topic, String value) {
 			if(newMoisture > 1023) newMoisture = 1023;
 			if(newMoisture < 0) newMoisture = 0;
 			//Divission 0
-			if(wpFZ.moistureWet + wpFZ.moistureDry == 0) wpFZ.moistureDry = 1;
+			if((wpFZ.moistureWet + wpFZ.moistureDry) == 0) wpFZ.moistureDry = 1;
 			moisture = map(newMoisture, wpFZ.moistureDry, wpFZ.moistureWet, 0, 100);
 			errorMoisture = false;
 			if(wpFZ.DebugMoisture) {
