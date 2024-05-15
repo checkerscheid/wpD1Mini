@@ -66,6 +66,9 @@ void calcDistance();
 uint8_t calcDistanceAvg(uint8_t raw);
 void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 #endif
+#ifdef wpMoisture
+void calcMoisture();
+#endif
 
 String SVNh = "$Rev: 94 $";
 String Revh;
