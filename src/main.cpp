@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 98                                                      $ #
+//# Revision     : $Rev:: 99                                                      $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 98 2024-05-15 14:59:49Z                         $ #
+//# File-ID      : $Id:: main.cpp 99 2024-05-15 20:27:53Z                         $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -464,7 +464,7 @@ void writeStringsToEEPROM() {
 #endif
 }
 String getVersion() {
-	Rev = "$Rev: 98 $";
+	Rev = "$Rev: 99 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
