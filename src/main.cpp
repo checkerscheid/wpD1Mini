@@ -99,6 +99,9 @@
 	uint16_t publishCountDistanceRaw = 0;
 	uint16_t publishCountDistanceAvg = 0;
 #endif
+bool errorRestLast = false;
+bool trySendRest = false;
+uint16_t publishCountErrorRest = 0;
 // values
 String mqttTopicUpdateMode;
 String mqttTopicRestartRequired;
@@ -680,11 +683,14 @@ void publishSettings(bool force) {
 }
 
 void publishInfo() {
+	wpFZ.ErrorRest = false;
+	trySendRest = false;
 #ifdef wpHT
 	int tempEqual = (int) temperature * 10;
 	if(temperatureLast != tempEqual || ++publishCountTemperature > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicTemperature.c_str(), String(temperature).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("temp", String(temperature));
+		trySendRest = true;
 		temperatureLast = tempEqual;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("Temperature", String(temperature), String(publishCountTemperature));
@@ -695,6 +701,7 @@ void publishInfo() {
 	if(humidityLast != humEqual || ++publishCountHumidity > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicHumidity.c_str(), String(humidity).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("hum", String(humidity));
+		trySendRest = true;
 		humidityLast = humEqual;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("Humidity", String(humidity), String(publishCountHumidity));
@@ -711,6 +718,7 @@ void publishInfo() {
 	if(ldrLast != ldr || ++publishCountLDR > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicLDR.c_str(), String(ldr).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("ldr", String(ldr));
+		trySendRest = true;
 		ldrLast = ldr;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("LDR", String(ldr), String(publishCountLDR));
@@ -727,6 +735,7 @@ void publishInfo() {
 	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("light", String(light));
+		trySendRest = true;
 		lightLast = light;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("Light", String(light), String(publishCountLight));
@@ -749,6 +758,7 @@ void publishInfo() {
 			if(!wpFZ.lightToTurnOn.startsWith("_")) {
 				if(wpFZ.lightToTurnOn.startsWith("http://")) {
 					wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRawRest(wpFZ.lightToTurnOn);
+					trySendRest = true;
 					lm += ", send REST '" + wpFZ.lightToTurnOn + "': 'On'";
 				} else {
 					mqttClient.publish(wpFZ.lightToTurnOn.c_str(), String("on").c_str());
@@ -768,6 +778,7 @@ void publishInfo() {
 	if(rainLast != rain || ++publishCountRain > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicRain.c_str(), String(rain).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("rain", String(rain));
+		trySendRest = true;
 		rainLast = rain;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("Rain", String(rain), String(publishCountRain));
@@ -800,6 +811,7 @@ void publishInfo() {
 	if(volumeLast != volume || ++publishCountVolume > wpFZ.publishQoS) {
 		mqttClient.publish(mqttTopicVolume.c_str(), String(volume).c_str());
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("vol", String(volume));
+		trySendRest = true;
 		volumeLast = volume;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("Volume", String(volume), String(publishCountVolume));
@@ -817,13 +829,20 @@ void publishInfo() {
 		mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
 		rssi = WiFi.RSSI();
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("rssi", String(rssi));
+		trySendRest = true;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("RSSI", String(rssi), String(publishCountRssi));
 		}
 		publishCountRssi = 0;
 	}
-	mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.ErrorRest).c_str());
-	wpFZ.ErrorRest = false;
+	if((errorRestLast != wpFZ.ErrorRest && trySendRest) || ++publishCountErrorRest > wpFZ.publishQoS) {
+		mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.ErrorRest).c_str());
+		errorRestLast = wpFZ.ErrorRest;
+		trySendRest = false;
+		if(wpFZ.DebugRest)
+			publishInfoDebug("ErrorRest", String(wpFZ.ErrorRest), String(publishCountErrorRest));
+		publishCountErrorRest = 0;
+	}
 }
 void publishInfoDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
@@ -1219,9 +1238,8 @@ void callbackMqttDebug(String topic, String value) {
 		int ar = analogRead(LDRPin);
 		uint16_t newLdr = (uint16_t)ar;
 		if(!isnan(newLdr) && ar > 0) {
-			newLdr = 1024 - newLdr;
 			//ldr = calcLdrAvg(newLdr) + wpFZ.ldrCorrection;
-			ldr = newLdr + wpFZ.ldrCorrection;
+			ldr = (1023 - newLdr) + wpFZ.ldrCorrection;
 			errorLDR = false;
 			if(wpFZ.DebugLDR) {
 				String logmessage = "LDR: " + String(ldr) + " (" + String(newLdr) + ")";
@@ -1304,9 +1322,9 @@ void callbackMqttDebug(String topic, String value) {
 		int ar = analogRead(RainPin);
 		double newRain = (double)ar;
 		if(!isnan(newRain)) {
-			if(newRain > 1024) newRain = 1024;
+			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
-			rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
+			rain = ((1023 - newRain) / 102.3) + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
