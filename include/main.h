@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 94                                                      $ #
+//# Revision     : $Rev:: 101                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 94 2024-05-09 20:39:28Z                           $ #
+//# File-ID      : $Id:: main.h 101 2024-05-16 23:36:36Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -70,7 +70,7 @@ void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 void calcMoisture();
 #endif
 
-String SVNh = "$Rev: 94 $";
+String SVNh = "$Rev: 101 $";
 String Revh;
 String Rev;
 int Buildh;
