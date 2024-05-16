@@ -257,8 +257,6 @@ void setup() {
 	digitalWrite(trigPin, LOW);
 #endif
 }
-int dummy = 0;
-int c = 0;
 void loop() {
 	doTheWebServerCommand();
 	doTheWebserverBlink();
