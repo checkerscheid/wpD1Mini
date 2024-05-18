@@ -108,113 +108,6 @@
 bool errorRestLast = false;
 bool trySendRest = false;
 uint16_t publishCountErrorRest = 0;
-// values
-String mqttTopicUpdateMode;
-String mqttTopicRestartRequired;
-String mqttTopicOnlineToggler;
-// settings
-String mqttTopicDeviceName;
-String mqttTopicDeviceDescription;
-String mqttTopicErrorOnline; // 1 Error
-String mqttTopicVersion;
-String mqttTopicwpFreakaZoneVersion;
-String mqttTopicSsid;
-String mqttTopicIp;
-String mqttTopicMac;
-String mqttTopicRssi;
-String mqttTopicMqttServer;
-String mqttTopicRestServer;
-// commands
-String mqttTopicSetDeviceName;
-String mqttTopicSetDeviceDescription;
-String mqttTopicRestartDevice;
-String mqttTopicUpdateFW;
-String mqttTopicForceMqttUpdate;
-String mqttTopicCalcValues;
-String mqttTopicDebugEprom;
-String mqttTopicDebugWiFi;
-String mqttTopicDebugMqtt;
-String mqttTopicDebugFinder;
-String mqttTopicDebugRest;
-String mqttTopicErrorRest;
-#ifdef wpHT
-	// values
-	String mqttTopicTemperature;
-	String mqttTopicHumidity;
-	String mqttTopicErrorHT;
-	// settings
-	String mqttTopicMaxCycleHT;
-	String mqttTopicTemperatureCorrection;
-	String mqttTopicHumidityCorrection;
-	// commands
-	String mqttTopicDebugHT;
-#endif
-#ifdef wpLDR
-	// values
-	String mqttTopicLDR;
-	String mqttTopicErrorLDR;
-	// settings
-	String mqttTopicMaxCycleLDR;
-	String mqttTopicLdrCorrection;
-	// commands
-	String mqttTopicDebugLDR;
-#endif
-#ifdef wpLight
-	// values
-	String mqttTopicLight;
-	String mqttTopicErrorLight;
-	// settings
-	String mqttTopicMaxCycleLight;
-	String mqttTopicLightCorrection;
-	// commands
-	String mqttTopicDebugLight;
-#endif
-#ifdef wpBM
-	// values
-	String mqttTopicBM;
-	// settings
-#ifdef wpLDR
-	String mqttTopicThreshold;
-	String mqttTopicLightToTurnOn;
-#endif
-	// commands
-	String mqttTopicDebugBM;
-#endif
-#ifdef wpRain
-	// values
-	String mqttTopicRain;
-	String mqttTopicErrorRain;
-	// settings
-	String mqttTopicMaxCycleRain;
-	String mqttTopicRainCorrection;
-	// commands
-	String mqttTopicDebugRain;
-#endif
-#ifdef wpDistance
-	// values
-	String mqttTopicVolume;
-	String mqttTopicDistanceRaw;
-	String mqttTopicDistanceAvg;
-	String mqttTopicErrorDistance;
-	// settings
-	String mqttTopicMaxCycleDistance;
-	String mqttTopicDistanceCorrection;
-	String mqttTopicMaxVolume;
-	String mqttTopicHeight;
-	// commands
-	String mqttTopicDebugDistance;
-#endif
-#ifdef wpMoisture
-	// values
-	String mqttTopicMoisture;
-	String mqttTopicErrorMoisture;
-	// settings
-	String mqttTopicMaxCycleMoisture;
-	String mqttTopicMoistureDry;
-	String mqttTopicMoistureWet;
-	// commands
-	String mqttTopicDebugMoisture;
-#endif
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -237,6 +130,8 @@ void setup() {
 	wpFZ.printRestored();
 	wpFZ.setMainVersion(getVersion());
 	wpFZ.setupWiFi();
+	wpFZ.OnSince = wpFZ.getDateTime();
+	wpFZ.OnDuration = wpFZ.getOnlineTime(false);
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
 	connectMqtt();
@@ -381,11 +276,15 @@ void getVars() {
 	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	mqttTopicVersion = wpFZ.DeviceName + "/info/Version";
 	mqttTopicwpFreakaZoneVersion = wpFZ.DeviceName + "/info/wpFreakaZone";
+	mqttTopicOnSince = wpFZ.DeviceName + "/info/OnSince";
+	mqttTopicOnDuration = wpFZ.DeviceName + "/info/OnDuration";
 	mqttTopicSsid = wpFZ.DeviceName + "/info/WiFi/SSID";
 	mqttTopicIp = wpFZ.DeviceName + "/info/WiFi/Ip";
 	mqttTopicMac = wpFZ.DeviceName + "/info/WiFi/Mac";
+	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
 	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
 	mqttTopicMqttServer = wpFZ.DeviceName + "/info/MQTT/Server";
+	mqttTopicMqttSince = wpFZ.DeviceName + "/info/MQTT/Since";
 	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
 	mqttTopicSetDeviceName = wpFZ.DeviceName + "/settings/DeviceName";
@@ -519,6 +418,7 @@ void connectMqtt() {
 	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
+			wpFZ.MqttSince = wpFZ.getDateTime();
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 			publishSettings();
@@ -665,11 +565,15 @@ void publishSettings(bool force) {
 	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(0).c_str());
 	mqttClient.publish(mqttTopicVersion.c_str(), getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicwpFreakaZoneVersion.c_str(), wpFZ.getVersion().c_str(), true);
+	mqttClient.publish(mqttTopicOnSince.c_str(), wpFZ.OnSince.c_str());
+	mqttClient.publish(mqttTopicOnDuration.c_str(), wpFZ.OnDuration.c_str());
 	mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid, true);
 	mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
 	mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str(), true);
 	mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str(), true);
+	mqttClient.publish(mqttTopicWiFiSince.c_str(), wpFZ.WiFiSince.c_str());
 	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str(), true);
+	mqttClient.publish(mqttTopicMqttSince.c_str(), wpFZ.MqttSince.c_str());
 	mqttClient.publish(mqttTopicRestServer.c_str(), (String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort)).c_str(), true);
 	// settings
 	mqttClient.publish(mqttTopicSetDeviceName.c_str(), wpFZ.DeviceName.c_str());
@@ -893,11 +797,19 @@ void publishInfo() {
 	//if(rssi != WiFi.RSSI() || ++publishCountRssi > wpFZ.publishQoS) {
 	if(++publishCountRssi > 4 * 120) {
 		mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
+		mqttClient.publish(mqttTopicOnSince.c_str(), wpFZ.OnSince.c_str());
+		mqttClient.publish(mqttTopicOnDuration.c_str(), wpFZ.OnDuration.c_str());
+		mqttClient.publish(mqttTopicWiFiSince.c_str(), wpFZ.WiFiSince.c_str());
+		mqttClient.publish(mqttTopicMqttSince.c_str(), wpFZ.MqttSince.c_str());
 		rssi = WiFi.RSSI();
 		wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("rssi", String(rssi));
 		trySendRest = true;
 		if(wpFZ.DebugMqtt) {
 			publishInfoDebug("RSSI", String(rssi), String(publishCountRssi));
+			publishInfoDebug("OnSince", String(wpFZ.OnSince), String(publishCountRssi));
+			publishInfoDebug("OnDuration", String(wpFZ.OnDuration), String(publishCountRssi));
+			publishInfoDebug("WiFiSince", String(wpFZ.WiFiSince), String(publishCountRssi));
+			publishInfoDebug("MqttSince", String(wpFZ.MqttSince), String(publishCountRssi));
 		}
 		publishCountRssi = 0;
 	}
@@ -1432,8 +1344,7 @@ void callbackMqttDebug(String topic, String value) {
 		if(!isnan(newRain)) {
 			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
-			//rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
-			rain = map(newRain, 1023, 0, 0, 10) + wpFZ.rainCorrection;
+			rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";

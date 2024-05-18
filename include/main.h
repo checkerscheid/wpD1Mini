@@ -17,6 +17,118 @@
 #define BasisEmpty_h
 #include <Arduino.h>
 
+// values
+String mqttTopicUpdateMode;
+String mqttTopicRestartRequired;
+String mqttTopicOnlineToggler;
+// settings
+String mqttTopicDeviceName;
+String mqttTopicDeviceDescription;
+String mqttTopicErrorOnline; // 1 Error
+String mqttTopicVersion;
+String mqttTopicwpFreakaZoneVersion;
+String mqttTopicOnSince;
+String mqttTopicOnDuration;
+String mqttTopicSsid;
+String mqttTopicIp;
+String mqttTopicMac;
+String mqttTopicWiFiSince;
+String mqttTopicRssi;
+String mqttTopicMqttServer;
+String mqttTopicMqttSince;
+String mqttTopicRestServer;
+// commands
+String mqttTopicSetDeviceName;
+String mqttTopicSetDeviceDescription;
+String mqttTopicRestartDevice;
+String mqttTopicUpdateFW;
+String mqttTopicForceMqttUpdate;
+String mqttTopicCalcValues;
+String mqttTopicDebugEprom;
+String mqttTopicDebugWiFi;
+String mqttTopicDebugMqtt;
+String mqttTopicDebugFinder;
+String mqttTopicDebugRest;
+String mqttTopicErrorRest;
+#ifdef wpHT
+	// values
+	String mqttTopicTemperature;
+	String mqttTopicHumidity;
+	String mqttTopicErrorHT;
+	// settings
+	String mqttTopicMaxCycleHT;
+	String mqttTopicTemperatureCorrection;
+	String mqttTopicHumidityCorrection;
+	// commands
+	String mqttTopicDebugHT;
+#endif
+#ifdef wpLDR
+	// values
+	String mqttTopicLDR;
+	String mqttTopicErrorLDR;
+	// settings
+	String mqttTopicMaxCycleLDR;
+	String mqttTopicLdrCorrection;
+	// commands
+	String mqttTopicDebugLDR;
+#endif
+#ifdef wpLight
+	// values
+	String mqttTopicLight;
+	String mqttTopicErrorLight;
+	// settings
+	String mqttTopicMaxCycleLight;
+	String mqttTopicLightCorrection;
+	// commands
+	String mqttTopicDebugLight;
+#endif
+#ifdef wpBM
+	// values
+	String mqttTopicBM;
+	// settings
+#ifdef wpLDR
+	String mqttTopicThreshold;
+	String mqttTopicLightToTurnOn;
+#endif
+	// commands
+	String mqttTopicDebugBM;
+#endif
+#ifdef wpRain
+	// values
+	String mqttTopicRain;
+	String mqttTopicErrorRain;
+	// settings
+	String mqttTopicMaxCycleRain;
+	String mqttTopicRainCorrection;
+	// commands
+	String mqttTopicDebugRain;
+#endif
+#ifdef wpDistance
+	// values
+	String mqttTopicVolume;
+	String mqttTopicDistanceRaw;
+	String mqttTopicDistanceAvg;
+	String mqttTopicErrorDistance;
+	// settings
+	String mqttTopicMaxCycleDistance;
+	String mqttTopicDistanceCorrection;
+	String mqttTopicMaxVolume;
+	String mqttTopicHeight;
+	// commands
+	String mqttTopicDebugDistance;
+#endif
+#ifdef wpMoisture
+	// values
+	String mqttTopicMoisture;
+	String mqttTopicErrorMoisture;
+	// settings
+	String mqttTopicMaxCycleMoisture;
+	String mqttTopicMoistureDry;
+	String mqttTopicMoistureWet;
+	// commands
+	String mqttTopicDebugMoisture;
+#endif
+
 void getVars();
 String getVersion();
 void readStringsFromEEPROM();
