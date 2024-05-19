@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 103                                                     $ #
+//# Revision     : $Rev:: 108                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 103 2024-05-18 01:51:55Z                          $ #
+//# File-ID      : $Id:: main.h 108 2024-05-19 15:54:37Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -204,7 +204,7 @@ void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 void publishValuesSystem();
 void publishErrorRest();
 
-String SVNh = "$Rev: 103 $";
+String SVNh = "$Rev: 108 $";
 String Revh;
 String Rev;
 int Buildh;
