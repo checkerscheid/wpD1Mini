@@ -68,6 +68,7 @@ String mqttTopicErrorRest;
 	String mqttTopicErrorLDR;
 	// settings
 	String mqttTopicMaxCycleLDR;
+	String mqttTopicUseLdrAvg;
 	String mqttTopicLdrCorrection;
 	// commands
 	String mqttTopicDebugLDR;
@@ -78,6 +79,7 @@ String mqttTopicErrorRest;
 	String mqttTopicErrorLight;
 	// settings
 	String mqttTopicMaxCycleLight;
+	String mqttTopicUseLightAvg;
 	String mqttTopicLightCorrection;
 	// commands
 	String mqttTopicDebugLight;
@@ -99,9 +101,22 @@ String mqttTopicErrorRest;
 	String mqttTopicErrorRain;
 	// settings
 	String mqttTopicMaxCycleRain;
+	String mqttTopicUseRainAvg;
 	String mqttTopicRainCorrection;
 	// commands
 	String mqttTopicDebugRain;
+#endif
+#ifdef wpMoisture
+	// values
+	String mqttTopicMoisture;
+	String mqttTopicErrorMoisture;
+	// settings
+	String mqttTopicMaxCycleMoisture;
+	String mqttTopicUseMoistureAvg;
+	String mqttTopicMoistureDry;
+	String mqttTopicMoistureWet;
+	// commands
+	String mqttTopicDebugMoisture;
 #endif
 #ifdef wpDistance
 	// values
@@ -116,17 +131,6 @@ String mqttTopicErrorRest;
 	String mqttTopicHeight;
 	// commands
 	String mqttTopicDebugDistance;
-#endif
-#ifdef wpMoisture
-	// values
-	String mqttTopicMoisture;
-	String mqttTopicErrorMoisture;
-	// settings
-	String mqttTopicMaxCycleMoisture;
-	String mqttTopicMoistureDry;
-	String mqttTopicMoistureWet;
-	// commands
-	String mqttTopicDebugMoisture;
 #endif
 
 void getVars();
@@ -155,32 +159,50 @@ void publishInfoDebug(String name, String value, String publishCount);
 void callbackMqtt(char*, byte*, unsigned int);
 void callbackMqttDebug(String topic, String value);
 #ifdef wpHT
+void publishValueTemp(int equalVal);
+void publishValueHum(int equalVal);
+void publishErrorHT();
 void calcHT();
 void calcHTDebug(String name, float value, float raw);
 void calcHTError(String name);
 #endif
 #ifdef wpLDR
+void publishValueLDR();
+void publishErrorLDR();
 void calcLDR();
-//uint16_t calcLdrAvg(uint16_t raw);
+uint16_t calcLdrAvg(uint16_t raw);
 #endif
 #ifdef wpLight
+void publishValueLight();
+void publishErrorLight();
 void calcLight();
-//uint16_t calcLightAvg(uint16_t raw);
+uint16_t calcLightAvg(uint16_t raw);
 #endif
 #ifdef wpBM
+void publishValueBM();
 void calcBM();
 #endif
 #ifdef wpRain
+void publishValueRain();
+void publishErrorRain();
 void calcRain();
+uint16_t calcRainAvg(uint16_t raw);
+#endif
+#ifdef wpMoisture
+void publishValueMoisture();
+void publishErrorMoisture();
+void calcMoisture();
+uint16_t calcMoistureAvg(uint16_t raw);
 #endif
 #ifdef wpDistance
+void publishValueDistance();
+void publishErrorDistance();
 void calcDistance();
 uint8_t calcDistanceAvg(uint8_t raw);
 void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
 #endif
-#ifdef wpMoisture
-void calcMoisture();
-#endif
+void publishValuesSystem();
+void publishErrorRest();
 
 String SVNh = "$Rev: 103 $";
 String Revh;
