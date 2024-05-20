@@ -43,6 +43,7 @@ String mqttTopicSetDeviceDescription;
 String mqttTopicRestartDevice;
 String mqttTopicUpdateFW;
 String mqttTopicForceMqttUpdate;
+String mqttTopicForceRenewValue;
 String mqttTopicCalcValues;
 String mqttTopicDebugEprom;
 String mqttTopicDebugWiFi;

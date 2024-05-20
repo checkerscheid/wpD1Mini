@@ -25,6 +25,7 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
+uint loopTime = 200;
 //###################################################################################
 //  Value Defines
 //###################################################################################
@@ -205,23 +206,25 @@ void loop() {
 			calcRain();
 		}
 #endif
-#ifdef wpDistance
-		if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
-			cycleDistance = 0;
-			calcDistance();
-		}
-#endif
 #ifdef wpMoisture
 		if(++cycleMoisture >= wpFZ.maxCycleMoisture) {
 			cycleMoisture = 0;
 			calcMoisture();
 		}
 #endif
+#ifdef wpDistance
+		if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
+			cycleDistance = 0;
+			calcDistance();
+		}
+#endif
 		publishInfo();
 	}
 	wpFZ.loop();
 	mqttClient.loop();
-	delay(250);
+#ifndef wpDistance
+	delay(loopTime);
+#endif
 }
 
 //###################################################################################
@@ -306,6 +309,7 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
+	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
 	mqttTopicDebugWiFi = wpFZ.DeviceName + "/settings/Debug/WiFi";
@@ -342,7 +346,7 @@ void getVars() {
 	mqttTopicErrorLight = wpFZ.DeviceName + "/ERROR/Light";
 	// settings
 	mqttTopicMaxCycleLight = wpFZ.DeviceName + "/settings/Light/maxCycle";
-	mqttTopicUseLightAvg = wpFZ.DeviceName + "/settings/LDR/useAvg";
+	mqttTopicUseLightAvg = wpFZ.DeviceName + "/settings/Light/useAvg";
 	mqttTopicLightCorrection = wpFZ.DeviceName + "/settings/Light/Correction";
 	// commands
 	mqttTopicDebugLight = wpFZ.DeviceName + "/settings/Debug/Light";
@@ -451,6 +455,7 @@ void connectMqtt() {
 			mqttClient.subscribe(mqttTopicRestartDevice.c_str());
 			mqttClient.subscribe(mqttTopicUpdateFW.c_str());
 			mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
+			mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
 			mqttClient.subscribe(mqttTopicDebugEprom.c_str());
 			mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
 			mqttClient.subscribe(mqttTopicDebugMqtt.c_str());
@@ -668,6 +673,8 @@ void publishSettings(bool force) {
 #endif
 	if(force) {
 		mqttClient.publish(mqttTopicUpdateMode.c_str(), wpFZ.UpdateFW ? "On" : "Off");
+		mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), "0");
+		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
 	}
 }
 
@@ -1039,9 +1046,19 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		int readForceMqttUpdate = msg.toInt();
 		if(readForceMqttUpdate > 0) {
 			publishSettings(true);
+			publishValues();
 			//reset
 			mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
 			callbackMqttDebug(mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
+		}
+	}
+	if(strcmp(topic, mqttTopicForceRenewValue.c_str()) == 0) {
+		int readForceRenewValue = msg.toInt();
+		if(readForceRenewValue > 0) {
+			publishValues();
+			//reset
+			mqttClient.publish(mqttTopicForceRenewValue.c_str(), String(false).c_str());
+			callbackMqttDebug(mqttTopicForceRenewValue, String(readForceRenewValue));
 		}
 	}
 	if(strcmp(topic, mqttTopicDebugEprom.c_str()) == 0) {
@@ -1626,7 +1643,6 @@ void callbackMqttDebug(String topic, String value) {
 #endif
 #ifdef wpDistance
 	void calcDistance() {
-		uint loopTime = 250;
 		unsigned long duration;
 		digitalWrite(trigPin, HIGH);
 		delayMicroseconds(20);
