@@ -1556,16 +1556,16 @@ void callbackMqttDebug(String topic, String value) {
 #endif
 #ifdef wpRain
 	void calcRain() {
-		int ar = analogRead(RainPin);
-		double newRain = (double)ar;
+		int newRain = analogRead(RainPin);
 		if(!isnan(newRain)) {
 			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
+			int calcedRain = newRain;
 			if(wpFZ.useRainAvg) {
-				newRain = calcRainAvg(newRain);
+				calcedRain = calcRainAvg(newRain);
 			}
-			newRain = map(newRain, 1023, 0, 0, 500);
-			rain = newRain / 10 + wpFZ.rainCorrection;
+			calcedRain = map(newRain, 1023, 0, 0, 500);
+			rain = (float)(calcedRain / 10.0) + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
