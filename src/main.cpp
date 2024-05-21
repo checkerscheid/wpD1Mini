@@ -1222,9 +1222,10 @@ void callbackMqttDebug(String topic, String value) {
 		int ar = analogRead(RainPin);
 		double newRain = (double)ar;
 		if(!isnan(newRain)) {
-			if(newRain > 1024) newRain = 1024;
+			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
-			rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
+			newRain = map(newRain, 1023, 0, 0, 500);
+			rain = newRain / 10 + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
