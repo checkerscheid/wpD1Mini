@@ -1564,7 +1564,8 @@ void callbackMqttDebug(String topic, String value) {
 			if(wpFZ.useRainAvg) {
 				newRain = calcRainAvg(newRain);
 			}
-			rain = ((1024 - newRain) / 102.4) + wpFZ.rainCorrection;
+			newRain = map(newRain, 1023, 0, 0, 500);
+			rain = newRain / 10 + wpFZ.rainCorrection;
 			errorRain = false;
 			if(wpFZ.DebugRain) {
 				String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
