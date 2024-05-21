@@ -1224,6 +1224,9 @@ void callbackMqttDebug(String topic, String value) {
 		if(!isnan(newRain)) {
 			if(newRain > 1023) newRain = 1023;
 			if(newRain < 0) newRain = 0;
+			// Starkregen: 15 - 25 l/m (Warnstufe 1)
+			// heftiger Starkregen: 25 - 40 l/m (Warnstufe 2)
+			// extrem heftiger Starkregen: < 40 l/m (Warnstufe 3)
 			newRain = map(newRain, 1023, 0, 0, 500);
 			rain = newRain / 10 + wpFZ.rainCorrection;
 			errorRain = false;
