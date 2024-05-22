@@ -1049,6 +1049,7 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				publishValues();
 				//reset
 				mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
+				mqttClient.publish(mqttTopicForceRenewValue.c_str(), String(false).c_str());
 				callbackMqttDebug(mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
 			}
 		}
