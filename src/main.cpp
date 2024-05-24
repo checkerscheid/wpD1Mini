@@ -72,6 +72,10 @@ uint loopTime = 200;
 	bool bmLast = false;
 	uint16_t publishCountBM = 0;
 #endif
+#ifdef wpDO
+	#define DOPin D5
+	int doutput = LOW;
+#endif
 #ifdef wpRain
 	#define RainPin A0
 	#define RAINDETECTPin D6
@@ -150,6 +154,9 @@ void setup() {
 #endif
 #ifdef wpLight
 	lightMeter.begin();
+#endif
+#ifdef wpDO
+	pinMode(DOPin, OUTPUT);
 #endif
 #ifdef wpRain
 	pinMode(RAINDETECTPin, OUTPUT);
@@ -263,6 +270,9 @@ void getVars() {
 	EEPROM.get(wpFZ.addrThreshold, wpFZ.threshold);
 #endif
 #endif
+#ifdef wpDO
+	wpFZ.DebugDO = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugDO);
+#endif
 #ifdef wpRain
 	wpFZ.DebugRain = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRain);
 	wpFZ.maxCycleRain = EEPROM.read(wpFZ.addrMaxCycleRain);
@@ -361,6 +371,10 @@ void getVars() {
 #endif
 	// commands
 	mqttTopicDebugBM = wpFZ.DeviceName + "/settings/Debug/BM";
+#endif
+#ifdef wpDO
+	mqttTopicDO = wpFZ.DeviceName + "/DO";
+	mqttTopicDebugDO = wpFZ.DeviceName + "/settings/Debug/DO";
 #endif
 #ifdef wpRain
 	// values
@@ -485,6 +499,10 @@ void connectMqtt() {
 			mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 #endif
 			mqttClient.subscribe(mqttTopicDebugBM.c_str());
+#endif
+#ifdef wpDO
+			mqttClient.subscribe(mqttTopicDO.c_str());
+			mqttClient.subscribe(mqttTopicDebugDO.c_str());
 #endif
 #ifdef wpRain
 			mqttClient.subscribe(mqttTopicMaxCycleRain.c_str());
@@ -648,6 +666,9 @@ void publishSettings(bool force) {
 	mqttClient.publish(mqttTopicLightToTurnOn.c_str(), wpFZ.lightToTurnOn.c_str(), true);
 #endif
 	mqttClient.publish(mqttTopicDebugBM.c_str(), String(wpFZ.DebugBM).c_str());
+#endif
+#ifdef wpDO
+	mqttClient.publish(mqttTopicDebugDO.c_str(), String(wpFZ.DebugDO).c_str());
 #endif
 #ifdef wpRain
 	mqttClient.publish(mqttTopicMaxCycleRain.c_str(), String(wpFZ.maxCycleRain).c_str(), true);
@@ -1272,6 +1293,30 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			}
 		}
 #endif
+#endif
+#ifdef wpDO
+	if(strcmp(topic, mqttTopicDO.c_str()) == 0) {
+		int readDO = msg.toInt();
+		if(readDO == 0) {
+			doutput = LOW;
+		} else {
+			doutput = HIGH;
+		}
+		digitalWrite(DOPin, doutput);
+		callbackMqttDebug(mqttTopicDO, String(doutput));
+		wpFZ.SendWS("{\"id\":\"doutput\",\"value\":" + String(doutput) + "}");
+	}
+	if(strcmp(topic, mqttTopicDebugDO.c_str()) == 0) {
+		bool readDebugDO = msg.toInt();
+		if(wpFZ.DebugDO != readDebugDO) {
+			wpFZ.DebugDO = readDebugDO;
+			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugDO, wpFZ.DebugDO);
+			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
+			EEPROM.commit();
+			callbackMqttDebug(mqttTopicDebugDO, String(wpFZ.DebugDO));
+			wpFZ.SendWS("{\"id\":\"DebugDO\",\"value\":" + String(wpFZ.DebugDO ? "true" : "false") + "}");
+		}
+	}
 #endif
 #ifdef wpRain
 		if(strcmp(topic, mqttTopicMaxCycleRain.c_str()) == 0) {
