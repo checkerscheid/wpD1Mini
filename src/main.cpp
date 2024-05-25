@@ -1689,7 +1689,7 @@ void callbackMqttDebug(String topic, String value) {
 		}
 		// start pump and store timestart
 		if(pumpCycleActive && !pumpStart && !pumpPause) {
-			digitalWrite(RelaisPin, LOW);
+			digitalWrite(RelaisPin, HIGH);
 			pumpStart = true;
 			timePumpStart = m;
 			if(wpFZ.DebugRelais) {
@@ -1699,7 +1699,7 @@ void callbackMqttDebug(String topic, String value) {
 		// stop pump and start pause
 		if(pumpCycleActive && pumpStart && !pumpPause) {
 			if(m > (timePumpStart + (wpFZ.pumpActive * 1000))) {
-				digitalWrite(RelaisPin, HIGH);
+				digitalWrite(RelaisPin, LOW);
 				pumpPause = true;
 				timePumpPause = m;
 				if(wpFZ.DebugRelais) {
@@ -1774,6 +1774,8 @@ void callbackMqttDebug(String topic, String value) {
 			//Divission 0
 			if((wpFZ.moistureWet + wpFZ.moistureDry) == 0) wpFZ.moistureDry = 1;
 			moisture = map(newMoisture, wpFZ.moistureDry, wpFZ.moistureWet, 0, 100);
+			if(moisture > 100) moisture = 100;
+			if(moisture < 0) moisture = 0;
 			if(moisture < wpFZ.moistureMin) errorMoistureMin = true;
 			if(moisture > wpFZ.moistureMin) errorMoistureMin = false;
 			errorMoisture = false;
