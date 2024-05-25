@@ -78,7 +78,6 @@ uint loopTime = 200;
 #endif
 #ifdef wpRain
 	#define RainPin A0
-	#define RAINDETECTPin D6
 	uint cycleRain = 0;
 	bool errorRain = false;
 	bool errorRainLast = false;
@@ -163,13 +162,6 @@ void setup() {
 #endif
 #ifdef wpDO
 	pinMode(DOPin, OUTPUT);
-#endif
-#ifdef wpRain
-	pinMode(RAINDETECTPin, OUTPUT);
-#endif
-#if wpMoisture == 1
-	pinMode(MoistureDetectPin, INPUT);
-	digitalWrite(MoistureDetectPin, HIGH);
 #endif
 #ifdef wpDistance
 	pinMode(trigPin, OUTPUT);
