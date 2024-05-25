@@ -74,6 +74,13 @@ uint loopTime = 200;
 #endif
 #ifdef wpRelais
 	#define RelaisPin D6
+#ifdef wpMoisture
+	bool pumpCycleActive = false;
+	bool pumpStart = false;
+	bool pumpPause = false;
+	unsigned long timePumpStart = 0;
+	unsigned long timePumpPause = 0;
+#endif
 #endif
 #ifdef wpRain
 	#define RainPin A0
@@ -84,6 +91,19 @@ uint loopTime = 200;
 	double rain = 0.0;
 	double rainLast = 0.0;
 	uint16_t publishCountRain = 0;
+#endif
+#ifdef wpMoisture
+	#define MoisturePin A0
+	uint cycleMoisture = 0;
+	bool errorMoisture = false;
+	bool errorMoistureLast = false;
+	uint16_t publishCountErrorMoisture = 0;
+	bool errorMoistureMin = false;
+	bool errorMoistureMinLast = false;
+	uint16_t publishCountErrorMoistureMin = 0;
+	uint16_t moisture = 0;
+	uint16_t moistureLast = 0;
+	uint16_t publishCountMoisture = 0;
 #endif
 #ifdef wpDistance
 	#define trigPin D1
@@ -101,22 +121,6 @@ uint loopTime = 200;
 	uint16_t publishCountVolume = 0;
 	uint16_t publishCountDistanceRaw = 0;
 	uint16_t publishCountDistanceAvg = 0;
-#endif
-#ifdef wpMoisture
-	#define MoisturePin A0
-	#if wpMoisture == 1
-		#define MoistureDetectPin D6
-	#endif
-	uint cycleMoisture = 0;
-	bool errorMoisture = false;
-	bool errorMoistureLast = false;
-	uint16_t publishCountErrorMoisture = 0;
-	bool errorMoistureMin = false;
-	bool errorMoistureMinLast = false;
-	uint16_t publishCountErrorMoistureMin = 0;
-	uint16_t moisture = 0;
-	uint16_t moistureLast = 0;
-	uint16_t publishCountMoisture = 0;
 #endif
 bool errorRestLast = false;
 bool trySendRest = false;
@@ -207,6 +211,11 @@ void loop() {
 #endif
 #ifdef wpBM
 		calcBM();
+#endif
+#ifdef wpRelais
+#ifdef wpMoisture
+		calcRelais();
+#endif
 #endif
 #ifdef wpRain
 		if(++cycleRain >= wpFZ.maxCycleRain) {
@@ -1627,6 +1636,53 @@ void callbackMqttDebug(String topic, String value) {
 		}
 	}
 #endif
+#ifdef wpRelais
+#ifdef wpMoisture
+	void calcRelais() {
+		unsigned long m = millis();
+		// detect to dry soil
+		if(errorMoistureMin && !pumpCycleActive) {
+			pumpCycleActive = true;
+			pumpStart = false;
+			pumpPause = false;
+			if(wpFZ.DebugRelais) {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Detect 'toDry'");
+			}
+		}
+		// start pump and store timestart
+		if(pumpCycleActive && !pumpStart && !pumpPause) {
+			digitalWrite(RelaisPin, LOW);
+			pumpStart = true;
+			timePumpStart = m;
+			if(wpFZ.DebugRelais) {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "start 'pumpCycle' (" + String(timePumpStart) + ")");
+			}
+		}
+		// stop pump and start pause
+		if(pumpCycleActive && pumpStart && !pumpPause) {
+			if(m > (timePumpStart + (wpFZ.pumpActive * 1000))) {
+				digitalWrite(RelaisPin, HIGH);
+				pumpPause = true;
+				timePumpPause = m;
+				if(wpFZ.DebugRelais) {
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpCycle', start 'pumpPause' (" + String(timePumpPause) + ")");
+				}
+			}
+		}
+		// finished pause, reset all
+		if(pumpCycleActive && pumpStart && pumpPause) {
+			if(m > (timePumpPause + (wpFZ.pumpPause * 1000))) {
+				pumpCycleActive = false;
+				pumpStart = false;
+				pumpPause = false;
+				if(wpFZ.DebugRelais) {
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpPause'");
+				}
+			}
+		}
+	}
+#endif
+#endif
 #ifdef wpRain
 	void calcRain() {
 		int newRain = analogRead(RainPin);
@@ -1670,9 +1726,6 @@ void callbackMqttDebug(String topic, String value) {
 #ifdef wpMoisture
 	void calcMoisture() {
 		int ar = analogRead(MoisturePin);
-		#if wpMoisture == 1
-			wpFZ.DebugWS(wpFZ.strDEBUG, "calcMoisture", String(digitalRead(MoistureDetectPin)));
-		#endif
 		double newMoisture = (double)ar;
 		if(!isnan(newMoisture)) {
 			if(newMoisture > 1023) newMoisture = 1023;

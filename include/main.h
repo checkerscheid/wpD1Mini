@@ -99,6 +99,10 @@ String mqttTopicErrorRest;
 #ifdef wpRelais
 	// values
 	// settings
+#ifdef wpMoisture
+	String mqttTopicPumpActive;
+	String mqttTopicPumpPause;
+#endif
 	// commands
 	String mqttTopicRelais;
 	String mqttTopicDebugRelais;
@@ -191,6 +195,11 @@ uint16_t calcLightAvg(uint16_t raw);
 #ifdef wpBM
 void publishValueBM();
 void calcBM();
+#endif
+#ifdef wpRelais
+#ifdef wpMoisture
+void calcRelais();
+#endif
 #endif
 #ifdef wpRain
 void publishValueRain();
