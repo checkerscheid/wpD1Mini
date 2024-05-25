@@ -118,9 +118,11 @@ String mqttTopicErrorRest;
 	// values
 	String mqttTopicMoisture;
 	String mqttTopicErrorMoisture;
+	String mqttTopicErrorMoistureMin;
 	// settings
 	String mqttTopicMaxCycleMoisture;
 	String mqttTopicUseMoistureAvg;
+	String mqttTopicMoistureMin;
 	String mqttTopicMoistureDry;
 	String mqttTopicMoistureWet;
 	// commands
