@@ -282,6 +282,10 @@ void getVars() {
 #endif
 #ifdef wpRelais
 	wpFZ.DebugRelais = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRelais);
+#ifdef wpMoisture
+	EEPROM.get(wpFZ.addrPumpActive, wpFZ.pumpActive);
+	EEPROM.get(wpFZ.addrPumpPause, wpFZ.pumpPause);
+#endif
 #endif
 #ifdef wpRain
 	wpFZ.DebugRain = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRain);
@@ -384,6 +388,12 @@ void getVars() {
 	mqttTopicDebugBM = wpFZ.DeviceName + "/settings/Debug/BM";
 #endif
 #ifdef wpRelais
+	// settings
+#ifdef wpMoisture
+	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/PumpActive";
+	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/PumpPause";
+#endif
+	// commands
 	mqttTopicRelais = wpFZ.DeviceName + "/Relais";
 	mqttTopicDebugRelais = wpFZ.DeviceName + "/settings/Debug/Relais";
 #endif
@@ -514,6 +524,10 @@ void connectMqtt() {
 			mqttClient.subscribe(mqttTopicDebugBM.c_str());
 #endif
 #ifdef wpRelais
+#ifdef wpMoisture
+			mqttClient.subscribe(mqttTopicPumpActive.c_str());
+			mqttClient.subscribe(mqttTopicPumpPause.c_str());
+#endif
 			mqttClient.subscribe(mqttTopicRelais.c_str());
 			mqttClient.subscribe(mqttTopicDebugRelais.c_str());
 #endif
@@ -682,6 +696,10 @@ void publishSettings(bool force) {
 	mqttClient.publish(mqttTopicDebugBM.c_str(), String(wpFZ.DebugBM).c_str());
 #endif
 #ifdef wpRelais
+#ifdef wpMoisture
+	mqttClient.publish(mqttTopicPumpActive.c_str(), String(wpFZ.pumpActive).c_str());
+	mqttClient.publish(mqttTopicPumpPause.c_str(), String(wpFZ.pumpPause).c_str());
+#endif
 	mqttClient.publish(mqttTopicDebugRelais.c_str(), String(wpFZ.DebugRelais).c_str());
 #endif
 #ifdef wpRain
@@ -1321,6 +1339,26 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 #endif
 #endif
 #ifdef wpRelais
+#ifdef wpMoisture
+		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
+			uint16_t readPumpActive = msg.toInt();
+			if(wpFZ.pumpActive != readPumpActive) {
+				wpFZ.pumpActive = readPumpActive;
+				EEPROM.put(wpFZ.addrPumpActive, wpFZ.pumpActive);
+				EEPROM.commit();
+				callbackMqttDebug(mqttTopicPumpActive, String(wpFZ.pumpActive));
+			}
+		}
+		if(strcmp(topic, mqttTopicPumpPause.c_str()) == 0) {
+			uint16_t readPumpPause = msg.toInt();
+			if(wpFZ.pumpPause != readPumpPause) {
+				wpFZ.pumpPause = readPumpPause;
+				EEPROM.put(wpFZ.addrPumpPause, wpFZ.pumpPause);
+				EEPROM.commit();
+				callbackMqttDebug(mqttTopicPumpPause, String(wpFZ.pumpPause));
+			}
+		}
+#endif
 	if(strcmp(topic, mqttTopicRelais.c_str()) == 0) {
 		bool readRelais = msg.toInt();
 		if(readRelais == 0) {
@@ -1646,7 +1684,7 @@ void callbackMqttDebug(String topic, String value) {
 			pumpStart = false;
 			pumpPause = false;
 			if(wpFZ.DebugRelais) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Detect 'toDry'");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Detect 'toDry', start Pump Cycle");
 			}
 		}
 		// start pump and store timestart
@@ -1655,7 +1693,7 @@ void callbackMqttDebug(String topic, String value) {
 			pumpStart = true;
 			timePumpStart = m;
 			if(wpFZ.DebugRelais) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "start 'pumpCycle' (" + String(timePumpStart) + ")");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "start 'pump' (" + String(timePumpStart) + ")");
 			}
 		}
 		// stop pump and start pause
@@ -1665,7 +1703,7 @@ void callbackMqttDebug(String topic, String value) {
 				pumpPause = true;
 				timePumpPause = m;
 				if(wpFZ.DebugRelais) {
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpCycle', start 'pumpPause' (" + String(timePumpPause) + ")");
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pump', start 'pumpPause' (" + String(timePumpPause) + ")");
 				}
 			}
 		}
@@ -1676,7 +1714,7 @@ void callbackMqttDebug(String topic, String value) {
 				pumpStart = false;
 				pumpPause = false;
 				if(wpFZ.DebugRelais) {
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpPause'");
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpPause' and reset");
 				}
 			}
 		}
