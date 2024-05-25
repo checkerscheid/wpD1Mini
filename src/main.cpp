@@ -74,7 +74,6 @@ uint loopTime = 200;
 #endif
 #ifdef wpRain
 	#define RainPin A0
-	#define RAINDETECTPin D6
 	uint cycleRain = 0;
 	bool errorRain = false;
 	bool errorRainLast = false;
