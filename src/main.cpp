@@ -154,9 +154,6 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
-#endif
-#ifdef wpRain
-	pinMode(RAINDETECTPin, OUTPUT);
 #ifdef wpRelais
 	pinMode(RelaisPin, OUTPUT);
 #endif
