@@ -72,9 +72,8 @@ uint loopTime = 200;
 	bool bmLast = false;
 	uint16_t publishCountBM = 0;
 #endif
-#ifdef wpDO
-	#define DOPin D5
-	int doutput = LOW;
+#ifdef wpRelais
+	#define RelaisPin D6
 #endif
 #ifdef wpRain
 	#define RainPin A0
@@ -160,8 +159,8 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
-#ifdef wpDO
-	pinMode(DOPin, OUTPUT);
+#ifdef wpRelais
+	pinMode(RelaisPin, OUTPUT);
 #endif
 #ifdef wpDistance
 	pinMode(trigPin, OUTPUT);
@@ -272,8 +271,8 @@ void getVars() {
 	EEPROM.get(wpFZ.addrThreshold, wpFZ.threshold);
 #endif
 #endif
-#ifdef wpDO
-	wpFZ.DebugDO = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugDO);
+#ifdef wpRelais
+	wpFZ.DebugRelais = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRelais);
 #endif
 #ifdef wpRain
 	wpFZ.DebugRain = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRain);
@@ -375,9 +374,9 @@ void getVars() {
 	// commands
 	mqttTopicDebugBM = wpFZ.DeviceName + "/settings/Debug/BM";
 #endif
-#ifdef wpDO
-	mqttTopicDO = wpFZ.DeviceName + "/DO";
-	mqttTopicDebugDO = wpFZ.DeviceName + "/settings/Debug/DO";
+#ifdef wpRelais
+	mqttTopicRelais = wpFZ.DeviceName + "/Relais";
+	mqttTopicDebugRelais = wpFZ.DeviceName + "/settings/Debug/Relais";
 #endif
 #ifdef wpRain
 	// values
@@ -505,9 +504,9 @@ void connectMqtt() {
 #endif
 			mqttClient.subscribe(mqttTopicDebugBM.c_str());
 #endif
-#ifdef wpDO
-			mqttClient.subscribe(mqttTopicDO.c_str());
-			mqttClient.subscribe(mqttTopicDebugDO.c_str());
+#ifdef wpRelais
+			mqttClient.subscribe(mqttTopicRelais.c_str());
+			mqttClient.subscribe(mqttTopicDebugRelais.c_str());
 #endif
 #ifdef wpRain
 			mqttClient.subscribe(mqttTopicMaxCycleRain.c_str());
@@ -673,8 +672,8 @@ void publishSettings(bool force) {
 #endif
 	mqttClient.publish(mqttTopicDebugBM.c_str(), String(wpFZ.DebugBM).c_str());
 #endif
-#ifdef wpDO
-	mqttClient.publish(mqttTopicDebugDO.c_str(), String(wpFZ.DebugDO).c_str());
+#ifdef wpRelais
+	mqttClient.publish(mqttTopicDebugRelais.c_str(), String(wpFZ.DebugRelais).c_str());
 #endif
 #ifdef wpRain
 	mqttClient.publish(mqttTopicMaxCycleRain.c_str(), String(wpFZ.maxCycleRain).c_str(), true);
@@ -1312,27 +1311,26 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		}
 #endif
 #endif
-#ifdef wpDO
-	if(strcmp(topic, mqttTopicDO.c_str()) == 0) {
-		int readDO = msg.toInt();
-		if(readDO == 0) {
-			doutput = LOW;
+#ifdef wpRelais
+	if(strcmp(topic, mqttTopicRelais.c_str()) == 0) {
+		bool readRelais = msg.toInt();
+		if(readRelais == 0) {
+			digitalWrite(RelaisPin, LOW);
+			callbackMqttDebug(mqttTopicRelais, " = 0");
 		} else {
-			doutput = HIGH;
+			digitalWrite(RelaisPin, HIGH);
+			callbackMqttDebug(mqttTopicRelais, " != 0");
 		}
-		digitalWrite(DOPin, doutput);
-		callbackMqttDebug(mqttTopicDO, String(doutput));
-		wpFZ.SendWS("{\"id\":\"doutput\",\"value\":" + String(doutput) + "}");
 	}
-	if(strcmp(topic, mqttTopicDebugDO.c_str()) == 0) {
-		bool readDebugDO = msg.toInt();
-		if(wpFZ.DebugDO != readDebugDO) {
-			wpFZ.DebugDO = readDebugDO;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugDO, wpFZ.DebugDO);
+	if(strcmp(topic, mqttTopicDebugRelais.c_str()) == 0) {
+		bool readDebugRelais = msg.toInt();
+		if(wpFZ.DebugRelais != readDebugRelais) {
+			wpFZ.DebugRelais = readDebugRelais;
+			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugRelais, wpFZ.DebugRelais);
 			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
 			EEPROM.commit();
-			callbackMqttDebug(mqttTopicDebugDO, String(wpFZ.DebugDO));
-			wpFZ.SendWS("{\"id\":\"DebugDO\",\"value\":" + String(wpFZ.DebugDO ? "true" : "false") + "}");
+			callbackMqttDebug(mqttTopicDebugRelais, String(wpFZ.DebugRelais));
+			wpFZ.SendWS("{\"id\":\"DebugRelais\",\"value\":" + String(wpFZ.DebugRelais ? "true" : "false") + "}");
 		}
 	}
 #endif
@@ -1650,13 +1648,6 @@ void callbackMqttDebug(String topic, String value) {
 			errorRain = true;
 			String logmessage = "Sensor Failure";
 			wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
-		}
-		if(wpFZ.DebugRain) {
-			if(digitalRead(RAINDETECTPin) == HIGH) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", "no rain");
-			} else {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", "rain detect");
-			}
 		}
 	}
 	const uint8_t avgRainLength = 128;
