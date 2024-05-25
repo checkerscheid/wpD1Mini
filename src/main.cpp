@@ -150,8 +150,6 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
-#ifdef wpRain
-	pinMode(RAINDETECTPin, OUTPUT);
 #endif
 #ifdef wpDistance
 	pinMode(trigPin, OUTPUT);
