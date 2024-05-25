@@ -96,6 +96,13 @@ String mqttTopicErrorRest;
 	// commands
 	String mqttTopicDebugBM;
 #endif
+#ifdef wpRelais
+	// values
+	// settings
+	// commands
+	String mqttTopicRelais;
+	String mqttTopicDebugRelais;
+#endif
 #ifdef wpRain
 	// values
 	String mqttTopicRain;
