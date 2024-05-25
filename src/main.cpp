@@ -150,7 +150,6 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
-#endif
 #ifdef wpDistance
 	pinMode(trigPin, OUTPUT);
 	pinMode(echoPin, INPUT);
