@@ -159,6 +159,9 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
+#ifdef wpBM
+	pinMode(BMPin, INPUT);
+#endif
 #ifdef wpRelais
 	pinMode(RelaisPin, OUTPUT);
 #endif
