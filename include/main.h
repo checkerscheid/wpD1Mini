@@ -100,6 +100,7 @@ String mqttTopicErrorRest;
 	// values
 	// settings
 #ifdef wpMoisture
+	String mqttTopicWaterEmpty;
 	String mqttTopicPumpActive;
 	String mqttTopicPumpPause;
 #endif

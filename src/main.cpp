@@ -163,6 +163,9 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
+#ifdef wpBM
+	pinMode(BMPin, INPUT);
+#endif
 #ifdef wpRelais
 	pinMode(RelaisPin, OUTPUT);
 #endif
@@ -390,8 +393,9 @@ void getVars() {
 #ifdef wpRelais
 	// settings
 #ifdef wpMoisture
-	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/PumpActive";
-	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/PumpPause";
+	mqttTopicWaterEmpty = wpFZ.DeviceName + "/settings/Relais/waterEmpty";
+	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/pumpActive";
+	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/pumpPause";
 #endif
 	// commands
 	mqttTopicRelais = wpFZ.DeviceName + "/Relais";
@@ -582,9 +586,21 @@ void setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
 				wpFZ.calcValues = !wpFZ.calcValues;
 			}
+			if(request->getParam("cmd")->value() == "calcValues") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
+				wpFZ.calcValues = !wpFZ.calcValues;
+			}
 			if(request->getParam("cmd")->value() == "Blink") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Blink");
 			}
+#ifdef wpMoisture
+#ifdef wpRelais
+			if(request->getParam("cmd")->value() == "waterEmpty") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd waterEmpty");
+				wpFZ.waterEmpty = !wpFZ.waterEmpty;
+			}
+#endif
+#endif
 		}
 		request->send(200);
 		setWebServerBlink();
@@ -697,6 +713,7 @@ void publishSettings(bool force) {
 #endif
 #ifdef wpRelais
 #ifdef wpMoisture
+	mqttClient.publish(mqttTopicWaterEmpty.c_str(), String(wpFZ.waterEmpty).c_str());
 	mqttClient.publish(mqttTopicPumpActive.c_str(), String(wpFZ.pumpActive).c_str());
 	mqttClient.publish(mqttTopicPumpPause.c_str(), String(wpFZ.pumpPause).c_str());
 #endif
@@ -1340,6 +1357,13 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 #endif
 #ifdef wpRelais
 #ifdef wpMoisture
+		if(strcmp(topic, mqttTopicWaterEmpty.c_str()) == 0) {
+			bool readWaterEmpty = msg.toInt();
+			if(wpFZ.waterEmpty != readWaterEmpty) {
+				wpFZ.waterEmpty = readWaterEmpty;
+				callbackMqttDebug(mqttTopicWaterEmpty, String(wpFZ.waterEmpty));
+			}
+		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
 			uint16_t readPumpActive = msg.toInt();
 			if(wpFZ.pumpActive != readPumpActive) {
@@ -1677,44 +1701,46 @@ void callbackMqttDebug(String topic, String value) {
 #ifdef wpRelais
 #ifdef wpMoisture
 	void calcRelais() {
-		unsigned long m = millis();
-		// detect to dry soil
-		if(errorMoistureMin && !pumpCycleActive) {
-			pumpCycleActive = true;
-			pumpStart = false;
-			pumpPause = false;
-			if(wpFZ.DebugRelais) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Detect 'toDry', start Pump Cycle");
-			}
-		}
-		// start pump and store timestart
-		if(pumpCycleActive && !pumpStart && !pumpPause) {
-			digitalWrite(RelaisPin, HIGH);
-			pumpStart = true;
-			timePumpStart = m;
-			if(wpFZ.DebugRelais) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "start 'pump' (" + String(timePumpStart) + ")");
-			}
-		}
-		// stop pump and start pause
-		if(pumpCycleActive && pumpStart && !pumpPause) {
-			if(m > (timePumpStart + (wpFZ.pumpActive * 1000))) {
-				digitalWrite(RelaisPin, LOW);
-				pumpPause = true;
-				timePumpPause = m;
-				if(wpFZ.DebugRelais) {
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pump', start 'pumpPause' (" + String(timePumpPause) + ")");
-				}
-			}
-		}
-		// finished pause, reset all
-		if(pumpCycleActive && pumpStart && pumpPause) {
-			if(m > (timePumpPause + (wpFZ.pumpPause * 1000))) {
-				pumpCycleActive = false;
+		if(!wpFZ.waterEmpty) {
+			unsigned long m = millis();
+			// detect to dry soil
+			if(errorMoistureMin && !pumpCycleActive) {
+				pumpCycleActive = true;
 				pumpStart = false;
 				pumpPause = false;
 				if(wpFZ.DebugRelais) {
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpPause' and reset");
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Detect 'toDry', start Pump Cycle");
+				}
+			}
+			// start pump and store timestart
+			if(pumpCycleActive && !pumpStart && !pumpPause) {
+				digitalWrite(RelaisPin, HIGH);
+				pumpStart = true;
+				timePumpStart = m;
+				if(wpFZ.DebugRelais) {
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "start 'pump' (" + String(timePumpStart) + ")");
+				}
+			}
+			// stop pump and start pause
+			if(pumpCycleActive && pumpStart && !pumpPause) {
+				if(m > (timePumpStart + (wpFZ.pumpActive * 1000))) {
+					digitalWrite(RelaisPin, LOW);
+					pumpPause = true;
+					timePumpPause = m;
+					if(wpFZ.DebugRelais) {
+						wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pump', start 'pumpPause' (" + String(timePumpPause) + ")");
+					}
+				}
+			}
+			// finished pause, reset all
+			if(pumpCycleActive && pumpStart && pumpPause) {
+				if(m > (timePumpPause + (wpFZ.pumpPause * 1000))) {
+					pumpCycleActive = false;
+					pumpStart = false;
+					pumpPause = false;
+					if(wpFZ.DebugRelais) {
+						wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "stopped 'pumpPause' and reset");
+					}
 				}
 			}
 		}
