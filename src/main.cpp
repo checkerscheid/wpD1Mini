@@ -1689,8 +1689,7 @@ void callbackMqttDebug(String topic, String value) {
 				bm = true;
 				wpFZ.blink();
 				if(wpFZ.DebugBM) {
-					String logmessage = "Bewegung erkannt";
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", logmessage);
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", "Bewegung erkannt");
 				}
 			}
 		} else {
