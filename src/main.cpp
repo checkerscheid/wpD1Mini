@@ -236,6 +236,8 @@ void loop() {
 		if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
 			cycleDistance = 0;
 			calcDistance();
+		} else {
+			delay(loopTime);
 		}
 #endif
 		publishInfo();
