@@ -621,10 +621,12 @@ void setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
 				wpFZ.calcValues = !wpFZ.calcValues;
 			}
-			if(request->getParam("cmd")->value() == "calcValues") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
-				wpFZ.calcValues = !wpFZ.calcValues;
+#ifdef wpRelais
+			if(request->getParam("cmd")->value() == "waterEmpty") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd waterEmpty");
+				wpFZ.waterEmpty = !wpFZ.waterEmpty;
 			}
+#endif
 			if(request->getParam("cmd")->value() == "Blink") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Blink");
 			}
