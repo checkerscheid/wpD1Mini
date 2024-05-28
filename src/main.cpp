@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 114                                                     $ #
+//# Revision     : $Rev:: 116                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 114 2024-05-22 11:12:48Z                        $ #
+//# File-ID      : $Id:: main.cpp 116 2024-05-26 02:25:10Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -24,6 +24,8 @@
 #include <ESP8266HTTPClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+
+#define SHIELD 1
 
 uint loopTime = 200;
 //###################################################################################
@@ -73,7 +75,27 @@ uint loopTime = 200;
 	uint16_t publishCountBM = 0;
 #endif
 #ifdef wpRelais
-	#define RelaisPin D6
+	/// @todo need a better solution for switching Pins
+	//if(wpRelais == SHIELD) {
+		#define RelaisPin D1
+	//} else {
+	//	#define RelaisPin D6
+	//}
+
+	//onshield Relais
+
+	bool relaisOut = false;
+	bool relaisOutLast = false;
+	uint16_t publishCountRelaisOut = 0;
+	bool relaisAuto = false;
+	bool relaisAutoLast = false;
+	uint16_t publishCountRelaisAuto = 0;
+	bool relaisHand = false;
+	bool relaisHandLast = false;
+	uint16_t publishCountRelaisHand = 0;
+	bool relaisHandValue = false;
+	bool relaisHandValueLast = false;
+	uint16_t publishCountRelaisHandValue = 0;
 #ifdef wpMoisture
 	bool pumpCycleActive = false;
 	bool pumpStart = false;
@@ -163,6 +185,9 @@ void setup() {
 #ifdef wpLight
 	lightMeter.begin();
 #endif
+#ifdef wpBM
+	pinMode(BMPin, INPUT);
+#endif
 #ifdef wpRelais
 	pinMode(RelaisPin, OUTPUT);
 #endif
@@ -213,6 +238,7 @@ void loop() {
 		calcBM();
 #endif
 #ifdef wpRelais
+		calcRelaisOut();
 #ifdef wpMoisture
 		calcRelais();
 #endif
@@ -233,6 +259,8 @@ void loop() {
 		if(++cycleDistance >= (wpFZ.maxCycleDistance)) {
 			cycleDistance = 0;
 			calcDistance();
+		} else {
+			delay(loopTime);
 		}
 #endif
 		publishInfo();
@@ -393,6 +421,11 @@ void getVars() {
 	mqttTopicDebugBM = wpFZ.DeviceName + "/settings/Debug/BM";
 #endif
 #ifdef wpRelais
+	// values
+	mqttTopicRelaisOut = wpFZ.DeviceName + "/Relais/Out";
+	mqttTopicRelaisAuto = wpFZ.DeviceName + "/Relais/Auto";
+	mqttTopicRelaisHand = wpFZ.DeviceName + "/Relais/Hand";
+	mqttTopicRelaisHandValue = wpFZ.DeviceName + "/Relais/HandValue";
 	// settings
 	#ifdef wpMoisture
 	mqttTopicWaterEmpty = wpFZ.DeviceName + "/settings/Relais/waterEmpty";
@@ -400,7 +433,6 @@ void getVars() {
 	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/pumpPause";
 	#endif
 	// commands
-	mqttTopicRelais = wpFZ.DeviceName + "/Relais";
 	mqttTopicDebugRelais = wpFZ.DeviceName + "/settings/Debug/Relais";
 #endif
 #ifdef wpRain
@@ -470,7 +502,7 @@ void writeStringsToEEPROM() {
 // Allgemein
 //###################################################################################
 String getVersion() {
-	Rev = "$Rev: 114 $";
+	Rev = "$Rev: 116 $";
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	Build = Rev.toInt();
@@ -530,11 +562,12 @@ void connectMqtt() {
 			mqttClient.subscribe(mqttTopicDebugBM.c_str());
 #endif
 #ifdef wpRelais
+			mqttClient.subscribe(mqttTopicRelaisHand.c_str());
+			mqttClient.subscribe(mqttTopicRelaisHandValue.c_str());
 #ifdef wpMoisture
 			mqttClient.subscribe(mqttTopicPumpActive.c_str());
 			mqttClient.subscribe(mqttTopicPumpPause.c_str());
 #endif
-			mqttClient.subscribe(mqttTopicRelais.c_str());
 			mqttClient.subscribe(mqttTopicDebugRelais.c_str());
 #endif
 #ifdef wpRain
@@ -714,6 +747,8 @@ void publishSettings(bool force) {
 	mqttClient.publish(mqttTopicDebugBM.c_str(), String(wpFZ.DebugBM).c_str());
 #endif
 #ifdef wpRelais
+	mqttClient.publish(mqttTopicRelaisOut.c_str(), String(relaisOut).c_str());
+	mqttClient.publish(mqttTopicRelaisAuto.c_str(), String(relaisAuto).c_str());
 #ifdef wpMoisture
 	mqttClient.publish(mqttTopicWaterEmpty.c_str(), String(wpFZ.waterEmpty).c_str());
 	mqttClient.publish(mqttTopicPumpActive.c_str(), String(wpFZ.pumpActive).c_str());
@@ -843,6 +878,26 @@ void publishValueBM() {
 	publishCountBM = 0;
 }
 #endif
+#ifdef wpRelais
+void publishValueRelaisOut() {
+	mqttClient.publish(mqttTopicRelaisOut.c_str(), String(relaisOut).c_str());
+	wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("RelaisOut", String(relaisOut));
+	trySendRest = true;
+	relaisOutLast = relaisOut;
+	if(wpFZ.DebugMqtt) {
+		publishInfoDebug("RelaisOut", String(relaisOut), String(publishCountRelaisOut));
+	}
+	publishCountRelaisOut = 0;
+}
+void publishValueRelaisAuto() {
+	mqttClient.publish(mqttTopicRelaisAuto.c_str(), String(relaisAuto).c_str());
+	relaisAutoLast = relaisAuto;
+	if(wpFZ.DebugMqtt) {
+		publishInfoDebug("RelaisAuto", String(relaisAuto), String(publishCountRelaisAuto));
+	}
+	publishCountRelaisAuto = 0;
+}
+#endif
 #ifdef wpRain
 void publishValueRain() {
 	mqttClient.publish(mqttTopicRain.c_str(), String(rain).c_str());
@@ -963,6 +1018,10 @@ void publishValues() {
 #ifdef wpBM
 	publishValueBM();
 #endif
+#ifdef wpRelais
+	publishValueRelaisOut();
+	publishValueRelaisAuto();
+#endif
 #ifdef wpRain
 	publishValueRain();
 	publishErrorRain();
@@ -1017,6 +1076,14 @@ void publishInfo() {
 #ifdef wpBM
 	if(bmLast != bm || ++publishCountBM > wpFZ.publishQoS) {
 		publishValueBM();
+	}
+#endif
+#ifdef wpRelais
+	if(relaisOutLast != relaisOut || ++publishCountRelaisOut > wpFZ.publishQoS) {
+		publishValueRelaisOut();
+	}
+	if(relaisAutoLast != relaisAuto || ++publishCountRelaisAuto > wpFZ.publishQoS) {
+		publishValueRelaisAuto();
 	}
 #endif
 #ifdef wpRain
@@ -1358,6 +1425,20 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 #endif
 #endif
 #ifdef wpRelais
+		if(strcmp(topic, mqttTopicRelaisHand.c_str()) == 0) {
+			bool readRelaisHand = msg.toInt();
+			if(relaisHand != readRelaisHand) {
+				relaisHand = readRelaisHand;
+				callbackMqttDebug(mqttTopicRelaisHand, String(relaisHand));
+			}
+		}
+		if(strcmp(topic, mqttTopicRelaisHandValue.c_str()) == 0) {
+			bool readRelaisHandValue = msg.toInt();
+			if(relaisHandValue != readRelaisHandValue) {
+				relaisHandValue = readRelaisHandValue;
+				callbackMqttDebug(mqttTopicRelaisHandValue, String(relaisHandValue));
+			}
+		}
 #ifdef wpMoisture
 		if(strcmp(topic, mqttTopicWaterEmpty.c_str()) == 0) {
 			bool readWaterEmpty = msg.toInt();
@@ -1385,16 +1466,6 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			}
 		}
 #endif
-	if(strcmp(topic, mqttTopicRelais.c_str()) == 0) {
-		bool readRelais = msg.toInt();
-		if(readRelais == 0) {
-			digitalWrite(RelaisPin, LOW);
-			callbackMqttDebug(mqttTopicRelais, " = 0");
-		} else {
-			digitalWrite(RelaisPin, HIGH);
-			callbackMqttDebug(mqttTopicRelais, " != 0");
-		}
-	}
 	if(strcmp(topic, mqttTopicDebugRelais.c_str()) == 0) {
 		bool readDebugRelais = msg.toInt();
 		if(wpFZ.DebugRelais != readDebugRelais) {
@@ -1691,8 +1762,7 @@ void callbackMqttDebug(String topic, String value) {
 				bm = true;
 				wpFZ.blink();
 				if(wpFZ.DebugBM) {
-					String logmessage = "Bewegung erkannt";
-					wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", logmessage);
+					wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", "Bewegung erkannt");
 				}
 			}
 		} else {
@@ -1701,6 +1771,25 @@ void callbackMqttDebug(String topic, String value) {
 	}
 #endif
 #ifdef wpRelais
+	void calcRelaisOut() {
+		if(relaisHand) {
+			relaisOut = relaisHandValue;
+		} else {
+			relaisOut = relaisAuto;
+		}
+		if(relaisOut && digitalRead(RelaisPin) == LOW) {
+			digitalWrite(RelaisPin, HIGH);
+			if(wpFZ.DebugRelais) {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Relais turns on");
+			}
+		}
+		if(!relaisOut && digitalRead(RelaisPin) == HIGH) {
+			digitalWrite(RelaisPin, LOW);
+			if(wpFZ.DebugRelais) {
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcRelais", "Relais turns off");
+			}
+		}
+	}
 #ifdef wpMoisture
 	void calcRelais() {
 		if(!wpFZ.waterEmpty) {
@@ -1716,7 +1805,8 @@ void callbackMqttDebug(String topic, String value) {
 			}
 			// start pump and store timestart
 			if(pumpCycleActive && !pumpStart && !pumpPause) {
-				digitalWrite(RelaisPin, HIGH);
+				relaisAuto = true;
+				//digitalWrite(RelaisPin, HIGH);
 				pumpStart = true;
 				timePumpStart = m;
 				if(wpFZ.DebugRelais) {
@@ -1726,7 +1816,8 @@ void callbackMqttDebug(String topic, String value) {
 			// stop pump and start pause
 			if(pumpCycleActive && pumpStart && !pumpPause) {
 				if(m > (timePumpStart + (wpFZ.pumpActive * 1000))) {
-					digitalWrite(RelaisPin, LOW);
+					relaisAuto = false;
+					//digitalWrite(RelaisPin, LOW);
 					pumpPause = true;
 					timePumpPause = m;
 					if(wpFZ.DebugRelais) {
