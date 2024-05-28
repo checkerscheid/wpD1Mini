@@ -75,6 +75,7 @@ uint loopTime = 200;
 	uint16_t publishCountBM = 0;
 #endif
 #ifdef wpRelais
+	/// @todo need a better solution for switching Pins
 	//if(wpRelais == SHIELD) {
 		#define RelaisPin D1
 	//} else {
