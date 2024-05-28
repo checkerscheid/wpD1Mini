@@ -68,8 +68,8 @@ String mqttTopicErrorRest;
 	String mqttTopicLDR;
 	String mqttTopicErrorLDR;
 	// settings
-	String mqttTopicMaxCycleLDR;
 	String mqttTopicUseLdrAvg;
+	String mqttTopicMaxCycleLDR;
 	String mqttTopicLdrCorrection;
 	// commands
 	String mqttTopicDebugLDR;
@@ -79,8 +79,8 @@ String mqttTopicErrorRest;
 	String mqttTopicLight;
 	String mqttTopicErrorLight;
 	// settings
-	String mqttTopicMaxCycleLight;
 	String mqttTopicUseLightAvg;
+	String mqttTopicMaxCycleLight;
 	String mqttTopicLightCorrection;
 	// commands
 	String mqttTopicDebugLight;
@@ -89,23 +89,23 @@ String mqttTopicErrorRest;
 	// values
 	String mqttTopicBM;
 	// settings
-#ifdef wpLDR
+	#ifdef wpLDR
 	String mqttTopicThreshold;
 	String mqttTopicLightToTurnOn;
-#endif
+	#endif
 	// commands
 	String mqttTopicDebugBM;
 #endif
 #ifdef wpRelais
 	// values
+	String mqttTopicRelais;
 	// settings
-#ifdef wpMoisture
+	#ifdef wpMoisture
 	String mqttTopicWaterEmpty;
 	String mqttTopicPumpActive;
 	String mqttTopicPumpPause;
-#endif
+	#endif
 	// commands
-	String mqttTopicRelais;
 	String mqttTopicDebugRelais;
 #endif
 #ifdef wpRain
