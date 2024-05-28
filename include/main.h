@@ -98,6 +98,10 @@ String mqttTopicErrorRest;
 #endif
 #ifdef wpRelais
 	// values
+	String mqttTopicRelaisOut;
+	String mqttTopicRelaisAuto;
+	String mqttTopicRelaisHand;
+	String mqttTopicRelaisHandValue;
 	// settings
 #ifdef wpMoisture
 	String mqttTopicWaterEmpty;
@@ -105,7 +109,6 @@ String mqttTopicErrorRest;
 	String mqttTopicPumpPause;
 #endif
 	// commands
-	String mqttTopicRelais;
 	String mqttTopicDebugRelais;
 #endif
 #ifdef wpRain
@@ -198,6 +201,9 @@ void publishValueBM();
 void calcBM();
 #endif
 #ifdef wpRelais
+void publishValueRelaisOut();
+void publishValueRelaisAuto();
+void calcRelaisOut();
 #ifdef wpMoisture
 void calcRelais();
 #endif
