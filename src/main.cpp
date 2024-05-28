@@ -93,16 +93,19 @@ uint loopTime = 200;
 	bool relaisHand = false;
 	bool relaisHandLast = false;
 	uint16_t publishCountRelaisHand = 0;
+	bool setRelaisHand = false;
+	bool errorRelaisHand = false;
 	bool relaisHandValue = false;
 	bool relaisHandValueLast = false;
 	uint16_t publishCountRelaisHandValue = 0;
-#ifdef wpMoisture
+	bool setRelaisHandValue = false;
+	#ifdef wpMoisture
 	bool pumpCycleActive = false;
 	bool pumpStart = false;
 	bool pumpPause = false;
 	unsigned long timePumpStart = 0;
 	unsigned long timePumpPause = 0;
-#endif
+	#endif
 #endif
 #ifdef wpRain
 	#define RainPin A0
@@ -310,7 +313,9 @@ void getVars() {
 #endif
 #ifdef wpRelais
 	wpFZ.DebugRelais = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRelais);
-#ifdef wpMoisture
+	wpFZ.relaisHand = bitRead(wpFZ.settingsBool3, wpFZ.bitRelaisHand);
+	wpFZ.relaisHandValue = bitRead(wpFZ.settingsBool3, wpFZ.bitRelaisHandValue);
+	#ifdef wpMoisture
 	EEPROM.get(wpFZ.addrPumpActive, wpFZ.pumpActive);
 	EEPROM.get(wpFZ.addrPumpPause, wpFZ.pumpPause);
 #endif
@@ -420,7 +425,11 @@ void getVars() {
 	mqttTopicRelaisOut = wpFZ.DeviceName + "/Relais/Out";
 	mqttTopicRelaisAuto = wpFZ.DeviceName + "/Relais/Auto";
 	mqttTopicRelaisHand = wpFZ.DeviceName + "/Relais/Hand";
+	mqttTopicSetRelaisHand = wpFZ.DeviceName + "/Relais/setHand";
+	/// @note duplicate Hand?
+	mqttTopicErrorRelaisHand = wpFZ.DeviceName + "/ERROR/RelaisHand";
 	mqttTopicRelaisHandValue = wpFZ.DeviceName + "/Relais/HandValue";
+	mqttTopicSetRelaisHandValue = wpFZ.DeviceName + "/Relais/setHandValue";
 	// settings
 #ifdef wpMoisture
 	mqttTopicWaterEmpty = wpFZ.DeviceName + "/settings/Relais/waterEmpty";
@@ -550,19 +559,19 @@ void connectMqtt() {
 			mqttClient.subscribe(mqttTopicDebugLight.c_str());
 #endif
 #ifdef wpBM
-#ifdef wpLDR
+	#ifdef wpLDR
 			mqttClient.subscribe(mqttTopicThreshold.c_str());
 			mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
-#endif
+	#endif
 			mqttClient.subscribe(mqttTopicDebugBM.c_str());
 #endif
 #ifdef wpRelais
-			mqttClient.subscribe(mqttTopicRelaisHand.c_str());
-			mqttClient.subscribe(mqttTopicRelaisHandValue.c_str());
-#ifdef wpMoisture
+			mqttClient.subscribe(mqttTopicSetRelaisHand.c_str());
+			mqttClient.subscribe(mqttTopicSetRelaisHandValue.c_str());
+	#ifdef wpMoisture
 			mqttClient.subscribe(mqttTopicPumpActive.c_str());
 			mqttClient.subscribe(mqttTopicPumpPause.c_str());
-#endif
+	#endif
 			mqttClient.subscribe(mqttTopicDebugRelais.c_str());
 #endif
 #ifdef wpRain
@@ -611,10 +620,6 @@ void setupWebServer() {
 			if(request->getParam("cmd")->value() == "RestartDevice") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
 				setWebServerCommand(WebServerCommandrestartESP);
-			}
-			if(request->getParam("cmd")->value() == "calcValues") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
-				wpFZ.calcValues = !wpFZ.calcValues;
 			}
 			if(request->getParam("cmd")->value() == "calcValues") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
@@ -735,20 +740,23 @@ void publishSettings(bool force) {
 	mqttClient.publish(mqttTopicErrorLight.c_str(), String(errorLight).c_str());
 #endif
 #ifdef wpBM
-#ifdef wpLDR
+	#ifdef wpLDR
 	mqttClient.publish(mqttTopicThreshold.c_str(), String(wpFZ.threshold).c_str(), true);
 	mqttClient.publish(mqttTopicLightToTurnOn.c_str(), wpFZ.lightToTurnOn.c_str(), true);
-#endif
+	#endif
 	mqttClient.publish(mqttTopicDebugBM.c_str(), String(wpFZ.DebugBM).c_str());
 #endif
 #ifdef wpRelais
 	mqttClient.publish(mqttTopicRelaisOut.c_str(), String(relaisOut).c_str());
 	mqttClient.publish(mqttTopicRelaisAuto.c_str(), String(relaisAuto).c_str());
-#ifdef wpMoisture
+	mqttClient.publish(mqttTopicRelaisHand.c_str(), String(relaisHand).c_str());
+	mqttClient.publish(mqttTopicErrorRelaisHand.c_str(), String(errorRelaisHand).c_str());
+	mqttClient.publish(mqttTopicRelaisHandValue.c_str(), String(relaisHandValue).c_str());
+	#ifdef wpMoisture
 	mqttClient.publish(mqttTopicWaterEmpty.c_str(), String(wpFZ.waterEmpty).c_str());
 	mqttClient.publish(mqttTopicPumpActive.c_str(), String(wpFZ.pumpActive).c_str());
 	mqttClient.publish(mqttTopicPumpPause.c_str(), String(wpFZ.pumpPause).c_str());
-#endif
+	#endif
 	mqttClient.publish(mqttTopicDebugRelais.c_str(), String(wpFZ.DebugRelais).c_str());
 #endif
 #ifdef wpRain
