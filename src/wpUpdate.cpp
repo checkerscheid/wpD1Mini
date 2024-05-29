@@ -14,6 +14,7 @@
 //#                                                                                 #
 //###################################################################################
 #include <wpUpdate.h>
+#include <wpFreakaZone.h>
 
 wpUpdate::wpUpdate() {
 
@@ -36,22 +37,31 @@ void wpUpdate::start() {
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
 	switch (ret) {
-		case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
+		case HTTP_UPDATE_FAILED:
+			wpFZ.DebugWS(wpFZ.strERRROR, "wpUpdate::start", "HTTP_UPDATE_FAILD Error (" +
+				String(ESPhttpUpdate.getLastError()) + "): " +
+				ESPhttpUpdate.getLastErrorString());
+			break;
 
-		case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
+		case HTTP_UPDATE_NO_UPDATES:
+			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_NO_UPDATES");
+			break;
 
-		case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
+		case HTTP_UPDATE_OK:
+			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_OK");
+			break;
 	}
 }
 void wpUpdate::started() {
-	Serial.println("CALLBACK:  HTTP update process started");
+	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }
 void wpUpdate::finished() {
-	Serial.println("CALLBACK:  HTTP update process finished");
+	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::finished", "HTTP update finished");
 }
 void wpUpdate::progress(int cur, int total) {
-	Serial.printf("CALLBACK:  HTTP update process at %d of %d bytes...\n", cur, total);
+	String logmessage = "HTTP update: " + String(cur) + " of " + String(total) + " bytes";
+	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
 }
 void wpUpdate::error(int err) {
-	Serial.printf("CALLBACK:  HTTP update fatal error code %d\n", err);
+	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::error", "HTTP update fatal error, code: " + String(err));
 }

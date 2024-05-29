@@ -24,6 +24,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <wpUpdate.h>
 
 #define wpShield 1
 

@@ -25,7 +25,7 @@ class wpUpdate {
 		void check();
 		void start();
 	private:
-		const char* server = "https://updates.freakazone.com";
+		const char* server = "http://d1miniupdate.freakazone.com";
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);
