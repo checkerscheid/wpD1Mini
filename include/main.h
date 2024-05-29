@@ -101,7 +101,10 @@ String mqttTopicErrorRest;
 	String mqttTopicRelaisOut;
 	String mqttTopicRelaisAuto;
 	String mqttTopicRelaisHand;
+	String mqttTopicSetRelaisHand;
+	String mqttTopicErrorRelaisHand;
 	String mqttTopicRelaisHandValue;
+	String mqttTopicSetRelaisHandValue;
 	// settings
 	#ifdef wpMoisture
 	String mqttTopicWaterEmpty;
