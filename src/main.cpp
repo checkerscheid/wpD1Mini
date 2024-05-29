@@ -626,6 +626,10 @@ void setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
 				setWebServerCommand(WebServerCommandrestartESP);
 			}
+			if(request->getParam("cmd")->value() == "ScanWiFi") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ScanWiFi");
+				setWebServerCommand(WebServerCommandscanWiFi);
+			}
 			if(request->getParam("cmd")->value() == "calcValues") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
 				wpFZ.calcValues = !wpFZ.calcValues;
@@ -667,6 +671,9 @@ void doTheWebServerCommand() {
 			case WebServerCommandrestartESP:
 				setMqttOffline();
 				ESP.restart();
+				break;
+			case WebServerCommandscanWiFi:
+				wpFZ.scanWiFi();
 				break;
 		}
 		doWebServerCommand = WebServerCommanddoNothing;
