@@ -289,6 +289,7 @@ void getVars() {
 	wpFZ.DebugFinder = bitRead(wpFZ.settingsBool1, wpFZ.bitDebugFinder);
 	wpFZ.DebugRest = bitRead(wpFZ.settingsBool1, wpFZ.bitDebugRest);
 	wpFZ.settingsBool2 = EEPROM.read(wpFZ.addrSettingsBool2);
+	wpFZ.settingsBool3 = EEPROM.read(wpFZ.addrSettingsBool3);
 #ifdef wpHT
 	wpFZ.DebugHT = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugHT);
 	wpFZ.maxCycleHT = EEPROM.read(wpFZ.addrMaxCycleHT);
@@ -297,19 +298,21 @@ void getVars() {
 #endif
 #ifdef wpLDR
 	wpFZ.DebugLDR = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugLDR);
+	wpFZ.useLdrAvg = bitRead(wpFZ.settingsBool3, wpFZ.bitUseLdrAvg);
 	wpFZ.maxCycleLDR = EEPROM.read(wpFZ.addrMaxCycleLDR);
 	EEPROM.get(wpFZ.addrLdrCorrection, wpFZ.ldrCorrection);
 #endif
 #ifdef wpLight
 	wpFZ.DebugLight = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugLight);
+	wpFZ.useLightAvg = bitRead(wpFZ.settingsBool3, wpFZ.bitUseLightAvg);
 	wpFZ.maxCycleLight = EEPROM.read(wpFZ.addrMaxCycleLight);
 	EEPROM.get(wpFZ.addrLightCorrection, wpFZ.lightCorrection);
 #endif
 #ifdef wpBM
 	wpFZ.DebugBM = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugBM);
-#ifdef wpLDR
+	#ifdef wpLDR
 	EEPROM.get(wpFZ.addrThreshold, wpFZ.threshold);
-#endif
+	#endif
 #endif
 #ifdef wpRelais
 	wpFZ.DebugRelais = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRelais);
@@ -318,12 +321,21 @@ void getVars() {
 	#ifdef wpMoisture
 	EEPROM.get(wpFZ.addrPumpActive, wpFZ.pumpActive);
 	EEPROM.get(wpFZ.addrPumpPause, wpFZ.pumpPause);
-#endif
+	#endif
 #endif
 #ifdef wpRain
 	wpFZ.DebugRain = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugRain);
+	wpFZ.useRainAvg = bitRead(wpFZ.settingsBool3, wpFZ.bitUseRainAvg);
 	wpFZ.maxCycleRain = EEPROM.read(wpFZ.addrMaxCycleRain);
 	EEPROM.get(wpFZ.addrRainCorrection, wpFZ.rainCorrection);
+#endif
+#ifdef wpMoisture
+	wpFZ.DebugMoisture = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugMoisture);
+	wpFZ.useMoistureAvg = bitRead(wpFZ.settingsBool3, wpFZ.bitUseMoistureAvg);
+	wpFZ.maxCycleMoisture = EEPROM.read(wpFZ.addrMaxCycleMoisture);
+	wpFZ.moistureMin = EEPROM.read(wpFZ.addrMoistureMin);
+	EEPROM.get(wpFZ.addrMoistureDry, wpFZ.moistureDry);
+	EEPROM.get(wpFZ.addrMoistureWet, wpFZ.moistureWet);
 #endif
 #ifdef wpDistance
 	wpFZ.DebugDistance = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugDistance);
@@ -331,13 +343,6 @@ void getVars() {
 	wpFZ.distanceCorrection = EEPROM.read(wpFZ.addrDistanceCorrection);
 	wpFZ.height = EEPROM.read(wpFZ.addrHeight);
 	EEPROM.get(wpFZ.addrMaxVolume, wpFZ.maxVolume);
-#endif
-#ifdef wpMoisture
-	wpFZ.DebugMoisture = bitRead(wpFZ.settingsBool2, wpFZ.bitDebugMoisture);
-	wpFZ.maxCycleMoisture = EEPROM.read(wpFZ.addrMaxCycleMoisture);
-	wpFZ.moistureMin = EEPROM.read(wpFZ.addrMoistureMin);
-	EEPROM.get(wpFZ.addrMoistureDry, wpFZ.moistureDry);
-	EEPROM.get(wpFZ.addrMoistureWet, wpFZ.moistureWet);
 #endif
 	readStringsFromEEPROM();
 
@@ -392,8 +397,8 @@ void getVars() {
 	mqttTopicLDR = wpFZ.DeviceName + "/LDR";
 	mqttTopicErrorLDR = wpFZ.DeviceName + "/ERROR/LDR";
 	// settings
-	mqttTopicMaxCycleLDR = wpFZ.DeviceName + "/settings/LDR/maxCycle";
 	mqttTopicUseLdrAvg = wpFZ.DeviceName + "/settings/LDR/useAvg";
+	mqttTopicMaxCycleLDR = wpFZ.DeviceName + "/settings/LDR/maxCycle";
 	mqttTopicLdrCorrection = wpFZ.DeviceName + "/settings/LDR/Correction";
 	// commands
 	mqttTopicDebugLDR = wpFZ.DeviceName + "/settings/Debug/LDR";
@@ -403,8 +408,8 @@ void getVars() {
 	mqttTopicLight = wpFZ.DeviceName + "/Light";
 	mqttTopicErrorLight = wpFZ.DeviceName + "/ERROR/Light";
 	// settings
-	mqttTopicMaxCycleLight = wpFZ.DeviceName + "/settings/Light/maxCycle";
 	mqttTopicUseLightAvg = wpFZ.DeviceName + "/settings/Light/useAvg";
+	mqttTopicMaxCycleLight = wpFZ.DeviceName + "/settings/Light/maxCycle";
 	mqttTopicLightCorrection = wpFZ.DeviceName + "/settings/Light/Correction";
 	// commands
 	mqttTopicDebugLight = wpFZ.DeviceName + "/settings/Debug/Light";
@@ -413,10 +418,10 @@ void getVars() {
 	// values
 	mqttTopicBM = wpFZ.DeviceName + "/BM";
 	// settings
-#ifdef wpLDR
+	#ifdef wpLDR
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/BM/Threshold";
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/BM/LightToTurnOn";
-#endif
+	#endif
 	// commands
 	mqttTopicDebugBM = wpFZ.DeviceName + "/settings/Debug/BM";
 #endif
@@ -431,11 +436,11 @@ void getVars() {
 	mqttTopicRelaisHandValue = wpFZ.DeviceName + "/Relais/HandValue";
 	mqttTopicSetRelaisHandValue = wpFZ.DeviceName + "/Relais/setHandValue";
 	// settings
-#ifdef wpMoisture
+	#ifdef wpMoisture
 	mqttTopicWaterEmpty = wpFZ.DeviceName + "/settings/Relais/waterEmpty";
 	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/pumpActive";
 	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/pumpPause";
-#endif
+	#endif
 	// commands
 	mqttTopicDebugRelais = wpFZ.DeviceName + "/settings/Debug/Relais";
 #endif
@@ -444,8 +449,8 @@ void getVars() {
 	mqttTopicRain = wpFZ.DeviceName + "/Rain";
 	mqttTopicErrorRain = wpFZ.DeviceName + "/ERROR/Rain";
 	// settings
-	mqttTopicMaxCycleRain = wpFZ.DeviceName + "/settings/Rain/maxCycle";
 	mqttTopicUseRainAvg = wpFZ.DeviceName + "/settings/Rain/useAvg";
+	mqttTopicMaxCycleRain = wpFZ.DeviceName + "/settings/Rain/maxCycle";
 	mqttTopicRainCorrection = wpFZ.DeviceName + "/settings/Rain/Correction";
 	// commands
 	mqttTopicDebugRain = wpFZ.DeviceName + "/settings/Debug/Rain";
@@ -456,8 +461,8 @@ void getVars() {
 	mqttTopicErrorMoisture = wpFZ.DeviceName + "/ERROR/Moisture";
 	mqttTopicErrorMoistureMin = wpFZ.DeviceName + "/ERROR/MoistureMin";
 	// settings
-	mqttTopicMaxCycleMoisture = wpFZ.DeviceName + "/settings/Moisture/maxCycle";
 	mqttTopicUseMoistureAvg = wpFZ.DeviceName + "/settings/Moisture/useAvg";
+	mqttTopicMaxCycleMoisture = wpFZ.DeviceName + "/settings/Moisture/maxCycle";
 	mqttTopicMoistureMin = wpFZ.DeviceName + "/settings/Moisture/Min";
 	mqttTopicMoistureDry = wpFZ.DeviceName + "/settings/Moisture/Dry";
 	mqttTopicMoistureWet = wpFZ.DeviceName + "/settings/Moisture/Wet";
