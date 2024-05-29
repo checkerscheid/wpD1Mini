@@ -164,6 +164,7 @@ const int8_t WebServerCommandblink = 1;
 const int8_t WebServerCommandpublishSettings = 2;
 const int8_t WebServerCommandupdateFW = 3;
 const int8_t WebServerCommandrestartESP = 4;
+const int8_t WebServerCommandscanWiFi = 5;
 int8_t doWebServerCommand = WebServerCommanddoNothing;
 int8_t doWebServerBlink = WebServerCommanddoNothing;
 void setupWebServer();
