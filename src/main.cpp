@@ -63,7 +63,6 @@ void loop() {
 //  EEPROM
 //###################################################################################
 // strings
-byte byteStartForString = 50;
 void getVars() {
 	wpFZ.UpdateFW = false;
 	wpFZ.settingsBool1 = EEPROM.read(wpFZ.addrSettingsBool1);
@@ -92,29 +91,10 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
 	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	mqttTopicDebugFinder = wpFZ.DeviceName + "/settings/Debug/Finder";
 	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
 	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
-}
-void readStringsFromEEPROM() {
-	byteStartForString = 50; // reset
-	wpFZ.DeviceName = wpFZ.readStringFromEEPROM(byteStartForString, wpFZ.DeviceName);
-	byteStartForString = byteStartForString + 1 + wpFZ.DeviceName.length();
-	wpFZ.DeviceDescription = wpFZ.readStringFromEEPROM(byteStartForString, wpFZ.DeviceDescription);
-	byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
-	wpFZ.lightToTurnOn = wpFZ.readStringFromEEPROM(byteStartForString, wpFZ.lightToTurnOn);
-}
-void writeStringsToEEPROM() {
-	byteStartForString = 50; // reset
-	byteStartForString = wpFZ.writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
-	byteStartForString = wpFZ.writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
-#ifdef wpBM
-#ifdef wpLDR
-	byteStartForString = wpFZ.writeStringToEEPROM(byteStartForString, wpFZ.lightToTurnOn);
-#endif
-#endif
 }
 
 //###################################################################################

@@ -16,7 +16,6 @@
 #ifndef wpFreakaZone_h
 #define wpFreakaZone_h
 #include <Arduino.h>
-#include <EEPROM.h>
 #include <time.h>
 #include <ArduinoOTA.h>
 #include <ESPAsyncUDP.h>
@@ -50,7 +49,9 @@ class wpFreakaZone {
 
 		String OnSince;
 		String OnDuration;
+		/// @todo move to WiFi
 		String WiFiSince;
+		/// @todo move to Mqtt
 		String MqttSince;
 
 		const String strDEBUG  = "[  DEBUG  ]";
@@ -69,77 +70,6 @@ class wpFreakaZone {
 		const bool wpMoisture = false;
 		const bool wpDistance = false;
 
-/// bool values: byte 0 - 9
-		const byte addrBitsModules0 = 0;
-		byte bitsModules0;
-		const byte bitDHT11 = 0;
-		const byte bitDHT22 = 1;
-		const byte bitLDR = 2;
-		const byte bitLight = 3;
-		const byte bitBM = 4;
-		const byte bitRelais = 5;
-		const byte bitRelaisShield = 6;
-		const byte bitRain = 7;
-
-		const byte addrBitsModules1 = 1;
-		byte bitsModules1;
-		const byte bitMoisture = 0;
-		const byte bitDistance = 1;
-		
-		const byte addrBitsDebugBasis = 2;
-		byte bitsDebugBais;
-		const byte bitDebugEprom = 0;
-		const byte bitDebugWiFi = 1;
-		const byte bitDebugMqtt = 2;
-		const byte bitDebugFinder = 3;
-		const byte bitDebugRest = 4;
-		
-		const byte addrBitsDebugModules = 3;
-		byte bitsDebugModules;
-		const byte bitDebugHT = 0;
-		const byte bitDebugLDR = 1;
-		const byte bitDebugLight = 2;
-		const byte bitDebugBM = 3;
-		const byte bitDebugRelais = 4;
-		const byte bitDebugRain = 5;
-		const byte bitDebugMoisture = 6;
-		const byte bitDebugDistance = 7;
-		
-		const byte addrBitsModulesSettings = 5;
-		byte bitsModulesSettings;
-		const byte bitUseLdrAvg = 0;
-		const byte bitUseLightAvg = 1;
-		const byte bitRelaisHand = 2;
-		const byte bitRelaisHandValue = 3;
-		const byte bitUseRainAvg = 4;
-		const byte bitUseMoistureAvg = 5;
-
-/// byte values: byte 10 - 29
-		const byte byteMaxCycleHT = 10;
-		const byte byteMaxCycleLDR = 11;
-		const byte byteLDRCorrection = 12; // int8_t
-		const byte byteMaxCycleLight = 13;
-		const byte bytePumpActive = 14;
-		const byte byteMaxCycleRain = 15;
-		const byte byteRainCorrection = 16; // int8_t
-		const byte byteMaxCycleMoisture = 17;
-		const byte byteMoistureMin = 18;
-		const byte byteMaxCycleDistance = 19;
-		const byte byteDistanceCorrection = 20; // int8_t
-		const byte byteHeight = 21;
-
-/// byte values: 2byte 30 - 59
-		const byte byteTemperatureCorrection = 30; // int8_t * 10
-		const byte byteHumidityCorrection = 32; // int8_t * 10
-		const byte byteLightCorrection = 34; // int16_t
-		const byte byteThreshold = 36;
-		const byte bytePumpPause = 38;
-		const byte byteMoistureDry = 40;
-		const byte byteMoistureWet = 42;
-		const byte byteMaxVolume = 44;
-
-/// byte values: 4byte 60 - 99
-
 		String DeviceName;
 		String DeviceDescription;
 		bool OfflineTrigger;
@@ -148,7 +78,6 @@ class wpFreakaZone {
 		bool errorRest;
 		bool trySendRest;
 
-		bool DebugEprom = false;
 		bool DebugRest = false;
 
 		int16_t ldrCorrection;
@@ -185,8 +114,6 @@ class wpFreakaZone {
 		void blink();
 		bool setupOta();
 		void setupFinder();
-		String readStringFromEEPROM(int addrOffset, String defaultString);
-		int writeStringToEEPROM(int addrOffset, String &strToWrite);
 		bool sendRest(String name, String value);
 		bool sendRawRest(String target);
 

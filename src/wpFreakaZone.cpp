@@ -28,7 +28,6 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	UpdateFW = false;
 	calcValues = true;
 	
-	DebugEprom = false;
 	DebugWiFi = false;
 	DebugMqtt = false;
 	DebugFinder = false;
@@ -254,38 +253,6 @@ void wpFreakaZone::setupFinder() {
 	}
 }
 
-String wpFreakaZone::readStringFromEEPROM(int addrOffset, String defaultString) {
-	int newStrLen = EEPROM.read(addrOffset);
-	if (newStrLen == 255) return defaultString;
-
-	if(DebugEprom) {
-		Serial.printf("newStrLen: %u\n", newStrLen);
-	}
-	char data[newStrLen];
-	for (int i = 0; i < newStrLen; i++) {
-		data[i] = EEPROM.read(addrOffset + 1 + i);
-	}
-	data[newStrLen] = '\0';
-	return String(data);
-}
-
-int wpFreakaZone::writeStringToEEPROM(int addrOffset, String &strToWrite) {
-	byte len = strToWrite.length();
-	EEPROM.write(addrOffset, len);
-	int returns = addrOffset + 1;
-	for (int i = 0; i < len; i++) {
-		EEPROM.write(addrOffset + 1 + i, strToWrite[i]);
-		returns = addrOffset + 1 + i + 1;
-	}
-	EEPROM.commit();
-	if(DebugEprom) {
-		Serial.println();
-		Serial.printf("Start: %u\n", addrOffset);
-		Serial.printf("Len: %u\n", len);
-		Serial.printf("Start Next: %u\n", returns);
-	}
-	return returns;
-}
 // return true on success
 bool wpFreakaZone::sendRest(String name, String value) {
 	bool returns = false;
