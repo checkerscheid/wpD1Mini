@@ -13,26 +13,30 @@
 //# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef helperUpdate_h
-#define helperUpdate_h
+#ifndef helperWiFi_h
+#define helperWiFi_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <ESP8266HTTPClient.h>
-#include <ESP8266httpUpdate.h>
-
-class helperUpdate {
+#include <ESP8266WiFi.h>
+class helperWiFi {
 	public:
-		helperUpdate();
+		// settings
+		String mqttTopicSsid;
+		String mqttTopicIp;
+		String mqttTopicMac;
+		String mqttTopicWiFiSince;
+		String mqttTopicRssi;
+		// commands
+		String mqttTopicDebugWiFi;
+
+		helperWiFi();
 		void loop();
 		uint16_t getVersion();
-		void check();
-		void start();
+		void setupWiFi();
+		void scanWiFi();
 	private:
 		String SVNh = "$Rev: 118 $";
-		static void started();
-		static void finished();
-		static void progress(int cur, int total);
-		static void error(int err);
+		String printEncryptionType(int thisType);
 };
-
+extern helperWiFi wpWiFi;
 #endif

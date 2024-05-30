@@ -113,6 +113,12 @@ String wpFreakaZone::getVersion() {
 		" Build " + String(Buildh) + "." + String(Build);
 	return returns;
 }
+uint16_t wpFreakaZone::getBuild(String Rev) {
+	Rev.remove(0, 6);
+	Rev.remove(Rev.length() - 2, 2);
+	uint16_t returns = Rev.toInt();
+	return returns;
+}
 String wpFreakaZone::getTime() {
 	time_t now;
 	tm tm;
@@ -186,57 +192,6 @@ void wpFreakaZone::blink() {
 		digitalWrite(LED_BUILTIN, led);
 		delay(blinkDelay);
 	}
-}
-
-void wpFreakaZone::setupWiFi() {
-	delay(10);
-	Serial.print(getTime());
-	Serial.print(getOnlineTime());
-	Serial.print(strINFO);
-	Serial.print(funcToString("setupWiFi"));
-	Serial.print("Connecting to ");
-	Serial.println(ssid);
-	WiFi.setHostname(DeviceName.c_str());
-	WiFi.begin(ssid, password);
-	Serial.print(getTime());
-	Serial.print(getOnlineTime());
-	Serial.print(strINFO);
-	Serial.print(funcToString("setupWiFi"));
-	while(WiFi.status() != WL_CONNECTED) {
-		delay(500);
-		Serial.print(".");
-	}
-	Serial.println();
-	Serial.print(getTime());
-	Serial.print(getOnlineTime());
-	Serial.print(strINFO);
-	Serial.print(funcToString("setupWiFi"));
-	Serial.print("WiFi Connected: ");
-	Serial.println(WiFi.localIP());
-	WiFiSince = getDateTime();
-}
-
-void wpFreakaZone::scanWiFi() {
-	// scan for nearby networks:
-	DebugWS(strINFO, "scanWiFi", "Start scan WiFi networks");
-	int numSsid = WiFi.scanNetworks();
-	if (numSsid == -1) {
-		DebugWS(strWARN, "scanWiFi", "Couldn't get a WiFi connection");
-	} else {
-		// print the list of networks seen:
-		DebugWS(strINFO, "scanWiFi", "number of available WiFi networks:" + String(numSsid));
-
-		// print the network number and name for each network found:
-		for (int thisNet = 0; thisNet < numSsid; thisNet++) {
-			DebugWS(strINFO, "scanWiFi",
-				String(thisNet + 1) + ": " + WiFi.SSID(thisNet) + ", " +
-				"Channel: " + String(WiFi.channel(thisNet)) + ", " +
-				"BSSID: " + WiFi.BSSIDstr(thisNet) + ", " +
-				"Signal: " + String(WiFi.RSSI(thisNet)) + " dBm, " +
-				"Encryption: " + printEncryptionType(WiFi.encryptionType(thisNet)));
-		}
-	}
-	DebugWS(strINFO, "scanWiFi", "finished scan WiFi networks");
 }
 
 bool wpFreakaZone::setupOta() {
@@ -663,27 +618,6 @@ void wpFreakaZone::doTheWebServerDebugChange() {
 #endif
 		doWebServerDebugChange = "";
 	}
-}
-
-String wpFreakaZone::printEncryptionType(int thisType) {
-	switch (thisType) {
-		case ENC_TYPE_WEP:
-			return "WEP";
-			break;
-		case ENC_TYPE_TKIP:
-			return "WPA";
-			break;
-		case ENC_TYPE_CCMP:
-			return "WPA2";
-			break;
-		case ENC_TYPE_NONE:
-			return "None";
-			break;
-		case ENC_TYPE_AUTO:
-			return "Auto";
-			break;
-	}
-	return "Type not known: " + String(thisType);
 }
 
 //###################################################################################

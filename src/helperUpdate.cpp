@@ -18,9 +18,26 @@
 helperUpdate::helperUpdate() {
 
 }
+
+//###################################################################################
+// public
+//###################################################################################
+
+void helperUpdate::loop() {
+
+}
+
+uint16_t helperUpdate::getVersion() {
+	String SVN = "$Rev: 118 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
 void helperUpdate::check() {
 
 }
+
 void helperUpdate::start() {
 	WiFiClient client;
 	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
@@ -51,16 +68,24 @@ void helperUpdate::start() {
 			break;
 	}
 }
+
+//###################################################################################
+// private
+//###################################################################################
+
 void helperUpdate::started() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }
+
 void helperUpdate::finished() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::finished", "HTTP update finished");
 }
+
 void helperUpdate::progress(int cur, int total) {
 	String logmessage = "HTTP update: " + String(cur) + " of " + String(total) + " bytes";
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
 }
+
 void helperUpdate::error(int err) {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::error", "HTTP update fatal error, code: " + String(err));
 }

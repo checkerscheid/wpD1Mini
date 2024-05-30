@@ -33,7 +33,9 @@ class helperMqtt {
 
 		helperMqtt();
 		void loop();
+		uint16_t getVersion();
 	private:
+		String SVNh = "$Rev: 118 $";
 		void connectMqtt();
 		static void callbackMqtt(char*, byte*, unsigned int);
 

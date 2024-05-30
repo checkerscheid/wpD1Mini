@@ -17,17 +17,12 @@
 #define wpFreakaZone_h
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <ESP8266WiFi.h>
 #include <time.h>
 #include <ArduinoOTA.h>
 #include <ESPAsyncUDP.h>
 #include <ESP8266HTTPClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
-#ifdef wpHT // for DHT11 || DHT22
-	#include <DHT.h>
-#endif
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -157,6 +152,7 @@ class wpFreakaZone {
 		bool UpdateFW;
 		bool calcValues;
 		bool errorRest;
+		bool trySendRest;
 
 		const enum Debug {
 			DebugEprom,
@@ -220,10 +216,10 @@ class wpFreakaZone {
 		String getDateTime();
 		String getOnlineTime();
 		String getOnlineTime(bool forDebug);
+		String funcToString(String msg);
+		uint16_t getBuild(String);
 		void setVersion(uint16_t v);
 		void blink();
-		void setupWiFi();
-		void scanWiFi();
 		bool setupOta();
 		void setupFinder();
 		String readStringFromEEPROM(int addrOffset, String defaultString);
@@ -248,7 +244,6 @@ class wpFreakaZone {
 		String Rev;
 		int Buildh;
 		int Build;
-		String funcToString(String msg);
 
 		String doWebServerDebugChange = "";
 		void setWebServerDebugChange(String DebugPlugIn);

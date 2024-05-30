@@ -31,6 +31,13 @@ void helperMqtt::loop() {
 
 }
 
+uint16_t helperMqtt::getVersion() {
+	String SVN = "$Rev: 118 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
 //###################################################################################
 // private
 //###################################################################################
