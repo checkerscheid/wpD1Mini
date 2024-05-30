@@ -27,9 +27,6 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	UpdateFW = false;
 	calcValues = true;
 
-	DebugRest = false;
-	ErrorRest = false;
-
 #ifdef wpHT
 	DebugHT = false;
 	maxCycleHT = 4;
@@ -220,63 +217,6 @@ bool wpFreakaZone::setupOta() {
 	return returns;
 }
 
-// return true on success
-bool wpFreakaZone::sendRest(String name, String value) {
-	bool returns = false;
-	WiFiClient client;
-	HTTPClient http;
-	String targetmac = WiFi.macAddress();
-	targetmac.replace(":", "");
-	targetmac.toLowerCase();
-	String targetwithident = "http://" + String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort) + "/?m=" + targetmac;
-	String target = targetwithident + "&" + name + "=" + value;
-	if(DebugRest) {
-		String logmessage = "HTTP: '" + target + "'";
-		wpFZ.DebugWS(wpFZ.strINFO, "sendRest", logmessage);
-	}
-	http.begin(client, target.c_str());
-	int httpResponseCode = http.GET();
-	if (httpResponseCode > 0) {
-		if(DebugRest) {
-			String payload = http.getString();
-			payload.replace("\"", "'");
-			String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
-			wpFZ.DebugWS(wpFZ.strINFO, "sendRest", logmessage);
-		}
-		returns = true;
-	} else {
-		String logmessage = "HTTP Response (" + String(httpResponseCode) + ")";
-		wpFZ.DebugWS(wpFZ.strERRROR, "sendRest", logmessage);
-	}
-	http.end();
-	return returns;
-}
-// return true on success
-bool wpFreakaZone::sendRawRest(String target) {
-	bool returns = false;
-	WiFiClient client;
-	HTTPClient http;
-	if(DebugRest) {
-		String logmessage = "HTTP: '" + target + "'";
-		wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
-	}
-	http.begin(client, target.c_str());
-	int httpResponseCode = http.GET();
-	if (httpResponseCode > 0) {
-		if(DebugRest) {
-			String payload = http.getString();
-			payload.replace("\"", "'");
-			String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
-			wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
-		}
-		returns = true;
-	} else {
-		String logmessage = "HTTP Response (" + String(httpResponseCode) + ")";
-		wpFZ.DebugWS(wpFZ.strERRROR, "sendRawRest", logmessage);
-	}
-	http.end();
-	return returns;
-}
 void wpFreakaZone::setupWebServer() {
 	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";

@@ -18,11 +18,7 @@
 #include <Arduino.h>
 #include <time.h>
 #include <ArduinoOTA.h>
-#include <ESP8266HTTPClient.h>
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
 #include <helperWebServer.h>
-#include <DHT.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -70,10 +66,6 @@ class wpFreakaZone {
 		bool OfflineTrigger;
 		bool UpdateFW;
 		bool calcValues;
-		bool errorRest;
-		bool trySendRest;
-
-		bool DebugRest = false;
 
 		int16_t ldrCorrection;
 		int16_t lightCorrection;
@@ -108,8 +100,6 @@ class wpFreakaZone {
 		void setVersion(uint16_t v);
 		void blink();
 		bool setupOta();
-		bool sendRest(String name, String value);
-		bool sendRawRest(String target);
 
 		static String JsonKeyValue(String name, String value);
 		static String JsonKeyString(String name, String value);

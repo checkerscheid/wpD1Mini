@@ -20,9 +20,6 @@ uint loopTime = 200;
 //  Value Defines
 //###################################################################################
 
-bool errorRestLast = false;
-bool trySendRest = false;
-uint16_t publishCountErrorRest = 0;
 
 //###################################################################################
 //  setup
@@ -38,7 +35,6 @@ void setup() {
 	wpFZ.printRestored();
 
 	wpWiFi.setupWiFi();
-	wpFZ.setupFinder();
 }
 
 //###################################################################################
@@ -83,15 +79,12 @@ void getVars() {
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicOnSince = wpFZ.DeviceName + "/info/OnSince";
 	mqttTopicOnDuration = wpFZ.DeviceName + "/info/OnDuration";
-	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
 	mqttTopicSetDeviceName = wpFZ.DeviceName + "/settings/DeviceName";
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
-	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
 }
 
 //###################################################################################
@@ -175,14 +168,6 @@ void publishValuesSystem() {
 	}
 	publishCountRssi = 0;
 }
-void publishErrorRest() {
-	mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.errorRest).c_str());
-	errorRestLast = wpFZ.errorRest;
-	trySendRest = false;
-	if(wpFZ.DebugRest)
-		publishInfoDebug("ErrorRest", String(wpFZ.errorRest), String(publishCountErrorRest));
-	publishCountErrorRest = 0;
-}
 
 //###################################################################################
 //  publish values
@@ -233,13 +218,14 @@ void publishValues() {
 }
 
 void publishInfo() {
-	wpFZ.errorRest = false;
-	trySendRest = false;
+	wpRest.errorRest = false;
+	wpRest.trySendRest = false;
 	if(++publishCountRssi > 4 * 120) {
 		publishValuesSystem();
 	}
-	if((errorRestLast != wpFZ.errorRest && trySendRest) || ++publishCountErrorRest > wpFZ.publishQoS) {
-		publishErrorRest();
+	if((wpRest.errorRestLast != wpRest.errorRest && wpRest.trySendRest)
+		|| ++wpRest.publishCountErrorRest > wpFZ.publishQoS) {
+		wpRest.publishErrorRest();
 	}
 }
 void publishInfoDebug(String name, String value, String publishCount) {
