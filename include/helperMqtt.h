@@ -13,13 +13,13 @@
 //# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef wpMqtt_h
-#define wpMqtt_h
+#ifndef helperMqtt_h
+#define helperMqtt_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-class wpMqtt {
+class helperMqtt {
 	public:
 		// settings
 		String mqttTopicMqttServer;
@@ -31,12 +31,12 @@ class wpMqtt {
 		static WiFiClient wifiClient;
 		static PubSubClient mqttClient;
 
-		wpMqtt();
+		helperMqtt();
 		void loop();
 	private:
 		void connectMqtt();
 		static void callbackMqtt(char*, byte*, unsigned int);
 
 };
-extern wpMqtt mqtt;
+extern helperMqtt wpmqtt;
 #endif

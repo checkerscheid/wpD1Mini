@@ -13,16 +13,15 @@
 //# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
 //#                                                                                 #
 //###################################################################################
-#include <wpUpdate.h>
-#include <wpFreakaZone.h>
+#include <helperUpdate.h>
 
-wpUpdate::wpUpdate() {
-
-}
-void wpUpdate::check() {
+helperUpdate::helperUpdate() {
 
 }
-void wpUpdate::start() {
+void helperUpdate::check() {
+
+}
+void helperUpdate::start() {
 	WiFiClient client;
 	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
@@ -32,7 +31,7 @@ void wpUpdate::start() {
 	ESPhttpUpdate.onProgress(progress);
 	ESPhttpUpdate.onError(error);
 
-	t_httpUpdate_return ret = ESPhttpUpdate.update(client, server);
+	t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
 	// Or:
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
@@ -52,16 +51,16 @@ void wpUpdate::start() {
 			break;
 	}
 }
-void wpUpdate::started() {
+void helperUpdate::started() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }
-void wpUpdate::finished() {
+void helperUpdate::finished() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::finished", "HTTP update finished");
 }
-void wpUpdate::progress(int cur, int total) {
+void helperUpdate::progress(int cur, int total) {
 	String logmessage = "HTTP update: " + String(cur) + " of " + String(total) + " bytes";
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
 }
-void wpUpdate::error(int err) {
+void helperUpdate::error(int err) {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::error", "HTTP update fatal error, code: " + String(err));
 }

@@ -13,15 +13,16 @@
 //# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef wpUpdate_h
-#define wpUpdate_h
+#ifndef helperUpdate_h
+#define helperUpdate_h
 #include <Arduino.h>
+#include <wpFreakaZone.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
-class wpUpdate {
+class helperUpdate {
 	public:
-		wpUpdate();
+		helperUpdate();
 		void loop();
 		
 		void check();

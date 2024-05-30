@@ -13,9 +13,9 @@
 //# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#include <wpDHT.h>
+#include <moduleDHT.h>
 
-wpDHT::wpDHT(PubSubClient mc, uint8_t wpHTtype) {
+moduleDHT::moduleDHT(PubSubClient mc, uint8_t wpHTtype) {
 	if(wpFZ.installedModules[wpFZ.wpDHT11]) {
 		wpHTtype = DHT11;
 	}
@@ -42,13 +42,13 @@ wpDHT::wpDHT(PubSubClient mc, uint8_t wpHTtype) {
 //###################################################################################
 // public
 //###################################################################################
-void wpDHT::loop() {
+void moduleDHT::loop() {
 	if(++cycleHT >= wpFZ.maxCycleHT) {
 		cycleHT = 0;
 		calcHT();
 	}
 }
-void wpDHT::publishValueTemp(int equalVal) {
+void moduleDHT::publishValueTemp(int equalVal) {
 	mqttClient.publish(mqttTopicTemperature.c_str(), String(temperature).c_str());
 	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("temp", String(temperature));
 	wpFZ.trySendRest = true;
@@ -58,7 +58,7 @@ void wpDHT::publishValueTemp(int equalVal) {
 	}
 	publishCountTemperature = 0;
 }
-void wpDHT::publishValueHum(int equalVal) {
+void moduleDHT::publishValueHum(int equalVal) {
 	mqttClient.publish(mqttTopicHumidity.c_str(), String(humidity).c_str());
 	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("hum", String(humidity));
 	wpFZ.trySendRest = true;
@@ -68,11 +68,11 @@ void wpDHT::publishValueHum(int equalVal) {
 	}
 	publishCountHumidity = 0;
 }
-void publishInfoDebug(String name, String value, String publishCount) {
+void moduleDHT::publishInfoDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
-void wpDHT::publishErrorHT() {
+void moduleDHT::publishErrorHT() {
 	mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
 	errorHTLast = errorHT;
 	publishCountErrorHT = 0;
@@ -81,7 +81,7 @@ void wpDHT::publishErrorHT() {
 //###################################################################################
 // Allgemein
 //###################################################################################
-void wpDHT::calcHT() {
+void moduleDHT::calcHT() {
 	bool e = false;
 	float newT = dht.readTemperature();
 	float newH = dht.readHumidity();
@@ -108,12 +108,12 @@ void wpDHT::calcHT() {
 	errorHT = e;
 }
 
-void wpDHT::calcHTDebug(String name, int16_t value, float raw) {
+void moduleDHT::calcHTDebug(String name, int16_t value, float raw) {
 	String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "calcHT", logmessage);
 }
 
-void wpDHT::calcHTError(String name) {
+void moduleDHT::calcHTError(String name) {
 	wpFZ.blink();
 	String logmessage = name + ": Sensor Failure";
 	wpFZ.DebugWS(wpFZ.strERRROR, "calcHT", logmessage);

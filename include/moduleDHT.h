@@ -13,8 +13,8 @@
 //# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef wpDHT_h
-#define wpDHT_h
+#ifndef moduleDHT_h
+#define moduleDHT_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <PubSubClient.h>
@@ -22,7 +22,7 @@
 
 #define DHTPin D7
 
-class wpDHT {
+class moduleDHT {
 	public:
 		bool errorHT = false;
 		int16_t temperature = 0;
@@ -43,11 +43,12 @@ class wpDHT {
 
 		DHT dht;
 
-		wpDHT(PubSubClient, uint8_t);
+		moduleDHT(PubSubClient, uint8_t);
 		void loop();
 
 		void publishValueTemp(int equalVal);
 		void publishValueHum(int equalVal);
+		void publishInfoDebug(String name, String value, String publishCount);
 		void publishErrorHT();
 	private:
 		PubSubClient mqttClient;

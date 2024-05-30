@@ -13,12 +13,12 @@
 //# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#include <wpMqtt.h>
+#include <helperMqtt.h>
 
-WiFiClient wpMqtt::wifiClient;
-PubSubClient wpMqtt::mqttClient(wpMqtt::wifiClient);
+WiFiClient helperMqtt::wifiClient;
+PubSubClient helperMqtt::mqttClient(helperMqtt::wifiClient);
 
-wpMqtt::wpMqtt() {
+helperMqtt::helperMqtt() {
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
 	connectMqtt();
@@ -27,14 +27,14 @@ wpMqtt::wpMqtt() {
 //###################################################################################
 // public
 //###################################################################################
-void wpMqtt::loop() {
+void helperMqtt::loop() {
 
 }
 
 //###################################################################################
 // private
 //###################################################################################
-void wpMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
+void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	String msg = "";
 	for (unsigned int i = 0; i < length; i++) {
 		msg += (char)payload[i];
@@ -47,7 +47,7 @@ void wpMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	} else {
 	}
 }
-void wpMqtt::connectMqtt() {
+void helperMqtt::connectMqtt() {
 	String logmessage = "Connecting MQTT Server: " + String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort) + " as " + wpFZ.DeviceName;
 	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 	while(!mqttClient.connected()) {
