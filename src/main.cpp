@@ -46,8 +46,6 @@ void setup() {
 // loop
 //###################################################################################
 void loop() {
-	doTheWebServerCommand();
-	doTheWebserverBlink();
 	checkOfflineTrigger();
 	if(wpFZ.UpdateFW) ArduinoOTA.handle();
 	wpWiFi.loop();
@@ -176,43 +174,7 @@ void checkOfflineTrigger() {
 //###################################################################################
 // publish settings
 //###################################################################################
-void publishSettings() {
-	publishSettings(false);
-}
-void publishSettings(bool force) {
-	mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
-	// values
-	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
-	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);
-	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(0).c_str());
-	mqttClient.publish(mqttTopicVersion.c_str(), getVersion().c_str(), true);
-	mqttClient.publish(mqttTopicwpFreakaZoneVersion.c_str(), wpFZ.getVersion().c_str(), true);
-	mqttClient.publish(mqttTopicOnSince.c_str(), wpFZ.OnSince.c_str());
-	mqttClient.publish(mqttTopicOnDuration.c_str(), wpFZ.OnDuration.c_str());
-	mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid, true);
-	mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
-	mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str(), true);
-	mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str(), true);
-	mqttClient.publish(mqttTopicWiFiSince.c_str(), wpFZ.WiFiSince.c_str());
-	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str(), true);
-	mqttClient.publish(mqttTopicMqttSince.c_str(), wpFZ.MqttSince.c_str());
-	mqttClient.publish(mqttTopicRestServer.c_str(), (String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort)).c_str(), true);
-	// settings
-	mqttClient.publish(mqttTopicSetDeviceName.c_str(), wpFZ.DeviceName.c_str());
-	mqttClient.publish(mqttTopicSetDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str());
-	mqttClient.publish(mqttTopicCalcValues.c_str(), String(wpFZ.calcValues).c_str());
-	mqttClient.publish(mqttTopicDebugEprom.c_str(), String(wpFZ.DebugEprom).c_str());
-	mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(wpFZ.DebugWiFi).c_str());
-	mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(wpFZ.DebugMqtt).c_str());
-	mqttClient.publish(mqttTopicDebugFinder.c_str(), String(wpFZ.DebugFinder).c_str());
-	mqttClient.publish(mqttTopicDebugRest.c_str(), String(wpFZ.DebugRest).c_str());
-	mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.errorRest).c_str());
-	if(force) {
-		mqttClient.publish(mqttTopicUpdateMode.c_str(), wpFZ.UpdateFW ? "On" : "Off");
-		mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), "0");
-		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
-	}
-}
+
 
 //###################################################################################
 //  publish values Helper

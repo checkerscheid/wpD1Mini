@@ -6,45 +6,25 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 08.03.2024                                                       #
+//# Date         : 29.05.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 117                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef helperMqtt_h
-#define helperMqtt_h
+#ifndef helperEEPROM_h
+#define helperEEPROM_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-class helperMqtt {
+class helperEEPROM {
 	public:
-		// settings
-		String mqttTopicMqttServer;
-		String mqttTopicMqttSince;
-		String mqttTopicErrorOnline; // 1 Error
-		// commands
-		String mqttTopicForceMqttUpdate;
-		String mqttTopicForceRenewValue;
-
-		static WiFiClient wifiClient;
-		static PubSubClient mqttClient;
-
-		helperMqtt();
+		helperEEPROM();
 		void loop();
 		uint16_t getVersion();
-		void setMqttOffline();
-		void publishSettings();
-		void publishSettings(bool force);
-		void publishInfo();
-		void publishInfoDebug(String name, String value, String publishCount);
+		void changeDebug();
 	private:
 		String SVNh = "$Rev: 118 $";
-		void connectMqtt();
-		static void callbackMqtt(char*, byte*, unsigned int);
-
 };
-extern helperMqtt wpMqtt;
+extern helperEEPROM wpEEPROM;
 #endif

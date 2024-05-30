@@ -6,7 +6,7 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 08.03.2024                                                       #
+//# Date         : 29.05.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 117                                                     $ #
 //# Author       : $Author::                                                      $ #
@@ -49,6 +49,15 @@ uint16_t helperWiFi::getVersion() {
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+void helperWiFi::changeDebug() {
+	wpFZ.DebugWiFi = !wpFZ.DebugWiFi;
+	bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugWiFi, wpFZ.DebugWiFi);
+	EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
+	EEPROM.commit();
+	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(wpFZ.DebugEprom ? "true" : "false") + "}");
+	wpFZ.blink();
 }
 
 void helperWiFi::setupWiFi() {

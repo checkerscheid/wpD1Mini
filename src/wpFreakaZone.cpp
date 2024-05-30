@@ -344,32 +344,6 @@ bool wpFreakaZone::sendRawRest(String target) {
 	return returns;
 }
 void wpFreakaZone::setupWebServer() {
-	server.addHandler(&ws);
-	server.onNotFound([](AsyncWebServerRequest *request){ 
-		request->send(404, "text/plain", "Link was not found!");  
-	});
-
-	server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-		request->send(200, "application/json", "{\"this\":{\"is\":{\"a\":{\"FreakaZone\":{\"member\":true}}}}}");
-	});
-
-	server.on("/print", HTTP_GET, [](AsyncWebServerRequest *request) {
-		request->send_P(200, "text/html", index_html, processor);
-	});
-	server.on("/setDebug", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setDebug");
-		if(request->hasParam("Debug")) {
-			wpFZ.setWebServerDebugChange(request->getParam("Debug")->value());
-		}
-		request->send(200);
-	});
-
-	server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-		AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon, sizeof(favicon));
-		response->addHeader("Content-Encoding", "gzip");
-		request->send(response);
-	});
-
 	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
 		message += JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
@@ -630,10 +604,10 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 	String toSend = getTime() + getOnlineTime() + typ + funcToString(func) + msg;
 	Serial.println(toSend);
-	ws.textAll("{\"msg\":\"" + toSend + "\",\"newline\":" + (newline ? "true" : "false") + "}");
+	wpWebServer.webSocket.textAll("{\"msg\":\"" + toSend + "\",\"newline\":" + (newline ? "true" : "false") + "}");
 }
 void wpFreakaZone::SendWS(String msg) {
-	ws.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
+	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
 }
 
 String wpFreakaZone::funcToString(String msg) {
@@ -671,85 +645,3 @@ void wpFreakaZone::printRestored() {
 	Serial.println(getVersion());
 }
 
-String processor(const String& var) {
-	String wpHT_s;
-	if(var == "IPADRESS")
-		return WiFi.localIP().toString();
-	if(var == "DeviceName")
-		return wpFZ.DeviceName;
-	if(var == "DeviceDescription")
-		return wpFZ.DeviceDescription;
-	if(var == "CompiledWith") {
-		wpHT_s = "<ul>";
-#ifdef wpHT
-	if(wpHT == DHT11)
-			wpHT_s += "<li>wpHT HT11</li>";
-	if(wpHT == DHT22)
-			wpHT_s += "<li>wpHT HT22</li>";
-#endif
-#ifdef wpLDR
-		wpHT_s += "<li>wpLDR</li>";
-#endif
-#ifdef wpLight
-		wpHT_s += "<li>wpLight</li>";
-#endif
-#ifdef wpBM
-		wpHT_s += "<li>wpBM</li>";
-#endif
-#ifdef wpRelais
-		wpHT_s += "<li>wpRelais</li>";
-#endif
-#ifdef wpRain
-		wpHT_s += "<li>wpRain</li>";
-#endif
-#ifdef wpMoisture
-		wpHT_s += "<li>wpMoisture</li>";
-#endif
-#ifdef wpDistance
-		wpHT_s += "<li>wpDistance</li>";
-#endif
-		return wpHT_s += "</ul>";
-	}
-	if(var == "Debug") {
-		wpHT_s = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>";
-		wpHT_s += "<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") + " onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";	
-#ifdef wpMoisture
-#ifdef wpRelais
-		wpHT_s += "<li><input id='waterEmpty' type='checkbox'" + String(wpFZ.waterEmpty ? " checked='checked'" : "") + " onchange='cmdHandle(event)' /><label for='waterEmpty'>waterEmpty</label></li>";
-#endif
-#endif
-		wpHT_s += "<li><span class='bold'>Debug:</span></li><li><hr /></li>";
-		wpHT_s += "<li><input id='DebugEprom' type='checkbox'" + String(wpFZ.DebugEprom ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugEprom'>Eprom</label></li>";
-		wpHT_s += "<li><input id='DebugWiFi' type='checkbox'" + String(wpFZ.DebugWiFi ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWiFi'>WiFi</label></li>";
-		wpHT_s += "<li><input id='DebugMqtt' type='checkbox'" + String(wpFZ.DebugMqtt ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugMqtt'>Mqtt</label></li>";
-		wpHT_s += "<li><input id='DebugFinder' type='checkbox'" + String(wpFZ.DebugFinder ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugFinder'>Finder</label></li>";
-		wpHT_s += "<li><input id='DebugRest' type='checkbox'" + String(wpFZ.DebugRest ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugRest'>Rest</label></li>";
-
-#ifdef wpHT
-		wpHT_s += "<li><input id='DebugHT' type='checkbox'" + String(wpFZ.DebugHT ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugHT'>HT</label></li>";
-#endif
-#ifdef wpLDR
-		wpHT_s += "<li><input id='DebugLDR' type='checkbox'" + String(wpFZ.DebugLDR ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLDR'>LDR</label></li>";
-#endif
-#ifdef wpLight
-		wpHT_s += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
-#endif
-#ifdef wpBM
-		wpHT_s += "<li><input id='DebugBM' type='checkbox'" + String(wpFZ.DebugBM ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugBM'>BM</label></li>";
-#endif
-#ifdef wpRelais
-		wpHT_s += "<li><input id='DebugRelais' type='checkbox'" + String(wpFZ.DebugRelais ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRelais'>Relais</label></li>";
-#endif
-#ifdef wpRain
-		wpHT_s += "<li><input id='DebugRain' type='checkbox'" + String(wpFZ.DebugRain ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRain'>Rain</label></li>";
-#endif
-#ifdef wpMoisture
-		wpHT_s += "<li><input id='DebugMoisture' type='checkbox'" + String(wpFZ.DebugMoisture ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugMoisture'>Moisture</label></li>";
-#endif
-#ifdef wpDistance
-		wpHT_s += "<li><input id='DebugDistance' type='checkbox'" + String(wpFZ.DebugDistance ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDistance'>Distance</label></li>";
-#endif
-		return wpHT_s += "</ul>";
-	}
-	return String();
-}

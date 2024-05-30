@@ -49,11 +49,6 @@ String getVersion();
 void readStringsFromEEPROM();
 int writeStringToEEPROM(int addrOffset, String &strToWrite);
 void checkOfflineTrigger();
-void setMqttOffline();
-void publishSettings();
-void publishSettings(bool);
-void publishInfo();
-void publishInfoDebug(String name, String value, String publishCount);
 void callbackMqtt(char*, byte*, unsigned int);
 void callbackMqttDebug(String topic, String value);
 
