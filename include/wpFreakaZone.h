@@ -62,7 +62,6 @@ class wpFreakaZone {
 
 		String DeviceName;
 		String DeviceDescription;
-		bool OfflineTrigger;
 		bool calcValues;
 
 		int16_t ldrCorrection;

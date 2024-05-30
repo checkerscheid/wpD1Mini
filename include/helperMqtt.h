@@ -19,13 +19,13 @@
 #include <wpFreakaZone.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <helperOnlineToggler.h>
 class helperMqtt {
 	public:
 		static bool DebugMqtt;
 		// settings
 		String mqttTopicMqttServer;
 		String mqttTopicMqttSince;
-		String mqttTopicErrorOnline; // 1 Error
 		// commands
 		String mqttTopicForceMqttUpdate;
 		String mqttTopicForceRenewValue;

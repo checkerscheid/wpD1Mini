@@ -41,7 +41,6 @@ void setup() {
 // loop
 //###################################################################################
 void loop() {
-	checkOfflineTrigger();
 	wpWiFi.loop();
 	wpMqtt.loop();
 	if(wpFZ.calcValues) {
@@ -73,7 +72,6 @@ void getVars() {
 	// settings
 	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
 	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
-	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicOnSince = wpFZ.DeviceName + "/info/OnSince";
 	mqttTopicOnDuration = wpFZ.DeviceName + "/info/OnDuration";
 	// commands
@@ -111,7 +109,7 @@ void connectMqtt() {
 			// subscribes
 			mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
 			mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
-			mqttClient.subscribe(mqttTopicOnlineToggler.c_str());
+			mqttClient.subscribe(wpOnlineToggler.mqttTopicOnlineToggler.c_str());
 			mqttClient.subscribe(mqttTopicRestartDevice.c_str());
 			mqttClient.subscribe(mqttTopicUpdateFW.c_str());
 			mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
@@ -129,13 +127,6 @@ void connectMqtt() {
 	}
 }
 
-void checkOfflineTrigger() {
-	if(wpFZ.OfflineTrigger) {
-		// set offline for reboot
-		setMqttOffline();
-		wpFZ.OfflineTrigger = false;
-	}
-}
 
 //###################################################################################
 // publish settings
@@ -259,11 +250,11 @@ void callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				callbackMqttDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
 			}
 		}
-		if(strcmp(topic, mqttTopicOnlineToggler.c_str()) == 0) {
+		if(strcmp(topic, wpOnlineToggler.mqttTopicOnlineToggler.c_str()) == 0) {
 			int readOnline = msg.toInt();
 			if(readOnline != 1) {
 				//reset
-				mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
+				wpMqtt.mqttClient.publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
 			}
 		}
 		if(strcmp(topic, mqttTopicCalcValues.c_str()) == 0) {

@@ -24,7 +24,6 @@ helperMqtt::helperMqtt() {
 	// settings
 	mqttTopicMqttServer = wpFZ.DeviceName + "/info/MQTT/Server";
 	mqttTopicMqttSince = wpFZ.DeviceName + "/info/MQTT/Since";
-	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// commands
 	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
 	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
@@ -62,7 +61,7 @@ void helperMqtt::changeDebug() {
 }
 
 void helperMqtt::setMqttOffline() {
-	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
+	mqttClient.publish(wpOnlineToggler.mqttTopicErrorOnline.c_str(), String(1).c_str());
 }
 
 void helperMqtt::publishSettings() {
@@ -70,7 +69,7 @@ void helperMqtt::publishSettings() {
 }
 
 void helperMqtt::publishSettings(bool force) {
-	mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
+	mqttClient.publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
 	// values
 	mqttClient.publish(mqttTopicDeviceName.c_str(), wpFZ.DeviceName.c_str(), true);
 	mqttClient.publish(mqttTopicDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str(), true);

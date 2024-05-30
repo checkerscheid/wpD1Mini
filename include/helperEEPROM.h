@@ -46,6 +46,7 @@ class helperEEPROM {
 		const byte bitDebugMqtt = 2;
 		const byte bitDebugFinder = 3;
 		const byte bitDebugRest = 4;
+		const byte bitDebugOnlineToggler = 5;
 		
 		const byte addrBitsDebugModules = 3;
 		byte bitsDebugModules;

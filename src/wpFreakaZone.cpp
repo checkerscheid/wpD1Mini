@@ -23,7 +23,6 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	configTime(TZ, NTP_SERVER);
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
-	OfflineTrigger = false;
 	calcValues = true;
 
 #ifdef wpHT
