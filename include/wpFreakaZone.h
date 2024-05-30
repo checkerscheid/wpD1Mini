@@ -17,7 +17,6 @@
 #define wpFreakaZone_h
 #include <Arduino.h>
 #include <time.h>
-#include <ArduinoOTA.h>
 #include <helperWebServer.h>
 
 #define NTP_SERVER "172.17.1.1"
@@ -64,7 +63,6 @@ class wpFreakaZone {
 		String DeviceName;
 		String DeviceDescription;
 		bool OfflineTrigger;
-		bool UpdateFW;
 		bool calcValues;
 
 		int16_t ldrCorrection;
@@ -99,7 +97,6 @@ class wpFreakaZone {
 		uint16_t getBuild(String);
 		void setVersion(uint16_t v);
 		void blink();
-		bool setupOta();
 
 		static String JsonKeyValue(String name, String value);
 		static String JsonKeyString(String name, String value);

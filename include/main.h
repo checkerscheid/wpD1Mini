@@ -21,15 +21,12 @@
 #include <helperMqtt.h>
 
 // values
-String mqttTopicUpdateMode;
-String mqttTopicRestartRequired;
 String mqttTopicOnlineToggler;
 // settings
 String mqttTopicDeviceName;
 String mqttTopicDeviceDescription;
 String mqttTopicErrorOnline; // 1 Error
 String mqttTopicRestartDevice;
-String mqttTopicUpdateFW;
 String mqttTopicOnSince;
 String mqttTopicOnDuration;
 // commands

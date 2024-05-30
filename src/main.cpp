@@ -42,7 +42,6 @@ void setup() {
 //###################################################################################
 void loop() {
 	checkOfflineTrigger();
-	if(wpFZ.UpdateFW) ArduinoOTA.handle();
 	wpWiFi.loop();
 	wpMqtt.loop();
 	if(wpFZ.calcValues) {
@@ -71,8 +70,6 @@ void getVars() {
 	readStringsFromEEPROM();
 
 	// values
-	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
-	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
 	// settings
 	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
 	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
@@ -83,7 +80,6 @@ void getVars() {
 	mqttTopicSetDeviceName = wpFZ.DeviceName + "/settings/DeviceName";
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
-	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 }
 

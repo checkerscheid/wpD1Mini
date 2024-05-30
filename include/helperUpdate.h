@@ -17,11 +17,20 @@
 #define helperUpdate_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <ArduinoOTA.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
 class helperUpdate {
 	public:
+		// values
+		String mqttTopicUpdateMode;
+		String mqttTopicRestartRequired;
+		// settings
+		String mqttTopicUpdateFW;
+
+		bool UpdateFW = false;
+
 		helperUpdate();
 		void loop();
 		uint16_t getVersion();
@@ -29,6 +38,7 @@ class helperUpdate {
 		void start();
 	private:
 		String SVNh = "$Rev: 118 $";
+		bool setupOta();
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);

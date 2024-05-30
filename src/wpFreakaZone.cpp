@@ -24,7 +24,6 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
 	OfflineTrigger = false;
-	UpdateFW = false;
 	calcValues = true;
 
 #ifdef wpHT
@@ -184,37 +183,6 @@ void wpFreakaZone::blink() {
 		digitalWrite(LED_BUILTIN, led);
 		delay(blinkDelay);
 	}
-}
-
-bool wpFreakaZone::setupOta() {
-	bool returns = false;
-	ArduinoOTA.onStart([]() {
-		String logmessage = "OTA Start";
-		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
-	});
-	ArduinoOTA.onEnd([]() {
-		wpFZ.OfflineTrigger = true;
-		String logmessage = "OTA End";
-		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
-	});
-	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-		String logmessage = "OTA Progress: " + String((progress / (total / 100))) + " %";
-		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
-	});
-	ArduinoOTA.onError([](ota_error_t error) {
-		String logmessage = "Error (" + String(error) + ") ";
-		if (error == OTA_AUTH_ERROR) logmessage += "Auth Failed";
-		else if (error == OTA_BEGIN_ERROR) logmessage += "Begin Failed";
-		else if (error == OTA_CONNECT_ERROR) logmessage += "Connect Failed";
-		else if (error == OTA_RECEIVE_ERROR) logmessage += "Receive Failed";
-		else if (error == OTA_END_ERROR) logmessage += "End Failed";
-		wpFZ.DebugWS(wpFZ.strERRROR, "setupOta", logmessage);
-	});
-	ArduinoOTA.begin();
-	returns = true;
-	String logmessage = "OTA Ready, IP address: " + WiFi.localIP().toString();
-	wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
-	return returns;
 }
 
 void wpFreakaZone::setupWebServer() {
