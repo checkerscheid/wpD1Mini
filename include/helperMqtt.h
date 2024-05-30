@@ -6,31 +6,37 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 29.05.2024                                                       #
+//# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 117                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
+//# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef wpUpdate_h
-#define wpUpdate_h
+#ifndef wpMqtt_h
+#define wpMqtt_h
 #include <Arduino.h>
-#include <ESP8266HTTPClient.h>
-#include <ESP8266httpUpdate.h>
-
-class wpUpdate {
+#include <wpFreakaZone.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+class wpMqtt {
 	public:
-		wpUpdate();
-		void loop();
-		
-		void check();
-		void start();
-	private:
-		static void started();
-		static void finished();
-		static void progress(int cur, int total);
-		static void error(int err);
-};
+		// settings
+		String mqttTopicMqttServer;
+		String mqttTopicMqttSince;
+		// commands
+		String mqttTopicForceMqttUpdate;
+		String mqttTopicForceRenewValue;
 
+		static WiFiClient wifiClient;
+		static PubSubClient mqttClient;
+
+		wpMqtt();
+		void loop();
+	private:
+		void connectMqtt();
+		static void callbackMqtt(char*, byte*, unsigned int);
+
+};
+extern wpMqtt mqtt;
 #endif

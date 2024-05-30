@@ -32,20 +32,6 @@ uint loopTime = 200;
 //###################################################################################
 //  Value Defines
 //###################################################################################
-#ifdef wpHT
-	#include <DHT.h>
-	#define DHTPin D7
-	uint cycleHT = 0;
-	bool errorHT = false;
-	bool errorHTLast = false;
-	uint16_t publishCountErrorHT = 0;
-	float temperature = 0.0;
-	int temperatureLast = 0;
-	uint16_t publishCountTemperature = 0;
-	float humidity = 0.0;
-	int humidityLast = 0;
-	uint16_t publishCountHumidity = 0;
-#endif
 #ifdef wpLDR
 	#define LDRPin A0
 	uint cycleLDR = 0;
@@ -381,18 +367,7 @@ void getVars() {
 	mqttTopicDebugFinder = wpFZ.DeviceName + "/settings/Debug/Finder";
 	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
 	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
-#ifdef wpHT
-	// values
-	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
-	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
-	mqttTopicErrorHT = wpFZ.DeviceName + "/ERROR/HT";
-	// settings
-	mqttTopicMaxCycleHT = wpFZ.DeviceName + "/settings/HT/maxCycle";
-	mqttTopicTemperatureCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Temperature";
-	mqttTopicHumidityCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Humidity";
-	// commands
-	mqttTopicDebugHT = wpFZ.DeviceName + "/settings/Debug/HT";
-#endif
+
 #ifdef wpLDR
 	// values
 	mqttTopicLDR = wpFZ.DeviceName + "/LDR";
@@ -809,33 +784,7 @@ void publishSettings(bool force) {
 //###################################################################################
 //  publish values Helper
 //###################################################################################
-#ifdef wpHT
-void publishValueTemp(int equalVal) {
-	mqttClient.publish(mqttTopicTemperature.c_str(), String(temperature).c_str());
-	wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("temp", String(temperature));
-	trySendRest = true;
-	temperatureLast = equalVal;
-	if(wpFZ.DebugMqtt) {
-		publishInfoDebug("Temperature", String(temperature), String(publishCountTemperature));
-	}
-	publishCountTemperature = 0;
-}
-void publishValueHum(int equalVal) {
-	mqttClient.publish(mqttTopicHumidity.c_str(), String(humidity).c_str());
-	wpFZ.ErrorRest = wpFZ.ErrorRest | !wpFZ.sendRest("hum", String(humidity));
-	trySendRest = true;
-	humidityLast = equalVal;
-	if(wpFZ.DebugMqtt) {
-		publishInfoDebug("Humidity", String(humidity), String(publishCountHumidity));
-	}
-	publishCountHumidity = 0;
-}
-void publishErrorHT() {
-	mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
-	errorHTLast = errorHT;
-	publishCountErrorHT = 0;
-}
-#endif
+
 #ifdef wpLDR
 void publishValueLDR() {
 	mqttClient.publish(mqttTopicLDR.c_str(), String(ldr).c_str());
@@ -1693,43 +1642,6 @@ void callbackMqttDebug(String topic, String value) {
 //###################################################################################
 // calc values
 //###################################################################################
-#ifdef wpHT
-	void calcHT() {
-		bool e = false;
-		float newT = dht.readTemperature();
-		float newH = dht.readHumidity();
-		if(!isnan(newT)) {
-			temperature = newT + wpFZ.temperatureCorrection;
-			e = e | false;
-			if(wpFZ.DebugHT) {
-				calcHTDebug("Temperature", temperature, newT);
-			}
-		} else {
-			e = e | true;
-			calcHTError("Temperature");
-		}
-		if(!isnan(newH)) {
-			humidity = newH + wpFZ.humidityCorrection;
-			if(wpFZ.DebugHT) {
-				e = e | false;
-				calcHTDebug("Humidity", humidity, newH);
-			}
-		} else {
-			e = e | true;
-			calcHTError("Humidity");
-		}
-		errorHT = e;
-	}
-	void calcHTDebug(String name, float value, float raw) {
-		String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
-		wpFZ.DebugWS(wpFZ.strDEBUG, "calcHT", logmessage);
-	}
-	void calcHTError(String name) {
-		wpFZ.blink();
-		String logmessage = name + ": Sensor Failure";
-		wpFZ.DebugWS(wpFZ.strERRROR, "calcHT", logmessage);
-	}
-#endif
 #ifdef wpLDR
 	void calcLDR() {
 		int ar = analogRead(LDRPin);

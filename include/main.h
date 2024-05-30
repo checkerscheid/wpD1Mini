@@ -51,18 +51,6 @@ String mqttTopicDebugMqtt;
 String mqttTopicDebugFinder;
 String mqttTopicDebugRest;
 String mqttTopicErrorRest;
-#ifdef wpHT
-	// values
-	String mqttTopicTemperature;
-	String mqttTopicHumidity;
-	String mqttTopicErrorHT;
-	// settings
-	String mqttTopicMaxCycleHT;
-	String mqttTopicTemperatureCorrection;
-	String mqttTopicHumidityCorrection;
-	// commands
-	String mqttTopicDebugHT;
-#endif
 #ifdef wpLDR
 	// values
 	String mqttTopicLDR;
@@ -180,14 +168,6 @@ void publishInfo();
 void publishInfoDebug(String name, String value, String publishCount);
 void callbackMqtt(char*, byte*, unsigned int);
 void callbackMqttDebug(String topic, String value);
-#ifdef wpHT
-void publishValueTemp(int equalVal);
-void publishValueHum(int equalVal);
-void publishErrorHT();
-void calcHT();
-void calcHTDebug(String name, float value, float raw);
-void calcHTError(String name);
-#endif
 #ifdef wpLDR
 void publishValueLDR();
 void publishErrorLDR();

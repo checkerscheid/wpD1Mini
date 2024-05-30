@@ -32,6 +32,7 @@
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
 
+/// @brief Base class with std: consts, EEPROM, WebServer and CalcVersion
 class wpFreakaZone {
 	public:
 		const char* ssid = "Mikrowellen";
@@ -41,6 +42,7 @@ class wpFreakaZone {
 		const uint16_t mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
+		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16_t findListenPort = 51346;
 		const uint16_t publishQoS = 4 * 60 * 10;
 
@@ -69,8 +71,10 @@ class wpFreakaZone {
 			wpRelaisShield,
 			wpRain,
 			wpMoisture,
-			wpDistance
+			wpDistance,
+			ModulesEND
 		};
+		bool installedModules[ModulesEND];
 		/// @brief  EEPROM byte 0
 		const enum settingsBIT0 {
 			bitDHT11,
@@ -119,8 +123,6 @@ class wpFreakaZone {
 		/// @brief  EEPROM byte ab 10 (uint8_t)
 		const enum settingsByte {
 			byteMaxCycleHT = 10,
-			byteTemperatureCorrection, // int8_t * 10
-			byteHumidityCorrection, // int8_t * 10
 			byteMaxCycleLDR,
 			byteLDRCorrection, // int8_t
 			byteMaxCycleLight,
@@ -135,12 +137,14 @@ class wpFreakaZone {
 		};
 		/// @brief  EEPROM 2byte ab 30 (uint16_t)
 		const enum settingsWord {
-			byteLightCorrection = 30, // int16_t
-			byteThreshold = 32,
-			bytePumpPause = 34,
-			byteMoistureDry = 36,
-			byteMoistureWet = 38,
-			byteMaxVolume = 40
+			byteTemperatureCorrection = 30, // int8_t * 10
+			byteHumidityCorrection = 32, // int8_t * 10
+			byteLightCorrection = 34, // int16_t
+			byteThreshold = 36,
+			bytePumpPause = 38,
+			byteMoistureDry = 40,
+			byteMoistureWet = 42,
+			byteMaxVolume = 44
 		};
 		/// @brief  EEPROM 4byte ab 60
 		const enum settingsDWord {
@@ -152,6 +156,7 @@ class wpFreakaZone {
 		bool OfflineTrigger;
 		bool UpdateFW;
 		bool calcValues;
+		bool errorRest;
 
 		const enum Debug {
 			DebugEprom,
@@ -184,50 +189,27 @@ class wpFreakaZone {
 			maxCycleMoisture,
 			maxCycleDistance
 		};
-#ifdef wpHT
-		float temperatureCorrection;
-		float humidityCorrection;
-#endif
-#ifdef wpLDR
 		int16_t ldrCorrection;
-#endif
-#ifdef wpLight
 		int16_t lightCorrection;
-#endif
-#ifdef wpBM
-	#ifdef wpLDR
 		uint16_t threshold;
 		String lightToTurnOn;
-	#endif
-#endif
-#ifdef wpRelais
 		bool relaisHand;
 		bool relaisHandValue;
-	#ifdef wpMoisture
 		bool waterEmpty;
 		uint16_t pumpActive;
 		uint16_t pumpPause;
-	#endif
-#endif
-#ifdef wpRain
 		float rainCorrection;
-#endif
-#ifdef wpMoisture
 		bool useMoistureAvg;
 		byte moistureMin;
 		// Dry = high e.g. 622
 		int16_t moistureDry;
 		// Wet = low e.g. 224
 		int16_t moistureWet;
-#endif
-#ifdef wpDistance
 		int8_t distanceCorrection;
 		uint16_t maxVolume;
 		uint8_t height;
-#endif
 
 		wpFreakaZone(String);
-
 		void loop();
 
 		AsyncWebServer server = AsyncWebServer(80);
