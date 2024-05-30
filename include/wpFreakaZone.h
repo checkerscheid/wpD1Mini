@@ -18,7 +18,6 @@
 #include <Arduino.h>
 #include <time.h>
 #include <ArduinoOTA.h>
-#include <ESPAsyncUDP.h>
 #include <ESP8266HTTPClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -39,7 +38,7 @@ class wpFreakaZone {
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
-		const uint16_t findListenPort = 51346;
+		const uint16_t finderListenPort = 51346;
 		const uint16_t publishQoS = 4 * 60 * 10;
 
 		uint16_t MajorVersion;
@@ -109,7 +108,6 @@ class wpFreakaZone {
 		void setVersion(uint16_t v);
 		void blink();
 		bool setupOta();
-		void setupFinder();
 		bool sendRest(String name, String value);
 		bool sendRawRest(String target);
 

@@ -38,7 +38,6 @@ void setup() {
 	wpFZ.printRestored();
 
 	wpWiFi.setupWiFi();
-	setupWebServer();
 	wpFZ.setupFinder();
 }
 
@@ -91,7 +90,6 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-	mqttTopicDebugFinder = wpFZ.DeviceName + "/settings/Debug/Finder";
 	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
 	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
 }

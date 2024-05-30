@@ -18,6 +18,7 @@
 helperEEPROM wpEEPROM();
 
 helperEEPROM::helperEEPROM() {
+	EEPROM.begin(4095);
 	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
 }
 

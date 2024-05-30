@@ -18,17 +18,15 @@
 wpFreakaZone wpFZ("BasisEmpty");
 
 wpFreakaZone::wpFreakaZone(String deviceName) {
-	MajorVersion = 2;
-	MinorVersion = 5;
-	EEPROM.begin(4095);
+	MajorVersion = 3;
+	MinorVersion = 0;
 	configTime(TZ, NTP_SERVER);
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
 	OfflineTrigger = false;
 	UpdateFW = false;
 	calcValues = true;
-	
-	DebugFinder = false;
+
 	DebugRest = false;
 	ErrorRest = false;
 
@@ -220,35 +218,6 @@ bool wpFreakaZone::setupOta() {
 	String logmessage = "OTA Ready, IP address: " + WiFi.localIP().toString();
 	wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	return returns;
-}
-
-AsyncUDP udp;
-
-void wpFreakaZone::setupFinder() {
-	if(udp.listen(wpFZ.findListenPort)) {
-		udp.onPacket([](AsyncUDPPacket packet) {
-			int val = strncmp((char *) packet.data(), "FreakaZone Member?", 2);
-			if(val == 0) {
-				String IP = WiFi.localIP().toString();
-				packet.printf("{\"Iam\":{\"FreakaZoneClient\":\"%s\",\"IP\":\"%s\",\"MAC\":\"%s\",\"wpFreakaZoneVersion\":\"%s\",\"Version\":\"%s\"}}",
-					wpFZ.DeviceName.c_str(), IP.c_str(), WiFi.macAddress().c_str(), wpFZ.getVersion().c_str(), wpFZ.MainVersion.c_str());
-				String logmessage = "Found FreakaZone Member question";
-				wpFZ.DebugWS(wpFZ.strDEBUG, "setupFinder", logmessage);
-			}
-			char* tmpStr = (char*) malloc(packet.length() + 1);
-			memcpy(tmpStr, packet.data(), packet.length());
-			tmpStr[packet.length()] = '\0';
-			String dataString = String(tmpStr);
-			free(tmpStr);
-			String logmessage = "UDP Packet Type: " +
-				String(packet.isBroadcast() ? "Broadcast" : packet.isMulticast() ? "Multicast" : "Unicast") +
-				", From: " + packet.remoteIP().toString() + ":" + String(packet.remotePort()) +
-				", To: " + packet.localIP().toString() + ":" + String(packet.localPort()) +
-				", Length: " + String(packet.length()) +
-				", Data: " + dataString;
-			wpFZ.DebugWS(wpFZ.strDEBUG, "setupFinder", logmessage);
-		});
-	}
 }
 
 // return true on success
