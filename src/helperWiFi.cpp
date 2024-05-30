@@ -28,12 +28,13 @@ helperWiFi::helperWiFi() {
 	mqttTopicDebugWiFi = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
 	setupWiFi();
+	// because DateTime Only works with NTP Server
+	wpFZ.OnSince = wpFZ.getDateTime();
 }
 
 //###################################################################################
 // public
 //###################################################################################
-
 void helperWiFi::loop() {
 	if(WiFi.status() == WL_CONNECTED) {
 		digitalWrite(LED_BUILTIN, LOW);

@@ -48,6 +48,14 @@ void moduleDHT::loop() {
 		calcHT();
 	}
 }
+
+uint16_t moduleDHT::getVersion() {
+	String SVN = "$Rev: 118 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
 void moduleDHT::publishValueTemp(int equalVal) {
 	mqttClient.publish(mqttTopicTemperature.c_str(), String(temperature).c_str());
 	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("temp", String(temperature));
@@ -58,6 +66,7 @@ void moduleDHT::publishValueTemp(int equalVal) {
 	}
 	publishCountTemperature = 0;
 }
+
 void moduleDHT::publishValueHum(int equalVal) {
 	mqttClient.publish(mqttTopicHumidity.c_str(), String(humidity).c_str());
 	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("hum", String(humidity));
@@ -68,10 +77,12 @@ void moduleDHT::publishValueHum(int equalVal) {
 	}
 	publishCountHumidity = 0;
 }
+
 void moduleDHT::publishInfoDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
+
 void moduleDHT::publishErrorHT() {
 	mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
 	errorHTLast = errorHT;

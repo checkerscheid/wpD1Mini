@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <helperWiFi.h>
+#include <helperMqtt.h>
 
 // values
 String mqttTopicUpdateMode;
@@ -27,18 +28,14 @@ String mqttTopicOnlineToggler;
 String mqttTopicDeviceName;
 String mqttTopicDeviceDescription;
 String mqttTopicErrorOnline; // 1 Error
+String mqttTopicRestartDevice;
+String mqttTopicUpdateFW;
 String mqttTopicOnSince;
 String mqttTopicOnDuration;
-String mqttTopicMqttServer;
-String mqttTopicMqttSince;
 String mqttTopicRestServer;
 // commands
 String mqttTopicSetDeviceName;
 String mqttTopicSetDeviceDescription;
-String mqttTopicRestartDevice;
-String mqttTopicUpdateFW;
-String mqttTopicForceMqttUpdate;
-String mqttTopicForceRenewValue;
 String mqttTopicCalcValues;
 String mqttTopicDebugEprom;
 String mqttTopicDebugMqtt;
@@ -51,19 +48,6 @@ void getVars();
 String getVersion();
 void readStringsFromEEPROM();
 int writeStringToEEPROM(int addrOffset, String &strToWrite);
-const int8_t WebServerCommanddoNothing = -1;
-const int8_t WebServerCommandblink = 1;
-const int8_t WebServerCommandpublishSettings = 2;
-const int8_t WebServerCommandupdateFW = 3;
-const int8_t WebServerCommandrestartESP = 4;
-const int8_t WebServerCommandscanWiFi = 5;
-int8_t doWebServerCommand = WebServerCommanddoNothing;
-int8_t doWebServerBlink = WebServerCommanddoNothing;
-void setupWebServer();
-void setWebServerCommand(int8_t command);
-void setWebServerBlink();
-void doTheWebServerCommand();
-void doTheWebserverBlink();
 void checkOfflineTrigger();
 void setMqttOffline();
 void publishSettings();

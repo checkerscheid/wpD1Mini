@@ -15,8 +15,6 @@
 //###################################################################################
 #include <main.h>
 
-#define wpShield 1
-
 uint loopTime = 200;
 //###################################################################################
 //  Value Defines
@@ -38,9 +36,8 @@ void setup() {
 	wpFZ.printStart();
 	getVars();
 	wpFZ.printRestored();
+
 	wpWiFi.setupWiFi();
-	wpFZ.OnSince = wpFZ.getDateTime();
-	wpFZ.OnDuration = wpFZ.getOnlineTime(false);
 	setupWebServer();
 	wpFZ.setupFinder();
 }
@@ -54,14 +51,11 @@ void loop() {
 	checkOfflineTrigger();
 	if(wpFZ.UpdateFW) ArduinoOTA.handle();
 	wpWiFi.loop();
-	if(!mqttClient.connected()) {
-		connectMqtt();
-	}
+	wpMqtt.loop();
 	if(wpFZ.calcValues) {
 		publishInfo();
 	}
 	wpFZ.loop();
-	mqttClient.loop();
 #ifndef wpDistance
 	delay(loopTime);
 #endif
@@ -87,25 +81,18 @@ void getVars() {
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
 	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
-	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// settings
 	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
 	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
-	mqttTopicVersion = wpFZ.DeviceName + "/info/Version";
-	mqttTopicwpFreakaZoneVersion = wpFZ.DeviceName + "/info/wpFreakaZone";
 	mqttTopicOnSince = wpFZ.DeviceName + "/info/OnSince";
 	mqttTopicOnDuration = wpFZ.DeviceName + "/info/OnDuration";
-	mqttTopicMqttServer = wpFZ.DeviceName + "/info/MQTT/Server";
-	mqttTopicMqttSince = wpFZ.DeviceName + "/info/MQTT/Since";
 	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
 	mqttTopicSetDeviceName = wpFZ.DeviceName + "/settings/DeviceName";
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
-	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
-	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
 	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
@@ -178,88 +165,12 @@ void connectMqtt() {
 	}
 }
 
-void setupWebServer() {
-	wpFZ.setupWebServer();
-
-	wpFZ.server.on("/setCmd", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCmd");
-		if(request->hasParam("cmd")) {
-			if(request->getParam("cmd")->value() == "ForceMqttUpdate") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ForceMqttUpdate");
-				setWebServerCommand(WebServerCommandpublishSettings);
-			}
-			if(request->getParam("cmd")->value() == "UpdateFW") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateFW");
-				setWebServerCommand(WebServerCommandupdateFW);
-			}
-			if(request->getParam("cmd")->value() == "RestartDevice") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
-				setWebServerCommand(WebServerCommandrestartESP);
-			}
-			if(request->getParam("cmd")->value() == "ScanWiFi") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ScanWiFi");
-				setWebServerCommand(WebServerCommandscanWiFi);
-			}
-			if(request->getParam("cmd")->value() == "calcValues") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
-				wpFZ.calcValues = !wpFZ.calcValues;
-			}
-			if(request->getParam("cmd")->value() == "Blink") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Blink");
-			}
-			if(request->getParam("cmd")->value() == "waterEmpty") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd waterEmpty");
-				wpFZ.waterEmpty = !wpFZ.waterEmpty;
-			}
-		}
-		request->send(200);
-		setWebServerBlink();
-	});
-	wpFZ.server.begin();
-}
-void setWebServerCommand(int8_t command) {
-	doWebServerCommand = command;
-}
-void setWebServerBlink() {
-	doWebServerBlink = WebServerCommandblink;
-}
-void doTheWebServerCommand() {
-	if(doWebServerCommand > 0) {
-		switch(doWebServerCommand) {
-			case WebServerCommandpublishSettings:
-				publishSettings(true);
-				break;
-			case WebServerCommandupdateFW:
-				if(wpFZ.setupOta()) {
-					wpFZ.UpdateFW = true;
-				}
-				break;
-			case WebServerCommandrestartESP:
-				setMqttOffline();
-				ESP.restart();
-				break;
-			case WebServerCommandscanWiFi:
-				wpWiFi.scanWiFi();
-				break;
-		}
-		doWebServerCommand = WebServerCommanddoNothing;
-	}
-}
-void doTheWebserverBlink() {
-	if(doWebServerBlink > 0) {
-		wpFZ.blink();
-		doWebServerBlink = WebServerCommanddoNothing;
-	}
-}
 void checkOfflineTrigger() {
 	if(wpFZ.OfflineTrigger) {
 		// set offline for reboot
 		setMqttOffline();
 		wpFZ.OfflineTrigger = false;
 	}
-}
-void setMqttOffline() {
-	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
 }
 
 //###################################################################################

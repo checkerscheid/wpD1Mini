@@ -45,12 +45,14 @@ class moduleDHT {
 
 		moduleDHT(PubSubClient, uint8_t);
 		void loop();
+		uint16_t getVersion();
 
 		void publishValueTemp(int equalVal);
 		void publishValueHum(int equalVal);
 		void publishInfoDebug(String name, String value, String publishCount);
 		void publishErrorHT();
 	private:
+		String SVNh = "$Rev: 118 $";
 		PubSubClient mqttClient;
 		uint16_t cycleHT = 0;
 		bool errorHTLast = false;

@@ -15,10 +15,20 @@
 //###################################################################################
 #include <helperMqtt.h>
 
+helperMqtt wpMqtt();
+
 WiFiClient helperMqtt::wifiClient;
 PubSubClient helperMqtt::mqttClient(helperMqtt::wifiClient);
 
 helperMqtt::helperMqtt() {
+	// settings
+	mqttTopicMqttServer = wpFZ.DeviceName + "/info/MQTT/Server";
+	mqttTopicMqttSince = wpFZ.DeviceName + "/info/MQTT/Since";
+	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
+	// commands
+	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
+	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
+	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
 	connectMqtt();
@@ -28,7 +38,10 @@ helperMqtt::helperMqtt() {
 // public
 //###################################################################################
 void helperMqtt::loop() {
-
+	if(!mqttClient.connected()) {
+		connectMqtt();
+	}
+	mqttClient,loop();
 }
 
 uint16_t helperMqtt::getVersion() {
@@ -36,6 +49,10 @@ uint16_t helperMqtt::getVersion() {
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+void helperMqtt::setMqttOffline() {
+	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
 }
 
 //###################################################################################
