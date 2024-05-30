@@ -17,14 +17,14 @@
 #define moduleDHT_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <PubSubClient.h>
+#include <helperMqtt.h>
+#include <helperRest.h>
 #include <DHT.h>
 
 #define DHTPin D7
 
 class moduleDHT {
 	public:
-		bool errorHT = false;
 		int16_t temperature = 0;
 		int16_t humidity = 0;
 		// values
@@ -32,28 +32,28 @@ class moduleDHT {
 		String mqttTopicHumidity;
 		String mqttTopicErrorHT;
 		// settings
-		String mqttTopicMaxCycleHT;
+		String mqttTopicMaxCycle;
 		String mqttTopicTemperatureCorrection;
 		String mqttTopicHumidityCorrection;
 		// commands
 		String mqttTopicDebugHT;
 
-		int8_t temperatureCorrection;
-		int8_t humidityCorrection;
+		bool DebugHT = false;
+		bool errorHT = false;
+		int8_t temperatureCorrection = 0;
+		int8_t humidityCorrection = 0;
+		uint16_t maxCycle = 4;
 
-		DHT dht;
-
-		moduleDHT(PubSubClient, uint8_t);
+		moduleDHT();
 		void loop();
 		uint16_t getVersion();
 
-		void publishValueTemp(int equalVal);
-		void publishValueHum(int equalVal);
-		void publishInfoDebug(String name, String value, String publishCount);
-		void publishErrorHT();
+		void checkSubscripes(char* topic, String msg);
+		void publishSettings();
+		void publishValues();
+		void publishValues(bool force);
 	private:
 		String SVNh = "$Rev: 118 $";
-		PubSubClient mqttClient;
 		uint16_t cycleHT = 0;
 		bool errorHTLast = false;
 		uint16_t publishCountErrorHT = 0;
@@ -62,9 +62,16 @@ class moduleDHT {
 		int16_t humidityLast = 0;
 		uint16_t publishCountHumidity = 0;
 
+		void setSubscribes();
+		void publishValueTemp();
+		void publishValueHum();
+		void publishErrorHT();
 		void calcHT();
-		void calcHTDebug(String name, int16_t value, float raw);
 		void calcHTError(String name);
+		void publishInfoDebug(String name, String value, String publishCount);
+		void checkSubscripesDebug(String topic, String value);
+		void calcHTDebug(String name, int16_t value, float raw);
 };
+extern moduleDHT wpDHT;
 
 #endif

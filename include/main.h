@@ -17,8 +17,14 @@
 #define BasisEmpty_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <helperWiFi.h>
+#include <helperFinder.h>
 #include <helperMqtt.h>
+#include <helperOnlineToggler.h>
+#include <helperRest.h>
+#include <helperUpdate.h>
+#include <helperWebServer.h>
+#include <helperWiFi.h>
+#include <moduleDHT.h>
 
 // values
 // settings
@@ -32,19 +38,14 @@ String mqttTopicSetDeviceName;
 String mqttTopicSetDeviceDescription;
 String mqttTopicCalcValues;
 
-
 void getVars();
-String getVersion();
-void callbackMqtt(char*, byte*, unsigned int);
-void callbackMqttDebug(String topic, String value);
+uint16_t getVersion();
+String getStringVersion();
+uint16_t getGlobalBuild();
 
 void publishValuesSystem();
 
 String SVNh = "$Rev: 118 $";
-String Revh;
-String Rev;
-int Buildh;
-int Build;
 // counter
 uint16_t publishCountRssi = 0;
 

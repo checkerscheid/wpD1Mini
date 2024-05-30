@@ -15,21 +15,16 @@
 //###################################################################################
 #include <moduleDHT.h>
 
-moduleDHT::moduleDHT(PubSubClient mc, uint8_t wpHTtype) {
-	if(wpFZ.installedModules[wpFZ.wpDHT11]) {
-		wpHTtype = DHT11;
-	}
-	if(wpFZ.installedModules[wpFZ.wpDHT22]) {
-		wpHTtype = DHT11;
-	}
-	dht = new DHT(DHTPin, wpHTtype);
-	mqttClient = mc;
+moduleDHT wpDHT();
+DHT dht(DHTPin, wpFZ.choosenDHT);
+
+moduleDHT::moduleDHT() {
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
 	mqttTopicErrorHT = wpFZ.DeviceName + "/ERROR/HT";
 	// settings
-	mqttTopicMaxCycleHT = wpFZ.DeviceName + "/settings/HT/maxCycle";
+	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/HT/maxCycle";
 	mqttTopicTemperatureCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Temperature";
 	mqttTopicHumidityCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Humidity";
 	// commands
@@ -37,16 +32,21 @@ moduleDHT::moduleDHT(PubSubClient mc, uint8_t wpHTtype) {
 
 	temperatureCorrection = 0;
 	humidityCorrection = 0;
+
+	dht.begin();
+
+	setSubscribes();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleDHT::loop() {
-	if(++cycleHT >= wpFZ.maxCycleHT) {
+	if(wpFZ.calcValues && ++cycleHT >= maxCycle) {
 		cycleHT = 0;
 		calcHT();
 	}
+	publishValues();
 }
 
 uint16_t moduleDHT::getVersion() {
@@ -56,42 +56,116 @@ uint16_t moduleDHT::getVersion() {
 	return v > vh ? v : vh;
 }
 
-void moduleDHT::publishValueTemp(int equalVal) {
-	mqttClient.publish(mqttTopicTemperature.c_str(), String(temperature).c_str());
-	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("temp", String(temperature));
-	wpFZ.trySendRest = true;
-	temperatureLast = equalVal;
-	if(wpFZ.DebugMqtt) {
-		publishInfoDebug("Temperature", String(temperature), String(publishCountTemperature));
+void moduleDHT::checkSubscripes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
+		byte readMaxCycle = msg.toInt();
+		if(readMaxCycle <= 0) readMaxCycle = 1;
+		if(maxCycle != readMaxCycle) {
+			maxCycle = readMaxCycle;
+			EEPROM.write(wpEEPROM.byteMaxCycleHT, maxCycle);
+			EEPROM.commit();
+			checkSubscripesDebug(mqttTopicMaxCycle, String(maxCycle));
+		}
+	}
+	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
+		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10);
+		if(temperatureCorrection != readTemperatureCorrection) {
+			temperatureCorrection = readTemperatureCorrection;
+			EEPROM.put(wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
+			EEPROM.commit();
+			checkSubscripesDebug(mqttTopicTemperatureCorrection, String(temperatureCorrection));
+		}
+	}
+	if(strcmp(topic, mqttTopicHumidityCorrection.c_str()) == 0) {
+		int8_t readHumidityCorrection = int8_t(msg.toFloat() * 10);
+		if(humidityCorrection != readHumidityCorrection) {
+			humidityCorrection = readHumidityCorrection;
+			EEPROM.put(wpEEPROM.byteHumidityCorrection, humidityCorrection);
+			EEPROM.commit();
+			checkSubscripesDebug(mqttTopicHumidityCorrection, String(humidityCorrection));
+		}
+	}
+	if(strcmp(topic, mqttTopicDebugHT.c_str()) == 0) {
+		bool readDebugHT = msg.toInt();
+		if(DebugHT != readDebugHT) {
+			DebugHT = readDebugHT;
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, DebugHT);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			EEPROM.commit();
+			checkSubscripesDebug(mqttTopicDebugHT, String(DebugHT));
+			wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(DebugHT ? "true" : "false") + "}");
+		}
+	}
+}
+
+void moduleDHT::publishSettings() {
+	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicTemperatureCorrection.c_str(), String(float(temperatureCorrection / 10)).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicHumidityCorrection.c_str(), String(float(humidityCorrection / 10)).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicDebugHT.c_str(), String(DebugHT).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
+}
+
+void moduleDHT::publishValues() {
+	publishValues(false);
+}
+void moduleDHT::publishValues(bool force) {
+	if(force) {
+		publishCountTemperature  = wpFZ.publishQoS;
+		publishCountHumidity = wpFZ.publishQoS;
+		publishCountErrorHT = wpFZ.publishQoS;
+	}
+	if(temperatureLast != temperature || ++publishCountTemperature > wpFZ.publishQoS) {
+		publishValueTemp();
+	}
+	if(humidityLast != humidity || ++publishCountHumidity > wpFZ.publishQoS) {
+		publishValueHum();
+	}
+	if(errorHTLast != errorHT || ++publishCountErrorHT > wpFZ.publishQoS) {
+		publishErrorHT();
+	}
+}
+
+//###################################################################################
+// private
+//###################################################################################
+void moduleDHT::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTemperatureCorrection.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicHumidityCorrection.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebugHT.c_str());
+}
+
+void moduleDHT::publishValueTemp() {
+	String sendTemperature = String(float(temperature / 100.0));
+	wpMqtt.mqttClient.publish(mqttTopicTemperature.c_str(), sendTemperature.c_str());
+	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("temp", sendTemperature);
+	wpRest.trySendRest = true;
+	temperatureLast = temperature;
+	if(wpMqtt.DebugMqtt) {
+		publishInfoDebug("Temperature", sendTemperature, String(publishCountTemperature));
 	}
 	publishCountTemperature = 0;
 }
 
-void moduleDHT::publishValueHum(int equalVal) {
-	mqttClient.publish(mqttTopicHumidity.c_str(), String(humidity).c_str());
-	wpFZ.errorRest = wpFZ.errorRest | !wpFZ.sendRest("hum", String(humidity));
-	wpFZ.trySendRest = true;
-	humidityLast = equalVal;
-	if(wpFZ.DebugMqtt) {
-		publishInfoDebug("Humidity", String(humidity), String(publishCountHumidity));
+void moduleDHT::publishValueHum() {
+	String sendHumidity = String(float(humidity / 100.0));
+	wpMqtt.mqttClient.publish(mqttTopicHumidity.c_str(), sendHumidity.c_str());
+	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("hum", sendHumidity);
+	wpRest.trySendRest = true;
+	humidityLast = humidity;
+	if(wpMqtt.DebugMqtt) {
+		publishInfoDebug("Humidity", sendHumidity, String(publishCountHumidity));
 	}
 	publishCountHumidity = 0;
 }
 
-void moduleDHT::publishInfoDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 void moduleDHT::publishErrorHT() {
-	mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
 	errorHTLast = errorHT;
 	publishCountErrorHT = 0;
 }
 
-//###################################################################################
-// Allgemein
-//###################################################################################
 void moduleDHT::calcHT() {
 	bool e = false;
 	float newT = dht.readTemperature();
@@ -99,7 +173,7 @@ void moduleDHT::calcHT() {
 	if(!isnan(newT)) {
 		temperature = int16_t(newT * 100) + temperatureCorrection;
 		e = e | false;
-		if(wpFZ.DebugHT) {
+		if(DebugHT) {
 			calcHTDebug("Temperature", temperature, newT);
 		}
 	} else {
@@ -108,7 +182,7 @@ void moduleDHT::calcHT() {
 	}
 	if(!isnan(newH)) {
 		humidity = newH + humidityCorrection;
-		if(wpFZ.DebugHT) {
+		if(DebugHT) {
 			e = e | false;
 			calcHTDebug("Humidity", humidity, newH);
 		}
@@ -119,13 +193,24 @@ void moduleDHT::calcHT() {
 	errorHT = e;
 }
 
-void moduleDHT::calcHTDebug(String name, int16_t value, float raw) {
-	String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "calcHT", logmessage);
-}
-
 void moduleDHT::calcHTError(String name) {
 	wpFZ.blink();
 	String logmessage = name + ": Sensor Failure";
 	wpFZ.DebugWS(wpFZ.strERRROR, "calcHT", logmessage);
+}
+
+void moduleDHT::publishInfoDebug(String name, String value, String publishCount) {
+	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
+	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
+
+void moduleDHT::checkSubscripesDebug(String topic, String value) {
+	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
+	wpFZ.DebugWS(wpFZ.strINFO, "callbackMqtt", logmessage);
+	wpFZ.blink();
+}
+
+void moduleDHT::calcHTDebug(String name, int16_t value, float raw) {
+	String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
+	wpFZ.DebugWS(wpFZ.strDEBUG, "calcHT", logmessage);
 }

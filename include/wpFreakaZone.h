@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <time.h>
 #include <helperWebServer.h>
+#include <DHT.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -38,11 +39,11 @@ class wpFreakaZone {
 
 		uint16_t MajorVersion;
 		uint16_t MinorVersion;
-		uint16_t Build;
-		String MainVersion;
 
 		String OnSince;
 		String OnDuration;
+
+		const uint16_t loopTime = 200;
 
 		const String strDEBUG  = "[  DEBUG  ]";
 		const String strINFO   = "[- INFO  -]";
@@ -51,6 +52,7 @@ class wpFreakaZone {
 
 		const bool wpDHT11 = false;
 		const bool wpDHT22 = false;
+		uint8_t choosenDHT;
 		const bool wpLDR = false;
 		const bool wpLight = false;
 		const bool wpBM = false;
@@ -86,15 +88,14 @@ class wpFreakaZone {
 
 		wpFreakaZone(String);
 		void loop();
+		uint16_t getVersion();
 
-		String getVersion();
+		uint16_t getBuild(String);
 		String getTime();
 		String getDateTime();
 		String getOnlineTime();
 		String getOnlineTime(bool forDebug);
 		String funcToString(String msg);
-		uint16_t getBuild(String);
-		void setVersion(uint16_t v);
 		void blink();
 
 		static String JsonKeyValue(String name, String value);
@@ -109,16 +110,10 @@ class wpFreakaZone {
 
 	private:
 		String SVNh = "$Rev: 117 $";
-		String Revh;
-		String Rev;
-		int Buildh;
-		int Build;
 
 		String doWebServerDebugChange = "";
 		void setWebServerDebugChange(String DebugPlugIn);
 		void doTheWebServerDebugChange();
-
-		String printEncryptionType(int thisType);
 };
 extern wpFreakaZone wpFZ;
 

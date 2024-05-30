@@ -44,5 +44,6 @@ class helperUpdate {
 		static void progress(int cur, int total);
 		static void error(int err);
 };
+extern helperUpdate wpUpdate;
 
 #endif

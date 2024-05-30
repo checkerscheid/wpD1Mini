@@ -15,26 +15,14 @@
 //###################################################################################
 #include <main.h>
 
-uint loopTime = 200;
-//###################################################################################
-//  Value Defines
-//###################################################################################
-
-
-//###################################################################################
-//  setup
-//###################################################################################
 void setup() {
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, HIGH);
 	Serial.begin(9600);
 	while(!Serial) {}
-	EEPROM.begin(4095);
 	wpFZ.printStart();
 	getVars();
 	wpFZ.printRestored();
-
-	wpWiFi.setupWiFi();
 }
 
 //###################################################################################
@@ -44,14 +32,15 @@ void loop() {
 	wpWiFi.loop();
 	wpMqtt.loop();
 	if(wpFZ.calcValues) {
-		publishInfo();
+		//calcValues();
 	}
 	wpFZ.loop();
 #ifndef wpDistance
-	delay(loopTime);
+	delay(wpFZ.loopTime);
 #endif
 }
 
+#ifdef oldEEPROM
 //###################################################################################
 //  EEPROM
 //###################################################################################
@@ -80,59 +69,51 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 }
-
+#endif
 //###################################################################################
 // Allgemein
 //###################################################################################
-String getVersion() {
-	Rev = "$Rev: 118 $";
-	Rev.remove(0, 6);
-	Rev.remove(Rev.length() - 2, 2);
-	Build = Rev.toInt();
-	Revh = SVNh;
-	Revh.remove(0, 6);
-	Revh.remove(Revh.length() - 2, 2);
-	Buildh = Revh.toInt();
-	String returns = "Build " +
-		String(Buildh) + "." + String(Build);
+uint16_t getVersion() {
+	String SVN = "$Rev: 118 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
+String getStringVersion() {
+	uint16_t globalBuild = getGlobalBuild();
+	uint16_t Build = getVersion();
+
+	String returns = "V " +
+		String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) +
+		" Build " + String(globalBuild > Build ? globalBuild : Build);
 	return returns;
 }
-void connectMqtt() {
-	String logmessage = "Connecting MQTT Server: " + String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort) + " as " + wpFZ.DeviceName;
-	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
-	while(!mqttClient.connected()) {
-		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
-			wpFZ.MqttSince = wpFZ.getDateTime();
-			String logmessage = "MQTT Connected";
-			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
-			publishSettings();
-			// subscribes
-			mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
-			mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
-			mqttClient.subscribe(wpOnlineToggler.mqttTopicOnlineToggler.c_str());
-			mqttClient.subscribe(mqttTopicRestartDevice.c_str());
-			mqttClient.subscribe(mqttTopicUpdateFW.c_str());
-			mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
-			mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
-			mqttClient.subscribe(mqttTopicDebugEprom.c_str());
-			mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
-			mqttClient.subscribe(mqttTopicDebugMqtt.c_str());
-			mqttClient.subscribe(mqttTopicDebugFinder.c_str());
-			mqttClient.subscribe(mqttTopicDebugRest.c_str());
-		} else {
-			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 5 seconds";
-			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
-			delay(5000);
-		}
-	}
+
+uint16_t getGlobalBuild() {
+ 	uint16_t v = 0;
+	uint16_t check = wpEEPROM.getVersion();
+	v = v > check ? v : check;
+	check = wpFinder.getVersion();
+	v = v > check ? v : check;
+	check = wpMqtt.getVersion();
+	v = v > check ? v : check;
+	check = wpOnlineToggler.getVersion();
+	v = v > check ? v : check;
+	check = wpRest.getVersion();
+	v = v > check ? v : check;
+	check = wpUpdate.getVersion();
+	v = v > check ? v : check;
+	check = wpWebServer.getVersion();
+	v = v > check ? v : check;
+	check = wpWiFi.getVersion();
+	v = v > check ? v : check;
+	check = wpFZ.getVersion();
+	v = v > check ? v : check;
+	check = wpDHT.getVersion();
+	v = v > check ? v : check;
 }
-
-
-//###################################################################################
-// publish settings
-//###################################################################################
-
-
+#ifdef oldMqtt
 //###################################################################################
 //  publish values Helper
 //###################################################################################

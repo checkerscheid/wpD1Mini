@@ -15,6 +15,8 @@
 //###################################################################################
 #include <helperUpdate.h>
 
+helperUpdate wpUpdate();
+
 helperUpdate::helperUpdate() {
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
@@ -84,7 +86,7 @@ bool helperUpdate::setupOta() {
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	});
 	ArduinoOTA.onEnd([]() {
-		wpFZ.OfflineTrigger = true;
+		wpOnlineToggler.OfflineTrigger = true;
 		String logmessage = "OTA End";
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	});

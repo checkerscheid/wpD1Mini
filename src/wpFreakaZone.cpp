@@ -24,13 +24,14 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
 	calcValues = true;
+	choosenDHT = 0;
+	if(wpDHT11) {
+		choosenDHT = DHT11;
+	}
+	if(wpDHT22) {
+		choosenDHT = DHT22;
+	}
 
-#ifdef wpHT
-	DebugHT = false;
-	maxCycleHT = 4;
-	temperatureCorrection = 0.0;
-	humidityCorrection = 0.0;
-#endif
 #ifdef wpLDR
 	DebugLDR = false;
 	useLdrAvg = false;
@@ -83,32 +84,29 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 #endif
 }
 
+//###################################################################################
+// public
+//###################################################################################
 void wpFreakaZone::loop() {
 	doTheWebServerDebugChange();
 	OnDuration = getOnlineTime(false);
 }
 
-String wpFreakaZone::getVersion() {
-	Rev = "$Rev: 117 $";
-	Rev.remove(0, 6);
-	Rev.remove(Rev.length() - 2, 2);
-	Build = Rev.toInt();
-	Revh = SVNh;
-	Revh.remove(0, 6);
-	Revh.remove(Revh.length() - 2, 2);
-	Buildh = Revh.toInt();
-
-	String returns = "V " +
-		String(MajorVersion) + "." + String(MinorVersion) +
-		" Build " + String(Buildh) + "." + String(Build);
-	return returns;
+uint16_t wpFreakaZone::getVersion() {
+	String SVN = "$Rev: 118 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
 }
+
 uint16_t wpFreakaZone::getBuild(String Rev) {
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
 	uint16_t returns = Rev.toInt();
 	return returns;
 }
+
+
 String wpFreakaZone::getTime() {
 	time_t now;
 	tm tm;
@@ -120,6 +118,7 @@ String wpFreakaZone::getTime() {
 	String timeNow = timeh + ":" + timem + ":" + times;
 	return "[" + timeNow + "]";
 }
+
 String wpFreakaZone::getDateTime() {
 	time_t now;
 	tm tm;
@@ -134,9 +133,11 @@ String wpFreakaZone::getDateTime() {
 	String datetimeNow = dated + "." + datem + "." + datey + " " + timeh + ":" + timem + ":" + times;
 	return datetimeNow;
 }
+
 String wpFreakaZone::getOnlineTime() {
 	return wpFreakaZone::getOnlineTime(true);
 }
+
 String wpFreakaZone::getOnlineTime(bool forDebug) {
 	unsigned long secall = (unsigned long) millis() / 1000;
 	unsigned long minohnesec = (unsigned long) round(secall / 60);
@@ -156,19 +157,14 @@ String wpFreakaZone::getOnlineTime(bool forDebug) {
 		return msg;
 	}
 }
-void wpFreakaZone::setMainVersion(String v) {
-	MainVersion = v;
-}
-String wpFreakaZone::JsonKeyValue(String name, String value) {
-	String message = "\"" + name + "\":" + value;
-	if(value == "nan") {
-		message = "\"" + name + "\":\"" + value + "\"";
+
+String wpFreakaZone::funcToString(String msg) {
+	msg.remove(16);
+	String e = "";
+	for(int i = msg.length(); i < 16; i++) {
+		e += ' ';
 	}
-	return message;
-}
-String wpFreakaZone::JsonKeyString(String name, String value) {
-	String message = "\"" + name + "\":\"" + value + "\"";
-	return message;
+	return "[" + msg + e + "] ";
 }
 
 void wpFreakaZone::blink() {
@@ -184,6 +180,18 @@ void wpFreakaZone::blink() {
 	}
 }
 
+String wpFreakaZone::JsonKeyValue(String name, String value) {
+	String message = "\"" + name + "\":" + value;
+	if(value == "nan") {
+		message = "\"" + name + "\":\"" + value + "\"";
+	}
+	return message;
+}
+String wpFreakaZone::JsonKeyString(String name, String value) {
+	String message = "\"" + name + "\":\"" + value + "\"";
+	return message;
+}
+#ifdef oldWebserver
 void wpFreakaZone::setupWebServer() {
 	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
@@ -306,6 +314,7 @@ void wpFreakaZone::setupWebServer() {
 		request->send(200, "application/json", message.c_str());
 	});
 }
+
 void wpFreakaZone::setWebServerDebugChange(String DebugPlugIn) {
 	doWebServerDebugChange = DebugPlugIn;
 }
@@ -434,7 +443,7 @@ void wpFreakaZone::doTheWebServerDebugChange() {
 		doWebServerDebugChange = "";
 	}
 }
-
+#endif
 //###################################################################################
 // Debug Messages
 //###################################################################################
@@ -449,15 +458,6 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 }
 void wpFreakaZone::SendWS(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
-}
-
-String wpFreakaZone::funcToString(String msg) {
-	msg.remove(16);
-	String e = "";
-	for(int i = msg.length(); i < 16; i++) {
-		e += ' ';
-	}
-	return "[" + msg + e + "] ";
 }
 
 void wpFreakaZone::printStart() {
@@ -485,4 +485,6 @@ void wpFreakaZone::printRestored() {
 	Serial.print(funcToString("StartDevice"));
 	Serial.println(getVersion());
 }
-
+//###################################################################################
+// private
+//###################################################################################
