@@ -52,11 +52,11 @@ uint16_t helperWiFi::getVersion() {
 }
 
 void helperWiFi::changeDebug() {
-	wpFZ.DebugWiFi = !wpFZ.DebugWiFi;
-	bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugWiFi, wpFZ.DebugWiFi);
-	EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
+	DebugWiFi = !DebugWiFi;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, DebugWiFi);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(wpFZ.DebugEprom ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -88,7 +88,7 @@ void helperWiFi::setupWiFi() {
 	Serial.print("WiFi Connected: ");
 	Serial.println(WiFi.localIP());
 
-	wpFZ.WiFiSince = wpFZ.getDateTime();
+	WiFiSince = wpFZ.getDateTime();
 }
 
 void helperWiFi::scanWiFi() {

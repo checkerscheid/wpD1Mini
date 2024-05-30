@@ -17,9 +17,11 @@
 #define helperWiFi_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <helperEEPROM.h>
 #include <ESP8266WiFi.h>
 class helperWiFi {
 	public:
+		bool DebugWiFi = false;
 		// settings
 		String mqttTopicSsid;
 		String mqttTopicIp;
@@ -28,6 +30,7 @@ class helperWiFi {
 		String mqttTopicRssi;
 		// commands
 		String mqttTopicDebugWiFi;
+		String WiFiSince;
 
 		helperWiFi();
 		void loop();

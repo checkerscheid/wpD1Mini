@@ -21,6 +21,7 @@
 #include <PubSubClient.h>
 class helperMqtt {
 	public:
+		static bool DebugMqtt;
 		// settings
 		String mqttTopicMqttServer;
 		String mqttTopicMqttSince;
@@ -28,6 +29,8 @@ class helperMqtt {
 		// commands
 		String mqttTopicForceMqttUpdate;
 		String mqttTopicForceRenewValue;
+		String mqttTopicDebugMqtt;
+		String MqttSince;
 
 		static WiFiClient wifiClient;
 		static PubSubClient mqttClient;
@@ -35,6 +38,7 @@ class helperMqtt {
 		helperMqtt();
 		void loop();
 		uint16_t getVersion();
+		void changeDebug();
 		void setMqttOffline();
 		void publishSettings();
 		void publishSettings(bool force);

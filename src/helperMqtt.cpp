@@ -28,6 +28,7 @@ helperMqtt::helperMqtt() {
 	// commands
 	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
 	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
+	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
@@ -51,6 +52,15 @@ uint16_t helperMqtt::getVersion() {
 	return v > vh ? v : vh;
 }
 
+void helperMqtt::changeDebug() {
+	DebugMqtt = !DebugMqtt;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, DebugMqtt);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+	EEPROM.commit();
+	wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(DebugMqtt ? "true" : "false") + "}");
+	wpFZ.blink();
+}
+
 void helperMqtt::setMqttOffline() {
 	mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
 }
@@ -69,21 +79,21 @@ void helperMqtt::publishSettings(bool force) {
 	mqttClient.publish(mqttTopicwpFreakaZoneVersion.c_str(), wpFZ.getVersion().c_str(), true);
 	mqttClient.publish(mqttTopicOnSince.c_str(), wpFZ.OnSince.c_str());
 	mqttClient.publish(mqttTopicOnDuration.c_str(), wpFZ.OnDuration.c_str());
-	mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid, true);
-	mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
-	mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str(), true);
-	mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str(), true);
-	mqttClient.publish(mqttTopicWiFiSince.c_str(), wpFZ.WiFiSince.c_str());
+	mqttClient.publish(wpWiFi.mqttTopicSsid.c_str(), wpFZ.ssid, true);
+	mqttClient.publish(wpWiFi.mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
+	mqttClient.publish(wpWiFi.mqttTopicIp.c_str(), WiFi.localIP().toString().c_str(), true);
+	mqttClient.publish(wpWiFi.mqttTopicMac.c_str(), WiFi.macAddress().c_str(), true);
+	mqttClient.publish(wpWiFi.mqttTopicWiFiSince.c_str(), wpWiFi.WiFiSince.c_str());
 	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str(), true);
-	mqttClient.publish(mqttTopicMqttSince.c_str(), wpFZ.MqttSince.c_str());
+	mqttClient.publish(mqttTopicMqttSince.c_str(), MqttSince.c_str());
 	mqttClient.publish(mqttTopicRestServer.c_str(), (String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort)).c_str(), true);
 	// settings
 	mqttClient.publish(mqttTopicSetDeviceName.c_str(), wpFZ.DeviceName.c_str());
 	mqttClient.publish(mqttTopicSetDeviceDescription.c_str(), wpFZ.DeviceDescription.c_str());
 	mqttClient.publish(mqttTopicCalcValues.c_str(), String(wpFZ.calcValues).c_str());
-	mqttClient.publish(mqttTopicDebugEprom.c_str(), String(wpFZ.DebugEprom).c_str());
-	mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(wpFZ.DebugWiFi).c_str());
-	mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(wpFZ.DebugMqtt).c_str());
+	mqttClient.publish(wpEEPROM.mqttTopicDebugEprom.c_str(), String(wpEEPROM.DebugEEPROM).c_str());
+	mqttClient.publish(wpWiFi.mqttTopicDebugWiFi.c_str(), String(wpWiFi.DebugWiFi).c_str());
+	mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(DebugMqtt).c_str());
 	mqttClient.publish(mqttTopicDebugFinder.c_str(), String(wpFZ.DebugFinder).c_str());
 	mqttClient.publish(mqttTopicDebugRest.c_str(), String(wpFZ.DebugRest).c_str());
 	mqttClient.publish(mqttTopicErrorRest.c_str(), String(wpFZ.errorRest).c_str());
@@ -102,7 +112,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	for (unsigned int i = 0; i < length; i++) {
 		msg += (char)payload[i];
 	}
-	if(wpFZ.DebugMqtt) {
+	if(DebugMqtt) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "callbackMqtt", "Message arrived on topic: '" + String(topic) + "': " + msg);
 	}
 	if(msg == "") {
@@ -115,7 +125,7 @@ void helperMqtt::connectMqtt() {
 	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
-			wpFZ.MqttSince = wpFZ.getDateTime();
+			MqttSince = wpFZ.getDateTime();
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 		} else {

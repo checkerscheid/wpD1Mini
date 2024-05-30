@@ -37,7 +37,6 @@ String mqttTopicRestServer;
 String mqttTopicSetDeviceName;
 String mqttTopicSetDeviceDescription;
 String mqttTopicCalcValues;
-String mqttTopicDebugMqtt;
 String mqttTopicDebugFinder;
 String mqttTopicDebugRest;
 String mqttTopicErrorRest;

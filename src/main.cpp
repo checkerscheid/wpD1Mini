@@ -91,7 +91,6 @@ void getVars() {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	mqttTopicDebugFinder = wpFZ.DeviceName + "/settings/Debug/Finder";
 	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
 	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";

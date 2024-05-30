@@ -28,8 +28,6 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	UpdateFW = false;
 	calcValues = true;
 	
-	DebugWiFi = false;
-	DebugMqtt = false;
 	DebugFinder = false;
 	DebugRest = false;
 	ErrorRest = false;

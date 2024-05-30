@@ -49,10 +49,6 @@ class wpFreakaZone {
 
 		String OnSince;
 		String OnDuration;
-		/// @todo move to WiFi
-		String WiFiSince;
-		/// @todo move to Mqtt
-		String MqttSince;
 
 		const String strDEBUG  = "[  DEBUG  ]";
 		const String strINFO   = "[- INFO  -]";
