@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 120 2024-05-31 03:32:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -35,16 +35,18 @@ class wpFreakaZone {
 		const uint16_t restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16_t finderListenPort = 51346;
-		const uint16_t publishQoS = 4 * 60 * 10;
+		const uint16_t loopTime = 200; // ms
+		const uint16_t minute10  = 5 * 60 * 10;
+		const uint16_t minute5 = 5 * 60 * 10;
+		const uint16_t minute2 = 5 * 60 * 10;
+		const uint16_t publishQoS = minute10; // 5 because loopTime = 200
 
-		uint16_t MajorVersion;
-		uint16_t MinorVersion;
+		uint16_t MajorVersion = 3;
+		uint16_t MinorVersion = 0;
 		String Version;
 
 		String OnSince;
 		String OnDuration;
-
-		const uint16_t loopTime = 200;
 
 		const String strDEBUG  = "[  DEBUG  ]";
 		const String strINFO   = "[- INFO  -]";
@@ -81,8 +83,9 @@ class wpFreakaZone {
 		String mqttTopicRestartDevice;
 		String mqttTopicCalcValues;
 
-		wpFreakaZone(String);
-		void loop();
+		wpFreakaZone();
+		void init(String);
+		void cycle();
 		uint16_t getVersion();
 
 		uint16_t getBuild(String);
@@ -99,15 +102,18 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		void DebugWS(String typ, String func, String msg, bool newline);
 		void SendWS(String msg);
+		void DebugcheckSubscripes(String topic, String value);
 
 		void printStart();
 		void printRestored();
 
-		void checkSubscripes(char* topic, String msg);
 		void publishSettings();
+		void publishSettings(bool force);
 		void publishValues();
+		void checkSubscripes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 117 $";
+		String SVNh = "$Rev: 120 $";
+		uint16_t publishCountOnDuration = 0;
 		void setSubscribes();
 		void checkSubscripesDebug(String topic, String value);
 };

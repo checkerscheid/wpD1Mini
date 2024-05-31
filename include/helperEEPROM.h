@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperEEPROM.h 120 2024-05-31 03:32:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -99,13 +99,14 @@ class helperEEPROM {
 		String mqttTopicDebugEprom;
 
 		helperEEPROM();
-		void loop();
+		void init();
+		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
 	private:
-		String SVNh = "$Rev: 118 $";
+		String SVNh = "$Rev: 120 $";
 		const byte byteStartForString0 = 100;
 		String readStringFromEEPROM(int addrOffset, String defaultString);
 		int writeStringToEEPROM(int addrOffset, String &strToWrite);

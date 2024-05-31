@@ -8,22 +8,24 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperWiFi.cpp 120 2024-05-31 03:32:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
 
 helperWiFi wpWiFi;
 
-helperWiFi::helperWiFi() {
+helperWiFi::helperWiFi() {}
+void helperWiFi::init() {
+	// values
+	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
+	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
 	// settings
 	mqttTopicSsid = wpFZ.DeviceName + "/info/WiFi/SSID";
 	mqttTopicIp = wpFZ.DeviceName + "/info/WiFi/Ip";
 	mqttTopicMac = wpFZ.DeviceName + "/info/WiFi/Mac";
-	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
-	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
 	// commands
 	mqttTopicDebugWiFi = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
@@ -35,7 +37,7 @@ helperWiFi::helperWiFi() {
 //###################################################################################
 // public
 //###################################################################################
-void helperWiFi::loop() {
+void helperWiFi::cycle() {
 	if(WiFi.status() == WL_CONNECTED) {
 		digitalWrite(LED_BUILTIN, LOW);
 	} else {
@@ -45,7 +47,7 @@ void helperWiFi::loop() {
 }
 
 uint16_t helperWiFi::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -114,9 +116,50 @@ void helperWiFi::scanWiFi() {
 	wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi", "finished scan WiFi networks");
 }
 
+void helperWiFi::publishSettings() {
+	publishSettings(false);
+}
+void helperWiFi::publishSettings(bool force) {
+	wpMqtt.mqttClient.publish(mqttTopicSsid.c_str(), wpFZ.ssid);
+	wpMqtt.mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str());
+	wpMqtt.mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str());
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(DebugWiFi).c_str());
+	}
+}
+
+void helperWiFi::publishValues() {
+	if(DebugWiFiLast != DebugWiFi || ++publishCountDebugWiFi > wpFZ.publishQoS) {
+		DebugWiFiLast = DebugWiFi;
+		wpMqtt.mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(DebugWiFi).c_str());
+		publishCountDebugWiFi = 0;
+	}
+	if(++publishCountRssi > wpFZ.minute2) {
+		wpMqtt.mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
+		publishCountRssi = 0;
+	}
+}
+
+void helperWiFi::checkSubscripes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebugWiFi.c_str()) == 0) {
+		bool readDebugWiFi = msg.toInt();
+		if(DebugWiFi != readDebugWiFi) {
+			DebugWiFi = readDebugWiFi;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, DebugWiFi);
+			EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscripes(mqttTopicDebugWiFi, String(DebugWiFi));
+		}
+	}
+}
+
 //###################################################################################
 // private
 //###################################################################################
+void helperWiFi::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
+}
 String helperWiFi::printEncryptionType(int thisType) {
 	switch (thisType) {
 		case ENC_TYPE_WEP:

@@ -8,16 +8,21 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperRest.cpp 120 2024-05-31 03:32:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperRest.h>
 
 helperRest wpRest;
 
-helperRest::helperRest() {
+helperRest::helperRest() {}
+void helperRest::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif	
 	// settings
 	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
@@ -25,16 +30,28 @@ helperRest::helperRest() {
 	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
 
 	setupRest();
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void helperRest::loop() {
+void helperRest::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t helperRest::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

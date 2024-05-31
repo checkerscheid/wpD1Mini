@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
+//# File-ID      : $Id:: helperMqtt.h 120 2024-05-31 03:32:41Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperMqtt_h
@@ -23,30 +23,35 @@
 #include <helperRest.h>
 class helperMqtt {
 	public:
-		bool DebugMqtt;
+		bool DebugMqtt = false;
+		// values
+		String mqttTopicMqttSince;
 		// settings
 		String mqttTopicMqttServer;
-		String mqttTopicMqttSince;
 		// commands
 		String mqttTopicForceMqttUpdate;
 		String mqttTopicForceRenewValue;
 		String mqttTopicDebugMqtt;
+
 		String MqttSince;
 
 		static WiFiClient wifiClient;
 		static PubSubClient mqttClient;
 
 		helperMqtt();
-		void loop();
+		void init();
+		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
+
+	private:
+		String SVNh = "$Rev: 120 $";
+		bool DebugMqttLast = false;
+		uint16_t publishCountDebugMqtt = 0;
+		void connectMqtt();	
 		void publishSettings();
 		void publishSettings(bool force);
-		void publishInfo();
-		void publishInfoDebug(String name, String value, String publishCount);
-	private:
-		String SVNh = "$Rev: 118 $";
-		void connectMqtt();
+		void publishValues();
 		static void callbackMqtt(char*, byte*, unsigned int);
 
 };

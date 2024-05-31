@@ -8,18 +8,17 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 120 2024-05-31 03:32:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
 
-wpFreakaZone wpFZ("BasisEmpty");
+wpFreakaZone wpFZ;
+wpFreakaZone::wpFreakaZone() {}
 
-wpFreakaZone::wpFreakaZone(String deviceName) {
-	MajorVersion = 3;
-	MinorVersion = 0;
+void wpFreakaZone::init(String deviceName) {
 	configTime(TZ, NTP_SERVER);
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
@@ -45,20 +44,18 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-
-	publishSettings();
-	setSubscribes();
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void wpFreakaZone::loop() {
+void wpFreakaZone::cycle() {
 	OnDuration = getOnlineTime(false);
+	publishValues();
 }
 
 uint16_t wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -156,25 +153,47 @@ String wpFreakaZone::JsonKeyString(String name, String value) {
 	return message;
 }
 
+void wpFreakaZone::publishSettings() {
+	publishSettings(false);
+}
+void wpFreakaZone::publishSettings(bool force) {
+	wpMqtt.mqttClient.publish(mqttTopicDeviceName.c_str(), DeviceName.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicDeviceDescription.c_str(), DeviceDescription.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicVersion.c_str(), Version.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicOnSince.c_str(), OnSince.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicCalcValues.c_str(), String(calcValues).c_str());
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicSetDeviceName.c_str(), String(DeviceName).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetDeviceDescription.c_str(), String(DeviceDescription).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicRestartDevice.c_str(), String(0).c_str());
+	}
+}
+
+void wpFreakaZone::publishValues() {
+	if(++publishCountOnDuration > minute2) {
+		wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
+		publishCountOnDuration = 0;
+	}
+}
 
 void wpFreakaZone::checkSubscripes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicSetDeviceName.c_str()) == 0) {
-		if(strcmp(msg.c_str(), wpFZ.DeviceName.c_str()) != 0) {
+	if(strcmp(topic, wpFZ.mqttTopicSetDeviceName.c_str()) == 0) {
+		if(wpFZ.DeviceName != msg) {
 			wpFZ.DeviceName = msg;
 			wpEEPROM.writeStringsToEEPROM();
-			wpMqtt.mqttClient.publish(mqttTopicRestartRequired.c_str(), String(1).c_str());
-			wpMqtt.mqttClient.publish(mqttTopicRestartDevice.c_str(), String(0).c_str());
-			checkSubscripesDebug(mqttTopicDeviceName, wpFZ.DeviceName);
+			wpMqtt.mqttClient.publish(wpFZ.mqttTopicRestartRequired.c_str(), String(1).c_str());
+			wpMqtt.mqttClient.publish(wpFZ.mqttTopicRestartDevice.c_str(), String(0).c_str());
+			checkSubscripesDebug(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
 		}
 	}
-	if(strcmp(topic, mqttTopicSetDeviceDescription.c_str()) == 0) {
-		if(strcmp(msg.c_str(), wpFZ.DeviceDescription.c_str()) != 0) {
+	if(strcmp(topic, wpFZ.mqttTopicSetDeviceDescription.c_str()) == 0) {
+		if(wpFZ.DeviceDescription != msg) {
 			wpFZ.DeviceDescription = msg;
 			wpEEPROM.writeStringsToEEPROM();
 			checkSubscripesDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
 		}
 	}
-	if(strcmp(topic, mqttTopicRestartDevice.c_str()) == 0) {
+	if(strcmp(topic, wpFZ.mqttTopicRestartDevice.c_str()) == 0) {
 		int readRestartDevice = msg.toInt();
 		if(readRestartDevice > 0) {
 			wpOnlineToggler.setMqttOffline();
@@ -182,24 +201,14 @@ void wpFreakaZone::checkSubscripes(char* topic, String msg) {
 			ESP.restart();
 		}
 	}
-	if(strcmp(topic, mqttTopicCalcValues.c_str()) == 0) {
+	if(strcmp(topic, wpFZ.mqttTopicCalcValues.c_str()) == 0) {
 		bool readCalcValues = msg.toInt();
 		if(wpFZ.calcValues != readCalcValues) {
 			wpFZ.calcValues = readCalcValues;
-			checkSubscripesDebug(mqttTopicCalcValues, String(wpFZ.calcValues));
+			wpFZ.SendWS("{\"id\":\"CalcValues\",\"value\":" + String(wpFZ.calcValues ? "true" : "false") + "}");
+			checkSubscripesDebug(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
-}
-
-void wpFreakaZone::publishSettings() {
-	wpMqtt.mqttClient.publish(mqttTopicDeviceName.c_str(), DeviceName.c_str());
-	wpMqtt.mqttClient.publish(mqttTopicDeviceDescription.c_str(), DeviceDescription.c_str());
-	wpMqtt.mqttClient.publish(mqttTopicVersion.c_str(), Version.c_str());
-	wpMqtt.mqttClient.publish(mqttTopicOnSince.c_str(), OnSince.c_str());
-}
-
-void wpFreakaZone::publishValues() {
-	wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
 }
 
 //###################################################################################
@@ -241,7 +250,7 @@ void wpFreakaZone::printRestored() {
 	Serial.print(getOnlineTime());
 	Serial.print(strINFO);
 	Serial.print(funcToString("StartDevice"));
-	Serial.println(getVersion());
+	Serial.println(Version);
 }
 //###################################################################################
 // private

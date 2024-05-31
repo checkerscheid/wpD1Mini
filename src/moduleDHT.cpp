@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 117 2024-05-29 01:28:02Z                  $ #
+//# File-ID      : $Id:: moduleDHT.cpp 120 2024-05-31 03:32:41Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -18,7 +18,12 @@
 moduleDHT wpDHT;
 DHT dht(DHTPin, wpFZ.choosenDHT);
 
-moduleDHT::moduleDHT() {
+moduleDHT::moduleDHT() {}
+void moduleDHT::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
@@ -35,22 +40,34 @@ moduleDHT::moduleDHT() {
 
 	dht.begin();
 	publishSettings();
-	setSubscribes();
+	setSubscribes();	
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void moduleDHT::loop() {
+void moduleDHT::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
 	if(wpFZ.calcValues && ++cycleHT >= maxCycle) {
 		cycleHT = 0;
 		calcHT();
 	}
 	publishValues();
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

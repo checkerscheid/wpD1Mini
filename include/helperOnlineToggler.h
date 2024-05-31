@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
+//# File-ID      : $Id:: helperOnlineToggler.h 120 2024-05-31 03:32:41Z           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperOnlineToggler_h
@@ -31,12 +31,13 @@ class helperOnlineToggler {
 		bool OfflineTrigger;
 
 		helperOnlineToggler();
-		void loop();
+		void init();
+		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
 		void setMqttOffline();
 	private:
-		String SVNh = "$Rev: 118 $";
+		String SVNh = "$Rev: 120 $";
 		void checkOfflineTrigger();
 };
 extern helperOnlineToggler wpOnlineToggler;

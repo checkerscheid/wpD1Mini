@@ -8,34 +8,51 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 120 2024-05-31 03:32:41Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
 
 helperOnlineToggler wpOnlineToggler;
 
-helperOnlineToggler::helperOnlineToggler() {
+helperOnlineToggler::helperOnlineToggler() {}
+void helperOnlineToggler::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif
 	// settings
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// commands
 	mqttTopicDebugOnlineToggler = wpFZ.DeviceName + "/settings/Debug/OnlineToggler";
 
-	OfflineTrigger = false;
+	OfflineTrigger = false;	
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void helperOnlineToggler::loop() {
+void helperOnlineToggler::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
 	checkOfflineTrigger();
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,33 +8,50 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperWebServer.cpp 120 2024-05-31 03:32:41Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
 
 helperWebServer wpWebServer;
 
-helperWebServer::helperWebServer() {
+helperWebServer::helperWebServer() {}
+void helperWebServer::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif
 	doWebServerCommand = WebServerCommanddoNothing;
 	doWebServerDebugChange = WebServerCommanddoNothing;
 	doWebServerBlink = WebServerCommanddoNothing;
-	setupWebServer();
+	setupWebServer();	
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void helperWebServer::loop() {
+void helperWebServer::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
 	doTheWebServerCommand();
 	doTheWebServerDebugChange();
 	doTheWebserverBlink();
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

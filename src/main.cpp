@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 119                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 118 2024-05-29 01:29:33Z                        $ #
+//# File-ID      : $Id:: main.cpp 119 2024-05-31 03:31:43Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -20,24 +20,30 @@ void setup() {
 	digitalWrite(LED_BUILTIN, HIGH);
 	Serial.begin(9600);
 	while(!Serial) {}
+	wpFZ.init("BasisEmpty");
 	wpFZ.printStart();
-	wpFZ.printRestored();
 	wpFZ.Version = getStringVersion();
+	wpFZ.printRestored();
+
+	wpWiFi.init();
+	wpMqtt.init();
+
+	wpFZ.publishSettings();
+
 }
 
 //###################################################################################
 // loop
 //###################################################################################
 void loop() {
-	wpWiFi.loop();
-	wpMqtt.loop();
+	wpWiFi.cycle();
+	wpMqtt.cycle();
 	if(wpFZ.calcValues) {
 		//calcValues();
 	}
-	wpFZ.loop();
-#ifndef wpDistance
+	wpFZ.cycle();
+	
 	delay(wpFZ.loopTime);
-#endif
 }
 
 #ifdef oldEEPROM
@@ -74,7 +80,7 @@ void getVars() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 119 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

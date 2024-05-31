@@ -8,28 +8,45 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 117                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 117 2024-05-29 01:28:02Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 120 2024-05-31 03:32:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
 
 helperEEPROM wpEEPROM;
 
-helperEEPROM::helperEEPROM() {
+helperEEPROM::helperEEPROM() {}
+void helperEEPROM::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif
 	EEPROM.begin(4095);
-	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";
+	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";	
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void helperEEPROM::loop() {
+void helperEEPROM::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -63,7 +80,6 @@ void helperEEPROM::writeStringsToEEPROM() {
 //###################################################################################
 // private
 //###################################################################################
-
 String helperEEPROM::readStringFromEEPROM(int addrOffset, String defaultString) {
 	int newStrLen = EEPROM.read(addrOffset);
 	if (newStrLen == 255) return defaultString;

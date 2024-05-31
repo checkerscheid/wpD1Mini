@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
+//# File-ID      : $Id:: helperRest.h 120 2024-05-31 03:32:41Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperRest_h
@@ -35,7 +35,8 @@ class helperRest {
 		uint16_t publishCountErrorRest = 0;
 
 		helperRest();
-		void loop();
+		void init();
+		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
 		void setupRest();
@@ -43,7 +44,7 @@ class helperRest {
 		bool sendRawRest(String target);
 		void publishErrorRest();
 	private:
-		String SVNh = "$Rev: 118 $";
+		String SVNh = "$Rev: 120 $";
 		void publishInfoDebug(String name, String value, String publishCount);
 };
 extern helperRest wpRest;

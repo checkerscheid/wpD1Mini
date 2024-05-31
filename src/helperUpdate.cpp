@@ -8,32 +8,49 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
+//# File-ID      : $Id:: helperUpdate.cpp 120 2024-05-31 03:32:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
 
 helperUpdate wpUpdate;
 
-helperUpdate::helperUpdate() {
+helperUpdate::helperUpdate() {}
+void helperUpdate::init() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Init");
+#endif
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
 	// commands
-	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
+	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";	
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("Inited");
+#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
 
-void helperUpdate::loop() {
+void helperUpdate::cycle() {
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycle");
+#endif
 	if(UpdateFW) ArduinoOTA.handle();
+#ifdef DEBUG
+	Serial.print(__FILE__);
+	Serial.println("cycled");
+#endif
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 118 $";
+	String SVN = "$Rev: 120 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

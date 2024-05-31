@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 118                                                     $ #
+//# Revision     : $Rev:: 120                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 118 2024-05-29 01:29:33Z                          $ #
+//# File-ID      : $Id:: helperUpdate.h 120 2024-05-31 03:32:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperUpdate_h
@@ -31,13 +31,14 @@ class helperUpdate {
 		bool UpdateFW = false;
 
 		helperUpdate();
-		void loop();
+		void init();
+		void cycle();
 		uint16_t getVersion();
 		void check();
 		void start();
 		bool setupOta();
 	private:
-		String SVNh = "$Rev: 118 $";
+		String SVNh = "$Rev: 120 $";
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);
