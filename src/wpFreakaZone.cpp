@@ -32,63 +32,28 @@ wpFreakaZone::wpFreakaZone(String deviceName) {
 		choosenDHT = DHT22;
 	}
 
-#ifdef wpLDR
-	DebugLDR = false;
-	useLdrAvg = false;
-	maxCycleLDR = 4;
-	ldrCorrection = 0;
-#endif
-#ifdef wpLight
-	DebugLight = false;
-	useLightAvg = false;
-	maxCycleLight = 4;
-	lightCorrection = 0;
-#endif
-#ifdef wpBM
-	DebugBM = false;
-	#ifdef wpLDR
-	threshold = 600;
-	lightToTurnOn = "";
-	#endif
-#endif
-#ifdef wpRelais
-	DebugRelais = false;
-	relaisHand = false;
-	relaisHandValue = false;
-	#ifdef wpMoisture
-	waterEmpty = false;
-	pumpActive = 2; // sekunden
-	pumpPause = 5 * 60; // 5 minutes
-	#endif
-#endif
-#ifdef wpRain
-	DebugRain = false;
-	useRainAvg = false;
-	maxCycleRain = 4;
-	rainCorrection = 0;
-#endif
-#ifdef wpMoisture
-	DebugMoisture = false;
-	useMoistureAvg = false;
-	maxCycleMoisture = 4;
-	moistureMin = 30;
-	moistureDry = 1023;
-	moistureWet = 0;
-#endif
-#ifdef wpDistance
-	DebugDistance = false;
-	maxCycleDistance = 4;
-	distanceCorrection = 0;
-	maxVolume = 4000;
-	height = 120;
-#endif
+	// values
+	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
+	// settings
+	mqttTopicDeviceName = wpFZ.DeviceName + "/info/DeviceName";
+	mqttTopicDeviceDescription = wpFZ.DeviceName + "/info/DeviceDescription";
+	mqttTopicVersion = wpFZ.DeviceName + "/info/Version";
+	mqttTopicOnSince = wpFZ.DeviceName + "/info/OnSince";
+	mqttTopicOnDuration = wpFZ.DeviceName + "/info/OnDuration";
+	// commands
+	mqttTopicSetDeviceName = wpFZ.DeviceName + "/settings/DeviceName";
+	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
+	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
+	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
+
+	publishSettings();
+	setSubscribes();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void wpFreakaZone::loop() {
-	doTheWebServerDebugChange();
 	OnDuration = getOnlineTime(false);
 }
 
@@ -105,7 +70,6 @@ uint16_t wpFreakaZone::getBuild(String Rev) {
 	uint16_t returns = Rev.toInt();
 	return returns;
 }
-
 
 String wpFreakaZone::getTime() {
 	time_t now;
@@ -191,259 +155,53 @@ String wpFreakaZone::JsonKeyString(String name, String value) {
 	String message = "\"" + name + "\":\"" + value + "\"";
 	return message;
 }
-#ifdef oldWebserver
-void wpFreakaZone::setupWebServer() {
-	server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
-		String message = "{\"FreakaZoneDevice\":{";
-		message += JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
-		message += JsonKeyString("DeviceDescription", wpFZ.DeviceDescription) + ",";
-		message += JsonKeyString("wpFreakaZoneVersion", wpFZ.getVersion()) + ",";
-		message += JsonKeyString("Version", wpFZ.MainVersion) + ",";
-		String minimac = WiFi.macAddress();
-		minimac.replace(":", "");
-		minimac.toLowerCase();
-		message += JsonKeyString("MAC", WiFi.macAddress()) + ",";
-		message += JsonKeyString("miniMAC", minimac) + ",";
-		message += JsonKeyValue("UpdateMode", wpFZ.UpdateFW ? "true" : "false") + ",";
-		message += JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
-#ifdef wpHT
-		message += "\"HT\":{";
-		message += JsonKeyValue("MaxCycleHT", String(wpFZ.maxCycleHT)) + ",";
-		message += JsonKeyValue("TemperatureCorrection", String(wpFZ.temperatureCorrection)) + ",";
-		message += JsonKeyValue("HumidityCorrection", String(wpFZ.humidityCorrection));
-		message += "},";
-#endif
-#ifdef wpLDR
-		message += "\"LDR\":{";
-		message += JsonKeyValue("MaxCycleLDR", String(wpFZ.maxCycleLDR)) + ",";
-		message += JsonKeyValue("useLDRAvg", String(wpFZ.useLdrAvg)) + ",";
-		message += JsonKeyValue("LDRCorrection", String(wpFZ.ldrCorrection));
-		message += "},";
-#endif
-#ifdef wpLight
-		message += "\"Light\":{";
-		message += JsonKeyValue("MaxCycleLight", String(wpFZ.maxCycleLight)) + ",";
-		message += JsonKeyValue("useLightAvg", String(wpFZ.useLightAvg)) + ",";
-		message += JsonKeyValue("LightCorrection", String(wpFZ.lightCorrection));
-		message += "},";
-#endif
-#ifdef wpBM
-		message += "\"BM\":{";
-	#ifdef wpLDR
-		message += "\"LDR\":{";
-		message += JsonKeyValue("Threshold", String(wpFZ.threshold)) + ",";
-		message += JsonKeyString("LightToTurnOn", wpFZ.lightToTurnOn);
-		message += "}";
-	#endif
-		message += "},";
-#endif
-#ifdef wpRelais
-		message += "\"Relais\":{";
-		message += JsonKeyValue("Hand", wpFZ.relaisHand ? "true" : "false") + ",";
-		message += JsonKeyValue("HandValue", wpFZ.relaisHandValue ? "true" : "false");
-	#ifdef wpMoisture
-		message += ",\"Moisture\":{";
-		message += JsonKeyValue("waterEmpty", wpFZ.waterEmpty ? "true" : "false") + ",";
-		message += JsonKeyValue("pumpActive", String(wpFZ.pumpActive)) + ",";
-		message += JsonKeyValue("pumpPause", String(wpFZ.pumpPause));
-		message += "}";
-	#endif
-		message += "},";
-#endif
-#ifdef wpRain
-		message += "\"Rain\":{";
-		message += JsonKeyValue("MaxCycleRain", String(wpFZ.maxCycleRain)) + ",";
-		message += JsonKeyValue("useRainAvg", String(wpFZ.useRainAvg)) + ",";
-		message += JsonKeyValue("RainCorrection", String(wpFZ.rainCorrection));
-		message += "},";
-#endif
-#ifdef wpMoisture
-		message += "\"Moisture\":{";
-		message += JsonKeyValue("MaxCycleMoisture", String(wpFZ.maxCycleMoisture)) + ",";
-		message += JsonKeyValue("useMoistureAvg", String(wpFZ.useMoistureAvg)) + ",";
-		message += JsonKeyValue("MoistureMin", String(wpFZ.moistureMin)) + ",";
-		message += JsonKeyValue("MoistureDry", String(wpFZ.moistureDry)) + ",";
-		message += JsonKeyValue("MoistureWet", String(wpFZ.moistureWet));
-		message += "},";
-#endif
-#ifdef wpDistance
-		message += "\"Distance\":{";
-		message += JsonKeyValue("MaxCycleDistance", String(wpFZ.maxCycleDistance)) + ",";
-		message += JsonKeyValue("distanceCorrection", String(wpFZ.distanceCorrection)) + ",";
-		message += JsonKeyValue("maxVolume", String(wpFZ.maxVolume)) + ",";
-		message += JsonKeyValue("height", String(wpFZ.height));
-		message += "},";
-#endif
-		message += "\"Debug\":{";
-		message += JsonKeyValue("EEPROM", wpFZ.DebugEprom ? "true" : "false") + ",";
-		message += JsonKeyValue("WiFi", wpFZ.DebugWiFi ? "true" : "false") + ",";
-		message += JsonKeyValue("MQTT", wpFZ.DebugMqtt ? "true" : "false") + ",";
-		message += JsonKeyValue("Search", wpFZ.DebugFinder ? "true" : "false") + ",";
-		message += JsonKeyValue("Rest", wpFZ.DebugRest ? "true" : "false");
-#ifdef wpHT
-	if(wpHT == DHT11) {
-		message += "," + JsonKeyValue("HT11", wpFZ.DebugHT ? "true" : "false");
-	} else if(wpHT == DHT22) {
-		message += "," + JsonKeyValue("HT22", wpFZ.DebugHT ? "true" : "false");
-	} else {
-		message += "," + JsonKeyValue("HT", wpFZ.DebugHT ? "true" : "false");
+
+
+void wpFreakaZone::checkSubscripes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSetDeviceName.c_str()) == 0) {
+		if(strcmp(msg.c_str(), wpFZ.DeviceName.c_str()) != 0) {
+			wpFZ.DeviceName = msg;
+			wpEEPROM.writeStringsToEEPROM();
+			wpMqtt.mqttClient.publish(mqttTopicRestartRequired.c_str(), String(1).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicRestartDevice.c_str(), String(0).c_str());
+			checkSubscripesDebug(mqttTopicDeviceName, wpFZ.DeviceName);
+		}
 	}
-#endif
-#ifdef wpLDR
-		message += "," + JsonKeyValue("LDR", wpFZ.DebugLDR ? "true" : "false");
-#endif
-#ifdef wpLight
-		message += "," + JsonKeyValue("Light", wpFZ.DebugLight ? "true" : "false");
-#endif
-#ifdef wpBM
-		message += "," + JsonKeyValue("BM", wpFZ.DebugBM ? "true" : "false");
-#endif
-#ifdef wpRelais
-		message += "," + JsonKeyValue("Relais", wpFZ.DebugRelais ? "true" : "false");
-#endif
-#ifdef wpRain
-		message += "," + JsonKeyValue("Rain", wpFZ.DebugRain ? "true" : "false");
-#endif
-#ifdef wpMoisture
-		message += "," + JsonKeyValue("Moisture", wpFZ.DebugMoisture ? "true" : "false");
-#endif
-#ifdef wpDistance
-		message += "," + JsonKeyValue("Distance", wpFZ.DebugDistance ? "true" : "false");
-#endif
-		message += "}}}";
-		request->send(200, "application/json", message.c_str());
-	});
+	if(strcmp(topic, mqttTopicSetDeviceDescription.c_str()) == 0) {
+		if(strcmp(msg.c_str(), wpFZ.DeviceDescription.c_str()) != 0) {
+			wpFZ.DeviceDescription = msg;
+			wpEEPROM.writeStringsToEEPROM();
+			checkSubscripesDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
+		}
+	}
+	if(strcmp(topic, mqttTopicRestartDevice.c_str()) == 0) {
+		int readRestartDevice = msg.toInt();
+		if(readRestartDevice > 0) {
+			wpOnlineToggler.setMqttOffline();
+			checkSubscripesDebug(mqttTopicRestartDevice, String(readRestartDevice));
+			ESP.restart();
+		}
+	}
+	if(strcmp(topic, mqttTopicCalcValues.c_str()) == 0) {
+		bool readCalcValues = msg.toInt();
+		if(wpFZ.calcValues != readCalcValues) {
+			wpFZ.calcValues = readCalcValues;
+			checkSubscripesDebug(mqttTopicCalcValues, String(wpFZ.calcValues));
+		}
+	}
 }
 
-void wpFreakaZone::setWebServerDebugChange(String DebugPlugIn) {
-	doWebServerDebugChange = DebugPlugIn;
+void wpFreakaZone::publishSettings() {
+	wpMqtt.mqttClient.publish(mqttTopicDeviceName.c_str(), DeviceName.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicDeviceDescription.c_str(), DeviceDescription.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicVersion.c_str(), Version.c_str());
+	wpMqtt.mqttClient.publish(mqttTopicOnSince.c_str(), OnSince.c_str());
 }
-void wpFreakaZone::doTheWebServerDebugChange() {
-	if(doWebServerDebugChange != "") {
-		if(doWebServerDebugChange == "DebugEprom") {
-			wpFZ.DebugEprom = !wpFZ.DebugEprom;
-			bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugEprom, wpFZ.DebugEprom);
-			EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugEprom");
-			wpFZ.blink();
-		}
-		if(doWebServerDebugChange == "DebugWiFi") {
-			wpFZ.DebugWiFi = !wpFZ.DebugWiFi;
-			bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugWiFi, wpFZ.DebugWiFi);
-			EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugWiFi");
-			wpFZ.blink();
-		}
-		if(doWebServerDebugChange == "DebugMqtt") {
-			wpFZ.DebugMqtt = !wpFZ.DebugMqtt;
-			bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugMqtt, wpFZ.DebugMqtt);
-			EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugMqtt");
-			wpFZ.blink();
-		}
-		if(doWebServerDebugChange == "DebugFinder") {
-			wpFZ.DebugFinder = !wpFZ.DebugFinder;
-			bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugFinder, wpFZ.DebugFinder);
-			EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugFinder");
-			wpFZ.blink();
-		}
-		if(doWebServerDebugChange == "DebugRest") {
-			wpFZ.DebugRest = !wpFZ.DebugRest;
-			bitWrite(wpFZ.settingsBool1, wpFZ.bitDebugRest, wpFZ.DebugRest);
-			EEPROM.write(wpFZ.addrSettingsBool1, wpFZ.settingsBool1);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugRest");
-			wpFZ.blink();
-		}
-#ifdef wpHT
-		if(doWebServerDebugChange == "DebugHT") {
-			wpFZ.DebugHT = !wpFZ.DebugHT;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugHT, wpFZ.DebugHT);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugHT");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpLDR
-		if(doWebServerDebugChange == "DebugLDR") {
-			wpFZ.DebugLDR = !wpFZ.DebugLDR;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugLDR, wpFZ.DebugLDR);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugLDR");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpLight
-		if(doWebServerDebugChange == "DebugLight") {
-			wpFZ.DebugLight = !wpFZ.DebugLight;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugLight, wpFZ.DebugLight);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugLight");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpBM
-		if(doWebServerDebugChange == "DebugBM") {
-			wpFZ.DebugBM = !wpFZ.DebugBM;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugBM, wpFZ.DebugBM);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugBM");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpRelais
-		if(doWebServerDebugChange == "DebugRelais") {
-			wpFZ.DebugRelais = !wpFZ.DebugRelais;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugRelais, wpFZ.DebugRelais);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugRelais");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpRain
-		if(doWebServerDebugChange == "DebugRain") {
-			wpFZ.DebugRain = !wpFZ.DebugRain;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugRain, wpFZ.DebugRain);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugRain");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpMoisture
-		if(doWebServerDebugChange == "DebugMoisture") {
-			wpFZ.DebugMoisture = !wpFZ.DebugMoisture;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugMoisture, wpFZ.DebugMoisture);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugMoisture");
-			wpFZ.blink();
-		}
-#endif
-#ifdef wpDistance
-		if(doWebServerDebugChange == "DebugDistance") {
-			wpFZ.DebugDistance = !wpFZ.DebugDistance;
-			bitWrite(wpFZ.settingsBool2, wpFZ.bitDebugDistance, wpFZ.DebugDistance);
-			EEPROM.write(wpFZ.addrSettingsBool2, wpFZ.settingsBool2);
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setDebug DebugDistance");
-			wpFZ.blink();
-		}
-#endif
-		doWebServerDebugChange = "";
-	}
+
+void wpFreakaZone::publishValues() {
+	wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
 }
-#endif
+
 //###################################################################################
 // Debug Messages
 //###################################################################################
@@ -488,3 +246,15 @@ void wpFreakaZone::printRestored() {
 //###################################################################################
 // private
 //###################################################################################
+void wpFreakaZone::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicRestartDevice.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicCalcValues.c_str());
+}
+
+void wpFreakaZone::checkSubscripesDebug(String topic, String value) {
+	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
+	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
+	wpFZ.blink();
+}

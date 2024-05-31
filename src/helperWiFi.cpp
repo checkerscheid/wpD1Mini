@@ -15,7 +15,7 @@
 //###################################################################################
 #include <helperWiFi.h>
 
-helperWiFi wpWiFi();
+helperWiFi wpWiFi;
 
 helperWiFi::helperWiFi() {
 	// settings

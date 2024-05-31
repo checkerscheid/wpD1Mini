@@ -102,11 +102,11 @@ class helperEEPROM {
 		void loop();
 		uint16_t getVersion();
 		void changeDebug();
+		void readStringsFromEEPROM();
+		void writeStringsToEEPROM();
 	private:
 		String SVNh = "$Rev: 118 $";
 		const byte byteStartForString0 = 100;
-		void readStringsFromEEPROM();
-		void writeStringsToEEPROM();
 		String readStringFromEEPROM(int addrOffset, String defaultString);
 		int writeStringToEEPROM(int addrOffset, String &strToWrite);
 };

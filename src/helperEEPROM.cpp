@@ -15,7 +15,7 @@
 //###################################################################################
 #include <helperEEPROM.h>
 
-helperEEPROM wpEEPROM();
+helperEEPROM wpEEPROM;
 
 helperEEPROM::helperEEPROM() {
 	EEPROM.begin(4095);
@@ -44,25 +44,25 @@ void helperEEPROM::changeDebug() {
 	wpFZ.blink();
 }
 
-//###################################################################################
-// private
-//###################################################################################
-
 void helperEEPROM::readStringsFromEEPROM() {
 	byteStartForString = byteStartForString0; // reset
 	wpFZ.DeviceName = readStringFromEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = byteStartForString + 1 + wpFZ.DeviceName.length();
 	wpFZ.DeviceDescription = readStringFromEEPROM(byteStartForString, wpFZ.DeviceDescription);
-	byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
-	wpFZ.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpFZ.lightToTurnOn);
+	//byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
+	//wpFZ.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpFZ.lightToTurnOn);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = byteStartForString0; // reset
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.lightToTurnOn);
+	//byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.lightToTurnOn);
 }
+
+//###################################################################################
+// private
+//###################################################################################
 
 String helperEEPROM::readStringFromEEPROM(int addrOffset, String defaultString) {
 	int newStrLen = EEPROM.read(addrOffset);

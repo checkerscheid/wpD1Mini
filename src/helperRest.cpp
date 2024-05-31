@@ -15,7 +15,7 @@
 //###################################################################################
 #include <helperRest.h>
 
-helperRest wpRest();
+helperRest wpRest;
 
 helperRest::helperRest() {
 	// settings

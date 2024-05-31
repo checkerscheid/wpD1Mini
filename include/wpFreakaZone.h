@@ -39,6 +39,7 @@ class wpFreakaZone {
 
 		uint16_t MajorVersion;
 		uint16_t MinorVersion;
+		String Version;
 
 		String OnSince;
 		String OnDuration;
@@ -66,25 +67,19 @@ class wpFreakaZone {
 		String DeviceDescription;
 		bool calcValues;
 
-		int16_t ldrCorrection;
-		int16_t lightCorrection;
-		uint16_t threshold;
-		String lightToTurnOn;
-		bool relaisHand;
-		bool relaisHandValue;
-		bool waterEmpty;
-		uint16_t pumpActive;
-		uint16_t pumpPause;
-		float rainCorrection;
-		bool useMoistureAvg;
-		byte moistureMin;
-		// Dry = high e.g. 622
-		int16_t moistureDry;
-		// Wet = low e.g. 224
-		int16_t moistureWet;
-		int8_t distanceCorrection;
-		uint16_t maxVolume;
-		uint8_t height;
+		// values
+		String mqttTopicRestartRequired;
+		// settings
+		String mqttTopicDeviceName;
+		String mqttTopicDeviceDescription;
+		String mqttTopicVersion;
+		String mqttTopicOnSince;
+		String mqttTopicOnDuration;
+		// commands
+		String mqttTopicSetDeviceName;
+		String mqttTopicSetDeviceDescription;
+		String mqttTopicRestartDevice;
+		String mqttTopicCalcValues;
 
 		wpFreakaZone(String);
 		void loop();
@@ -108,12 +103,13 @@ class wpFreakaZone {
 		void printStart();
 		void printRestored();
 
+		void checkSubscripes(char* topic, String msg);
+		void publishSettings();
+		void publishValues();
 	private:
 		String SVNh = "$Rev: 117 $";
-
-		String doWebServerDebugChange = "";
-		void setWebServerDebugChange(String DebugPlugIn);
-		void doTheWebServerDebugChange();
+		void setSubscribes();
+		void checkSubscripesDebug(String topic, String value);
 };
 extern wpFreakaZone wpFZ;
 

@@ -15,12 +15,11 @@
 //###################################################################################
 #include <helperUpdate.h>
 
-helperUpdate wpUpdate();
+helperUpdate wpUpdate;
 
 helperUpdate::helperUpdate() {
 	// values
 	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
-	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";
 	// commands
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 }
@@ -75,10 +74,6 @@ void helperUpdate::start() {
 	}
 }
 
-//###################################################################################
-// private
-//###################################################################################
-
 bool helperUpdate::setupOta() {
 	bool returns = false;
 	ArduinoOTA.onStart([]() {
@@ -110,6 +105,9 @@ bool helperUpdate::setupOta() {
 	return returns;
 }
 
+//###################################################################################
+// private
+//###################################################################################
 void helperUpdate::started() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }

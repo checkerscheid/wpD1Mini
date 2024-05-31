@@ -15,7 +15,7 @@
 //###################################################################################
 #include <helperFinder.h>
 
-helperFinder wpFinder();
+helperFinder wpFinder;
 
 helperFinder::helperFinder() {
 	// commands
@@ -56,8 +56,8 @@ void helperFinder::setupFinder() {
 			int val = strncmp((char *) packet.data(), "FreakaZone Member?", 2);
 			if(val == 0) {
 				String IP = WiFi.localIP().toString();
-				packet.printf("{\"Iam\":{\"FreakaZoneClient\":\"%s\",\"IP\":\"%s\",\"MAC\":\"%s\",\"wpFreakaZoneVersion\":\"%s\",\"Version\":\"%s\"}}",
-					wpFZ.DeviceName.c_str(), IP.c_str(), WiFi.macAddress().c_str(), wpFZ.getVersion().c_str(), wpFZ.MainVersion.c_str());
+				packet.printf("{\"Iam\":{\"FreakaZoneClient\":\"%s\",\"IP\":\"%s\",\"MAC\":\"%s\",\"Version\":\"%s\"}}",
+					wpFZ.DeviceName.c_str(), IP.c_str(), WiFi.macAddress().c_str(), wpFZ.Version.c_str());
 				String logmessage = "Found FreakaZone Member question";
 				wpFZ.DebugWS(wpFZ.strDEBUG, "setupFinder", logmessage);
 			}

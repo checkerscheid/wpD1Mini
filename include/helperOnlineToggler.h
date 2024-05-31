@@ -34,6 +34,7 @@ class helperOnlineToggler {
 		void loop();
 		uint16_t getVersion();
 		void changeDebug();
+		void setMqttOffline();
 	private:
 		String SVNh = "$Rev: 118 $";
 		void checkOfflineTrigger();

@@ -17,19 +17,40 @@
 #define helperWebServer_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <ESPAsyncWebServer.h>
 #include <helperWiFi.h>
 #include <helperMqtt.h>
+#include <helperFinder.h>
+#include <helperUpdate.h>
+#include <moduleDHT.h>
 class helperWebServer {
 	public:
 		
 		static const int8_t WebServerCommanddoNothing = -1;
+
 		static const int8_t WebServerCommandblink = 1;
 		static const int8_t WebServerCommandpublishSettings = 2;
 		static const int8_t WebServerCommandupdateFW = 3;
 		static const int8_t WebServerCommandrestartESP = 4;
 		static const int8_t WebServerCommandscanWiFi = 5;
 		static int8_t doWebServerCommand;
+
+		static const int8_t cmdDebugEprom = 1;
+		static const int8_t cmdDebugWiFi = 2;
+		static const int8_t cmdDebugMqtt = 3;
+		static const int8_t cmdDebugFinder = 4;
+		static const int8_t cmdDebugRest = 5;
+		static const int8_t cmdDebugOnlineToggler = 6;
+		static const int8_t cmdDebugHT = 7;
+		static const int8_t cmdDebugLDR = 8;
+		static const int8_t cmdDebugLight = 9;
+		static const int8_t cmdDebugBM = 10;
+		static const int8_t cmdDebugRelais = 11;
+		static const int8_t cmdDebugRain = 12;
+		static const int8_t cmdDebugMoisture = 13;
+		static const int8_t cmdDebugDistance = 14;
 		static int8_t doWebServerDebugChange;
+
 		static int8_t doWebServerBlink;
 
 		helperWebServer();
@@ -43,9 +64,9 @@ class helperWebServer {
 		static void setWebServerCommand(int8_t command);
 		static void setWebServerDebugChange(int8_t debug);
 		static void setWebServerBlink();
-		void doTheWebServerCommand();
-		void doTheWebServerDebugChange();
-		void doTheWebserverBlink();
+		static void doTheWebServerCommand();
+		static void doTheWebServerDebugChange();
+		static void doTheWebserverBlink();
 	private:
 		String SVNh = "$Rev: 118 $";
 };

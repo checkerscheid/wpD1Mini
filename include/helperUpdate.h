@@ -25,7 +25,6 @@ class helperUpdate {
 	public:
 		// values
 		String mqttTopicUpdateMode;
-		String mqttTopicRestartRequired;
 		// settings
 		String mqttTopicUpdateFW;
 
@@ -36,9 +35,9 @@ class helperUpdate {
 		uint16_t getVersion();
 		void check();
 		void start();
+		bool setupOta();
 	private:
 		String SVNh = "$Rev: 118 $";
-		bool setupOta();
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);

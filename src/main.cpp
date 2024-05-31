@@ -21,8 +21,8 @@ void setup() {
 	Serial.begin(9600);
 	while(!Serial) {}
 	wpFZ.printStart();
-	getVars();
 	wpFZ.printRestored();
+	wpFZ.Version = getStringVersion();
 }
 
 //###################################################################################
@@ -112,6 +112,7 @@ uint16_t getGlobalBuild() {
 	v = v > check ? v : check;
 	check = wpDHT.getVersion();
 	v = v > check ? v : check;
+	return v;
 }
 #ifdef oldMqtt
 //###################################################################################

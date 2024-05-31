@@ -26,19 +26,6 @@
 #include <helperWiFi.h>
 #include <moduleDHT.h>
 
-// values
-// settings
-String mqttTopicDeviceName;
-String mqttTopicDeviceDescription;
-String mqttTopicRestartDevice;
-String mqttTopicOnSince;
-String mqttTopicOnDuration;
-// commands
-String mqttTopicSetDeviceName;
-String mqttTopicSetDeviceDescription;
-String mqttTopicCalcValues;
-
-void getVars();
 uint16_t getVersion();
 String getStringVersion();
 uint16_t getGlobalBuild();

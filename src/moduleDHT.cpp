@@ -15,7 +15,7 @@
 //###################################################################################
 #include <moduleDHT.h>
 
-moduleDHT wpDHT();
+moduleDHT wpDHT;
 DHT dht(DHTPin, wpFZ.choosenDHT);
 
 moduleDHT::moduleDHT() {
@@ -34,7 +34,7 @@ moduleDHT::moduleDHT() {
 	humidityCorrection = 0;
 
 	dht.begin();
-
+	publishSettings();
 	setSubscribes();
 }
 
@@ -54,6 +54,15 @@ uint16_t moduleDHT::getVersion() {
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+void moduleDHT::changeDebug() {
+	DebugHT = !DebugHT;
+	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, DebugHT);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	EEPROM.commit();
+	wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(DebugHT ? "true" : "false") + "}");
+	wpFZ.blink();
 }
 
 void moduleDHT::checkSubscripes(char* topic, String msg) {
@@ -206,7 +215,7 @@ void moduleDHT::publishInfoDebug(String name, String value, String publishCount)
 
 void moduleDHT::checkSubscripesDebug(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
-	wpFZ.DebugWS(wpFZ.strINFO, "callbackMqtt", logmessage);
+	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
 	wpFZ.blink();
 }
 

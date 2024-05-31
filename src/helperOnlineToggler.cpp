@@ -15,7 +15,7 @@
 //###################################################################################
 #include <helperOnlineToggler.h>
 
-helperOnlineToggler wpOnlineToggler();
+helperOnlineToggler wpOnlineToggler;
 
 helperOnlineToggler::helperOnlineToggler() {
 	// settings
@@ -50,6 +50,10 @@ void helperOnlineToggler::changeDebug() {
 	wpFZ.blink();
 }
 
+void helperOnlineToggler::setMqttOffline() {
+	wpMqtt.mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
+}
+
 //###################################################################################
 // private
 //###################################################################################
@@ -57,7 +61,7 @@ void helperOnlineToggler::changeDebug() {
 void helperOnlineToggler::checkOfflineTrigger() {
 	if(OfflineTrigger) {
 		// set offline for reboot
-		wpMqtt.setMqttOffline();
+		setMqttOffline();
 		OfflineTrigger = false;
 	}
 }

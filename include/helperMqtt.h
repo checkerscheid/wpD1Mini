@@ -20,6 +20,7 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <helperOnlineToggler.h>
+#include <helperRest.h>
 class helperMqtt {
 	public:
 		static bool DebugMqtt;
@@ -39,7 +40,6 @@ class helperMqtt {
 		void loop();
 		uint16_t getVersion();
 		void changeDebug();
-		void setMqttOffline();
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishInfo();

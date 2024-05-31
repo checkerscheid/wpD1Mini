@@ -47,6 +47,7 @@ class moduleDHT {
 		moduleDHT();
 		void loop();
 		uint16_t getVersion();
+		void changeDebug();
 
 		void checkSubscripes(char* topic, String msg);
 		void publishSettings();
