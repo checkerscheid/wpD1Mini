@@ -182,22 +182,20 @@ void helperWebServer::setWebServerBlink() {
 
 void helperWebServer::doTheWebServerCommand() {
 	if(doWebServerCommand > 0) {
-		switch(doWebServerCommand) {
-			case WebServerCommandpublishSettings:
-				wpMqtt.publishSettings(true);
-				break;
-			case WebServerCommandupdateFW:
-				if(wpUpdate.setupOta()) {
-					wpUpdate.UpdateFW = true;
-				}
-				break;
-			case WebServerCommandrestartESP:
-				wpOnlineToggler.setMqttOffline();
-				ESP.restart();
-				break;
-			case WebServerCommandscanWiFi:
-				wpWiFi.scanWiFi();
-				break;
+		if(doWebServerCommand == WebServerCommandpublishSettings) {
+			wpMqtt.publishSettings(true);
+		}
+		if(doWebServerCommand == WebServerCommandupdateFW) {
+			if(wpUpdate.setupOta()) {
+				wpUpdate.UpdateFW = true;
+			}
+		}
+		if(doWebServerCommand == WebServerCommandrestartESP) {
+			wpOnlineToggler.setMqttOffline();
+			ESP.restart();
+		}
+		if(doWebServerCommand == WebServerCommandscanWiFi) {
+			wpWiFi.scanWiFi();
 		}
 		doWebServerCommand = WebServerCommanddoNothing;
 	}

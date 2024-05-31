@@ -87,9 +87,9 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	for (unsigned int i = 0; i < length; i++) {
 		msg += (char)payload[i];
 	}
-	// if(wpMqtt.DebugMqtt) {
+	if(wpMqtt.DebugMqtt) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "callbackMqtt", "Message arrived on topic: '" + String(topic) + "': " + msg);
-	// }
+	}
 	if(msg == "") {
 		wpFZ.DebugWS(wpFZ.strWARN, "callbackMqtt", "msg is empty, '" + String(topic) + "'");
 	} else {

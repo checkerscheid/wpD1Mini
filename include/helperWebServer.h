@@ -26,32 +26,32 @@
 class helperWebServer {
 	public:
 		
-		static const int8_t WebServerCommanddoNothing = -1;
+		const int8_t WebServerCommanddoNothing = -1;
 
-		static const int8_t WebServerCommandblink = 1;
-		static const int8_t WebServerCommandpublishSettings = 2;
-		static const int8_t WebServerCommandupdateFW = 3;
-		static const int8_t WebServerCommandrestartESP = 4;
-		static const int8_t WebServerCommandscanWiFi = 5;
-		static int8_t doWebServerCommand;
+		const int8_t WebServerCommandblink = 1;
+		const int8_t WebServerCommandpublishSettings = 2;
+		const int8_t WebServerCommandupdateFW = 3;
+		const int8_t WebServerCommandrestartESP = 4;
+		const int8_t WebServerCommandscanWiFi = 5;
+		int8_t doWebServerCommand;
 
-		static const int8_t cmdDebugEprom = 1;
-		static const int8_t cmdDebugWiFi = 2;
-		static const int8_t cmdDebugMqtt = 3;
-		static const int8_t cmdDebugFinder = 4;
-		static const int8_t cmdDebugRest = 5;
-		static const int8_t cmdDebugOnlineToggler = 6;
-		static const int8_t cmdDebugHT = 7;
-		static const int8_t cmdDebugLDR = 8;
-		static const int8_t cmdDebugLight = 9;
-		static const int8_t cmdDebugBM = 10;
-		static const int8_t cmdDebugRelais = 11;
-		static const int8_t cmdDebugRain = 12;
-		static const int8_t cmdDebugMoisture = 13;
-		static const int8_t cmdDebugDistance = 14;
-		static int8_t doWebServerDebugChange;
+		const int8_t cmdDebugEprom = 1;
+		const int8_t cmdDebugWiFi = 2;
+		const int8_t cmdDebugMqtt = 3;
+		const int8_t cmdDebugFinder = 4;
+		const int8_t cmdDebugRest = 5;
+		const int8_t cmdDebugOnlineToggler = 6;
+		const int8_t cmdDebugHT = 7;
+		const int8_t cmdDebugLDR = 8;
+		const int8_t cmdDebugLight = 9;
+		const int8_t cmdDebugBM = 10;
+		const int8_t cmdDebugRelais = 11;
+		const int8_t cmdDebugRain = 12;
+		const int8_t cmdDebugMoisture = 13;
+		const int8_t cmdDebugDistance = 14;
+		int8_t doWebServerDebugChange;
 
-		static int8_t doWebServerBlink;
+		int8_t doWebServerBlink;
 
 		helperWebServer();
 		void loop();
@@ -61,12 +61,12 @@ class helperWebServer {
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
 		
 		void setupWebServer();
-		static void setWebServerCommand(int8_t command);
-		static void setWebServerDebugChange(int8_t debug);
-		static void setWebServerBlink();
-		static void doTheWebServerCommand();
-		static void doTheWebServerDebugChange();
-		static void doTheWebserverBlink();
+		void setWebServerCommand(int8_t command);
+		void setWebServerDebugChange(int8_t debug);
+		void setWebServerBlink();
+		void doTheWebServerCommand();
+		void doTheWebServerDebugChange();
+		void doTheWebserverBlink();
 	private:
 		String SVNh = "$Rev: 118 $";
 };

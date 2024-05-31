@@ -23,7 +23,7 @@
 #include <helperRest.h>
 class helperMqtt {
 	public:
-		static bool DebugMqtt;
+		bool DebugMqtt;
 		// settings
 		String mqttTopicMqttServer;
 		String mqttTopicMqttSince;
