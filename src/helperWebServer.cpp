@@ -19,35 +19,19 @@ helperWebServer wpWebServer;
 
 helperWebServer::helperWebServer() {}
 void helperWebServer::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	doWebServerCommand = WebServerCommanddoNothing;
 	doWebServerDebugChange = WebServerCommanddoNothing;
 	doWebServerBlink = WebServerCommanddoNothing;
-	setupWebServer();	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
+	setupWebServer();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperWebServer::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
 	doTheWebServerCommand();
 	doTheWebServerDebugChange();
 	doTheWebserverBlink();
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperWebServer::getVersion() {

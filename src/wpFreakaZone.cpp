@@ -176,28 +176,35 @@ void wpFreakaZone::publishValues() {
 	}
 }
 
-void wpFreakaZone::checkSubscripes(char* topic, String msg) {
+void wpFreakaZone::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicRestartDevice.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicCalcValues.c_str());
+}
+
+void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, wpFZ.mqttTopicSetDeviceName.c_str()) == 0) {
 		if(wpFZ.DeviceName != msg) {
 			wpFZ.DeviceName = msg;
 			wpEEPROM.writeStringsToEEPROM();
 			wpMqtt.mqttClient.publish(wpFZ.mqttTopicRestartRequired.c_str(), String(1).c_str());
 			wpMqtt.mqttClient.publish(wpFZ.mqttTopicRestartDevice.c_str(), String(0).c_str());
-			checkSubscripesDebug(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
+			DebugcheckSubscribes(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
 		}
 	}
 	if(strcmp(topic, wpFZ.mqttTopicSetDeviceDescription.c_str()) == 0) {
 		if(wpFZ.DeviceDescription != msg) {
 			wpFZ.DeviceDescription = msg;
 			wpEEPROM.writeStringsToEEPROM();
-			checkSubscripesDebug(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
+			DebugcheckSubscribes(mqttTopicDeviceDescription, wpFZ.DeviceDescription);
 		}
 	}
 	if(strcmp(topic, wpFZ.mqttTopicRestartDevice.c_str()) == 0) {
 		int readRestartDevice = msg.toInt();
 		if(readRestartDevice > 0) {
 			wpOnlineToggler.setMqttOffline();
-			checkSubscripesDebug(mqttTopicRestartDevice, String(readRestartDevice));
+			DebugcheckSubscribes(mqttTopicRestartDevice, String(readRestartDevice));
 			ESP.restart();
 		}
 	}
@@ -206,7 +213,7 @@ void wpFreakaZone::checkSubscripes(char* topic, String msg) {
 		if(wpFZ.calcValues != readCalcValues) {
 			wpFZ.calcValues = readCalcValues;
 			wpFZ.SendWS("{\"id\":\"CalcValues\",\"value\":" + String(wpFZ.calcValues ? "true" : "false") + "}");
-			checkSubscripesDebug(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
+			DebugcheckSubscribes(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
 }
@@ -225,6 +232,11 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 }
 void wpFreakaZone::SendWS(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
+	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
+	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
+	wpFZ.blink();
 }
 
 void wpFreakaZone::printStart() {
@@ -255,15 +267,3 @@ void wpFreakaZone::printRestored() {
 //###################################################################################
 // private
 //###################################################################################
-void wpFreakaZone::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicRestartDevice.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicCalcValues.c_str());
-}
-
-void wpFreakaZone::checkSubscripesDebug(String topic, String value) {
-	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
-	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
-	wpFZ.blink();
-}

@@ -98,6 +98,7 @@ void helperMqtt::connectMqtt() {
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
 			MqttSince = wpFZ.getDateTime();
+			setSubscribes();
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 		} else {
@@ -108,6 +109,13 @@ void helperMqtt::connectMqtt() {
 	}
 }
 
+void helperMqtt::setSubscribes() {
+	mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
+	mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
+	mqttClient.subscribe(mqttTopicDebugMqtt.c_str());
+	wpFZ.setSubscribes();
+	wpWiFi.setSubscribes();
+}
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	String msg = "";
 	for (unsigned int i = 0; i < length; i++) {
@@ -125,8 +133,8 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				wpMqtt.publishSettings(true);
 				wpMqtt.publishValues();
 				//reset
-				mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
-				wpFZ.DebugcheckSubscripes(wpMqtt.mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
+				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
+				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
 			}
 		}
 		if(strcmp(topic, wpMqtt.mqttTopicForceRenewValue.c_str()) == 0) {
@@ -134,8 +142,8 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			if(readForceRenewValue != 0) {
 				wpMqtt.publishValues();
 				//reset
-				mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
-				wpFZ.DebugcheckSubscripes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
+				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
+				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
 			}
 		}
 		if(strcmp(topic, wpMqtt.mqttTopicDebugMqtt.c_str()) == 0) {
@@ -146,10 +154,10 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
 				EEPROM.commit();
 				wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(wpMqtt.DebugMqtt ? "true" : "false") + "}");
-				wpFZ.DebugcheckSubscripes(wpMqtt.mqttTopicDebugMqtt, String(wpMqtt.DebugMqtt));
+				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebugMqtt, String(wpMqtt.DebugMqtt));
 			}
 		}
-		wpFZ.checkSubscripes(topic, msg);
-		wpWiFi.checkSubscripes(topic, msg);
+		wpFZ.checkSubscribes(topic, msg);
+		wpWiFi.checkSubscribes(topic, msg);
 	}
 }

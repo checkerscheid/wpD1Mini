@@ -140,7 +140,10 @@ void helperWiFi::publishValues() {
 	}
 }
 
-void helperWiFi::checkSubscripes(char* topic, String msg) {
+void helperWiFi::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
+}
+void helperWiFi::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebugWiFi.c_str()) == 0) {
 		bool readDebugWiFi = msg.toInt();
 		if(DebugWiFi != readDebugWiFi) {
@@ -149,7 +152,7 @@ void helperWiFi::checkSubscripes(char* topic, String msg) {
 			EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
 			EEPROM.commit();
 			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
-			wpFZ.DebugcheckSubscripes(mqttTopicDebugWiFi, String(DebugWiFi));
+			wpFZ.DebugcheckSubscribes(mqttTopicDebugWiFi, String(DebugWiFi));
 		}
 	}
 }
@@ -157,9 +160,6 @@ void helperWiFi::checkSubscripes(char* topic, String msg) {
 //###################################################################################
 // private
 //###################################################################################
-void helperWiFi::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
-}
 String helperWiFi::printEncryptionType(int thisType) {
 	switch (thisType) {
 		case ENC_TYPE_WEP:

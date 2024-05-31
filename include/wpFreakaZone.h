@@ -102,7 +102,7 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		void DebugWS(String typ, String func, String msg, bool newline);
 		void SendWS(String msg);
-		void DebugcheckSubscripes(String topic, String value);
+		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();
 		void printRestored();
@@ -110,12 +110,11 @@ class wpFreakaZone {
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
-		void checkSubscripes(char* topic, String msg);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
 		uint16_t publishCountOnDuration = 0;
-		void setSubscribes();
-		void checkSubscripesDebug(String topic, String value);
 };
 extern wpFreakaZone wpFZ;
 

@@ -45,13 +45,13 @@ class helperWiFi {
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
-		void checkSubscripes(char* topic, String msg);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
 		bool DebugWiFiLast = false;
 		uint16_t publishCountDebugWiFi = 0;
 		uint16_t publishCountRssi = 0;
-		void setSubscribes();
 		String printEncryptionType(int thisType);
 };
 extern helperWiFi wpWiFi;
