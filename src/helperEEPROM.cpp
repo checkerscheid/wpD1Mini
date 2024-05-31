@@ -19,30 +19,14 @@ helperEEPROM wpEEPROM;
 
 helperEEPROM::helperEEPROM() {}
 void helperEEPROM::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	EEPROM.begin(4095);
-	mqttTopicDebugEprom = wpFZ.DeviceName + "/settings/Debug/Eprom";	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
+	mqttTopicDebugEEPROM = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperEEPROM::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperEEPROM::getVersion() {
@@ -54,7 +38,7 @@ uint16_t helperEEPROM::getVersion() {
 
 void helperEEPROM::changeDebug() {
 	DebugEEPROM = !DebugEEPROM;
-	bitWrite(bitsDebugBasis, bitDebugEprom, DebugEEPROM);
+	bitWrite(bitsDebugBasis, bitDebugEEPROM, DebugEEPROM);
 	EEPROM.write(addrBitsDebugBasis, bitsDebugBasis);
 	EEPROM.commit();
 	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(DebugEEPROM ? "true" : "false") + "}");
@@ -75,6 +59,41 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	//byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.lightToTurnOn);
+}
+
+void helperEEPROM::publishSettings() {
+	publishSettings(false);
+}
+void helperEEPROM::publishSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebugEEPROM.c_str(), String(DebugEEPROM).c_str());
+	}
+}
+
+void helperEEPROM::publishValues() {
+	if(DebugEEPROMLast != DebugEEPROM || ++publishCountDebugEEPROM > wpFZ.publishQoS) {
+		DebugEEPROMLast = DebugEEPROM;
+		wpMqtt.mqttClient.publish(mqttTopicDebugEEPROM.c_str(), String(DebugEEPROM).c_str());
+		publishCountDebugEEPROM = 0;
+	}
+}
+
+void helperEEPROM::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebugEEPROM.c_str());
+}
+
+void helperEEPROM::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebugEEPROM.c_str()) == 0) {
+		bool readDebugWiFi = msg.toInt();
+		if(DebugEEPROM != readDebugWiFi) {
+			DebugEEPROM = readDebugWiFi;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugEEPROM, DebugEEPROM);
+			EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(DebugEEPROM ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebugEEPROM, String(DebugEEPROM));
+		}
+	}
 }
 
 //###################################################################################
@@ -111,4 +130,73 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 		Serial.printf("Start Next: %u\n", returns);
 	}
 	return returns;
+}
+
+void helperEEPROM::readVars() {
+	/// bool values: byte 0 - 9
+		bitsModules0 = EEPROM.read(addrBitsModules0);
+		// bitDHT11 = 0;
+		// bitDHT22 = 1;
+		// bitLDR = 2;
+		// bitLight = 3;
+		// bitBM = 4;
+		// bitRelais = 5;
+		// bitRelaisShield = 6;
+		// bitRain = 7;
+
+		bitsModules1 = EEPROM.read(addrBitsModules1);
+		// bitMoisture = 0;
+		// bitDistance = 1;
+		
+		bitsDebugBasis = EEPROM.read(addrBitsDebugBasis);
+		DebugEEPROM = bitRead(bitsDebugBasis, bitDebugEEPROM);
+		wpWiFi.DebugWiFi = bitRead(bitsDebugBasis, bitDebugWiFi);
+		wpMqtt.DebugMqtt = bitRead(bitsDebugBasis, bitDebugMqtt);
+		wpFinder.DebugFinder = bitRead(bitsDebugBasis, bitDebugFinder);
+		wpRest.DebugRest = bitRead(bitsDebugBasis, bitDebugRest);
+		wpOnlineToggler.DebugOnlineToggler = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
+		
+		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
+		wpDHT.DebugHT = bitRead(bitsDebugModules, bitDebugHT);
+		// bitDebugLDR = 1;
+		// bitDebugLight = 2;
+		// bitDebugBM = 3;
+		// bitDebugRelais = 4;
+		// bitDebugRain = 5;
+		// bitDebugMoisture = 6;
+		// bitDebugDistance = 7;
+		
+		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
+		// bitUseLdrAvg = 0;
+		// bitUseLightAvg = 1;
+		// bitRelaisHand = 2;
+		// bitRelaisHandValue = 3;
+		// bitUseRainAvg = 4;
+		// bitUseMoistureAvg = 5;
+
+/// byte values: byte 10 - 29
+		wpDHT.maxCycle = EEPROM.read(byteMaxCycleHT);
+		wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
+		wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
+		// byteMaxCycleLDR = 11;
+		// byteLDRCorrection = 12; // int8_t
+		// byteMaxCycleLight = 13;
+		// bytePumpActive = 14;
+		// byteMaxCycleRain = 15;
+		// byteRainCorrection = 16; // int8_t
+		// byteMaxCycleMoisture = 17;
+		// byteMoistureMin = 18;
+		// byteMaxCycleDistance = 19;
+		// byteDistanceCorrection = 20; // int8_t
+		// byteHeight = 21;
+
+/// byte values: 2byte 30 - 59
+		// byteLightCorrection = 34; // int16_t
+		// byteThreshold = 36;
+		// bytePumpPause = 38;
+		// byteMoistureDry = 40;
+		// byteMoistureWet = 42;
+		// byteMaxVolume = 44;
+
+		readStringsFromEEPROM();
 }

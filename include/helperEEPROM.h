@@ -41,7 +41,7 @@ class helperEEPROM {
 		
 		const byte addrBitsDebugBasis = 2;
 		byte bitsDebugBasis;
-		const byte bitDebugEprom = 0; // include in bitsDebugBasis
+		const byte bitDebugEEPROM = 0; // include in bitsDebugBasis
 		const byte bitDebugWiFi = 1; // include in bitsDebugBasis
 		const byte bitDebugMqtt = 2; // include in bitsDebugBasis
 		const byte bitDebugFinder = 3; // include in bitsDebugBasis
@@ -70,33 +70,33 @@ class helperEEPROM {
 
 /// byte values: byte 10 - 29
 		const byte byteMaxCycleHT = 10;
-		const byte byteMaxCycleLDR = 11;
-		const byte byteLDRCorrection = 12; // int8_t
-		const byte byteMaxCycleLight = 13;
-		const byte bytePumpActive = 14;
-		const byte byteMaxCycleRain = 15;
-		const byte byteRainCorrection = 16; // int8_t
-		const byte byteMaxCycleMoisture = 17;
-		const byte byteMoistureMin = 18;
-		const byte byteMaxCycleDistance = 19;
-		const byte byteDistanceCorrection = 20; // int8_t
-		const byte byteHeight = 21;
+		const byte byteTemperatureCorrection = 11; // int8_t * 10
+		const byte byteHumidityCorrection = 12; // int8_t * 10
+		const byte byteMaxCycleLDR = 13;
+		const byte byteLDRCorrection = 14; // int8_t
+		const byte byteMaxCycleLight = 15;
+		const byte bytePumpActive = 16;
+		const byte byteMaxCycleRain = 17;
+		const byte byteRainCorrection = 18; // int8_t
+		const byte byteMaxCycleMoisture = 19;
+		const byte byteMoistureMin = 20;
+		const byte byteMaxCycleDistance = 21;
+		const byte byteDistanceCorrection = 22; // int8_t
+		const byte byteHeight = 23;
 
 /// byte values: 2byte 30 - 59
-		const byte byteTemperatureCorrection = 30; // int8_t * 10
-		const byte byteHumidityCorrection = 32; // int8_t * 10
-		const byte byteLightCorrection = 34; // int16_t
-		const byte byteThreshold = 36;
-		const byte bytePumpPause = 38;
-		const byte byteMoistureDry = 40;
-		const byte byteMoistureWet = 42;
-		const byte byteMaxVolume = 44;
+		const byte byteLightCorrection = 30; // int16_t
+		const byte byteThreshold = 32;
+		const byte bytePumpPause = 34;
+		const byte byteMoistureDry = 36;
+		const byte byteMoistureWet = 38;
+		const byte byteMaxVolume = 40;
 
 /// byte values: 4byte 60 - 99
 
 		uint16_t byteStartForString;
 
-		String mqttTopicDebugEprom;
+		String mqttTopicDebugEEPROM;
 
 		helperEEPROM();
 		void init();
@@ -105,11 +105,20 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
+
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
+		bool DebugEEPROMLast = false;
+		uint16_t publishCountDebugEEPROM = 0;
 		const byte byteStartForString0 = 100;
 		String readStringFromEEPROM(int addrOffset, String defaultString);
 		int writeStringToEEPROM(int addrOffset, String &strToWrite);
+		void readVars();
 };
 extern helperEEPROM wpEEPROM;
 #endif

@@ -22,6 +22,7 @@ void setup() {
 	while(!Serial) {}
 	wpFZ.init("BasisEmpty");
 	wpFZ.printStart();
+	wpEEPROM.init();
 	wpFZ.Version = getStringVersion();
 	wpFZ.printRestored();
 
