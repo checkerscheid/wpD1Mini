@@ -129,6 +129,13 @@ void helperWiFi::publishSettings(bool force) {
 }
 
 void helperWiFi::publishValues() {
+	publishValues(false);
+}
+void helperWiFi::publishValues(bool force) {
+	if(force) {
+		publishCountDebugWiFi = wpFZ.publishQoS;
+		publishCountRssi = wpFZ.minute2;
+	}
 	if(DebugWiFiLast != DebugWiFi || ++publishCountDebugWiFi > wpFZ.publishQoS) {
 		DebugWiFiLast = DebugWiFi;
 		wpMqtt.mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(DebugWiFi).c_str());
@@ -149,7 +156,7 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		if(DebugWiFi != readDebugWiFi) {
 			DebugWiFi = readDebugWiFi;
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, DebugWiFi);
-			EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
 			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicDebugWiFi, String(DebugWiFi));

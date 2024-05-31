@@ -47,6 +47,7 @@ class helperMqtt {
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
+		void publishValues(bool force);
 	private:
 		String SVNh = "$Rev: 120 $";
 		bool DebugMqttLast = false;

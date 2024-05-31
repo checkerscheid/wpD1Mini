@@ -71,6 +71,10 @@ void helperEEPROM::publishSettings(bool force) {
 }
 
 void helperEEPROM::publishValues() {
+	publishValues(false);
+}
+void helperEEPROM::publishValues(bool force) {
+	if(force) publishCountDebugEEPROM = wpFZ.publishQoS;
 	if(DebugEEPROMLast != DebugEEPROM || ++publishCountDebugEEPROM > wpFZ.publishQoS) {
 		DebugEEPROMLast = DebugEEPROM;
 		wpMqtt.mqttClient.publish(mqttTopicDebugEEPROM.c_str(), String(DebugEEPROM).c_str());
@@ -84,11 +88,11 @@ void helperEEPROM::setSubscribes() {
 
 void helperEEPROM::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebugEEPROM.c_str()) == 0) {
-		bool readDebugWiFi = msg.toInt();
-		if(DebugEEPROM != readDebugWiFi) {
-			DebugEEPROM = readDebugWiFi;
+		bool readDebugEEPROM = msg.toInt();
+		if(DebugEEPROM != readDebugEEPROM) {
+			DebugEEPROM = readDebugEEPROM;
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugEEPROM, DebugEEPROM);
-			EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
 			wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(DebugEEPROM ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicDebugEEPROM, String(DebugEEPROM));

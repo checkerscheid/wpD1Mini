@@ -19,36 +19,18 @@ helperOnlineToggler wpOnlineToggler;
 
 helperOnlineToggler::helperOnlineToggler() {}
 void helperOnlineToggler::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	// settings
-	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// commands
+	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicDebugOnlineToggler = wpFZ.DeviceName + "/settings/Debug/OnlineToggler";
 
-	OfflineTrigger = false;	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperOnlineToggler::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
-	checkOfflineTrigger();
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperOnlineToggler::getVersion() {
@@ -71,14 +53,41 @@ void helperOnlineToggler::setMqttOffline() {
 	wpMqtt.mqttClient.publish(mqttTopicErrorOnline.c_str(), String(1).c_str());
 }
 
+void helperOnlineToggler::publishSettings() {
+	publishSettings(false);
+}
+void helperOnlineToggler::publishSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebugOnlineToggler.c_str(), String(DebugOnlineToggler).c_str());
+	}
+}
+
+void helperOnlineToggler::publishValues() {
+	publishValues(false);
+}
+void helperOnlineToggler::publishValues(bool force) {
+	if(force) publishCountDebugOnlineToggler = wpFZ.publishQoS;
+	if(DebugOnlineTogglerLast != DebugOnlineToggler || ++publishCountDebugOnlineToggler > wpFZ.publishQoS) {
+		DebugOnlineTogglerLast = DebugOnlineToggler;
+		wpMqtt.mqttClient.publish(mqttTopicDebugOnlineToggler.c_str(), String(DebugOnlineToggler).c_str());
+		publishCountDebugOnlineToggler = 0;
+	}
+}
+
+void helperOnlineToggler::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicOnlineToggler.c_str());
+}
+void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebugOnlineToggler.c_str()) == 0) {
+		int readOnline = msg.toInt();
+		if(readOnline != 1) {
+			//reset
+			wpMqtt.mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
+		}
+	}
+}
+
 //###################################################################################
 // private
 //###################################################################################
 
-void helperOnlineToggler::checkOfflineTrigger() {
-	if(OfflineTrigger) {
-		// set offline for reboot
-		setMqttOffline();
-		OfflineTrigger = false;
-	}
-}

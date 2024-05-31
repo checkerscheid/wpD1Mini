@@ -77,16 +77,24 @@ void helperMqtt::publishSettings(bool force) {
 		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
 	}
 	wpFZ.publishSettings(force);
+	wpEEPROM.publishSettings(force);
 	wpWiFi.publishSettings(force);
+	wpOnlineToggler.publishSettings(force);
 }
 void helperMqtt::publishValues() {
+	publishValues(false);
+}
+void helperMqtt::publishValues(bool force) {
+	if(force) publishCountDebugMqtt = wpFZ.publishQoS;
 	if(DebugMqttLast != DebugMqtt || ++publishCountDebugMqtt > wpFZ.publishQoS) {
 		DebugMqttLast = DebugMqtt;
 		mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(DebugMqtt).c_str());
 		publishCountDebugMqtt = 0;
 	}
-	wpFZ.publishValues();
-	wpWiFi.publishValues();
+	wpFZ.publishValues(force);
+	wpEEPROM.publishValues(force);
+	wpWiFi.publishValues(force);
+	wpOnlineToggler.publishValues(force);
 }
 
 //###################################################################################
@@ -115,6 +123,8 @@ void helperMqtt::setSubscribes() {
 	mqttClient.subscribe(mqttTopicDebugMqtt.c_str());
 	wpFZ.setSubscribes();
 	wpWiFi.setSubscribes();
+	wpEEPROM.setSubscribes();
+	wpOnlineToggler.setSubscribes();
 }
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	String msg = "";
@@ -131,7 +141,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			int readForceMqttUpdate = msg.toInt();
 			if(readForceMqttUpdate != 0) {
 				wpMqtt.publishSettings(true);
-				wpMqtt.publishValues();
+				wpMqtt.publishValues(true);
 				//reset
 				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
@@ -140,7 +150,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		if(strcmp(topic, wpMqtt.mqttTopicForceRenewValue.c_str()) == 0) {
 			int readForceRenewValue = msg.toInt();
 			if(readForceRenewValue != 0) {
-				wpMqtt.publishValues();
+				wpMqtt.publishValues(true);
 				//reset
 				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
@@ -159,5 +169,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		}
 		wpFZ.checkSubscribes(topic, msg);
 		wpWiFi.checkSubscribes(topic, msg);
+		wpEEPROM.checkSubscribes(topic, msg);
+		wpOnlineToggler.checkSubscribes(topic, msg);
 	}
 }

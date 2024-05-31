@@ -109,6 +109,7 @@ class helperEEPROM {
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
+		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:

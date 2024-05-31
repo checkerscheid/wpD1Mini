@@ -170,6 +170,11 @@ void wpFreakaZone::publishSettings(bool force) {
 }
 
 void wpFreakaZone::publishValues() {
+	publishValues(false);
+}
+
+void wpFreakaZone::publishValues(bool force) {
+	if(force) publishCountOnDuration = minute2;
 	if(++publishCountOnDuration > minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
 		publishCountOnDuration = 0;
