@@ -28,17 +28,23 @@ class helperOnlineToggler {
 		// commands
 		String mqttTopicDebugOnlineToggler;
 
-		bool OfflineTrigger;
-
 		helperOnlineToggler();
 		void init();
 		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
 		void setMqttOffline();
+
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
-		void checkOfflineTrigger();
+		bool DebugOnlineTogglerLast = false;
+		uint16_t publishCountDebugOnlineToggler = 0;
 };
 extern helperOnlineToggler wpOnlineToggler;
 #endif
