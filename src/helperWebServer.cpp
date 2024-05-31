@@ -220,27 +220,27 @@ void helperWebServer::doTheWebServerDebugChange() {
 		if(doWebServerDebugChange == cmdDebugHT) {
 			wpDHT.changeDebug();
 		}
-		if(doWebServerDebugChange == cmdDebugLDR) {
-			// wpLDR.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugLight) {
-			// wpLight.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugBM) {
-			// wpBM.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugRelais) {
-			// wpRelais.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugRain) {
-			// wpRain.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugMoisture) {
-			// wpMoisture.changeDebug();
-		}
-		if(doWebServerDebugChange == cmdDebugDistance) {
-			// wpDistance.changeDebug();
-		}
+		// if(doWebServerDebugChange == cmdDebugLDR) {
+		// 	wpLDR.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugLight) {
+		// 	wpLight.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugBM) {
+		// 	wpBM.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugRelais) {
+		// 	wpRelais.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugRain) {
+		// 	wpRain.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugMoisture) {
+		// 	wpMoisture.changeDebug();
+		// }
+		// if(doWebServerDebugChange == cmdDebugDistance) {
+		// 	wpDistance.changeDebug();
+		// }
 		doWebServerDebugChange = WebServerCommanddoNothing;
 	}
 }
