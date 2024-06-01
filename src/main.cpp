@@ -31,6 +31,7 @@ void setup() {
 	wpOnlineToggler.init();
 	wpFinder.init();
 	wpWebServer.init();
+	wpRest.init();
 }
 
 //###################################################################################
@@ -44,6 +45,7 @@ void loop() {
 	wpOnlineToggler.cycle();
 	wpFinder.cycle();
 	wpWebServer.cycle();
+	wpRest.cycle();
 	if(wpFZ.calcValues) {
 		// calcValues();
 	}

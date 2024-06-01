@@ -149,8 +149,8 @@ void moduleDHT::setSubscribes() {
 void moduleDHT::publishValueTemp() {
 	String sendTemperature = String(float(temperature / 100.0));
 	wpMqtt.mqttClient.publish(mqttTopicTemperature.c_str(), sendTemperature.c_str());
-	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("temp", sendTemperature);
-	wpRest.trySendRest = true;
+	wpRest.error = wpRest.error | !wpRest.sendRest("temp", sendTemperature);
+	wpRest.trySend = true;
 	temperatureLast = temperature;
 	if(wpMqtt.Debug) {
 		publishInfoDebug("Temperature", sendTemperature, String(publishCountTemperature));
@@ -161,8 +161,8 @@ void moduleDHT::publishValueTemp() {
 void moduleDHT::publishValueHum() {
 	String sendHumidity = String(float(humidity / 100.0));
 	wpMqtt.mqttClient.publish(mqttTopicHumidity.c_str(), sendHumidity.c_str());
-	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("hum", sendHumidity);
-	wpRest.trySendRest = true;
+	wpRest.error = wpRest.error | !wpRest.sendRest("hum", sendHumidity);
+	wpRest.trySend = true;
 	humidityLast = humidity;
 	if(wpMqtt.Debug) {
 		publishInfoDebug("Humidity", sendHumidity, String(publishCountHumidity));

@@ -81,6 +81,7 @@ void helperMqtt::publishSettings(bool force) {
 	wpOnlineToggler.publishSettings(force);
 	wpFinder.publishSettings(force);
 	wpWebServer.publishSettings(force);
+	wpRest.publishSettings(force);
 }
 void helperMqtt::publishValues() {
 	publishValues(false);
@@ -98,6 +99,7 @@ void helperMqtt::publishValues(bool force) {
 	wpOnlineToggler.publishValues(force);
 	wpFinder.publishValues(force);
 	wpWebServer.publishValues(force);
+	wpRest.publishValues(force);
 }
 
 //###################################################################################
@@ -129,6 +131,9 @@ void helperMqtt::setSubscribes() {
 	wpWiFi.setSubscribes();
 	wpEEPROM.setSubscribes();
 	wpOnlineToggler.setSubscribes();
+	wpFinder.setSubscribes();
+	wpWebServer.setSubscribes();
+	wpRest.setSubscribes();
 }
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	String msg = "";
@@ -175,5 +180,8 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		wpWiFi.checkSubscribes(topic, msg);
 		wpEEPROM.checkSubscribes(topic, msg);
 		wpOnlineToggler.checkSubscribes(topic, msg);
+		wpFinder.checkSubscribes(topic, msg);
+		wpWebServer.checkSubscribes(topic, msg);
+		wpRest.checkSubscribes(topic, msg);
 	}
 }

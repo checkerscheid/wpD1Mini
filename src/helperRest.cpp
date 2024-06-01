@@ -22,10 +22,12 @@ void helperRest::init() {
 	// settings
 	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
-	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
+	mqttTopicError = wpFZ.DeviceName + "/ERROR/Rest";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Rest";
 
-	setupRest();
+	macId = WiFi.macAddress();
+	macId.replace(":", "");
+	macId.toLowerCase();
 }
 
 //###################################################################################
@@ -50,18 +52,12 @@ void helperRest::changeDebug() {
 	wpFZ.blink();
 }
 
-void helperRest::setupRest() {
-}
-
 // return true on success
 bool helperRest::sendRest(String name, String value) {
 	bool returns = false;
 	WiFiClient client;
 	HTTPClient http;
-	String targetmac = WiFi.macAddress();
-	targetmac.replace(":", "");
-	targetmac.toLowerCase();
-	String targetwithident = "http://" + String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort) + "/?m=" + targetmac;
+	String targetwithident = "http://" + String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort) + "/?m=" + macId;
 	String target = targetwithident + "&" + name + "=" + value;
 	if(Debug) {
 		String logmessage = "HTTP: '" + target + "'";
@@ -112,20 +108,53 @@ bool helperRest::sendRawRest(String target) {
 	return returns;
 }
 
-void helperRest::publishErrorRest() {
-	wpMqtt.mqttClient.publish(mqttTopicErrorRest.c_str(), String(errorRest).c_str());
-	errorRestLast = errorRest;
-	trySendRest = false;
-	if(Debug)
-		publishInfoDebug("ErrorRest", String(errorRest), String(publishCountErrorRest));
-	publishCountErrorRest = 0;
+void helperRest::publishSettings() {
+	publishSettings(false);
+}
+void helperRest::publishSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+	}
+}
+
+void helperRest::publishValues() {
+	publishValues(false);
+}
+void helperRest::publishValues(bool force) {
+	if(force) {
+		publishCountError = wpFZ.publishQoS;
+		publishCountDebug = wpFZ.publishQoS;
+	}
+	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
+		errorLast = error;
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+		publishCountError = 0;
+	}
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
+	}
+}
+
+void helperRest::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+}
+void helperRest::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
+		}
+	}
 }
 
 //###################################################################################
 // private
 //###################################################################################
 
-void helperRest::publishInfoDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}

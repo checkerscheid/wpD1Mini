@@ -23,10 +23,14 @@
 
 class helperUpdate {
 	public:
+		bool Debug = false;
 		// values
-		String mqttTopicUpdateMode;
+		String mqttTopicMode;
 		// settings
+		String mqttTopicServer;
+		// commands
 		String mqttTopicUpdateFW;
+		String mqttTopicDebug;
 
 		bool UpdateFW = false;
 
@@ -34,11 +38,21 @@ class helperUpdate {
 		void init();
 		void cycle();
 		uint16_t getVersion();
+		bool setupOta();
 		void check();
 		void start();
-		bool setupOta();
+		void start(String file);
+
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);

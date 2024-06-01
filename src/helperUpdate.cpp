@@ -19,18 +19,13 @@ helperUpdate wpUpdate;
 
 helperUpdate::helperUpdate() {}
 void helperUpdate::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	// values
-	mqttTopicUpdateMode = wpFZ.DeviceName + "/UpdateMode";
+	mqttTopicMode = wpFZ.DeviceName + "/UpdateMode";
+	// settings
+	mqttTopicServer = wpFZ.DeviceName + "/info/Update/Server";
 	// commands
-	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
+	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
 }
 
 //###################################################################################
@@ -38,15 +33,7 @@ void helperUpdate::init() {
 //###################################################################################
 
 void helperUpdate::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
 	if(UpdateFW) ArduinoOTA.handle();
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperUpdate::getVersion() {
@@ -54,41 +41,6 @@ uint16_t helperUpdate::getVersion() {
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
-}
-
-void helperUpdate::check() {
-
-}
-
-void helperUpdate::start() {
-	WiFiClient client;
-	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
-
-	// Add optional callback notifiers
-	ESPhttpUpdate.onStart(started);
-	ESPhttpUpdate.onEnd(finished);
-	ESPhttpUpdate.onProgress(progress);
-	ESPhttpUpdate.onError(error);
-
-	t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
-	// Or:
-	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
-
-	switch (ret) {
-		case HTTP_UPDATE_FAILED:
-			wpFZ.DebugWS(wpFZ.strERRROR, "wpUpdate::start", "HTTP_UPDATE_FAILD Error (" +
-				String(ESPhttpUpdate.getLastError()) + "): " +
-				ESPhttpUpdate.getLastErrorString());
-			break;
-
-		case HTTP_UPDATE_NO_UPDATES:
-			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_NO_UPDATES");
-			break;
-
-		case HTTP_UPDATE_OK:
-			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_OK");
-			break;
-	}
 }
 
 bool helperUpdate::setupOta() {
@@ -121,6 +73,42 @@ bool helperUpdate::setupOta() {
 	wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	return returns;
 }
+
+void helperUpdate::check() {
+
+}
+
+void helperUpdate::start(String file) {
+	WiFiClient client;
+	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
+
+	// Add optional callback notifiers
+	ESPhttpUpdate.onStart(started);
+	ESPhttpUpdate.onEnd(finished);
+	ESPhttpUpdate.onProgress(progress);
+	ESPhttpUpdate.onError(error);
+
+	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
+	// Or:
+	t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer, 80, file);
+
+	switch (ret) {
+		case HTTP_UPDATE_FAILED:
+			wpFZ.DebugWS(wpFZ.strERRROR, "wpUpdate::start", "HTTP_UPDATE_FAILD Error (" +
+				String(ESPhttpUpdate.getLastError()) + "): " +
+				ESPhttpUpdate.getLastErrorString());
+			break;
+
+		case HTTP_UPDATE_NO_UPDATES:
+			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_NO_UPDATES");
+			break;
+
+		case HTTP_UPDATE_OK:
+			wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::start", "HTTP_UPDATE_OK");
+			break;
+	}
+}
+
 
 //###################################################################################
 // private
