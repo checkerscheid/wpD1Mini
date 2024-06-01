@@ -32,6 +32,8 @@ void helperWiFi::init() {
 	setupWiFi();
 	// because DateTime Only works with NTP Server
 	wpFZ.OnSince = wpFZ.getDateTime();
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
@@ -44,6 +46,7 @@ void helperWiFi::cycle() {
 		digitalWrite(LED_BUILTIN, HIGH);
 		setupWiFi();
 	}
+	publishValues();
 }
 
 uint16_t helperWiFi::getVersion() {

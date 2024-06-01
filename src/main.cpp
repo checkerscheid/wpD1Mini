@@ -29,10 +29,12 @@ void setup() {
 
 	wpWiFi.init();
 	wpMqtt.init();
+	wpModules.init();
 	wpOnlineToggler.init();
 	wpFinder.init();
-	wpWebServer.init();
 	wpRest.init();
+	wpUpdate.init();
+	wpWebServer.init();
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.init();
@@ -43,14 +45,16 @@ void setup() {
 // loop
 //###################################################################################
 void loop() {
-	wpEEPROM.cycle();
 	wpFZ.cycle();
+	wpEEPROM.cycle();
 	wpWiFi.cycle();
 	wpMqtt.cycle();
+	wpModules.cycle();
 	wpOnlineToggler.cycle();
 	wpFinder.cycle();
-	wpWebServer.cycle();
 	wpRest.cycle();
+	wpUpdate.cycle();
+	wpWebServer.cycle();
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.cycle();
@@ -84,6 +88,8 @@ uint16_t getGlobalBuild() {
 	uint16_t check = wpEEPROM.getVersion();
 	v = v > check ? v : check;
 	check = wpFinder.getVersion();
+	v = v > check ? v : check;
+	check = wpModules.getVersion();
 	v = v > check ? v : check;
 	check = wpMqtt.getVersion();
 	v = v > check ? v : check;

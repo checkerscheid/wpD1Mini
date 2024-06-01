@@ -21,12 +21,16 @@ helperEEPROM::helperEEPROM() {}
 void helperEEPROM::init() {
 	EEPROM.begin(4095);
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
+	readVars();
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperEEPROM::cycle() {
+	publishValues();
 }
 
 uint16_t helperEEPROM::getVersion() {
@@ -139,8 +143,8 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 void helperEEPROM::readVars() {
 	/// bool values: byte 0 - 9
 		bitsModules0 = EEPROM.read(addrBitsModules0);
-		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitDHT11);
-		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitDHT22);
+		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
+		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
 		// bitLDR = 2;
 		// bitLight = 3;
 		// bitBM = 4;

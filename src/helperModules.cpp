@@ -21,6 +21,18 @@ helperModules::helperModules() {}
 void helperModules::init() {
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Modules";
+	// settings
+	
+	mqttTopicUseDHT11 = wpFZ.DeviceName + "/settings/useModule/DHT11";
+	mqttTopicUseDHT22 = wpFZ.DeviceName + "/settings/useModule/DHT22";
+	mqttTopicUseLDR = wpFZ.DeviceName + "/settings/useModule/LDR";
+	mqttTopicUseLight = wpFZ.DeviceName + "/settings/useModule/Light";
+	mqttTopicUseBM = wpFZ.DeviceName + "/settings/useModule/BM";
+	mqttTopicUseRelais = wpFZ.DeviceName + "/settings/useModule/Relais";
+	mqttTopicUseRelaisShield = wpFZ.DeviceName + "/settings/useModule/RelaisShield";
+	mqttTopicUseRain = wpFZ.DeviceName + "/settings/useModule/Rain";
+	mqttTopicUseMoisture = wpFZ.DeviceName + "/settings/useModule/Moisture";
+	mqttTopicUseDistance = wpFZ.DeviceName + "/settings/useModule/Distance";
 
 	choosenDHTmodul = 0;
 	if(useModuleDHT11) {
@@ -29,12 +41,15 @@ void helperModules::init() {
 	if(useModuleDHT22) {
 		choosenDHTmodul = DHT22;
 	}
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperModules::cycle() {
+	publishValues();
 }
 
 uint16_t helperModules::getVersion() {
@@ -57,6 +72,16 @@ void helperModules::publishSettings() {
 	publishSettings(false);
 }
 void helperModules::publishSettings(bool force) {
+	wpMqtt.mqttClient.publish(mqttTopicUseDHT11.c_str(), String(useModuleDHT11).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseDHT22.c_str(), String(useModuleDHT22).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseLDR.c_str(), String(useModuleLDR).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseLight.c_str(), String(useModuleLight).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseBM.c_str(), String(useModuleBM).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseRelais.c_str(), String(useModuleRelais).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseRelaisShield.c_str(), String(useModuleRelaisShield).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseRain.c_str(), String(useModuleRain).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseMoisture.c_str(), String(useModuleMoisture).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUseDistance.c_str(), String(useModuleDistance).c_str());
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
@@ -75,9 +100,42 @@ void helperModules::publishValues(bool force) {
 }
 
 void helperModules::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT11.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT22.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseLDR.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRelais.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRelaisShield.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseMoisture.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDistance.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperModules::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicUseDHT11.c_str()) == 0) {
+		bool readUseDHT11 = msg.toInt();
+		if(useModuleDHT11 != readUseDHT11) {
+			useModuleDHT11 = readUseDHT11;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT11, useModuleDHT11);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleDHT11\",\"value\":" + String(useModuleDHT11 ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseDHT11, String(Debug));
+		}
+	}
+	if(strcmp(topic, mqttTopicUseDHT22.c_str()) == 0) {
+		bool readUseDHT22 = msg.toInt();
+		if(useModuleDHT22 != readUseDHT22) {
+			useModuleDHT22 = readUseDHT22;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT22, useModuleDHT22);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleDHT22\",\"value\":" + String(useModuleDHT22 ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseDHT22, String(Debug));
+		}
+	}
+
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -91,7 +149,76 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 }
 
+void helperModules::publishAllSettings() {
+	publishAllSettings(false);
+}
+void helperModules::publishAllSettings(bool force) {
+	wpFZ.publishSettings(force);
+	wpEEPROM.publishSettings(force);
+	wpFinder.publishSettings(force);
+	wpModules.publishSettings(force);
+	wpMqtt.publishSettings(force);
+	wpOnlineToggler.publishSettings(force);
+	wpRest.publishSettings(force);
+	wpUpdate.publishSettings(force);
+	wpWebServer.publishSettings(force);
+	wpWiFi.publishSettings(force);
+
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		wpDHT.publishSettings(force);
+	}
+}
+
+void helperModules::publishAllValues() {
+	publishAllValues(false);
+}
+void helperModules::publishAllValues(bool force) {
+	wpFZ.publishValues(force);
+	wpEEPROM.publishValues(force);
+	wpFinder.publishValues(force);
+	wpModules.publishValues(force);
+	wpMqtt.publishValues(force);
+	wpOnlineToggler.publishValues(force);
+	wpRest.publishValues(force);
+	wpUpdate.publishValues(force);
+	wpWebServer.publishValues(force);
+	wpWiFi.publishValues(force);
+
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		wpDHT.publishValues(force);
+	}
+}
+
+void helperModules::setAllSubscribes() {
+	wpFZ.setSubscribes();
+	wpEEPROM.setSubscribes();
+	wpFinder.setSubscribes();
+	wpModules.setSubscribes();
+	wpOnlineToggler.setSubscribes();
+	wpRest.setSubscribes();
+	wpUpdate.setSubscribes();
+	wpWebServer.setSubscribes();
+	wpWiFi.setSubscribes();
+
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		wpDHT.setSubscribes();
+	}
+}
+void helperModules::checkAllSubscribes(char* topic, String msg) {
+	wpFZ.checkSubscribes(topic, msg);
+	wpEEPROM.checkSubscribes(topic, msg);
+	wpFinder.checkSubscribes(topic, msg);
+	wpModules.checkSubscribes(topic, msg);
+	wpOnlineToggler.checkSubscribes(topic, msg);
+	wpRest.checkSubscribes(topic, msg);
+	wpUpdate.checkSubscribes(topic, msg);
+	wpWebServer.checkSubscribes(topic, msg);
+	wpWiFi.checkSubscribes(topic, msg);
+
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		wpDHT.checkSubscribes(topic, msg);
+	}
+}
 //###################################################################################
 // private
 //###################################################################################
-

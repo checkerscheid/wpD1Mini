@@ -37,6 +37,8 @@ void wpFreakaZone::init(String deviceName) {
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################

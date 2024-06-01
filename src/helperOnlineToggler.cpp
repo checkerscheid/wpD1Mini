@@ -24,6 +24,8 @@ void helperOnlineToggler::init() {
 	// commands
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/OnlineToggler";
+	publishSettings();
+	publishValues();
 
 }
 
@@ -31,6 +33,7 @@ void helperOnlineToggler::init() {
 // public
 //###################################################################################
 void helperOnlineToggler::cycle() {
+	publishValues();
 }
 
 uint16_t helperOnlineToggler::getVersion() {

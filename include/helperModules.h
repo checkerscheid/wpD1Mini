@@ -32,8 +32,20 @@ class helperModules {
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
+
 		// commands
 		String mqttTopicDebug;
+		// settings
+		String mqttTopicUseDHT11;
+		String mqttTopicUseDHT22;
+		String mqttTopicUseLDR;
+		String mqttTopicUseLight;
+		String mqttTopicUseBM;
+		String mqttTopicUseRelais;
+		String mqttTopicUseRelaisShield;
+		String mqttTopicUseRain;
+		String mqttTopicUseMoisture;
+		String mqttTopicUseDistance;
 
 		helperModules();
 		void init();
@@ -48,6 +60,13 @@ class helperModules {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+
+		void publishAllSettings();
+		void publishAllSettings(bool force);
+		void publishAllValues();
+		void publishAllValues(bool force);
+		void setAllSubscribes();
+		void checkAllSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 121 $";
 		bool DebugLast = false;

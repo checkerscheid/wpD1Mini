@@ -28,12 +28,15 @@ void helperRest::init() {
 	macId = WiFi.macAddress();
 	macId.replace(":", "");
 	macId.toLowerCase();
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperRest::cycle() {
+	publishValues();
 }
 
 uint16_t helperRest::getVersion() {

@@ -26,6 +26,8 @@ void helperUpdate::init() {
 	// commands
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
@@ -34,6 +36,7 @@ void helperUpdate::init() {
 
 void helperUpdate::cycle() {
 	if(UpdateFW) ArduinoOTA.handle();
+	publishValues();
 }
 
 uint16_t helperUpdate::getVersion() {
@@ -135,6 +138,43 @@ void helperUpdate::start(String file) {
 	}
 }
 
+void helperUpdate::publishSettings() {
+	publishSettings(false);
+}
+void helperUpdate::publishSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+	}
+}
+
+void helperUpdate::publishValues() {
+	publishValues(false);
+}
+void helperUpdate::publishValues(bool force) {
+	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
+	}
+}
+
+void helperUpdate::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+}
+void helperUpdate::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugUpdate, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"DebugUpdate\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
+		}
+	}
+}
 
 //###################################################################################
 // private

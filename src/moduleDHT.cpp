@@ -35,6 +35,9 @@ void moduleDHT::init() {
 	humidityCorrection = 0;
 
 	dht.begin();
+
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################

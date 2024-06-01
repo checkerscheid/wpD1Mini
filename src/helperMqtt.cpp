@@ -33,6 +33,8 @@ void helperMqtt::init() {
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
@@ -75,17 +77,6 @@ void helperMqtt::publishSettings(bool force) {
 		mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), "0");
 		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
 	}
-	wpFZ.publishSettings(force);
-	wpEEPROM.publishSettings(force);
-	wpWiFi.publishSettings(force);
-	wpOnlineToggler.publishSettings(force);
-	wpFinder.publishSettings(force);
-	wpWebServer.publishSettings(force);
-	wpRest.publishSettings(force);
-
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-
-	}
 }
 void helperMqtt::publishValues() {
 	publishValues(false);
@@ -97,13 +88,6 @@ void helperMqtt::publishValues(bool force) {
 		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 		publishCountDebug = 0;
 	}
-	wpFZ.publishValues(force);
-	wpEEPROM.publishValues(force);
-	wpWiFi.publishValues(force);
-	wpOnlineToggler.publishValues(force);
-	wpFinder.publishValues(force);
-	wpWebServer.publishValues(force);
-	wpRest.publishValues(force);
 }
 
 //###################################################################################
@@ -131,13 +115,7 @@ void helperMqtt::setSubscribes() {
 	mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
 	mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
 	mqttClient.subscribe(mqttTopicDebug.c_str());
-	wpFZ.setSubscribes();
-	wpWiFi.setSubscribes();
-	wpEEPROM.setSubscribes();
-	wpOnlineToggler.setSubscribes();
-	wpFinder.setSubscribes();
-	wpWebServer.setSubscribes();
-	wpRest.setSubscribes();
+	wpModules.setAllSubscribes();
 }
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	String msg = "";
@@ -153,8 +131,8 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		if(strcmp(topic, wpMqtt.mqttTopicForceMqttUpdate.c_str()) == 0) {
 			int readForceMqttUpdate = msg.toInt();
 			if(readForceMqttUpdate != 0) {
-				wpMqtt.publishSettings(true);
-				wpMqtt.publishValues(true);
+				wpModules.publishAllSettings(true);
+				wpModules.publishAllValues(true);
 				//reset
 				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
@@ -163,7 +141,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 		if(strcmp(topic, wpMqtt.mqttTopicForceRenewValue.c_str()) == 0) {
 			int readForceRenewValue = msg.toInt();
 			if(readForceRenewValue != 0) {
-				wpMqtt.publishValues(true);
+				wpModules.publishAllValues(true);
 				//reset
 				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
@@ -180,12 +158,6 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebug, String(wpMqtt.Debug));
 			}
 		}
-		wpFZ.checkSubscribes(topic, msg);
-		wpWiFi.checkSubscribes(topic, msg);
-		wpEEPROM.checkSubscribes(topic, msg);
-		wpOnlineToggler.checkSubscribes(topic, msg);
-		wpFinder.checkSubscribes(topic, msg);
-		wpWebServer.checkSubscribes(topic, msg);
-		wpRest.checkSubscribes(topic, msg);
+		wpModules.checkAllSubscribes(topic, msg);
 	}
 }

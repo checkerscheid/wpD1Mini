@@ -25,19 +25,19 @@ class helperEEPROM {
 /// bool values: byte 0 - 9
 		const byte addrBitsModules0 = 0;
 		byte bitsModules0;
-		const byte bitDHT11 = 0; // include in bitsModules0
-		const byte bitDHT22 = 1; // include in bitsModules0
-		const byte bitLDR = 2; // include in bitsModules0
-		const byte bitLight = 3; // include in bitsModules0
-		const byte bitBM = 4; // include in bitsModules0
-		const byte bitRelais = 5; // include in bitsModules0
-		const byte bitRelaisShield = 6; // include in bitsModules0
-		const byte bitRain = 7; // include in bitsModules0
+		const byte bitUseDHT11 = 0; // include in bitsModules0
+		const byte bitUseDHT22 = 1; // include in bitsModules0
+		const byte bitUseLDR = 2; // include in bitsModules0
+		const byte bitUseLight = 3; // include in bitsModules0
+		const byte bitUseBM = 4; // include in bitsModules0
+		const byte bitUseRelais = 5; // include in bitsModules0
+		const byte bitUseRelaisShield = 6; // include in bitsModules0
+		const byte bitUseRain = 7; // include in bitsModules0
 
 		const byte addrBitsModules1 = 1;
 		byte bitsModules1;
-		const byte bitMoisture = 0; // include in bitsModules1
-		const byte bitDistance = 1; // include in bitsModules1
+		const byte bitUseMoisture = 0; // include in bitsModules1
+		const byte bitUseDistance = 1; // include in bitsModules1
 		
 		const byte addrBitsDebugBasis = 2;
 		byte bitsDebugBasis;

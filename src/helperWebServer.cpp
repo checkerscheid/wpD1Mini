@@ -24,6 +24,8 @@ void helperWebServer::init() {
 	doWebServerDebugChange = WebServerCommanddoNothing;
 	doWebServerBlink = WebServerCommanddoNothing;
 	setupWebServer();
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
@@ -33,6 +35,7 @@ void helperWebServer::cycle() {
 	doTheWebServerCommand();
 	doTheWebServerDebugChange();
 	doTheWebserverBlink();
+	publishValues();
 }
 
 uint16_t helperWebServer::getVersion() {

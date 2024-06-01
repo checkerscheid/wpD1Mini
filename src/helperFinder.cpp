@@ -22,12 +22,15 @@ void helperFinder::init() {
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Finder";
 	setupFinder();
+	publishSettings();
+	publishValues();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperFinder::cycle() {
+	publishValues();
 }
 
 uint16_t helperFinder::getVersion() {
