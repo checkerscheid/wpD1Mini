@@ -75,9 +75,25 @@ bool helperUpdate::setupOta() {
 }
 
 void helperUpdate::check() {
-
+	WiFiClient wifi;
+	HTTPClient http;
+	JsonDocument doc;
+	http.begin(wifi, String(wpFZ.updateServer));
+	int httpCode = http.GET();
+	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
+	String payload = http.getString();
+	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
+	deserializeJson(doc, payload);
+	//v3.0-build121
+	String v = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "installed Version: " + v);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + String(doc["wpFreakaZone"]["Version"]));
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + String(doc["wpFreakaZone"]["date"]));
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + String(doc["wpFreakaZone"]["filename"]));
 }
-
+void helperUpdate::start() {
+	start("firmware.bin");
+}
 void helperUpdate::start(String file) {
 	WiFiClient client;
 	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
@@ -90,7 +106,8 @@ void helperUpdate::start(String file) {
 
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
 	// Or:
-	t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer, 80, file);
+	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, server, 80, file);
+	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer) + "/" + file);
 
 	switch (ret) {
 		case HTTP_UPDATE_FAILED:

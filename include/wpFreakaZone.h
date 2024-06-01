@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 120                                                     $ #
+//# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 120 2024-05-31 03:32:41Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 121 2024-06-01 05:13:59Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -33,7 +33,7 @@ class wpFreakaZone {
 		const uint16_t mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
-		const char* updateServer = "d1miniupdate.freakazone.com";
+		const char* updateServer = "http://d1miniupdate.freakazone.com";
 		const uint16_t finderListenPort = 51346;
 		const uint16_t loopTime = 200; // ms
 		const uint16_t minute10  = 5 * 60 * 10;
@@ -43,6 +43,7 @@ class wpFreakaZone {
 
 		uint16_t MajorVersion = 3;
 		uint16_t MinorVersion = 0;
+		uint16_t Build;
 		String Version;
 
 		String OnSince;
@@ -114,7 +115,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 120 $";
+		String SVNh = "$Rev: 121 $";
 		uint16_t publishCountOnDuration = 0;
 };
 extern wpFreakaZone wpFZ;

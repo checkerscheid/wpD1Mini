@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 120                                                     $ #
+//# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 120 2024-05-31 03:32:41Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 121 2024-06-01 05:13:59Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -33,8 +33,10 @@ class helperWebServer {
 		const int8_t WebServerCommandblink = 1;
 		const int8_t WebServerCommandpublishSettings = 2;
 		const int8_t WebServerCommandupdateFW = 3;
-		const int8_t WebServerCommandrestartESP = 4;
-		const int8_t WebServerCommandscanWiFi = 5;
+		const int8_t WebServerCommandupdateCheck = 4;
+		const int8_t WebServerCommandupdateHTTP = 5;
+		const int8_t WebServerCommandrestartESP = 6;
+		const int8_t WebServerCommandscanWiFi = 7;
 		int8_t doWebServerCommand;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -80,7 +82,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 120 $";
+		String SVNh = "$Rev: 121 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -124,6 +126,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 			<ul>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">UpdateFW</span></li>
+				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">UpdateCheck</span></li>
+				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">UpdateHTTP</span></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">ScanWiFi</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>

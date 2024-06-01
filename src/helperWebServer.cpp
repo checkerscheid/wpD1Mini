@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 120                                                     $ #
+//# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 120 2024-05-31 03:32:41Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 121 2024-06-01 05:13:59Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -36,7 +36,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 120 $";
+	String SVN = "$Rev: 121 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -305,6 +305,14 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateFW");
 				wpWebServer.setWebServerCommand(wpWebServer.WebServerCommandupdateFW);
 			}
+			if(request->getParam("cmd")->value() == "UpdateCheck") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateCheck");
+				wpWebServer.setWebServerCommand(wpWebServer.WebServerCommandupdateCheck);
+			}
+			if(request->getParam("cmd")->value() == "UpdateHTTP") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateHTTP");
+				wpWebServer.setWebServerCommand(wpWebServer.WebServerCommandupdateHTTP);
+			}
 			if(request->getParam("cmd")->value() == "RestartDevice") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
 				wpWebServer.setWebServerCommand(wpWebServer.WebServerCommandrestartESP);
@@ -357,6 +365,12 @@ void helperWebServer::doTheWebServerCommand() {
 			if(wpUpdate.setupOta()) {
 				wpUpdate.UpdateFW = true;
 			}
+		}
+		if(doWebServerCommand == WebServerCommandupdateCheck) {
+			wpUpdate.check();
+		}
+		if(doWebServerCommand == WebServerCommandupdateHTTP) {
+			wpUpdate.start();
 		}
 		if(doWebServerCommand == WebServerCommandrestartESP) {
 			wpOnlineToggler.setMqttOffline();

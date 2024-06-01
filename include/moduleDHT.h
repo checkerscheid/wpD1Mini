@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 120                                                     $ #
+//# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 120 2024-05-31 03:32:41Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 121 2024-06-01 05:13:59Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -55,7 +55,7 @@ class moduleDHT {
 		void publishValues();
 		void publishValues(bool force);
 	private:
-		String SVNh = "$Rev: 120 $";
+		String SVNh = "$Rev: 121 $";
 		uint16_t cycleHT = 0;
 		bool errorLast = false;
 		uint16_t publishCountError = 0;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 119                                                     $ #
+//# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 119 2024-05-31 03:31:43Z                        $ #
+//# File-ID      : $Id:: main.cpp 121 2024-06-01 05:13:59Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -23,6 +23,7 @@ void setup() {
 	wpFZ.init("BasisEmpty");
 	wpFZ.printStart();
 	wpEEPROM.init();
+	wpFZ.Build = getBuild();
 	wpFZ.Version = getStringVersion();
 	wpFZ.printRestored();
 
@@ -57,7 +58,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 119 $";
+	String SVN = "$Rev: 121 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -96,4 +97,10 @@ uint16_t getGlobalBuild() {
 	check = wpDHT.getVersion();
 	v = v > check ? v : check;
 	return v;
+}
+
+uint16_t getBuild() {
+	uint16_t globalBuild = getGlobalBuild();
+	uint16_t Build = getVersion();
+	return globalBuild > Build ? globalBuild : Build;
 }

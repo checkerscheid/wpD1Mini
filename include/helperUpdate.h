@@ -20,6 +20,7 @@
 #include <ArduinoOTA.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
+#include <ArduinoJson.h>
 
 class helperUpdate {
 	public:
