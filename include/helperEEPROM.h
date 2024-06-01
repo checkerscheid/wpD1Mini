@@ -20,7 +20,7 @@
 #include <EEPROM.h>
 class helperEEPROM {
 	public:
-		bool DebugEEPROM = false;
+		bool Debug = false;
 
 /// bool values: byte 0 - 9
 		const byte addrBitsModules0 = 0;
@@ -45,8 +45,9 @@ class helperEEPROM {
 		const byte bitDebugWiFi = 1; // include in bitsDebugBasis
 		const byte bitDebugMqtt = 2; // include in bitsDebugBasis
 		const byte bitDebugFinder = 3; // include in bitsDebugBasis
-		const byte bitDebugRest = 4; // include in bitsDebugBasis
-		const byte bitDebugOnlineToggler = 5; // include in bitsDebugBasis
+		const byte bitDebugWebServer = 4;
+		const byte bitDebugRest = 5; // include in bitsDebugBasis
+		const byte bitDebugOnlineToggler = 6; // include in bitsDebugBasis
 		
 		const byte addrBitsDebugModules = 3;
 		byte bitsDebugModules;
@@ -96,7 +97,7 @@ class helperEEPROM {
 
 		uint16_t byteStartForString;
 
-		String mqttTopicDebugEEPROM;
+		String mqttTopicDebug;
 
 		helperEEPROM();
 		void init();
@@ -114,8 +115,8 @@ class helperEEPROM {
 		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
-		bool DebugEEPROMLast = false;
-		uint16_t publishCountDebugEEPROM = 0;
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 		const byte byteStartForString0 = 100;
 		String readStringFromEEPROM(int addrOffset, String defaultString);
 		int writeStringToEEPROM(int addrOffset, String &strToWrite);

@@ -27,7 +27,7 @@ void helperWiFi::init() {
 	mqttTopicIp = wpFZ.DeviceName + "/info/WiFi/Ip";
 	mqttTopicMac = wpFZ.DeviceName + "/info/WiFi/Mac";
 	// commands
-	mqttTopicDebugWiFi = wpFZ.DeviceName + "/settings/Debug/WiFi";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
 	setupWiFi();
 	// because DateTime Only works with NTP Server
@@ -54,11 +54,11 @@ uint16_t helperWiFi::getVersion() {
 }
 
 void helperWiFi::changeDebug() {
-	DebugWiFi = !DebugWiFi;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, DebugWiFi);
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -124,7 +124,7 @@ void helperWiFi::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str());
 	wpMqtt.mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str());
 	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(DebugWiFi).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
 
@@ -133,13 +133,13 @@ void helperWiFi::publishValues() {
 }
 void helperWiFi::publishValues(bool force) {
 	if(force) {
-		publishCountDebugWiFi = wpFZ.publishQoS;
+		publishCountDebug = wpFZ.publishQoS;
 		publishCountRssi = wpFZ.minute2;
 	}
-	if(DebugWiFiLast != DebugWiFi || ++publishCountDebugWiFi > wpFZ.publishQoS) {
-		DebugWiFiLast = DebugWiFi;
-		wpMqtt.mqttClient.publish(mqttTopicDebugWiFi.c_str(), String(DebugWiFi).c_str());
-		publishCountDebugWiFi = 0;
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
 	}
 	if(++publishCountRssi > wpFZ.minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
@@ -148,18 +148,18 @@ void helperWiFi::publishValues(bool force) {
 }
 
 void helperWiFi::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebugWiFi.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperWiFi::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicDebugWiFi.c_str()) == 0) {
-		bool readDebugWiFi = msg.toInt();
-		if(DebugWiFi != readDebugWiFi) {
-			DebugWiFi = readDebugWiFi;
-			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, DebugWiFi);
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(DebugWiFi ? "true" : "false") + "}");
-			wpFZ.DebugcheckSubscribes(mqttTopicDebugWiFi, String(DebugWiFi));
+			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
 }

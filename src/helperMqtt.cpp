@@ -29,10 +29,12 @@ void helperMqtt::init() {
 	// commands
 	mqttTopicForceMqttUpdate = wpFZ.DeviceName + "/ForceMqttUpdate";
 	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
-	mqttTopicDebugMqtt = wpFZ.DeviceName + "/settings/Debug/MQTT";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
+	Serial.print(millis());
+	Serial.println(" init");
 	connectMqtt();
 }
 
@@ -41,6 +43,8 @@ void helperMqtt::init() {
 //###################################################################################
 void helperMqtt::cycle() {
 	if(!mqttClient.connected()) {
+		Serial.print(millis());
+		Serial.println(" cycle");
 		connectMqtt();
 	}
 	mqttClient.loop();
@@ -55,11 +59,11 @@ uint16_t helperMqtt::getVersion() {
 }
 
 void helperMqtt::changeDebug() {
-	wpMqtt.DebugMqtt = !wpMqtt.DebugMqtt;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, wpMqtt.DebugMqtt);
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(wpMqtt.DebugMqtt ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -70,9 +74,9 @@ void helperMqtt::publishSettings(bool force) {
 	// values
 	mqttClient.publish(mqttTopicMqttSince.c_str(), MqttSince.c_str());
 	// settings
-	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str(), true);
+	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str());
 	if(force) {
-		mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(DebugMqtt).c_str());
+		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 		mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), "0");
 		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
 	}
@@ -80,21 +84,25 @@ void helperMqtt::publishSettings(bool force) {
 	wpEEPROM.publishSettings(force);
 	wpWiFi.publishSettings(force);
 	wpOnlineToggler.publishSettings(force);
+	wpFinder.publishSettings(force);
+	wpWebServer.publishSettings(force);
 }
 void helperMqtt::publishValues() {
 	publishValues(false);
 }
 void helperMqtt::publishValues(bool force) {
-	if(force) publishCountDebugMqtt = wpFZ.publishQoS;
-	if(DebugMqttLast != DebugMqtt || ++publishCountDebugMqtt > wpFZ.publishQoS) {
-		DebugMqttLast = DebugMqtt;
-		mqttClient.publish(mqttTopicDebugMqtt.c_str(), String(DebugMqtt).c_str());
-		publishCountDebugMqtt = 0;
+	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
 	}
 	wpFZ.publishValues(force);
 	wpEEPROM.publishValues(force);
 	wpWiFi.publishValues(force);
 	wpOnlineToggler.publishValues(force);
+	wpFinder.publishValues(force);
+	wpWebServer.publishValues(force);
 }
 
 //###################################################################################
@@ -120,7 +128,7 @@ void helperMqtt::connectMqtt() {
 void helperMqtt::setSubscribes() {
 	mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
 	mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
-	mqttClient.subscribe(mqttTopicDebugMqtt.c_str());
+	mqttClient.subscribe(mqttTopicDebug.c_str());
 	wpFZ.setSubscribes();
 	wpWiFi.setSubscribes();
 	wpEEPROM.setSubscribes();
@@ -131,7 +139,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 	for (unsigned int i = 0; i < length; i++) {
 		msg += (char)payload[i];
 	}
-	if(wpMqtt.DebugMqtt) {
+	if(wpMqtt.Debug) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "callbackMqtt", "Message arrived on topic: '" + String(topic) + "': " + msg);
 	}
 	if(msg == "") {
@@ -156,15 +164,15 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
 			}
 		}
-		if(strcmp(topic, wpMqtt.mqttTopicDebugMqtt.c_str()) == 0) {
-			bool readDebugMqtt = msg.toInt();
-			if(wpMqtt.DebugMqtt != readDebugMqtt) {
-				wpMqtt.DebugMqtt = readDebugMqtt;
-				bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, wpMqtt.DebugMqtt);
+		if(strcmp(topic, wpMqtt.mqttTopicDebug.c_str()) == 0) {
+			bool readDebug = msg.toInt();
+			if(wpMqtt.Debug != readDebug) {
+				wpMqtt.Debug = readDebug;
+				bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
 				EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
 				EEPROM.commit();
-				wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(wpMqtt.DebugMqtt ? "true" : "false") + "}");
-				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebugMqtt, String(wpMqtt.DebugMqtt));
+				wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(wpMqtt.Debug ? "true" : "false") + "}");
+				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebug, String(wpMqtt.Debug));
 			}
 		}
 		wpFZ.checkSubscribes(topic, msg);

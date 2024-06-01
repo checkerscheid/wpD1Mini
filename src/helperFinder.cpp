@@ -19,30 +19,15 @@ helperFinder wpFinder;
 
 helperFinder::helperFinder() {}
 void helperFinder::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	// commands
-	mqttTopicDebugFinder = wpFZ.DeviceName + "/settings/Debug/Finder";	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Finder";
+	setupFinder();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperFinder::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperFinder::getVersion() {
@@ -53,12 +38,50 @@ uint16_t helperFinder::getVersion() {
 }
 
 void helperFinder::changeDebug() {
-	DebugFinder = !DebugFinder;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, DebugFinder);
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(DebugFinder ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
+}
+
+void helperFinder::publishSettings() {
+	publishSettings(false);
+}
+void helperFinder::publishSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+	}
+}
+
+void helperFinder::publishValues() {
+	publishValues(false);
+}
+void helperFinder::publishValues(bool force) {
+	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
+	}
+}
+
+void helperFinder::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+}
+void helperFinder::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
+		}
+	}
 }
 
 //###################################################################################

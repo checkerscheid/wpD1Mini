@@ -22,12 +22,12 @@
 #include <ESP8266HTTPClient.h>
 class helperRest {
 	public:
-		bool DebugRest = false;
+		bool Debug = false;
 		// settings
 		String mqttTopicRestServer;
 		// commands
 		String mqttTopicErrorRest;
-		String mqttTopicDebugRest;
+		String mqttTopicDebug;
 		
 		bool errorRest = false;
 		bool errorRestLast = false;

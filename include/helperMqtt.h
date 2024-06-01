@@ -23,7 +23,7 @@
 #include <helperRest.h>
 class helperMqtt {
 	public:
-		bool DebugMqtt = false;
+		bool Debug = false;
 		// values
 		String mqttTopicMqttSince;
 		// settings
@@ -31,7 +31,7 @@ class helperMqtt {
 		// commands
 		String mqttTopicForceMqttUpdate;
 		String mqttTopicForceRenewValue;
-		String mqttTopicDebugMqtt;
+		String mqttTopicDebug;
 
 		String MqttSince;
 
@@ -50,8 +50,8 @@ class helperMqtt {
 		void publishValues(bool force);
 	private:
 		String SVNh = "$Rev: 120 $";
-		bool DebugMqttLast = false;
-		uint16_t publishCountDebugMqtt = 0;
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 		void connectMqtt();
 		void setSubscribes();
 		static void callbackMqtt(char*, byte*, unsigned int);

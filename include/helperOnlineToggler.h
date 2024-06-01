@@ -21,12 +21,12 @@
 class helperOnlineToggler {
 	public:
 // values
-		bool DebugOnlineToggler = false;
+		bool Debug = false;
 		// settings
 		String mqttTopicOnlineToggler;
 		String mqttTopicErrorOnline; // 1 Error
 		// commands
-		String mqttTopicDebugOnlineToggler;
+		String mqttTopicDebug;
 
 		helperOnlineToggler();
 		void init();
@@ -43,8 +43,8 @@ class helperOnlineToggler {
 		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
-		bool DebugOnlineTogglerLast = false;
-		uint16_t publishCountDebugOnlineToggler = 0;
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 };
 extern helperOnlineToggler wpOnlineToggler;
 #endif

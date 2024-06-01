@@ -20,10 +20,6 @@ DHT dht(DHTPin, wpFZ.choosenDHT);
 
 moduleDHT::moduleDHT() {}
 void moduleDHT::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
@@ -33,37 +29,25 @@ void moduleDHT::init() {
 	mqttTopicTemperatureCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Temperature";
 	mqttTopicHumidityCorrection = wpFZ.DeviceName + "/settings/HT/Correction/Humidity";
 	// commands
-	mqttTopicDebugHT = wpFZ.DeviceName + "/settings/Debug/HT";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/HT";
 
 	temperatureCorrection = 0;
 	humidityCorrection = 0;
 
 	dht.begin();
 	publishSettings();
-	setSubscribes();	
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
+	setSubscribes();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleDHT::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
 	if(wpFZ.calcValues && ++cycleHT >= maxCycle) {
 		cycleHT = 0;
 		calcHT();
 	}
 	publishValues();
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t moduleDHT::getVersion() {
@@ -74,11 +58,11 @@ uint16_t moduleDHT::getVersion() {
 }
 
 void moduleDHT::changeDebug() {
-	DebugHT = !DebugHT;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, DebugHT);
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(DebugHT ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -111,15 +95,15 @@ void moduleDHT::checkSubscripes(char* topic, String msg) {
 			checkSubscripesDebug(mqttTopicHumidityCorrection, String(humidityCorrection));
 		}
 	}
-	if(strcmp(topic, mqttTopicDebugHT.c_str()) == 0) {
-		bool readDebugHT = msg.toInt();
-		if(DebugHT != readDebugHT) {
-			DebugHT = readDebugHT;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, DebugHT);
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugHT, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
-			checkSubscripesDebug(mqttTopicDebugHT, String(DebugHT));
-			wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(DebugHT ? "true" : "false") + "}");
+			checkSubscripesDebug(mqttTopicDebug, String(Debug));
+			wpFZ.SendWS("{\"id\":\"DebugHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
 		}
 	}
 }
@@ -128,7 +112,7 @@ void moduleDHT::publishSettings() {
 	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicTemperatureCorrection.c_str(), String(float(temperatureCorrection / 10)).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicHumidityCorrection.c_str(), String(float(humidityCorrection / 10)).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicDebugHT.c_str(), String(DebugHT).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
 }
 
@@ -139,7 +123,7 @@ void moduleDHT::publishValues(bool force) {
 	if(force) {
 		publishCountTemperature  = wpFZ.publishQoS;
 		publishCountHumidity = wpFZ.publishQoS;
-		publishCountErrorHT = wpFZ.publishQoS;
+		publishCountError = wpFZ.publishQoS;
 	}
 	if(temperatureLast != temperature || ++publishCountTemperature > wpFZ.publishQoS) {
 		publishValueTemp();
@@ -147,7 +131,7 @@ void moduleDHT::publishValues(bool force) {
 	if(humidityLast != humidity || ++publishCountHumidity > wpFZ.publishQoS) {
 		publishValueHum();
 	}
-	if(errorHTLast != errorHT || ++publishCountErrorHT > wpFZ.publishQoS) {
+	if(errorLast != errorHT || ++publishCountError > wpFZ.publishQoS) {
 		publishErrorHT();
 	}
 }
@@ -159,7 +143,7 @@ void moduleDHT::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicTemperatureCorrection.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicHumidityCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebugHT.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
 void moduleDHT::publishValueTemp() {
@@ -168,7 +152,7 @@ void moduleDHT::publishValueTemp() {
 	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("temp", sendTemperature);
 	wpRest.trySendRest = true;
 	temperatureLast = temperature;
-	if(wpMqtt.DebugMqtt) {
+	if(wpMqtt.Debug) {
 		publishInfoDebug("Temperature", sendTemperature, String(publishCountTemperature));
 	}
 	publishCountTemperature = 0;
@@ -180,7 +164,7 @@ void moduleDHT::publishValueHum() {
 	wpRest.errorRest = wpRest.errorRest | !wpRest.sendRest("hum", sendHumidity);
 	wpRest.trySendRest = true;
 	humidityLast = humidity;
-	if(wpMqtt.DebugMqtt) {
+	if(wpMqtt.Debug) {
 		publishInfoDebug("Humidity", sendHumidity, String(publishCountHumidity));
 	}
 	publishCountHumidity = 0;
@@ -188,8 +172,8 @@ void moduleDHT::publishValueHum() {
 
 void moduleDHT::publishErrorHT() {
 	wpMqtt.mqttClient.publish(mqttTopicErrorHT.c_str(), String(errorHT).c_str());
-	errorHTLast = errorHT;
-	publishCountErrorHT = 0;
+	errorLast = errorHT;
+	publishCountError = 0;
 }
 
 void moduleDHT::calcHT() {
@@ -199,7 +183,7 @@ void moduleDHT::calcHT() {
 	if(!isnan(newT)) {
 		temperature = int16_t(newT * 100) + temperatureCorrection;
 		e = e | false;
-		if(DebugHT) {
+		if(Debug) {
 			calcHTDebug("Temperature", temperature, newT);
 		}
 	} else {
@@ -208,7 +192,7 @@ void moduleDHT::calcHT() {
 	}
 	if(!isnan(newH)) {
 		humidity = newH + humidityCorrection;
-		if(DebugHT) {
+		if(Debug) {
 			e = e | false;
 			calcHTDebug("Humidity", humidity, newH);
 		}

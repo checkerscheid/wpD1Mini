@@ -36,9 +36,9 @@ class moduleDHT {
 		String mqttTopicTemperatureCorrection;
 		String mqttTopicHumidityCorrection;
 		// commands
-		String mqttTopicDebugHT;
+		String mqttTopicDebug;
 
-		bool DebugHT = false;
+		bool Debug = false;
 		bool errorHT = false;
 		int8_t temperatureCorrection = 0;
 		int8_t humidityCorrection = 0;
@@ -57,8 +57,8 @@ class moduleDHT {
 	private:
 		String SVNh = "$Rev: 120 $";
 		uint16_t cycleHT = 0;
-		bool errorHTLast = false;
-		uint16_t publishCountErrorHT = 0;
+		bool errorLast = false;
+		uint16_t publishCountError = 0;
 		int16_t temperatureLast = 0;
 		uint16_t publishCountTemperature = 0;
 		int16_t humidityLast = 0;

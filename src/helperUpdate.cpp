@@ -94,11 +94,11 @@ void helperUpdate::start() {
 bool helperUpdate::setupOta() {
 	bool returns = false;
 	ArduinoOTA.onStart([]() {
+		wpOnlineToggler.setMqttOffline();
 		String logmessage = "OTA Start";
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	});
 	ArduinoOTA.onEnd([]() {
-		wpOnlineToggler.OfflineTrigger = true;
 		String logmessage = "OTA End";
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
 	});

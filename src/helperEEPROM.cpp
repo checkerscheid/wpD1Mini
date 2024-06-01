@@ -20,7 +20,7 @@ helperEEPROM wpEEPROM;
 helperEEPROM::helperEEPROM() {}
 void helperEEPROM::init() {
 	EEPROM.begin(4095);
-	mqttTopicDebugEEPROM = wpFZ.DeviceName + "/settings/Debug/EEPROM";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 }
 
 //###################################################################################
@@ -37,11 +37,11 @@ uint16_t helperEEPROM::getVersion() {
 }
 
 void helperEEPROM::changeDebug() {
-	DebugEEPROM = !DebugEEPROM;
-	bitWrite(bitsDebugBasis, bitDebugEEPROM, DebugEEPROM);
+	Debug = !Debug;
+	bitWrite(bitsDebugBasis, bitDebugEEPROM, Debug);
 	EEPROM.write(addrBitsDebugBasis, bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(DebugEEPROM ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -66,7 +66,7 @@ void helperEEPROM::publishSettings() {
 }
 void helperEEPROM::publishSettings(bool force) {
 	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebugEEPROM.c_str(), String(DebugEEPROM).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
 
@@ -74,28 +74,28 @@ void helperEEPROM::publishValues() {
 	publishValues(false);
 }
 void helperEEPROM::publishValues(bool force) {
-	if(force) publishCountDebugEEPROM = wpFZ.publishQoS;
-	if(DebugEEPROMLast != DebugEEPROM || ++publishCountDebugEEPROM > wpFZ.publishQoS) {
-		DebugEEPROMLast = DebugEEPROM;
-		wpMqtt.mqttClient.publish(mqttTopicDebugEEPROM.c_str(), String(DebugEEPROM).c_str());
-		publishCountDebugEEPROM = 0;
+	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		publishCountDebug = 0;
 	}
 }
 
 void helperEEPROM::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebugEEPROM.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
 void helperEEPROM::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicDebugEEPROM.c_str()) == 0) {
-		bool readDebugEEPROM = msg.toInt();
-		if(DebugEEPROM != readDebugEEPROM) {
-			DebugEEPROM = readDebugEEPROM;
-			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugEEPROM, DebugEEPROM);
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugEEPROM, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(DebugEEPROM ? "true" : "false") + "}");
-			wpFZ.DebugcheckSubscribes(mqttTopicDebugEEPROM, String(DebugEEPROM));
+			wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
 }
@@ -107,7 +107,7 @@ String helperEEPROM::readStringFromEEPROM(int addrOffset, String defaultString) 
 	int newStrLen = EEPROM.read(addrOffset);
 	if (newStrLen == 255) return defaultString;
 
-	if(DebugEEPROM) {
+	if(Debug) {
 		Serial.printf("newStrLen: %u\n", newStrLen);
 	}
 	char data[newStrLen];
@@ -127,7 +127,7 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 		returns = addrOffset + 1 + i + 1;
 	}
 	EEPROM.commit();
-	if(DebugEEPROM) {
+	if(Debug) {
 		Serial.println();
 		Serial.printf("Start: %u\n", addrOffset);
 		Serial.printf("Len: %u\n", len);
@@ -153,12 +153,13 @@ void helperEEPROM::readVars() {
 		// bitDistance = 1;
 		
 		bitsDebugBasis = EEPROM.read(addrBitsDebugBasis);
-		DebugEEPROM = bitRead(bitsDebugBasis, bitDebugEEPROM);
-		wpWiFi.DebugWiFi = bitRead(bitsDebugBasis, bitDebugWiFi);
-		wpMqtt.DebugMqtt = bitRead(bitsDebugBasis, bitDebugMqtt);
-		wpFinder.DebugFinder = bitRead(bitsDebugBasis, bitDebugFinder);
-		wpRest.DebugRest = bitRead(bitsDebugBasis, bitDebugRest);
-		wpOnlineToggler.DebugOnlineToggler = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
+		Debug = bitRead(bitsDebugBasis, bitDebugEEPROM);
+		wpWiFi.Debug = bitRead(bitsDebugBasis, bitDebugWiFi);
+		wpMqtt.Debug = bitRead(bitsDebugBasis, bitDebugMqtt);
+		wpFinder.Debug = bitRead(bitsDebugBasis, bitDebugFinder);
+		wpWebServer.Debug = bitRead(bitsDebugBasis, bitDebugWebServer);
+		wpRest.Debug = bitRead(bitsDebugBasis, bitDebugRest);
+		wpOnlineToggler.Debug = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
 		
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
 		wpDHT.DebugHT = bitRead(bitsDebugModules, bitDebugHT);

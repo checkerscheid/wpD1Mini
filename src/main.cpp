@@ -29,7 +29,8 @@ void setup() {
 	wpWiFi.init();
 	wpMqtt.init();
 	wpOnlineToggler.init();
-
+	wpFinder.init();
+	wpWebServer.init();
 }
 
 //###################################################################################
@@ -37,12 +38,14 @@ void setup() {
 //###################################################################################
 void loop() {
 	wpEEPROM.cycle();
+	wpFZ.cycle();
 	wpWiFi.cycle();
 	wpMqtt.cycle();
-	wpFZ.cycle();
 	wpOnlineToggler.cycle();
+	wpFinder.cycle();
+	wpWebServer.cycle();
 	if(wpFZ.calcValues) {
-		//calcValues();
+		// calcValues();
 	}
 	
 	delay(wpFZ.loopTime);

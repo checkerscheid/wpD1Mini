@@ -19,35 +19,19 @@ helperRest wpRest;
 
 helperRest::helperRest() {}
 void helperRest::init() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Init");
-#endif	
 	// settings
 	mqttTopicRestServer = wpFZ.DeviceName + "/info/Rest/Server";
 	// commands
 	mqttTopicErrorRest = wpFZ.DeviceName + "/ERROR/Rest";
-	mqttTopicDebugRest = wpFZ.DeviceName + "/settings/Debug/Rest";
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Rest";
 
 	setupRest();
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("Inited");
-#endif
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperRest::cycle() {
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycle");
-#endif
-#ifdef DEBUG
-	Serial.print(__FILE__);
-	Serial.println("cycled");
-#endif
 }
 
 uint16_t helperRest::getVersion() {
@@ -58,11 +42,11 @@ uint16_t helperRest::getVersion() {
 }
 
 void helperRest::changeDebug() {
-	DebugRest = !DebugRest;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugRest, DebugRest);
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugRest, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugRest\",\"value\":" + String(DebugRest ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugRest\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -79,14 +63,14 @@ bool helperRest::sendRest(String name, String value) {
 	targetmac.toLowerCase();
 	String targetwithident = "http://" + String(wpFZ.restServer) + ":" + String(wpFZ.restServerPort) + "/?m=" + targetmac;
 	String target = targetwithident + "&" + name + "=" + value;
-	if(DebugRest) {
+	if(Debug) {
 		String logmessage = "HTTP: '" + target + "'";
 		wpFZ.DebugWS(wpFZ.strINFO, "sendRest", logmessage);
 	}
 	http.begin(client, target.c_str());
 	int httpResponseCode = http.GET();
 	if (httpResponseCode > 0) {
-		if(DebugRest) {
+		if(Debug) {
 			String payload = http.getString();
 			payload.replace("\"", "'");
 			String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
@@ -106,14 +90,14 @@ bool helperRest::sendRawRest(String target) {
 	bool returns = false;
 	WiFiClient client;
 	HTTPClient http;
-	if(DebugRest) {
+	if(Debug) {
 		String logmessage = "HTTP: '" + target + "'";
 		wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
 	}
 	http.begin(client, target.c_str());
 	int httpResponseCode = http.GET();
 	if (httpResponseCode > 0) {
-		if(DebugRest) {
+		if(Debug) {
 			String payload = http.getString();
 			payload.replace("\"", "'");
 			String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
@@ -132,7 +116,7 @@ void helperRest::publishErrorRest() {
 	wpMqtt.mqttClient.publish(mqttTopicErrorRest.c_str(), String(errorRest).c_str());
 	errorRestLast = errorRest;
 	trySendRest = false;
-	if(DebugRest)
+	if(Debug)
 		publishInfoDebug("ErrorRest", String(errorRest), String(publishCountErrorRest));
 	publishCountErrorRest = 0;
 }

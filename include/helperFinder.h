@@ -17,13 +17,12 @@
 #define helperFinder_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <helperEEPROM.h>
 #include <ESPAsyncUDP.h>
 class helperFinder {
 	public:
-		bool DebugFinder = false;
+		bool Debug = false;
 		// commands
-		String mqttTopicDebugFinder;
+		String mqttTopicDebug;
 
 		helperFinder();
 		void init();
@@ -31,8 +30,17 @@ class helperFinder {
 		uint16_t getVersion();
 		void changeDebug();
 		void setupFinder();
+
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 };
 extern helperFinder wpFinder;
 #endif

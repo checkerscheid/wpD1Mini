@@ -21,7 +21,7 @@
 #include <ESP8266WiFi.h>
 class helperWiFi {
 	public:
-		bool DebugWiFi = false;
+		bool Debug = false;
 		// values
 		String mqttTopicRssi;
 		String mqttTopicWiFiSince;
@@ -30,7 +30,7 @@ class helperWiFi {
 		String mqttTopicIp;
 		String mqttTopicMac;
 		// commands
-		String mqttTopicDebugWiFi;
+		String mqttTopicDebug;
 
 		String WiFiSince;
 
@@ -50,8 +50,8 @@ class helperWiFi {
 		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
-		bool DebugWiFiLast = false;
-		uint16_t publishCountDebugWiFi = 0;
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 		uint16_t publishCountRssi = 0;
 		String printEncryptionType(int thisType);
 };

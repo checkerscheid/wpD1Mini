@@ -25,7 +25,9 @@
 #include <moduleDHT.h>
 class helperWebServer {
 	public:
-		
+		bool Debug = false;
+		// commands
+		String mqttTopicDebug;
 		const int8_t WebServerCommanddoNothing = -1;
 
 		const int8_t WebServerCommandblink = 1;
@@ -39,16 +41,17 @@ class helperWebServer {
 		const int8_t cmdDebugWiFi = 2;
 		const int8_t cmdDebugMqtt = 3;
 		const int8_t cmdDebugFinder = 4;
-		const int8_t cmdDebugRest = 5;
-		const int8_t cmdDebugOnlineToggler = 6;
-		const int8_t cmdDebugHT = 7;
-		const int8_t cmdDebugLDR = 8;
-		const int8_t cmdDebugLight = 9;
-		const int8_t cmdDebugBM = 10;
-		const int8_t cmdDebugRelais = 11;
-		const int8_t cmdDebugRain = 12;
-		const int8_t cmdDebugMoisture = 13;
-		const int8_t cmdDebugDistance = 14;
+		const int8_t cmdDebugWebServer = 5;
+		const int8_t cmdDebugRest = 6;
+		const int8_t cmdDebugOnlineToggler = 7;
+		const int8_t cmdDebugHT = 8;
+		const int8_t cmdDebugLDR = 9;
+		const int8_t cmdDebugLight = 10;
+		const int8_t cmdDebugBM = 11;
+		const int8_t cmdDebugRelais = 12;
+		const int8_t cmdDebugRain = 13;
+		const int8_t cmdDebugMoisture = 14;
+		const int8_t cmdDebugDistance = 15;
 		int8_t doWebServerDebugChange;
 
 		int8_t doWebServerBlink;
@@ -57,6 +60,7 @@ class helperWebServer {
 		void init();
 		void cycle();
 		uint16_t getVersion();
+		void changeDebug();
 
 		AsyncWebServer webServer = AsyncWebServer(80);
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
@@ -68,11 +72,21 @@ class helperWebServer {
 		void doTheWebServerCommand();
 		void doTheWebServerDebugChange();
 		void doTheWebserverBlink();
+		
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 120 $";
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
 };
 extern helperWebServer wpWebServer;
 
+String processor(const String& var);
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
@@ -166,7 +180,6 @@ function cmdHandle(e) {
 </body>
 </html>
 )rawliteral";
-String processor(const String& var);
 const uint8_t favicon[] PROGMEM = { // http://tomeko.net/online_tools/file_to_hex.php
 	0x1F, 0x8B, 0x08, 0x08, 0xDC, 0x41, 0x23, 0x66, 0x04, 0x00, 0x46, 0x72, 0x65, 0x61, 0x6B, 0x61, 
 	0x5A, 0x6F, 0x6E, 0x65, 0x5F, 0x6D, 0x69, 0x6E, 0x2E, 0x69, 0x63, 0x6F, 0x00, 0xA5, 0x93, 0xBF, 
