@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 122                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 121 2024-06-01 05:13:59Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 122 2024-06-01 07:52:17Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -115,7 +115,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 121 $";
+		String SVNh = "$Rev: 122 $";
 		uint16_t publishCountOnDuration = 0;
 };
 extern wpFreakaZone wpFZ;
