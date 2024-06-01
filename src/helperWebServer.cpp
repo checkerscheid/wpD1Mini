@@ -121,9 +121,9 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyString("miniMAC", minimac) + ",";
 		message += wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
-		if(wpFZ.wpDHT11 || wpFZ.wpDHT22) {
-			message += "\"HT\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleHT", String(wpDHT.maxCycle)) + ",";
+		if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+			message += "\"DHT\":{";
+			message += wpFZ.JsonKeyValue("MaxCycleDHT", String(wpDHT.maxCycle)) + ",";
 			message += wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + ",";
 			message += wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0)));
 			message += "},";
@@ -195,12 +195,12 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("MQTT", wpMqtt.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Search", wpFinder.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rest", wpRest.Debug ? "true" : "false");
-		String wpDHTJson = wpFZ.JsonKeyValue("HT", wpDHT.Debug ? "true" : "false");
-		if(wpFZ.wpDHT11) {
-			wpDHTJson = wpFZ.JsonKeyValue("HT11", wpDHT.Debug ? "true" : "false");
+		String wpDHTJson = wpFZ.JsonKeyValue("DHT", wpDHT.Debug ? "true" : "false");
+		if(wpFZ.useModuleDHT11) {
+			wpDHTJson = wpFZ.JsonKeyValue("DHT11", wpDHT.Debug ? "true" : "false");
 		}
-		if(wpFZ.wpDHT22) {
-			wpDHTJson = wpFZ.JsonKeyValue("HT22", wpDHT.Debug ? "true" : "false");
+		if(wpFZ.useModuleDHT22) {
+			wpDHTJson = wpFZ.JsonKeyValue("DHT22", wpDHT.Debug ? "true" : "false");
 		}
 		message += "," + wpDHTJson;
 #ifdef wpLDR
@@ -257,9 +257,9 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRest");
 				wpWebServer.setWebServerDebugChange(wpWebServer.cmdDebugRest);
 			}
-			if(request->getParam("Debug")->value() == "DebugHT") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugHT");
-				wpWebServer.setWebServerDebugChange(wpWebServer.cmdDebugHT);
+			if(request->getParam("Debug")->value() == "DebugDHT") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugDHT");
+				wpWebServer.setWebServerDebugChange(wpWebServer.cmdDebugDHT);
 			}
 			// if(request->getParam("Debug")->value() == "DebugLDR") {
 			// 	wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLDR");
@@ -402,7 +402,7 @@ void helperWebServer::doTheWebServerDebugChange() {
 		if(doWebServerDebugChange == cmdDebugRest) {
 			wpRest.changeDebug();
 		}
-		if(doWebServerDebugChange == cmdDebugHT) {
+		if(doWebServerDebugChange == cmdDebugDHT) {
 			wpDHT.changeDebug();
 		}
 		// if(doWebServerDebugChange == cmdDebugLDR) {
@@ -441,7 +441,7 @@ void helperWebServer::doTheWebserverBlink() {
 //###################################################################################
 
 String processor(const String& var) {
-	String wpHT_s;
+	String returns;
 	if(var == "IPADRESS")
 		return WiFi.localIP().toString();
 	if(var == "DeviceName")
@@ -449,76 +449,76 @@ String processor(const String& var) {
 	if(var == "DeviceDescription")
 		return wpFZ.DeviceDescription;
 	if(var == "CompiledWith") {
-		wpHT_s = "<ul>";
-#ifdef wpHT
-	if(wpHT == DHT11)
-			wpHT_s += "<li>wpHT HT11</li>";
-	if(wpHT == DHT22)
-			wpHT_s += "<li>wpHT HT22</li>";
-#endif
-#ifdef wpLDR
-		wpHT_s += "<li>wpLDR</li>";
-#endif
-#ifdef wpLight
-		wpHT_s += "<li>wpLight</li>";
-#endif
-#ifdef wpBM
-		wpHT_s += "<li>wpBM</li>";
-#endif
-#ifdef wpRelais
-		wpHT_s += "<li>wpRelais</li>";
-#endif
-#ifdef wpRain
-		wpHT_s += "<li>wpRain</li>";
-#endif
-#ifdef wpMoisture
-		wpHT_s += "<li>wpMoisture</li>";
-#endif
-#ifdef wpDistance
-		wpHT_s += "<li>wpDistance</li>";
-#endif
-		return wpHT_s += "</ul>";
-	}
-	if(var == "Debug") {
-		wpHT_s = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>";
-		wpHT_s += "<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") + " onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";	
-#ifdef wpMoisture
-#ifdef wpRelais
-		wpHT_s += "<li><input id='waterEmpty' type='checkbox'" + String(wpFZ.waterEmpty ? " checked='checked'" : "") + " onchange='cmdHandle(event)' /><label for='waterEmpty'>waterEmpty</label></li>";
-#endif
-#endif
-		wpHT_s += "<li><span class='bold'>Debug:</span></li><li><hr /></li>";
-		wpHT_s += "<li><input id='DebugEEPROM' type='checkbox'" + String(wpEEPROM.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugEEPROM'>Eprom</label></li>";
-		wpHT_s += "<li><input id='DebugWiFi' type='checkbox'" + String(wpWiFi.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWiFi'>WiFi</label></li>";
-		wpHT_s += "<li><input id='DebugMqtt' type='checkbox'" + String(wpMqtt.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugMqtt'>Mqtt</label></li>";
-		wpHT_s += "<li><input id='DebugFinder' type='checkbox'" + String(wpFinder.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugFinder'>Finder</label></li>";
-		wpHT_s += "<li><input id='DebugWebServer' type='checkbox'" + String(wpWebServer.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWebServer'>WebServer</label></li>";
-		wpHT_s += "<li><input id='DebugRest' type='checkbox'" + String(wpRest.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugRest'>Rest</label></li>";
-		if(wpFZ.wpDHT11 || wpFZ.wpDHT22) {
-			wpHT_s += "<li><input id='DebugHT' type='checkbox'" + String(wpDHT.Debug ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugHT'>HT</label></li>";
+		returns = "<ul>";
+		if(wpFZ.useModuleDHT11) {
+			returns += "<li>wpDHT11</li>";
+		}
+		if(wpFZ.useModuleDHT22) {
+			returns += "<li>wpDHT22</li>";
 		}
 #ifdef wpLDR
-		wpHT_s += "<li><input id='DebugLDR' type='checkbox'" + String(wpFZ.DebugLDR ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLDR'>LDR</label></li>";
+		returns += "<li>wpLDR</li>";
 #endif
 #ifdef wpLight
-		wpHT_s += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
+		returns += "<li>wpLight</li>";
 #endif
 #ifdef wpBM
-		wpHT_s += "<li><input id='DebugBM' type='checkbox'" + String(wpFZ.DebugBM ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugBM'>BM</label></li>";
+		returns += "<li>wpBM</li>";
 #endif
 #ifdef wpRelais
-		wpHT_s += "<li><input id='DebugRelais' type='checkbox'" + String(wpFZ.DebugRelais ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRelais'>Relais</label></li>";
+		returns += "<li>wpRelais</li>";
 #endif
 #ifdef wpRain
-		wpHT_s += "<li><input id='DebugRain' type='checkbox'" + String(wpFZ.DebugRain ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRain'>Rain</label></li>";
+		returns += "<li>wpRain</li>";
 #endif
 #ifdef wpMoisture
-		wpHT_s += "<li><input id='DebugMoisture' type='checkbox'" + String(wpFZ.DebugMoisture ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugMoisture'>Moisture</label></li>";
+		returns += "<li>wpMoisture</li>";
 #endif
 #ifdef wpDistance
-		wpHT_s += "<li><input id='DebugDistance' type='checkbox'" + String(wpFZ.DebugDistance ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDistance'>Distance</label></li>";
+		returns += "<li>wpDistance</li>";
 #endif
-		return wpHT_s += "</ul>";
+		return returns += "</ul>";
+	}
+	if(var == "Debug") {
+		returns = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>";
+		returns += "<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") + " onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";	
+#ifdef wpMoisture
+#ifdef wpRelais
+		returns += "<li><input id='waterEmpty' type='checkbox'" + String(wpFZ.waterEmpty ? " checked='checked'" : "") + " onchange='cmdHandle(event)' /><label for='waterEmpty'>waterEmpty</label></li>";
+#endif
+#endif
+		returns += "<li><span class='bold'>Debug:</span></li><li><hr /></li>";
+		returns += "<li><input id='DebugEEPROM' type='checkbox'" + String(wpEEPROM.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugEEPROM'>Eprom</label></li>";
+		returns += "<li><input id='DebugWiFi' type='checkbox'" + String(wpWiFi.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWiFi'>WiFi</label></li>";
+		returns += "<li><input id='DebugMqtt' type='checkbox'" + String(wpMqtt.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugMqtt'>Mqtt</label></li>";
+		returns += "<li><input id='DebugFinder' type='checkbox'" + String(wpFinder.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugFinder'>Finder</label></li>";
+		returns += "<li><input id='DebugWebServer' type='checkbox'" + String(wpWebServer.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWebServer'>WebServer</label></li>";
+		returns += "<li><input id='DebugRest' type='checkbox'" + String(wpRest.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugRest'>Rest</label></li>";
+		if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+			returns += "<li><input id='DebugDHT' type='checkbox'" + String(wpDHT.Debug ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDHT'>DHT</label></li>";
+		}
+#ifdef wpLDR
+		returns += "<li><input id='DebugLDR' type='checkbox'" + String(wpFZ.DebugLDR ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLDR'>LDR</label></li>";
+#endif
+#ifdef wpLight
+		returns += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
+#endif
+#ifdef wpBM
+		returns += "<li><input id='DebugBM' type='checkbox'" + String(wpFZ.DebugBM ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugBM'>BM</label></li>";
+#endif
+#ifdef wpRelais
+		returns += "<li><input id='DebugRelais' type='checkbox'" + String(wpFZ.DebugRelais ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRelais'>Relais</label></li>";
+#endif
+#ifdef wpRain
+		returns += "<li><input id='DebugRain' type='checkbox'" + String(wpFZ.DebugRain ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugRain'>Rain</label></li>";
+#endif
+#ifdef wpMoisture
+		returns += "<li><input id='DebugMoisture' type='checkbox'" + String(wpFZ.DebugMoisture ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugMoisture'>Moisture</label></li>";
+#endif
+#ifdef wpDistance
+		returns += "<li><input id='DebugDistance' type='checkbox'" + String(wpFZ.DebugDistance ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDistance'>Distance</label></li>";
+#endif
+		return returns += "</ul>";
 	}
 	return String();
 }

@@ -51,7 +51,7 @@ class helperEEPROM {
 		
 		const byte addrBitsDebugModules = 3;
 		byte bitsDebugModules;
-		const byte bitDebugHT = 0; // include in bitsDebugModules
+		const byte bitDebugDHT = 0; // include in bitsDebugModules
 		const byte bitDebugLDR = 1; // include in bitsDebugModules
 		const byte bitDebugLight = 2; // include in bitsDebugModules
 		const byte bitDebugBM = 3; // include in bitsDebugModules
@@ -70,7 +70,7 @@ class helperEEPROM {
 		const byte bitUseMoistureAvg = 5; // include in bitsModulesSettings
 
 /// byte values: byte 10 - 29
-		const byte byteMaxCycleHT = 10;
+		const byte byteMaxCycleDHT = 10;
 		const byte byteTemperatureCorrection = 11; // int8_t * 10
 		const byte byteHumidityCorrection = 12; // int8_t * 10
 		const byte byteMaxCycleLDR = 13;

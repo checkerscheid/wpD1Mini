@@ -54,17 +54,17 @@ class wpFreakaZone {
 		const String strWARN   = "[* WARN  *]";
 		const String strERRROR = "[! ERROR !]";
 
-		const bool wpDHT11 = false;
-		const bool wpDHT22 = false;
-		uint8_t choosenDHT;
-		const bool wpLDR = false;
-		const bool wpLight = false;
-		const bool wpBM = false;
-		const bool wpRelais = false;
-		const bool wpRelaisShield = false;
-		const bool wpRain = false;
-		const bool wpMoisture = false;
-		const bool wpDistance = false;
+		bool useModuleDHT11 = false;
+		bool useModuleDHT22 = false;
+		uint8_t choosenDHTmodul;
+		bool useModuleLDR = false;
+		bool useModuleLight = false;
+		bool useModuleBM = false;
+		bool useModuleRelais = false;
+		bool useModuleRelaisShield = false;
+		bool useModuleRain = false;
+		bool useModuleMoisture = false;
+		bool useModuleDistance = false;
 
 		String DeviceName;
 		String DeviceDescription;

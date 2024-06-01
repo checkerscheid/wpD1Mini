@@ -33,6 +33,10 @@ void setup() {
 	wpFinder.init();
 	wpWebServer.init();
 	wpRest.init();
+
+	if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+		wpDHT.init();
+	}
 }
 
 //###################################################################################
@@ -47,8 +51,9 @@ void loop() {
 	wpFinder.cycle();
 	wpWebServer.cycle();
 	wpRest.cycle();
-	if(wpFZ.calcValues) {
-		// calcValues();
+
+	if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+		wpDHT.cycle();
 	}
 	
 	delay(wpFZ.loopTime);

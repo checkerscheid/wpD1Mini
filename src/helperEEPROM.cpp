@@ -139,8 +139,8 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 void helperEEPROM::readVars() {
 	/// bool values: byte 0 - 9
 		bitsModules0 = EEPROM.read(addrBitsModules0);
-		// bitDHT11 = 0;
-		// bitDHT22 = 1;
+		wpFZ.useModuleDHT11 = bitRead(bitsModules0, bitDHT11);
+		wpFZ.useModuleDHT22 = bitRead(bitsModules0, bitDHT22);
 		// bitLDR = 2;
 		// bitLight = 3;
 		// bitBM = 4;
@@ -162,7 +162,7 @@ void helperEEPROM::readVars() {
 		wpOnlineToggler.Debug = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
 		
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
-		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugHT);
+		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugDHT);
 		// bitDebugLDR = 1;
 		// bitDebugLight = 2;
 		// bitDebugBM = 3;
@@ -180,7 +180,7 @@ void helperEEPROM::readVars() {
 		// bitUseMoistureAvg = 5;
 
 /// byte values: byte 10 - 29
-		wpDHT.maxCycle = EEPROM.read(byteMaxCycleHT);
+		wpDHT.maxCycle = EEPROM.read(byteMaxCycleDHT);
 		wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 		wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
 		// byteMaxCycleLDR = 11;

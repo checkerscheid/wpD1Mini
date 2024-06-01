@@ -46,7 +46,7 @@ class helperWebServer {
 		const int8_t cmdDebugWebServer = 5;
 		const int8_t cmdDebugRest = 6;
 		const int8_t cmdDebugOnlineToggler = 7;
-		const int8_t cmdDebugHT = 8;
+		const int8_t cmdDebugDHT = 8;
 		const int8_t cmdDebugLDR = 9;
 		const int8_t cmdDebugLight = 10;
 		const int8_t cmdDebugBM = 11;

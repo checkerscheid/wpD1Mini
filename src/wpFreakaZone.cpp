@@ -23,12 +23,12 @@ void wpFreakaZone::init(String deviceName) {
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
 	calcValues = true;
-	choosenDHT = 0;
-	if(wpDHT11) {
-		choosenDHT = DHT11;
+	choosenDHTmodul = 0;
+	if(useModuleDHT11) {
+		choosenDHTmodul = DHT11;
 	}
-	if(wpDHT22) {
-		choosenDHT = DHT22;
+	if(useModuleDHT22) {
+		choosenDHTmodul = DHT22;
 	}
 
 	// values
