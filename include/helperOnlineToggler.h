@@ -17,7 +17,6 @@
 #define helperOnlineToggler_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <helperEEPROM.h>
 class helperOnlineToggler {
 	public:
 // values

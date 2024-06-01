@@ -139,8 +139,8 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 void helperEEPROM::readVars() {
 	/// bool values: byte 0 - 9
 		bitsModules0 = EEPROM.read(addrBitsModules0);
-		wpFZ.useModuleDHT11 = bitRead(bitsModules0, bitDHT11);
-		wpFZ.useModuleDHT22 = bitRead(bitsModules0, bitDHT22);
+		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitDHT11);
+		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitDHT22);
 		// bitLDR = 2;
 		// bitLight = 3;
 		// bitBM = 4;
@@ -160,6 +160,7 @@ void helperEEPROM::readVars() {
 		wpWebServer.Debug = bitRead(bitsDebugBasis, bitDebugWebServer);
 		wpRest.Debug = bitRead(bitsDebugBasis, bitDebugRest);
 		wpOnlineToggler.Debug = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
+		wpModules.Debug = bitRead(bitsDebugBasis, bitDebugModules);
 		
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
 		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugDHT);

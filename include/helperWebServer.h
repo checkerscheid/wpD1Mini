@@ -18,11 +18,6 @@
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <ESPAsyncWebServer.h>
-#include <helperWiFi.h>
-#include <helperMqtt.h>
-#include <helperFinder.h>
-#include <helperUpdate.h>
-#include <moduleDHT.h>
 class helperWebServer {
 	public:
 		bool Debug = false;
@@ -40,20 +35,23 @@ class helperWebServer {
 		int8_t doWebServerCommand;
 
 		const int8_t cmdDebugEEPROM = 1;
-		const int8_t cmdDebugWiFi = 2;
-		const int8_t cmdDebugMqtt = 3;
-		const int8_t cmdDebugFinder = 4;
-		const int8_t cmdDebugWebServer = 5;
+		const int8_t cmdDebugFinder = 2;
+		const int8_t cmdDebugModules = 3;
+		const int8_t cmdDebugMqtt = 4;
+		const int8_t cmdDebugOnlineToggler = 5;
 		const int8_t cmdDebugRest = 6;
-		const int8_t cmdDebugOnlineToggler = 7;
-		const int8_t cmdDebugDHT = 8;
-		const int8_t cmdDebugLDR = 9;
-		const int8_t cmdDebugLight = 10;
-		const int8_t cmdDebugBM = 11;
-		const int8_t cmdDebugRelais = 12;
-		const int8_t cmdDebugRain = 13;
-		const int8_t cmdDebugMoisture = 14;
-		const int8_t cmdDebugDistance = 15;
+		const int8_t cmdDebugUpdate = 7;
+		const int8_t cmdDebugWebServer = 8;
+		const int8_t cmdDebugWiFi = 9;
+
+		const int8_t cmdDebugDHT = 101;
+		const int8_t cmdDebugLDR = 102;
+		const int8_t cmdDebugLight = 103;
+		const int8_t cmdDebugBM = 104;
+		const int8_t cmdDebugRelais = 105;
+		const int8_t cmdDebugRain = 106;
+		const int8_t cmdDebugMoisture = 107;
+		const int8_t cmdDebugDistance = 108;
 		int8_t doWebServerDebugChange;
 
 		int8_t doWebServerBlink;

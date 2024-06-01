@@ -16,7 +16,7 @@
 #include <moduleDHT.h>
 
 moduleDHT wpDHT;
-DHT dht(DHTPin, wpFZ.choosenDHTmodul);
+DHT dht(DHTPin, wpModules.choosenDHTmodul);
 
 moduleDHT::moduleDHT() {}
 void moduleDHT::init() {

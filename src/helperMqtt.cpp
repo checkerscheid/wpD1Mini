@@ -83,7 +83,7 @@ void helperMqtt::publishSettings(bool force) {
 	wpWebServer.publishSettings(force);
 	wpRest.publishSettings(force);
 
-	if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 
 	}
 }

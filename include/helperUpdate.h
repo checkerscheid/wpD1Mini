@@ -39,6 +39,7 @@ class helperUpdate {
 		void init();
 		void cycle();
 		uint16_t getVersion();
+		void changeDebug();
 		bool setupOta();
 		void check();
 		void start();

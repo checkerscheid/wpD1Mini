@@ -34,7 +34,7 @@ void setup() {
 	wpWebServer.init();
 	wpRest.init();
 
-	if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.init();
 	}
 }
@@ -52,7 +52,7 @@ void loop() {
 	wpWebServer.cycle();
 	wpRest.cycle();
 
-	if(wpFZ.useModuleDHT11 || wpFZ.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.cycle();
 	}
 	

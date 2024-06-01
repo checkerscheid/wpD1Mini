@@ -43,6 +43,15 @@ uint16_t helperUpdate::getVersion() {
 	return v > vh ? v : vh;
 }
 
+void helperUpdate::changeDebug() {
+	Debug = !Debug;
+	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugUpdate, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+	EEPROM.commit();
+	wpFZ.SendWS("{\"id\":\"DebugUpdate\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.blink();
+}
+
 bool helperUpdate::setupOta() {
 	bool returns = false;
 	ArduinoOTA.onStart([]() {

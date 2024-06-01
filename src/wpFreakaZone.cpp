@@ -23,13 +23,6 @@ void wpFreakaZone::init(String deviceName) {
 	DeviceName = deviceName;
 	DeviceDescription = deviceName;
 	calcValues = true;
-	choosenDHTmodul = 0;
-	if(useModuleDHT11) {
-		choosenDHTmodul = DHT11;
-	}
-	if(useModuleDHT22) {
-		choosenDHTmodul = DHT22;
-	}
 
 	// values
 	mqttTopicRestartRequired = wpFZ.DeviceName + "/RestartRequired";

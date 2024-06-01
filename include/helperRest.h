@@ -19,7 +19,6 @@
 #include <wpFreakaZone.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <helperMqtt.h>
 class helperRest {
 	public:
 		bool Debug = false;

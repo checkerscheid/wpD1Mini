@@ -17,8 +17,17 @@
 #define wpFreakaZone_h
 #include <Arduino.h>
 #include <time.h>
-#include <helperWebServer.h>
 #include <DHT.h>
+#include <helperEEPROM.h>
+#include <helperFinder.h>
+#include <helperModules.h>
+#include <helperMqtt.h>
+#include <helperOnlineToggler.h>
+#include <helperRest.h>
+#include <helperUpdate.h>
+#include <helperWebServer.h>
+#include <helperWiFi.h>
+#include <moduleDHT.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -53,18 +62,6 @@ class wpFreakaZone {
 		const String strINFO   = "[- INFO  -]";
 		const String strWARN   = "[* WARN  *]";
 		const String strERRROR = "[! ERROR !]";
-
-		bool useModuleDHT11 = false;
-		bool useModuleDHT22 = false;
-		uint8_t choosenDHTmodul;
-		bool useModuleLDR = false;
-		bool useModuleLight = false;
-		bool useModuleBM = false;
-		bool useModuleRelais = false;
-		bool useModuleRelaisShield = false;
-		bool useModuleRain = false;
-		bool useModuleMoisture = false;
-		bool useModuleDistance = false;
 
 		String DeviceName;
 		String DeviceDescription;

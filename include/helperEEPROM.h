@@ -42,12 +42,14 @@ class helperEEPROM {
 		const byte addrBitsDebugBasis = 2;
 		byte bitsDebugBasis;
 		const byte bitDebugEEPROM = 0; // include in bitsDebugBasis
-		const byte bitDebugWiFi = 1; // include in bitsDebugBasis
-		const byte bitDebugMqtt = 2; // include in bitsDebugBasis
-		const byte bitDebugFinder = 3; // include in bitsDebugBasis
-		const byte bitDebugWebServer = 4;
+		const byte bitDebugFinder = 1; // include in bitsDebugBasis
+		const byte bitDebugModules = 2; // include in bitsDebugBasis
+		const byte bitDebugMqtt = 3; // include in bitsDebugBasis
+		const byte bitDebugOnlineToggler = 4; // include in bitsDebugBasis
 		const byte bitDebugRest = 5; // include in bitsDebugBasis
-		const byte bitDebugOnlineToggler = 6; // include in bitsDebugBasis
+		const byte bitDebugUpdate = 6; // include in bitsDebugBasis
+		const byte bitDebugWebServer = 7; // include in bitsDebugBasis
+		const byte bitDebugWiFi = 8; // include in bitsDebugBasis
 		
 		const byte addrBitsDebugModules = 3;
 		byte bitsDebugModules;

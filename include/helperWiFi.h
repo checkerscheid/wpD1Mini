@@ -17,7 +17,6 @@
 #define helperWiFi_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <helperEEPROM.h>
 #include <ESP8266WiFi.h>
 class helperWiFi {
 	public:

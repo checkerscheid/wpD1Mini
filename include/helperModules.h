@@ -6,54 +6,52 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 08.03.2024                                                       #
+//# Date         : 01.06.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 121                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.h 121 2024-06-01 05:13:59Z                    $ #
+//# File-ID      : $Id:: helperFinder.h 121 2024-06-01 05:13:59Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef helperMqtt_h
-#define helperMqtt_h
+#ifndef helperModules_h
+#define helperModules_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-class helperMqtt {
+class helperModules {
 	public:
 		bool Debug = false;
-		// values
-		String mqttTopicMqttSince;
-		// settings
-		String mqttTopicMqttServer;
+
+		bool useModuleDHT11 = false;
+		bool useModuleDHT22 = false;
+		uint8_t choosenDHTmodul;
+		bool useModuleLDR = false;
+		bool useModuleLight = false;
+		bool useModuleBM = false;
+		bool useModuleRelais = false;
+		bool useModuleRelaisShield = false;
+		bool useModuleRain = false;
+		bool useModuleMoisture = false;
+		bool useModuleDistance = false;
 		// commands
-		String mqttTopicForceMqttUpdate;
-		String mqttTopicForceRenewValue;
 		String mqttTopicDebug;
 
-		String MqttSince;
-
-		static WiFiClient wifiClient;
-		static PubSubClient mqttClient;
-
-		helperMqtt();
+		helperModules();
 		void init();
 		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
+		void setupModules();
 
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
 		void publishValues(bool force);
+		void setSubscribes();
+		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 121 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
-		void connectMqtt();
-		void setSubscribes();
-		static void callbackMqtt(char*, byte*, unsigned int);
-
 };
-extern helperMqtt wpMqtt;
+extern helperModules wpModules;
 #endif

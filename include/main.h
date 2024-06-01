@@ -17,14 +17,6 @@
 #define BasisEmpty_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <helperWiFi.h>
-#include <helperMqtt.h>
-#include <helperOnlineToggler.h>
-#include <helperFinder.h>
-#include <helperRest.h>
-#include <helperWebServer.h>
-#include <helperUpdate.h>
-#include <moduleDHT.h>
 
 uint16_t getVersion();
 uint16_t getBuild();
