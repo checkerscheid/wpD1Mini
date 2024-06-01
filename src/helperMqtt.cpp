@@ -33,9 +33,6 @@ void helperMqtt::init() {
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
 	mqttClient.setCallback(callbackMqtt);
-	Serial.print(millis());
-	Serial.println(" init");
-	connectMqtt();
 }
 
 //###################################################################################
@@ -43,8 +40,6 @@ void helperMqtt::init() {
 //###################################################################################
 void helperMqtt::cycle() {
 	if(!mqttClient.connected()) {
-		Serial.print(millis());
-		Serial.println(" cycle");
 		connectMqtt();
 	}
 	mqttClient.loop();
@@ -114,6 +109,7 @@ void helperMqtt::connectMqtt() {
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
 			MqttSince = wpFZ.getDateTime();
+			mqttClient.publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
 			setSubscribes();
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);

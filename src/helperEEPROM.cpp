@@ -162,7 +162,7 @@ void helperEEPROM::readVars() {
 		wpOnlineToggler.Debug = bitRead(bitsDebugBasis, bitDebugOnlineToggler);
 		
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
-		wpDHT.DebugHT = bitRead(bitsDebugModules, bitDebugHT);
+		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugHT);
 		// bitDebugLDR = 1;
 		// bitDebugLight = 2;
 		// bitDebugBM = 3;

@@ -37,7 +37,7 @@ class helperWebServer {
 		const int8_t WebServerCommandscanWiFi = 5;
 		int8_t doWebServerCommand;
 
-		const int8_t cmdDebugEprom = 1;
+		const int8_t cmdDebugEEPROM = 1;
 		const int8_t cmdDebugWiFi = 2;
 		const int8_t cmdDebugMqtt = 3;
 		const int8_t cmdDebugFinder = 4;
