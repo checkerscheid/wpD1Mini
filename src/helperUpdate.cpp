@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 122                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 122 2024-06-01 07:52:17Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 123 2024-06-02 04:37:07Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -40,7 +40,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 122 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -160,7 +160,7 @@ void helperUpdate::publishValues(bool force) {
 }
 
 void helperUpdate::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 void helperUpdate::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

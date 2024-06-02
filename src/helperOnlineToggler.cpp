@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 121 2024-06-01 05:13:59Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 123 2024-06-02 04:37:07Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -37,7 +37,7 @@ void helperOnlineToggler::cycle() {
 }
 
 uint16_t helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -78,7 +78,7 @@ void helperOnlineToggler::publishValues(bool force) {
 }
 
 void helperOnlineToggler::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicOnlineToggler.c_str());
+	wpMqtt.subscribe(mqttTopicOnlineToggler.c_str());
 }
 void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicOnlineToggler.c_str()) == 0) {

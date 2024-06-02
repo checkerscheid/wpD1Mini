@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 124                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.h 121 2024-06-01 05:13:59Z                  $ #
+//# File-ID      : $Id:: helperModules.h 124 2024-06-02 04:37:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -68,7 +68,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 121 $";
+		String SVNh = "$Rev: 124 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };

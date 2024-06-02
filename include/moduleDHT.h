@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 121 2024-06-01 05:13:59Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 123 2024-06-02 04:37:07Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -23,14 +23,14 @@
 
 class moduleDHT {
 	public:
-		int16_t temperature = 0;
-		int16_t humidity = 0;
+		int16_t temperature;
+		int16_t humidity;
 
-		bool Debug = false;
-		bool error = false;
-		int8_t temperatureCorrection = 0;
-		int8_t humidityCorrection = 0;
-		uint8_t maxCycle = 5;
+		bool Debug;
+		bool error;
+		int8_t temperatureCorrection;
+		int8_t humidityCorrection;
+		uint8_t maxCycle;
 		// values
 		String mqttTopicTemperature;
 		String mqttTopicHumidity;
@@ -57,16 +57,16 @@ class moduleDHT {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 121 $";
-		uint16_t cycleCounter = 0;
-		bool errorLast = false;
-		uint16_t publishCountError = 0;
-		int16_t temperatureLast = 0;
-		uint16_t publishCountTemperature = 0;
-		int16_t humidityLast = 0;
-		uint16_t publishCountHumidity = 0;
-		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		String SVNh = "$Rev: 123 $";
+		uint16_t cycleCounter;
+		bool errorLast;
+		uint16_t publishCountError;
+		int16_t temperatureLast;
+		uint16_t publishCountTemperature;
+		int16_t humidityLast;
+		uint16_t publishCountHumidity;
+		bool DebugLast;
+		uint16_t publishCountDebug;
 
 		void publishValueTemp();
 		void publishValueHum();

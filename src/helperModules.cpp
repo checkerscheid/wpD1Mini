@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 124                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.cpp 121 2024-06-01 05:13:59Z                $ #
+//# File-ID      : $Id:: helperModules.cpp 124 2024-06-02 04:37:51Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -53,7 +53,7 @@ void helperModules::cycle() {
 }
 
 uint16_t helperModules::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 124 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -100,17 +100,17 @@ void helperModules::publishValues(bool force) {
 }
 
 void helperModules::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT11.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT22.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseLDR.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseRelais.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseRelaisShield.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseMoisture.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseDistance.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicUseDHT11.c_str());
+	wpMqtt.subscribe(mqttTopicUseDHT22.c_str());
+	wpMqtt.subscribe(mqttTopicUseLDR.c_str());
+	wpMqtt.subscribe(mqttTopicUseLight.c_str());
+	wpMqtt.subscribe(mqttTopicUseBM.c_str());
+	wpMqtt.subscribe(mqttTopicUseRelais.c_str());
+	wpMqtt.subscribe(mqttTopicUseRelaisShield.c_str());
+	wpMqtt.subscribe(mqttTopicUseRain.c_str());
+	wpMqtt.subscribe(mqttTopicUseMoisture.c_str());
+	wpMqtt.subscribe(mqttTopicUseDistance.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicUseDHT11.c_str()) == 0) {

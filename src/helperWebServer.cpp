@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 122                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 122 2024-06-01 07:52:17Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 123 2024-06-02 04:37:07Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 122 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -76,7 +76,7 @@ void helperWebServer::publishValues(bool force) {
 }
 
 void helperWebServer::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 void helperWebServer::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -140,9 +140,9 @@ void helperWebServer::setupWebServer() {
 #endif
 		if(wpModules.useModuleLight) {
 			message += "\"Light\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleLight", String(wpFZ.maxCycleLight)) + ",";
-			message += wpFZ.JsonKeyValue("useLightAvg", String(wpFZ.useLightAvg)) + ",";
-			message += wpFZ.JsonKeyValue("LightCorrection", String(wpFZ.lightCorrection));
+			message += wpFZ.JsonKeyValue("MaxCycleLight", String(wpLight.maxCycle)) + ",";
+			message += wpFZ.JsonKeyValue("useLightAvg", String(wpLight.useAvg)) + ",";
+			message += wpFZ.JsonKeyValue("LightCorrection", String(wpLight.correction));
 			message += "},";
 		}
 #ifdef wpBM
@@ -195,7 +195,7 @@ void helperWebServer::setupWebServer() {
 		message += "\"Debug\":{";
 		message += wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Modules", wpModules.Debug ? "true" : "false");
+		message += wpFZ.JsonKeyValue("Modules", wpModules.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("MQTT", wpMqtt.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("OnlineToggler", wpOnlineToggler.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rest", wpRest.Debug ? "true" : "false") + ",";
@@ -533,7 +533,7 @@ String processor(const String& var) {
 		returns += "<li><input id='DebugLDR' type='checkbox'" + String(wpFZ.DebugLDR ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLDR'>LDR</label></li>";
 #endif
 		if(wpModules.useModuleLight) {
-			returns += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
+			returns += "<li><input id='DebugLight' type='checkbox'" + String(wpLight.Debug ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
 		}
 #ifdef wpBM
 		returns += "<li><input id='DebugBM' type='checkbox'" + String(wpFZ.DebugBM ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugBM'>BM</label></li>";

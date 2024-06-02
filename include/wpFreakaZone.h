@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 122                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 122 2024-06-01 07:52:17Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 123 2024-06-02 04:37:07Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -36,6 +36,19 @@
 /// @brief Base class with std: consts, EEPROM, WebServer and CalcVersion
 class wpFreakaZone {
 	public:
+
+		// helperEEPROM* wpEEPROM;
+		// helperFinder* wpFinder;
+		// helperModules* wpModules;
+		// helperMqtt* wpMqtt;
+		// helperOnlineToggler* wpOnlineToggler;
+		// helperRest* wpRest;
+		// helperUpdate* wpUpdate;
+		// helperWebServer* wpWebServer;
+		// helperWiFi* wpWiFi;
+		// moduleDHT* wpDHT;
+		// moduleLight* wpLight;
+
 		const char* ssid = "Mikrowellen";
 		const char* password = "Welc0me@wp-Scheid.com";
 
@@ -113,7 +126,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 122 $";
+		String SVNh = "$Rev: 123 $";
 		uint16_t publishCountOnDuration = 0;
 };
 extern wpFreakaZone wpFZ;

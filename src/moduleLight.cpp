@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 124                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 121 2024-06-01 05:13:59Z                   $ #
+//# File-ID      : $Id:: moduleLight.cpp 124 2024-06-02 04:37:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -64,7 +64,7 @@ void moduleLight::cycle() {
 }
 
 uint16_t moduleLight::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 124 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -116,10 +116,10 @@ void moduleLight::publishValues(bool force) {
 }
 
 void moduleLight::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.subscribe(mqttTopicCorrection.c_str());
+	wpMqtt.subscribe(mqttTopicUseAvg.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 
 void moduleLight::checkSubscribes(char* topic, String msg) {

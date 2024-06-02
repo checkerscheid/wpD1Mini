@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 121 2024-06-01 05:13:59Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 123 2024-06-02 04:37:07Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -50,7 +50,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16_t wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -177,10 +177,10 @@ void wpFreakaZone::publishValues(bool force) {
 }
 
 void wpFreakaZone::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicRestartDevice.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicCalcValues.c_str());
+	// wpMqtt.subscribe(mqttTopicSetDeviceName.c_str());
+	// wpMqtt.subscribe(mqttTopicSetDeviceDescription.c_str());
+	// wpMqtt.subscribe(mqttTopicRestartDevice.c_str());
+	// wpMqtt.subscribe(mqttTopicCalcValues.c_str());
 }
 
 void wpFreakaZone::checkSubscribes(char* topic, String msg) {

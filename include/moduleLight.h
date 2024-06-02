@@ -8,13 +8,13 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 124                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 121 2024-06-01 05:13:59Z                     $ #
+//# File-ID      : $Id:: moduleLight.h 124 2024-06-02 04:37:51Z                   $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleDHT_h
-#define moduleDHT_h
+#ifndef moduleLight_h
+#define moduleLight_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <Wire.h>
@@ -54,7 +54,7 @@ class moduleLight {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 121 $";
+		String SVNh = "$Rev: 124 $";
 		uint16_t cycleCounter;
 		bool errorLast;
 		uint16_t publishCountError;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 121 2024-06-01 05:13:59Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 123 2024-06-02 04:37:07Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -19,6 +19,13 @@ moduleDHT wpDHT;
 
 moduleDHT::moduleDHT() {}
 void moduleDHT::init() {
+	temperature = 0;
+	humidity = 0;
+	Debug = false;
+	error = false;
+	temperatureCorrection = 0;
+	humidityCorrection = 0;
+	maxCycle = 0;
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
@@ -32,6 +39,16 @@ void moduleDHT::init() {
 
 	temperatureCorrection = 0;
 	humidityCorrection = 0;
+
+	cycleCounter = 0;
+	errorLast = false;
+	publishCountError = 0;
+	temperatureLast = 0;
+	publishCountTemperature = 0;
+	humidityLast = 0;
+	publishCountHumidity = 0;
+	DebugLast = false;
+	publishCountDebug = 0;
 
 	dht = new DHT(DHTPin, wpModules.choosenDHTmodul);
 	dht->begin();
@@ -52,7 +69,7 @@ void moduleDHT::cycle() {
 }
 
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -108,10 +125,10 @@ void moduleDHT::publishValues(bool force) {
 }
 
 void moduleDHT::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicTemperatureCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicHumidityCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.subscribe(mqttTopicTemperatureCorrection.c_str());
+	wpMqtt.subscribe(mqttTopicHumidityCorrection.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {

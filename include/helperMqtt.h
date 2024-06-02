@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.h 121 2024-06-01 05:13:59Z                    $ #
+//# File-ID      : $Id:: helperMqtt.h 123 2024-06-02 04:37:07Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperMqtt_h
@@ -46,14 +46,15 @@ class helperMqtt {
 		void publishSettings(bool force);
 		void publishValues();
 		void publishValues(bool force);
+		void subscribe(const char* topic);
 	private:
-		String SVNh = "$Rev: 121 $";
+		String SVNh = "$Rev: 123 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		void connectMqtt();
 		void setSubscribes();
 		static void callbackMqtt(char*, byte*, unsigned int);
-
+		unsigned long lastConnectTry;
 };
 extern helperMqtt wpMqtt;
 #endif

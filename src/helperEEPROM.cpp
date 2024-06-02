@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 121 2024-06-01 05:13:59Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 123 2024-06-02 04:37:07Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -34,7 +34,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -87,7 +87,7 @@ void helperEEPROM::publishValues(bool force) {
 }
 
 void helperEEPROM::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.subscribe(mqttTopicDebug.c_str());
 }
 
 void helperEEPROM::checkSubscribes(char* topic, String msg) {
@@ -178,7 +178,7 @@ void helperEEPROM::readVars() {
 		
 		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
 		// bitUseLdrAvg = 0;
-		wpLight.useAVG = bitRead(bitsModulesSettings, bitUseLightAvg);
+		wpLight.useAvg = bitRead(bitsModulesSettings, bitUseLightAvg);
 		// bitRelaisHand = 2;
 		// bitRelaisHandValue = 3;
 		// bitUseRainAvg = 4;
@@ -201,7 +201,7 @@ void helperEEPROM::readVars() {
 		// byteHeight = 21;
 
 /// byte values: 2byte 30 - 59
-		EEPROM.get(byteLightCorrection, wpLight.Correction); // int16_t
+		EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
 		// byteThreshold = 36;
 		// bytePumpPause = 38;
 		// byteMoistureDry = 40;

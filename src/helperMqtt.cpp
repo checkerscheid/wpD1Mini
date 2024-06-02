@@ -8,20 +8,19 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 121                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 121 2024-06-01 05:13:59Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 123 2024-06-02 04:37:07Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
 
 helperMqtt wpMqtt;
 
-WiFiClient helperMqtt::wifiClient;
-PubSubClient helperMqtt::mqttClient(helperMqtt::wifiClient);
-
 helperMqtt::helperMqtt() {}
 void helperMqtt::init() {
+	WiFiClient wifiClient;
+	mqttClient = new PubSubClient(wifiClient);
 	// values
 	mqttTopicMqttSince = wpFZ.DeviceName + "/info/MQTT/Since";
 	// settings
@@ -31,25 +30,35 @@ void helperMqtt::init() {
 	mqttTopicForceRenewValue = wpFZ.DeviceName + "/ForceRenewValue";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	
-	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
-	mqttClient.setCallback(callbackMqtt);
-	publishSettings();
-	publishValues();
+	mqttClient->setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
+	mqttClient->setCallback(callbackMqtt);
+	lastConnectTry = millis();
+	//connectMqtt();
+	//publishSettings();
+	//publishValues();
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void helperMqtt::cycle() {
-	if(!mqttClient.connected()) {
-		connectMqtt();
+	if(!mqttClient->connected()) {
+		if((lastConnectTry + 5000) > millis()) {
+			lastConnectTry = millis();
+			Serial.println(mqttClient->state());
+			connectMqtt();
+			wpModules.publishAllSettings();
+			wpModules.publishAllValues();
+		}
+		//connectMqtt();
+	} else {
+		mqttClient->loop();
 	}
-	mqttClient.loop();
 	publishValues();
 }
 
 uint16_t helperMqtt::getVersion() {
-	String SVN = "$Rev: 121 $";
+	String SVN = "$Rev: 123 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -69,13 +78,13 @@ void helperMqtt::publishSettings() {
 }
 void helperMqtt::publishSettings(bool force) {
 	// values
-	mqttClient.publish(mqttTopicMqttSince.c_str(), MqttSince.c_str());
+	mqttClient->publish(mqttTopicMqttSince.c_str(), MqttSince.c_str());
 	// settings
-	mqttClient.publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str());
+	mqttClient->publish(mqttTopicMqttServer.c_str(), (String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort)).c_str());
 	if(force) {
-		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		mqttClient.publish(mqttTopicForceMqttUpdate.c_str(), "0");
-		mqttClient.publish(mqttTopicForceRenewValue.c_str(), "0");
+		mqttClient->publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		mqttClient->publish(mqttTopicForceMqttUpdate.c_str(), "0");
+		mqttClient->publish(mqttTopicForceRenewValue.c_str(), "0");
 	}
 }
 void helperMqtt::publishValues() {
@@ -85,8 +94,13 @@ void helperMqtt::publishValues(bool force) {
 	if(force) publishCountDebug = wpFZ.publishQoS;
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
-		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		mqttClient->publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 		publishCountDebug = 0;
+	}
+}
+void helperMqtt::subscribe(const char* topic) {
+	if(!mqttClient->subscribe(topic)) {
+		wpFZ.DebugWS(wpFZ.strERRROR, "wpMqtt::subscribe", "Topic: " + String(topic));
 	}
 }
 
@@ -96,15 +110,15 @@ void helperMqtt::publishValues(bool force) {
 void helperMqtt::connectMqtt() {
 	String logmessage = "Connecting MQTT Server: " + String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort) + " as " + wpFZ.DeviceName;
 	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
-	while(!mqttClient.connected()) {
-		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
+	while(!mqttClient->connected()) {
+		if(mqttClient->connect(wpFZ.DeviceName.c_str())) {
 			MqttSince = wpFZ.getDateTime();
-			mqttClient.publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
-			setSubscribes();
+			mqttClient->publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
+			//setSubscribes();
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 		} else {
-			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 5 seconds";
+			String logmessage =  "failed, rc= " + String(mqttClient->state()) + ",  will try again in 5 seconds";
 			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
 			delay(5000);
 		}
@@ -112,9 +126,9 @@ void helperMqtt::connectMqtt() {
 }
 
 void helperMqtt::setSubscribes() {
-	mqttClient.subscribe(mqttTopicForceMqttUpdate.c_str());
-	mqttClient.subscribe(mqttTopicForceRenewValue.c_str());
-	mqttClient.subscribe(mqttTopicDebug.c_str());
+	subscribe(mqttTopicForceMqttUpdate.c_str());
+	subscribe(mqttTopicForceRenewValue.c_str());
+	subscribe(mqttTopicDebug.c_str());
 	wpModules.setAllSubscribes();
 }
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
@@ -134,7 +148,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				wpModules.publishAllSettings(true);
 				wpModules.publishAllValues(true);
 				//reset
-				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
+				wpMqtt->mqttClient.publish(wpMqtt.mqttTopicForceMqttUpdate.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceMqttUpdate, String(readForceMqttUpdate));
 			}
 		}
@@ -143,7 +157,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			if(readForceRenewValue != 0) {
 				wpModules.publishAllValues(true);
 				//reset
-				wpMqtt.mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
+				wpMqtt->mqttClient.publish(wpMqtt.mqttTopicForceRenewValue.c_str(), String(false).c_str());
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicForceRenewValue, String(readForceRenewValue));
 			}
 		}
