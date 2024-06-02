@@ -151,7 +151,7 @@ void helperRest::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWS("{\"id\":\"DebugRest\",\"value\":" + String(Debug ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}

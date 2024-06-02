@@ -136,6 +136,19 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 		}
 	}
 
+
+	if(strcmp(topic, mqttTopicUseLight.c_str()) == 0) {
+		bool readUseLight = msg.toInt();
+		if(useModuleLight != readUseLight) {
+			useModuleLight = readUseLight;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseLight, useModuleLight);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleLight\",\"value\":" + String(useModuleLight ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseLight, String(Debug));
+		}
+	}
+
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -143,7 +156,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugModules, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugModule\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWS("{\"id\":\"DebugModules\",\"value\":" + String(Debug ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
@@ -167,6 +180,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.publishSettings(force);
 	}
+	if(wpModules.useModuleLight) {
+		wpLight.publishSettings(force);
+	}
 }
 
 void helperModules::publishAllValues() {
@@ -187,6 +203,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.publishValues(force);
 	}
+	if(wpModules.useModuleLight) {
+		wpLight.publishValues(force);
+	}
 }
 
 void helperModules::setAllSubscribes() {
@@ -203,6 +222,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.setSubscribes();
 	}
+	if(wpModules.useModuleLight) {
+		wpLight.setSubscribes();
+	}
 }
 void helperModules::checkAllSubscribes(char* topic, String msg) {
 	wpFZ.checkSubscribes(topic, msg);
@@ -217,6 +239,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleLight) {
+		wpLight.checkSubscribes(topic, msg);
 	}
 }
 //###################################################################################

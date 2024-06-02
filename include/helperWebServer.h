@@ -159,16 +159,18 @@ function onClose(event) {
 	setTimeout(initWebSocket, 2000);
 }
 function onMessage(event) {
+	%debugWebServer%
 	const d = JSON.parse(event.data);
 	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
 		document.getElementById(d.msg.id).checked = d.msg.value;;
-	}
-	if(!d.newline) {
-		if(WebSerialBox.hasChildNodes()) {
-			WebSerialBox.removeChild(WebSerialBox.children[0]);
+	} else {
+		if(!d.newline) {
+			if(WebSerialBox.hasChildNodes()) {
+				WebSerialBox.removeChild(WebSerialBox.children[0]);
+			}
 		}
+		WebSerialBox.innerHTML = '<p>' + d.msg + '</p>' + WebSerialBox.innerHTML;
 	}
-	WebSerialBox.innerHTML = '<p>' + d.msg + '</p>' + WebSerialBox.innerHTML;
 }
 function changeHandle(e) {
 	xmlHttp.open( "GET", "/setDebug?Debug=" + e.target.id, false);

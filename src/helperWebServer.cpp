@@ -138,13 +138,13 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("LDRCorrection", String(wpFZ.ldrCorrection));
 		message += "},";
 #endif
-#ifdef wpLight
-		message += "\"Light\":{";
-		message += wpFZ.JsonKeyValue("MaxCycleLight", String(wpFZ.maxCycleLight)) + ",";
-		message += wpFZ.JsonKeyValue("useLightAvg", String(wpFZ.useLightAvg)) + ",";
-		message += wpFZ.JsonKeyValue("LightCorrection", String(wpFZ.lightCorrection));
-		message += "},";
-#endif
+		if(wpModules.useModuleLight) {
+			message += "\"Light\":{";
+			message += wpFZ.JsonKeyValue("MaxCycleLight", String(wpFZ.maxCycleLight)) + ",";
+			message += wpFZ.JsonKeyValue("useLightAvg", String(wpFZ.useLightAvg)) + ",";
+			message += wpFZ.JsonKeyValue("LightCorrection", String(wpFZ.lightCorrection));
+			message += "},";
+		}
 #ifdef wpBM
 		message += "\"BM\":{";
 	#ifdef wpLDR
@@ -213,9 +213,9 @@ void helperWebServer::setupWebServer() {
 #ifdef wpLDR
 		message += "," + wpFZ.JsonKeyValue("LDR", wpFZ.DebugLDR ? "true" : "false");
 #endif
-#ifdef wpLight
-		message += "," + wpFZ.JsonKeyValue("Light", wpFZ.DebugLight ? "true" : "false");
-#endif
+		if(wpModules.useModuleLight) {
+			message += "," + wpFZ.JsonKeyValue("Light", wpLight.Debug ? "true" : "false");
+		}
 #ifdef wpBM
 		message += "," + wpFZ.JsonKeyValue("BM", wpFZ.DebugBM ? "true" : "false");
 #endif
@@ -284,10 +284,10 @@ void helperWebServer::setupWebServer() {
 			// 	wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLDR");
 			// 	wpWebServer.setWebServerDebugChange(wpFZ.DebugLDR);
 			// }
-			// if(request->getParam("Debug")->value() == "DebugLight") {
-			// 	wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLight");
-			// 	wpWebServer.setWebServerDebugChange(wpFZ.DebugLight);
-			// }
+			if(request->getParam("Debug")->value() == "DebugLight") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLight");
+				wpWebServer.setWebServerDebugChange(wpWebServer.cmdDebugLight);
+			}
 			// if(request->getParam("Debug")->value() == "DebugBM") {
 			// 	wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugBM");
 			// 	wpWebServer.setWebServerDebugChange(wpFZ.DebugBM);
@@ -436,9 +436,9 @@ void helperWebServer::doTheWebServerDebugChange() {
 		// if(doWebServerDebugChange == cmdDebugLDR) {
 		// 	wpLDR.changeDebug();
 		// }
-		// if(doWebServerDebugChange == cmdDebugLight) {
-		// 	wpLight.changeDebug();
-		// }
+		if(doWebServerDebugChange == cmdDebugLight) {
+			wpLight.changeDebug();
+		}
 		// if(doWebServerDebugChange == cmdDebugBM) {
 		// 	wpBM.changeDebug();
 		// }
@@ -487,9 +487,9 @@ String processor(const String& var) {
 #ifdef wpLDR
 		returns += "<li>wpLDR</li>";
 #endif
-#ifdef wpLight
-		returns += "<li>wpLight</li>";
-#endif
+		if(wpModules.useModuleLight) {
+			returns += "<li>wpLight</li>";
+		}
 #ifdef wpBM
 		returns += "<li>wpBM</li>";
 #endif
@@ -525,15 +525,16 @@ String processor(const String& var) {
 		returns += "<li><input id='DebugUpdate' type='checkbox'" + String(wpUpdate.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugUpdate'>Update</label></li>";
 		returns += "<li><input id='DebugWebServer' type='checkbox'" + String(wpWebServer.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWebServer'>WebServer</label></li>";
 		returns += "<li><input id='DebugWiFi' type='checkbox'" + String(wpWiFi.Debug ? " checked" : "") + " onchange='changeHandle(event)' /><label for='DebugWiFi'>WiFi</label></li>";
+		returns += "<li><hr /></li>";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			returns += "<li><input id='DebugDHT' type='checkbox'" + String(wpDHT.Debug ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDHT'>DHT</label></li>";
 		}
 #ifdef wpLDR
 		returns += "<li><input id='DebugLDR' type='checkbox'" + String(wpFZ.DebugLDR ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLDR'>LDR</label></li>";
 #endif
-#ifdef wpLight
-		returns += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
-#endif
+		if(wpModules.useModuleLight) {
+			returns += "<li><input id='DebugLight' type='checkbox'" + String(wpFZ.DebugLight ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugLight'>Light</label></li>";
+		}
 #ifdef wpBM
 		returns += "<li><input id='DebugBM' type='checkbox'" + String(wpFZ.DebugBM ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugBM'>BM</label></li>";
 #endif
@@ -550,6 +551,13 @@ String processor(const String& var) {
 		returns += "<li><input id='DebugDistance' type='checkbox'" + String(wpFZ.DebugDistance ? " checked='checked'" : "") + " onchange='changeHandle(event)' /><label for='DebugDistance'>Distance</label></li>";
 #endif
 		return returns += "</ul>";
+	}
+	if(var == "debugWebServer") {
+		String returns = "";
+		if(wpWebServer.Debug) {
+			returns = "console.log(event)";
+		}
+		return returns;
 	}
 	return String();
 }

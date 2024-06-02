@@ -16,7 +16,6 @@
 #include <moduleDHT.h>
 
 moduleDHT wpDHT;
-DHT dht(DHTPin, wpModules.choosenDHTmodul);
 
 moduleDHT::moduleDHT() {}
 void moduleDHT::init() {
@@ -34,7 +33,8 @@ void moduleDHT::init() {
 	temperatureCorrection = 0;
 	humidityCorrection = 0;
 
-	dht.begin();
+	dht = new DHT(DHTPin, wpModules.choosenDHTmodul);
+	dht->begin();
 
 	publishSettings();
 	publishValues();
@@ -185,8 +185,8 @@ void moduleDHT::publishValueHum() {
 
 void moduleDHT::calc() {
 	bool e = false;
-	float newT = dht.readTemperature();
-	float newH = dht.readHumidity();
+	float newT = dht->readTemperature();
+	float newH = dht->readHumidity();
 	if(!isnan(newT)) {
 		temperature = int16_t(newT * 100) + temperatureCorrection;
 		e = e | false;
@@ -198,9 +198,9 @@ void moduleDHT::calc() {
 		printCalcError("Temperature");
 	}
 	if(!isnan(newH)) {
-		humidity = newH + humidityCorrection;
+		humidity = int16_t(newH * 100) + humidityCorrection;
+		e = e | false;
 		if(Debug) {
-			e = e | false;
 			printCalcDebug("Humidity", humidity, newH);
 		}
 	} else {

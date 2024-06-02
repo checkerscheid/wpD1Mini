@@ -95,7 +95,7 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugOnlineToggler, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugWiFi\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWS("{\"id\":\"DebugOnlineToggler\",\"value\":" + String(Debug ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}

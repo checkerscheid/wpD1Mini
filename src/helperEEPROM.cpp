@@ -45,7 +45,7 @@ void helperEEPROM::changeDebug() {
 	bitWrite(bitsDebugBasis, bitDebugEEPROM, Debug);
 	EEPROM.write(addrBitsDebugBasis, bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugEprom\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
@@ -146,7 +146,7 @@ void helperEEPROM::readVars() {
 		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
 		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
 		// bitLDR = 2;
-		// bitLight = 3;
+		wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
 		// bitBM = 4;
 		// bitRelais = 5;
 		// bitRelaisShield = 6;
@@ -169,7 +169,7 @@ void helperEEPROM::readVars() {
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
 		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugDHT);
 		// bitDebugLDR = 1;
-		// bitDebugLight = 2;
+		wpLight.Debug = bitRead(bitsDebugModules, bitDebugLight);
 		// bitDebugBM = 3;
 		// bitDebugRelais = 4;
 		// bitDebugRain = 5;
@@ -178,7 +178,7 @@ void helperEEPROM::readVars() {
 		
 		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
 		// bitUseLdrAvg = 0;
-		// bitUseLightAvg = 1;
+		wpLight.useAVG = bitRead(bitsModulesSettings, bitUseLightAvg);
 		// bitRelaisHand = 2;
 		// bitRelaisHandValue = 3;
 		// bitUseRainAvg = 4;
@@ -190,7 +190,7 @@ void helperEEPROM::readVars() {
 		wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
 		// byteMaxCycleLDR = 11;
 		// byteLDRCorrection = 12; // int8_t
-		// byteMaxCycleLight = 13;
+		wpLight.maxCycle = EEPROM.read(byteMaxCycleLight);
 		// bytePumpActive = 14;
 		// byteMaxCycleRain = 15;
 		// byteRainCorrection = 16; // int8_t
@@ -201,7 +201,7 @@ void helperEEPROM::readVars() {
 		// byteHeight = 21;
 
 /// byte values: 2byte 30 - 59
-		// byteLightCorrection = 34; // int16_t
+		EEPROM.get(byteLightCorrection, wpLight.Correction); // int16_t
 		// byteThreshold = 36;
 		// bytePumpPause = 38;
 		// byteMoistureDry = 40;

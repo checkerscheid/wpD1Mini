@@ -17,34 +17,31 @@
 #define moduleDHT_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <DHT.h>
+#include <Wire.h>
+#include <AS_BH1750.h>
 
-#define DHTPin D7
-
-class moduleDHT {
+class moduleLight {
 	public:
-		int16_t temperature = 0;
-		int16_t humidity = 0;
+		int16_t light;
+		bool useAvg;
 
-		bool Debug = false;
-		bool error = false;
-		int8_t temperatureCorrection = 0;
-		int8_t humidityCorrection = 0;
-		uint8_t maxCycle = 5;
+		bool Debug;
+		bool error;
+		int16_t correction;
+		uint8_t maxCycle;
 		// values
-		String mqttTopicTemperature;
-		String mqttTopicHumidity;
+		String mqttTopicLight;
 		String mqttTopicError;
 		// settings
 		String mqttTopicMaxCycle;
-		String mqttTopicTemperatureCorrection;
-		String mqttTopicHumidityCorrection;
+		String mqttTopicCorrection;
+		String mqttTopicUseAvg;
 		// commands
 		String mqttTopicDebug;
 		
-		DHT* dht;
+		AS_BH1750* lightMeter;
 
-		moduleDHT();
+		moduleLight();
 		void init();
 		void cycle();
 		uint16_t getVersion();
@@ -58,23 +55,23 @@ class moduleDHT {
 		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 121 $";
-		uint16_t cycleCounter = 0;
-		bool errorLast = false;
-		uint16_t publishCountError = 0;
-		int16_t temperatureLast = 0;
-		uint16_t publishCountTemperature = 0;
-		int16_t humidityLast = 0;
-		uint16_t publishCountHumidity = 0;
-		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16_t cycleCounter;
+		bool errorLast;
+		uint16_t publishCountError;
+		int16_t lightLast;
+		uint16_t publishCountLight;
+		bool DebugLast;
+		uint16_t publishCountDebug;
+		static const uint8_t avgLength = 128;
+		int avgValues[avgLength];
 
-		void publishValueTemp();
-		void publishValueHum();
+		void publishValue();
 		void calc();
+		uint16_t calcAvg(uint16_t raw);
 		void printCalcError(String name);
 		void printCalcDebug(String name, int16_t value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 };
-extern moduleDHT wpDHT;
+extern moduleLight wpLight;
 
 #endif
