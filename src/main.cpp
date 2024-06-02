@@ -42,6 +42,9 @@ void setup() {
 	if(wpModules.useModuleLight) {
 		wpLight.init();
 	}
+	wpModules.publishAllValues();
+	wpModules.publishAllSettings();
+	wpModules.setAllSubscribes();
 }
 
 //###################################################################################
@@ -61,6 +64,9 @@ void loop() {
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.cycle();
+	}
+	if(wpModules.useModuleLight) {
+		wpLight.cycle();
 	}
 	
 	delay(wpFZ.loopTime);

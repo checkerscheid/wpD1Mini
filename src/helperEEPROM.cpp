@@ -22,8 +22,6 @@ void helperEEPROM::init() {
 	EEPROM.begin(4095);
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 	readVars();
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -87,7 +85,7 @@ void helperEEPROM::publishValues(bool force) {
 }
 
 void helperEEPROM::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
 void helperEEPROM::checkSubscribes(char* topic, String msg) {

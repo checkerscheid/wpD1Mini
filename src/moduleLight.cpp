@@ -18,6 +18,8 @@
 // uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
 moduleLight wpLight;
 
+AS_BH1750 moduleLight::lightMeter;
+
 moduleLight::moduleLight() {}
 void moduleLight::init() {
 	light = 0;
@@ -37,8 +39,7 @@ void moduleLight::init() {
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Light";
 
-	lightMeter = new AS_BH1750();
-	lightMeter->begin();
+	lightMeter.begin();
 
 	cycleCounter = 0;
 	errorLast = false;
@@ -47,9 +48,6 @@ void moduleLight::init() {
 	publishCountLight = 0;
 	DebugLast = false;
 	publishCountDebug = 0;
-
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -116,10 +114,10 @@ void moduleLight::publishValues(bool force) {
 }
 
 void moduleLight::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.subscribe(mqttTopicUseAvg.c_str());
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
 void moduleLight::checkSubscribes(char* topic, String msg) {
@@ -180,9 +178,9 @@ void moduleLight::publishValue() {
 }
 
 void moduleLight::calc() {
-	float ar = lightMeter->readLightLevel();
+	float ar = lightMeter.readLightLevel();
 	uint16_t newLight = (uint16_t)ar;
-	if(!isnan(newLight) || ar < 0) {
+	if(ar > 0) {
 		if(useAvg) {
 			newLight = calcAvg(newLight);
 		}

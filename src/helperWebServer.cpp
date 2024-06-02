@@ -24,8 +24,6 @@ void helperWebServer::init() {
 	doWebServerDebugChange = WebServerCommanddoNothing;
 	doWebServerBlink = WebServerCommanddoNothing;
 	setupWebServer();
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -76,7 +74,7 @@ void helperWebServer::publishValues(bool force) {
 }
 
 void helperWebServer::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperWebServer::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -231,6 +229,17 @@ void helperWebServer::setupWebServer() {
 #ifdef wpDistance
 		message += "," + wpFZ.JsonKeyValue("Distance", wpFZ.DebugDistance ? "true" : "false");
 #endif
+		message += "},\"useModul\":{";
+		message += wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false");
 		message += "}}}";
 		request->send(200, "application/json", message.c_str());
 	});
@@ -378,7 +387,8 @@ void helperWebServer::setWebServerBlink() {
 void helperWebServer::doTheWebServerCommand() {
 	if(doWebServerCommand > 0) {
 		if(doWebServerCommand == WebServerCommandpublishSettings) {
-			wpMqtt.publishSettings(true);
+			wpModules.publishAllSettings(true);
+			wpModules.publishAllValues(true);
 		}
 		if(doWebServerCommand == WebServerCommandupdateFW) {
 			if(wpUpdate.setupOta()) {

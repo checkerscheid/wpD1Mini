@@ -41,8 +41,6 @@ void helperModules::init() {
 	if(useModuleDHT22) {
 		choosenDHTmodul = DHT22;
 	}
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -100,17 +98,17 @@ void helperModules::publishValues(bool force) {
 }
 
 void helperModules::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicUseDHT11.c_str());
-	wpMqtt.subscribe(mqttTopicUseDHT22.c_str());
-	wpMqtt.subscribe(mqttTopicUseLDR.c_str());
-	wpMqtt.subscribe(mqttTopicUseLight.c_str());
-	wpMqtt.subscribe(mqttTopicUseBM.c_str());
-	wpMqtt.subscribe(mqttTopicUseRelais.c_str());
-	wpMqtt.subscribe(mqttTopicUseRelaisShield.c_str());
-	wpMqtt.subscribe(mqttTopicUseRain.c_str());
-	wpMqtt.subscribe(mqttTopicUseMoisture.c_str());
-	wpMqtt.subscribe(mqttTopicUseDistance.c_str());
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT11.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDHT22.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseLDR.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRelais.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRelaisShield.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseMoisture.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDistance.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicUseDHT11.c_str()) == 0) {
@@ -213,6 +211,7 @@ void helperModules::setAllSubscribes() {
 	wpEEPROM.setSubscribes();
 	wpFinder.setSubscribes();
 	wpModules.setSubscribes();
+	wpMqtt.setSubscribes();
 	wpOnlineToggler.setSubscribes();
 	wpRest.setSubscribes();
 	wpUpdate.setSubscribes();

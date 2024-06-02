@@ -37,18 +37,6 @@
 class wpFreakaZone {
 	public:
 
-		// helperEEPROM* wpEEPROM;
-		// helperFinder* wpFinder;
-		// helperModules* wpModules;
-		// helperMqtt* wpMqtt;
-		// helperOnlineToggler* wpOnlineToggler;
-		// helperRest* wpRest;
-		// helperUpdate* wpUpdate;
-		// helperWebServer* wpWebServer;
-		// helperWiFi* wpWiFi;
-		// moduleDHT* wpDHT;
-		// moduleLight* wpLight;
-
 		const char* ssid = "Mikrowellen";
 		const char* password = "Welc0me@wp-Scheid.com";
 

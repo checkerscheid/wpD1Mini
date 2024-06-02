@@ -22,8 +22,6 @@ void helperFinder::init() {
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Finder";
 	setupFinder();
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -71,7 +69,7 @@ void helperFinder::publishValues(bool force) {
 }
 
 void helperFinder::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperFinder::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

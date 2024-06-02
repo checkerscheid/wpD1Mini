@@ -52,9 +52,6 @@ void moduleDHT::init() {
 
 	dht = new DHT(DHTPin, wpModules.choosenDHTmodul);
 	dht->begin();
-
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -125,10 +122,10 @@ void moduleDHT::publishValues(bool force) {
 }
 
 void moduleDHT::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.subscribe(mqttTopicTemperatureCorrection.c_str());
-	wpMqtt.subscribe(mqttTopicHumidityCorrection.c_str());
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTemperatureCorrection.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicHumidityCorrection.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {

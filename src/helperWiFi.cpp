@@ -32,8 +32,6 @@ void helperWiFi::init() {
 	setupWiFi();
 	// because DateTime Only works with NTP Server
 	wpFZ.OnSince = wpFZ.getDateTime();
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -151,7 +149,7 @@ void helperWiFi::publishValues(bool force) {
 }
 
 void helperWiFi::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperWiFi::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

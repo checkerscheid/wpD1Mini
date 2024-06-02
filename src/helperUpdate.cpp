@@ -26,8 +26,6 @@ void helperUpdate::init() {
 	// commands
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -160,7 +158,7 @@ void helperUpdate::publishValues(bool force) {
 }
 
 void helperUpdate::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperUpdate::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

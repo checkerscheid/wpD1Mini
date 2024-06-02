@@ -46,13 +46,12 @@ class helperMqtt {
 		void publishSettings(bool force);
 		void publishValues();
 		void publishValues(bool force);
-		void subscribe(const char* topic);
+		void setSubscribes();
 	private:
 		String SVNh = "$Rev: 123 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		void connectMqtt();
-		void setSubscribes();
 		static void callbackMqtt(char*, byte*, unsigned int);
 		unsigned long lastConnectTry;
 };

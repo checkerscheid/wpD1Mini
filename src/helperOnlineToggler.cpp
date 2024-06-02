@@ -24,8 +24,6 @@ void helperOnlineToggler::init() {
 	// commands
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/OnlineToggler";
-	publishSettings();
-	publishValues();
 
 }
 
@@ -78,7 +76,7 @@ void helperOnlineToggler::publishValues(bool force) {
 }
 
 void helperOnlineToggler::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicOnlineToggler.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicOnlineToggler.c_str());
 }
 void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicOnlineToggler.c_str()) == 0) {

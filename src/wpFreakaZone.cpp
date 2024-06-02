@@ -37,8 +37,6 @@ void wpFreakaZone::init(String deviceName) {
 	mqttTopicSetDeviceDescription = wpFZ.DeviceName + "/settings/DeviceDescription";
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -177,10 +175,10 @@ void wpFreakaZone::publishValues(bool force) {
 }
 
 void wpFreakaZone::setSubscribes() {
-	// wpMqtt.subscribe(mqttTopicSetDeviceName.c_str());
-	// wpMqtt.subscribe(mqttTopicSetDeviceDescription.c_str());
-	// wpMqtt.subscribe(mqttTopicRestartDevice.c_str());
-	// wpMqtt.subscribe(mqttTopicCalcValues.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceName.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetDeviceDescription.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicRestartDevice.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicCalcValues.c_str());
 }
 
 void wpFreakaZone::checkSubscribes(char* topic, String msg) {

@@ -28,8 +28,6 @@ void helperRest::init() {
 	macId = WiFi.macAddress();
 	macId.replace(":", "");
 	macId.toLowerCase();
-	publishSettings();
-	publishValues();
 }
 
 //###################################################################################
@@ -141,7 +139,7 @@ void helperRest::publishValues(bool force) {
 }
 
 void helperRest::setSubscribes() {
-	wpMqtt.subscribe(mqttTopicDebug.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperRest::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

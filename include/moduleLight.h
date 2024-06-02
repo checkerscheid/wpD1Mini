@@ -39,7 +39,7 @@ class moduleLight {
 		// commands
 		String mqttTopicDebug;
 		
-		AS_BH1750* lightMeter;
+		static AS_BH1750 lightMeter;
 
 		moduleLight();
 		void init();
