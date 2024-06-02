@@ -23,16 +23,17 @@ class helperWebServer {
 		bool Debug = false;
 		// commands
 		String mqttTopicDebug;
-		const int8_t WebServerCommanddoNothing = -1;
+		const int8_t cmdDoNothing = 0;
 
-		const int8_t WebServerCommandblink = 1;
-		const int8_t WebServerCommandpublishSettings = 2;
-		const int8_t WebServerCommandupdateFW = 3;
-		const int8_t WebServerCommandupdateCheck = 4;
-		const int8_t WebServerCommandupdateHTTP = 5;
-		const int8_t WebServerCommandrestartESP = 6;
-		const int8_t WebServerCommandscanWiFi = 7;
-		int8_t doWebServerCommand;
+		const int8_t cmdBlink = 1;
+		const int8_t cmdForceMqttUpdate = 2;
+		const int8_t cmdForceRenewValue = 3;
+		const int8_t cmdUpdateFW = 4;
+		const int8_t cmdUpdateCheck = 6;
+		const int8_t cmdUpdateHTTP = 7;
+		const int8_t cmdRestartESP = 8;
+		const int8_t cmdScanWiFi = 9;
+		int8_t doCommand;
 
 		const int8_t cmdDebugEEPROM = 1;
 		const int8_t cmdDebugFinder = 2;
@@ -44,17 +45,18 @@ class helperWebServer {
 		const int8_t cmdDebugWebServer = 8;
 		const int8_t cmdDebugWiFi = 9;
 
-		const int8_t cmdDebugDHT = 101;
+		const int8_t cmdDebugDHT = 20;
+		const int8_t cmdDebugLight = 21;
+		const int8_t cmdDebugMoisture = 22;
+		const int8_t cmdDebugRelais = 23;
+		
 		const int8_t cmdDebugLDR = 102;
-		const int8_t cmdDebugLight = 103;
 		const int8_t cmdDebugBM = 104;
-		const int8_t cmdDebugRelais = 105;
 		const int8_t cmdDebugRain = 106;
-		const int8_t cmdDebugMoisture = 107;
 		const int8_t cmdDebugDistance = 108;
-		int8_t doWebServerDebugChange;
+		int8_t doDebugChange;
 
-		int8_t doWebServerBlink;
+		int8_t doBlink;
 
 		helperWebServer();
 		void init();
@@ -66,12 +68,12 @@ class helperWebServer {
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
 		
 		void setupWebServer();
-		void setWebServerCommand(int8_t command);
-		void setWebServerDebugChange(int8_t debug);
-		void setWebServerBlink();
-		void doTheWebServerCommand();
-		void doTheWebServerDebugChange();
-		void doTheWebserverBlink();
+		void setCommand(int8_t command);
+		void setDebugChange(int8_t debug);
+		void setBlink();
+		void doTheCommand();
+		void doTheDebugChange();
+		void doTheBlink();
 		
 		void publishSettings();
 		void publishSettings(bool force);
@@ -123,6 +125,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 			%CompiledWith%
 			<ul>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
+				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
 				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">UpdateFW</span></li>
 				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">UpdateCheck</span></li>
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">UpdateHTTP</span></li>

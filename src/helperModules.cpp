@@ -181,6 +181,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleLight) {
 		wpLight.publishSettings(force);
 	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.publishSettings(force);
+	}
 }
 
 void helperModules::publishAllValues() {
@@ -204,6 +207,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleLight) {
 		wpLight.publishValues(force);
 	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.publishValues(force);
+	}
 }
 
 void helperModules::setAllSubscribes() {
@@ -224,6 +230,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleLight) {
 		wpLight.setSubscribes();
 	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.setSubscribes();
+	}
 }
 void helperModules::checkAllSubscribes(char* topic, String msg) {
 	wpFZ.checkSubscribes(topic, msg);
@@ -241,6 +250,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleLight) {
 		wpLight.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.checkSubscribes(topic, msg);
 	}
 }
 //###################################################################################

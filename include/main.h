@@ -22,6 +22,7 @@ uint16_t getVersion();
 uint16_t getBuild();
 String getStringVersion();
 uint16_t getGlobalBuild();
+void BuildChecker(uint16_t &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 

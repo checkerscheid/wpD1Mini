@@ -42,6 +42,12 @@ void setup() {
 	if(wpModules.useModuleLight) {
 		wpLight.init();
 	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.init();
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.init();
+	}
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
@@ -67,6 +73,12 @@ void loop() {
 	}
 	if(wpModules.useModuleLight) {
 		wpLight.cycle();
+	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.cycle();
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.cycle();
 	}
 	
 	delay(wpFZ.loopTime);
@@ -94,29 +106,25 @@ String getStringVersion() {
 
 uint16_t getGlobalBuild() {
  	uint16_t v = 0;
-	uint16_t check = wpEEPROM.getVersion();
-	v = v > check ? v : check;
-	check = wpFinder.getVersion();
-	v = v > check ? v : check;
-	check = wpModules.getVersion();
-	v = v > check ? v : check;
-	check = wpMqtt.getVersion();
-	v = v > check ? v : check;
-	check = wpOnlineToggler.getVersion();
-	v = v > check ? v : check;
-	check = wpRest.getVersion();
-	v = v > check ? v : check;
-	check = wpUpdate.getVersion();
-	v = v > check ? v : check;
-	check = wpWebServer.getVersion();
-	v = v > check ? v : check;
-	check = wpWiFi.getVersion();
-	v = v > check ? v : check;
-	check = wpFZ.getVersion();
-	v = v > check ? v : check;
-	check = wpDHT.getVersion();
-	v = v > check ? v : check;
+	BuildChecker(v, wpEEPROM.getVersion());
+	BuildChecker(v, wpFinder.getVersion());
+	BuildChecker(v, wpModules.getVersion());
+	BuildChecker(v, wpMqtt.getVersion());
+	BuildChecker(v, wpOnlineToggler.getVersion());
+	BuildChecker(v, wpRest.getVersion());
+	BuildChecker(v, wpUpdate.getVersion());
+	BuildChecker(v, wpWebServer.getVersion());
+	BuildChecker(v, wpWiFi.getVersion());
+	BuildChecker(v, wpFZ.getVersion());
+
+	BuildChecker(v, wpDHT.getVersion());
+	BuildChecker(v, wpLight.getVersion());
+	BuildChecker(v, wpMoisture.getVersion());
+	BuildChecker(v, wpRelais.getVersion());
 	return v;
+}
+void buildChecker(uint16_t &v, uint16 moduleBuild) {
+	v = v > moduleBuild ? v : moduleBuild;
 }
 
 uint16_t getBuild() {

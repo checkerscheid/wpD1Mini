@@ -146,8 +146,8 @@ void helperEEPROM::readVars() {
 		// bitLDR = 2;
 		wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
 		// bitBM = 4;
-		// bitRelais = 5;
-		// bitRelaisShield = 6;
+		wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
+		wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
 		// bitRain = 7;
 
 		bitsModules1 = EEPROM.read(addrBitsModules1);
@@ -169,7 +169,7 @@ void helperEEPROM::readVars() {
 		// bitDebugLDR = 1;
 		wpLight.Debug = bitRead(bitsDebugModules, bitDebugLight);
 		// bitDebugBM = 3;
-		// bitDebugRelais = 4;
+		wpRelais.Debug = bitRead(bitsDebugModules, bitDebugRelais);
 		// bitDebugRain = 5;
 		// bitDebugMoisture = 6;
 		// bitDebugDistance = 7;
@@ -177,8 +177,9 @@ void helperEEPROM::readVars() {
 		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
 		// bitUseLdrAvg = 0;
 		wpLight.useAvg = bitRead(bitsModulesSettings, bitUseLightAvg);
-		// bitRelaisHand = 2;
-		// bitRelaisHandValue = 3;
+		wpRelais.handSet = bitRead(bitsModulesSettings, bitRelaisHand);
+		wpRelais.handValueSet = bitRead(bitsModulesSettings, bitRelaisHandValue);
+		wpRelais.waterEmpty = bitRead(bitsModulesSettings, bitRelaisWaterEmpty);
 		// bitUseRainAvg = 4;
 		// bitUseMoistureAvg = 5;
 
@@ -189,7 +190,7 @@ void helperEEPROM::readVars() {
 		// byteMaxCycleLDR = 11;
 		// byteLDRCorrection = 12; // int8_t
 		wpLight.maxCycle = EEPROM.read(byteMaxCycleLight);
-		// bytePumpActive = 14;
+		wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 		// byteMaxCycleRain = 15;
 		// byteRainCorrection = 16; // int8_t
 		// byteMaxCycleMoisture = 17;
@@ -201,7 +202,7 @@ void helperEEPROM::readVars() {
 /// byte values: 2byte 30 - 59
 		EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
 		// byteThreshold = 36;
-		// bytePumpPause = 38;
+		EEPROM.get(bytePumpPause, wpRelais.pumpPause);
 		// byteMoistureDry = 40;
 		// byteMoistureWet = 42;
 		// byteMaxVolume = 44;

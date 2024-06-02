@@ -68,8 +68,9 @@ class helperEEPROM {
 		const byte bitUseLightAvg = 1; // include in bitsModulesSettings
 		const byte bitRelaisHand = 2; // include in bitsModulesSettings
 		const byte bitRelaisHandValue = 3; // include in bitsModulesSettings
-		const byte bitUseRainAvg = 4; // include in bitsModulesSettings
-		const byte bitUseMoistureAvg = 5; // include in bitsModulesSettings
+		const byte bitRelaisWaterEmpty = 4; // include in bitsModulesSettings
+		const byte bitUseRainAvg = 5; // include in bitsModulesSettings
+		const byte bitUseMoistureAvg = 6; // include in bitsModulesSettings
 
 /// byte values: byte 10 - 29
 		const byte byteMaxCycleDHT = 10;
