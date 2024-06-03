@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 124                                                     $ #
+//# Revision     : $Rev:: 126                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 124 2024-06-02 04:37:51Z                   $ #
+//# File-ID      : $Id:: moduleMoisture.h 126 2024-06-03 03:11:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleMoisture_h
@@ -56,7 +56,7 @@ class moduleMoisture {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 124 $";
+		String SVNh = "$Rev: 126 $";
 		uint8_t moisturePin;
 		uint16_t cycleCounter;
 		int16_t moistureLast;

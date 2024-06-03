@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 123                                                     $ #
+//# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 123 2024-06-02 04:37:07Z                          $ #
+//# File-ID      : $Id:: main.h 125 2024-06-03 03:11:11Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -27,7 +27,7 @@ void BuildChecker(uint16_t &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 123 $";
+String SVNh = "$Rev: 125 $";
 // counter
 uint16_t publishCountRssi = 0;
 

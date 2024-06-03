@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 124                                                     $ #
+//# Revision     : $Rev:: 126                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 124 2024-06-02 04:37:51Z                   $ #
+//# File-ID      : $Id:: moduleRelais.h 126 2024-06-03 03:11:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -64,7 +64,7 @@ class moduleRelais {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 124 $";
+		String SVNh = "$Rev: 126 $";
 		uint8_t relaisPin;
 		bool outputLast;
 		uint16_t publishCountOutput;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 123                                                     $ #
+//# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 123 2024-06-02 04:37:07Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 125 2024-06-03 03:11:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -54,7 +54,7 @@ void helperMqtt::cycle() {
 }
 
 uint16_t helperMqtt::getVersion() {
-	String SVN = "$Rev: 123 $";
+	String SVN = "$Rev: 125 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

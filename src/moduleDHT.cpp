@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 123                                                     $ #
+//# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 123 2024-06-02 04:37:07Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 125 2024-06-03 03:11:11Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -59,7 +59,7 @@ void moduleDHT::cycle() {
 }
 
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 123 $";
+	String SVN = "$Rev: 125 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

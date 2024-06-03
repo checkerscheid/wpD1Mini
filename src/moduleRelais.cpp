@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 124                                                     $ #
+//# Revision     : $Rev:: 126                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 124 2024-06-02 04:37:51Z                 $ #
+//# File-ID      : $Id:: moduleRelais.cpp 126 2024-06-03 03:11:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -77,7 +77,7 @@ void moduleRelais::cycle() {
 }
 
 uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 124 $";
+	String SVN = "$Rev: 126 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 124                                                     $ #
+//# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 124 2024-06-02 04:37:51Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 125 2024-06-03 03:11:11Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -57,7 +57,7 @@ void moduleLight::cycle() {
 }
 
 uint16_t moduleLight::getVersion() {
-	String SVN = "$Rev: 124 $";
+	String SVN = "$Rev: 125 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
