@@ -60,7 +60,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = byteStartForString0; // reset
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
-	//byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.lightToTurnOn);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
 }
 
 void helperEEPROM::publishSettings() {
@@ -143,16 +143,16 @@ void helperEEPROM::readVars() {
 		bitsModules0 = EEPROM.read(addrBitsModules0);
 		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
 		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
-		// bitLDR = 2;
+		wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
 		wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
-		// bitBM = 4;
+		wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
 		wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
 		wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
-		// bitRain = 7;
+		wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 
 		bitsModules1 = EEPROM.read(addrBitsModules1);
 		wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
-		// bitDistance = 1;
+		wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
 		
 		bitsDebugBasis = EEPROM.read(addrBitsDebugBasis);
 		Debug = bitRead(bitsDebugBasis, bitDebugEEPROM);
@@ -166,46 +166,46 @@ void helperEEPROM::readVars() {
 		
 		bitsDebugModules = EEPROM.read(addrBitsDebugModules);
 		wpDHT.Debug = bitRead(bitsDebugModules, bitDebugDHT);
-		// bitDebugLDR = 1;
+		wpLDR.Debug = bitRead(bitsDebugModules, bitDebugLDR);
 		wpLight.Debug = bitRead(bitsDebugModules, bitDebugLight);
-		// bitDebugBM = 3;
+		wpBM.Debug = bitRead(bitsDebugModules, bitDebugBM);
 		wpRelais.Debug = bitRead(bitsDebugModules, bitDebugRelais);
-		// bitDebugRain = 5;
+		wpRain.Debug = bitRead(bitsDebugModules, bitDebugRain);
 		wpMoisture.Debug = bitRead(bitsDebugModules, bitDebugMoisture);
-		// bitDebugDistance = 7;
+		wpDistance.Debug = bitRead(bitsDebugModules, bitDebugDistance);
 		
 		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
-		// bitUseLdrAvg = 0;
+		wpLDR.useAvg = bitRead(bitsModulesSettings, bitUseLdrAvg);
 		wpLight.useAvg = bitRead(bitsModulesSettings, bitUseLightAvg);
 		wpRelais.handSet = bitRead(bitsModulesSettings, bitRelaisHand);
 		wpRelais.handValueSet = bitRead(bitsModulesSettings, bitRelaisHandValue);
 		wpRelais.waterEmptySet = bitRead(bitsModulesSettings, bitRelaisWaterEmpty);
-		// bitUseRainAvg = 4;
+		wpRain.useAvg = bitRead(bitsModulesSettings, bitUseRainAvg);
 		wpMoisture.useAvg = bitRead(bitsModulesSettings, bitUseMoistureAvg);
 
 /// byte values: byte 10 - 29
 		wpDHT.maxCycle = EEPROM.read(byteMaxCycleDHT);
 		wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 		wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
-		// byteMaxCycleLDR = 11;
-		// byteLDRCorrection = 12; // int8_t
+		wpLDR.maxCycle = EEPROM.read(byteMaxCycleLDR);
+		wpLDR.correction = EEPROM.read(byteLDRCorrection);
 		wpLight.maxCycle = EEPROM.read(byteMaxCycleLight);
 		wpRelais.pumpActive = EEPROM.read(bytePumpActive);
-		// byteMaxCycleRain = 15;
-		// byteRainCorrection = 16; // int8_t
+		wpRain.maxCycle = EEPROM.read(byteMaxCycleRain);
+		wpRain.correction = EEPROM.read(byteRainCorrection);
 		wpMoisture.maxCycle = EEPROM.read(byteMaxCycleMoisture);
 		wpMoisture.minValue = EEPROM.read(byteMoistureMin);
-		// byteMaxCycleDistance = 19;
-		// byteDistanceCorrection = 20; // int8_t
-		// byteHeight = 21;
+		wpDistance.maxCycle = EEPROM.read(byteMaxCycleDistance);
+		wpDistance.correction = EEPROM.read(byteDistanceCorrection);
+		wpDistance.height = EEPROM.read(byteHeight);
 
 /// byte values: 2byte 30 - 59
 		EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
-		// byteThreshold = 36;
+		EEPROM.get(byteThreshold, wpBM.threshold);
 		EEPROM.get(bytePumpPause, wpRelais.pumpPause);
 		EEPROM.get(byteMoistureDry, wpMoisture.dry);
 		EEPROM.get(byteMoistureWet, wpMoisture.wet);
-		// byteMaxVolume = 44;
+		EEPROM.get(byteMaxVolume, wpDistance.volume);
 
 		readStringsFromEEPROM();
 }

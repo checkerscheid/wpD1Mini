@@ -95,9 +95,10 @@ void helperUpdate::check() {
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	deserializeJson(doc, payload);
 	//v3.0-build121
-	String v = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "installed Version: " + v);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + String(doc["wpFreakaZone"]["Version"]));
+	String vServer = String(doc["wpFreakaZone"]["Version"]);
+	String vInstalled = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
+	wpFZ.DebugWS(vServer == vInstalled ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + vInstalled);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + vServer);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + String(doc["wpFreakaZone"]["date"]));
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + String(doc["wpFreakaZone"]["filename"]));
 }

@@ -96,7 +96,7 @@ void helperWiFi::setupWiFi() {
 
 void helperWiFi::scanWiFi() {
 	// scan for nearby networks:
-	wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi", "Start scan WiFi networks");
+	wpFZ.DebugWS(wpFZ.strWARN, "scanWiFi", "Start scan WiFi networks");
 	int numSsid = WiFi.scanNetworks();
 	if (numSsid == -1) {
 		wpFZ.DebugWS(wpFZ.strWARN, "scanWiFi", "Couldn't get a WiFi connection");
@@ -114,7 +114,7 @@ void helperWiFi::scanWiFi() {
 				"Encryption: " + printEncryptionType(WiFi.encryptionType(thisNet)));
 		}
 	}
-	wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi", "finished scan WiFi networks");
+	wpFZ.DebugWS(wpFZ.strWARN, "scanWiFi", "finished scan WiFi networks");
 }
 
 void helperWiFi::publishSettings() {

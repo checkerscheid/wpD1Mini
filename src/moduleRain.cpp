@@ -6,41 +6,37 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 01.06.2024                                                       #
+//# Date         : 02.06.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: moduleLight.cpp 125 2024-06-03 03:11:11Z                 $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleLight.h>
+#include <moduleRain.h>
 
-// uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
-moduleLight wpLight;
+moduleRain wpRain;
 
-AS_BH1750 moduleLight::lightMeter;
-
-moduleLight::moduleLight() {}
-void moduleLight::init() {
-	light = 0;
+moduleRain::moduleRain() {}
+void moduleRain::init() {
+	RainPin = A0;
+	rain = 0;
 	error = false;
 	// values
-	mqttTopicLight = wpFZ.DeviceName + "/Light";
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/Light";
+	mqttTopicRain = wpFZ.DeviceName + "/Rain";
+	mqttTopicError = wpFZ.DeviceName + "/ERROR/Rain";
 	// settings
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Light/maxCycle";
-	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Light/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/Light/useAvg";
+	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Rain/maxCycle";
+	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Rain/Correction";
+	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/Rain/useAvg";
 	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Light";
-
-	lightMeter.begin();
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Rain";
 
 	cycleCounter = 0;
 	errorLast = false;
 	publishCountError = 0;
-	lightLast = 0;
-	publishCountLight = 0;
+	rainLast = 0;
+	publishCountRain = 0;
 	DebugLast = false;
 	publishCountDebug = 0;
 }
@@ -48,7 +44,7 @@ void moduleLight::init() {
 //###################################################################################
 // public
 //###################################################################################
-void moduleLight::cycle() {
+void moduleRain::cycle() {
 	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
 		cycleCounter = 0;
 		calc();
@@ -56,26 +52,26 @@ void moduleLight::cycle() {
 	publishValues();
 }
 
-uint16_t moduleLight::getVersion() {
+uint16_t moduleRain::getVersion() {
 	String SVN = "$Rev: 125 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleLight::changeDebug() {
+void moduleRain::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
+	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRain, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugLight\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugRain\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
-void moduleLight::publishSettings() {
+void moduleRain::publishSettings() {
 	publishSettings(false);
 }
-void moduleLight::publishSettings(bool force) {
+void moduleRain::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
@@ -84,16 +80,16 @@ void moduleLight::publishSettings(bool force) {
 	}
 }
 
-void moduleLight::publishValues() {
+void moduleRain::publishValues() {
 	publishValues(false);
 }
-void moduleLight::publishValues(bool force) {
+void moduleRain::publishValues(bool force) {
 	if(force) {
-		publishCountLight = wpFZ.publishQoS;
+		publishCountRain = wpFZ.publishQoS;
 		publishCountError = wpFZ.publishQoS;
 		publishCountDebug = wpFZ.publishQoS;
 	}
-	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
+	if(rainLast != rain || ++publishCountRain > wpFZ.publishQoS) {
 		publishValue();
 	}
 	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
@@ -108,20 +104,20 @@ void moduleLight::publishValues(bool force) {
 	}
 }
 
-void moduleLight::setSubscribes() {
+void moduleRain::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
-void moduleLight::checkSubscribes(char* topic, String msg) {
+void moduleRain::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
 		byte readMaxCycle = msg.toInt();
 		if(readMaxCycle <= 0) readMaxCycle = 1;
 		if(maxCycle != readMaxCycle) {
 			maxCycle = readMaxCycle;
-			EEPROM.write(wpEEPROM.byteMaxCycleLight, maxCycle);
+			EEPROM.write(wpEEPROM.byteMaxCycleRain, maxCycle);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
 		}
@@ -130,7 +126,7 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteLightCorrection, correction);
+			EEPROM.put(wpEEPROM.byteRainCorrection, correction);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
@@ -139,7 +135,7 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseLightAvg, useAvg);
+			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseRainAvg, useAvg);
 			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
@@ -161,37 +157,40 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 // private
 //###################################################################################
-void moduleLight::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
+void moduleRain::publishValue() {
+	wpMqtt.mqttClient.publish(mqttTopicRain.c_str(), String(rain).c_str());
+	wpRest.error = wpRest.error | !wpRest.sendRest("rain", String(rain));
 	wpRest.trySend = true;
-	lightLast = light;
+	rainLast = rain;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Light", String(light), String(publishCountLight));
+		printPublishValueDebug("Rain", String(rain), String(publishCountRain));
 	}
-	publishCountLight = 0;
+	publishCountRain = 0;
 }
 
-void moduleLight::calc() {
-	float ar = lightMeter.readLightLevel();
-	uint16_t newLight = (uint16_t)ar;
-	if(ar >= 0) {
+void moduleRain::calc() {
+	int newRain = analogRead(RainPin);
+	if(!isnan(newRain)) {
+		if(newRain > 1023) newRain = 1023;
+		if(newRain < 0) newRain = 0;
+		int calcedRain = newRain;
 		if(useAvg) {
-			newLight = calcAvg(newLight);
+			calcedRain = calcAvg(newRain);
 		}
-		light = newLight + correction;
+		calcedRain = map(newRain, 1023, 0, 0, 500);
+		rain = (float)(calcedRain / 10.0) + correction;
 		error = false;
 		if(Debug) {
-			String logmessage = "Light: " + String(light) + " (" + String(newLight) + ")";
-			wpFZ.DebugWS(wpFZ.strDEBUG, "wpLight::calc", logmessage);
+			String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
+			wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", logmessage);
 		}
 	} else {
 		error = true;
 		String logmessage = "Sensor Failure";
-		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
+		wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 	}
 }
-uint16_t moduleLight::calcAvg(uint16_t raw) {
+uint16_t moduleRain::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -206,7 +205,7 @@ uint16_t moduleLight::calcAvg(uint16_t raw) {
 	return round(avg / avgCount);
 }
 
-void moduleLight::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleRain::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }

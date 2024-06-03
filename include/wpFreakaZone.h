@@ -28,9 +28,13 @@
 #include <helperWebServer.h>
 #include <helperWiFi.h>
 #include <moduleDHT.h>
+#include <moduleLDR.h>
 #include <moduleLight.h>
-#include <moduleMoisture.h>
+#include <moduleBM.h>
 #include <moduleRelais.h>
+#include <moduleRain.h>
+#include <moduleMoisture.h>
+#include <moduleDistance.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"

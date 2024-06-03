@@ -6,41 +6,50 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 01.06.2024                                                       #
+//# Date         : 02.06.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: moduleLight.cpp 125 2024-06-03 03:11:11Z                 $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleLight.h>
+#include <moduleDistance.h>
 
-// uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
-moduleLight wpLight;
+moduleDistance wpDistance;
 
-AS_BH1750 moduleLight::lightMeter;
-
-moduleLight::moduleLight() {}
-void moduleLight::init() {
-	light = 0;
+moduleDistance::moduleDistance() {}
+void moduleDistance::init() {
+	trigPin = D1;
+	echoPin = D2;
+	pinMode(trigPin, OUTPUT);
+	pinMode(echoPin, INPUT_PULLUP);
+	volume = 0;
+	height = 0;
+	distanceRaw = 0;
+	distanceAvg = 0;
 	error = false;
 	// values
-	mqttTopicLight = wpFZ.DeviceName + "/Light";
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/Light";
+	mqttTopicVolume = wpFZ.DeviceName + "/Volume";
+	mqttTopicdistanceRaw = wpFZ.DeviceName + "/Distance/Raw";
+	mqttTopicdistanceAvg = wpFZ.DeviceName + "/Distance/Avg";
+	mqttTopicError = wpFZ.DeviceName + "/ERROR/Distance";
 	// settings
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Light/maxCycle";
-	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Light/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/Light/useAvg";
+	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Distance/maxCycle";
+	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Distance/correction";
+	mqttTopicHeight = wpFZ.DeviceName + "/settings/Distance/Height";
+	mqttTopicMaxVolume = wpFZ.DeviceName + "/settings/Distance/maxVolume";
 	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Light";
-
-	lightMeter.begin();
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Distance";
 
 	cycleCounter = 0;
+	volumeLast = 0;
+	publishCountVolume = 0;
+	distanceRawLast = 0;
+	publishCountDistanceRaw = 0;
+	distanceAvgLast = 0;
+	publishCountDistanceAvg = 0;
 	errorLast = false;
 	publishCountError = 0;
-	lightLast = 0;
-	publishCountLight = 0;
 	DebugLast = false;
 	publishCountDebug = 0;
 }
@@ -48,7 +57,7 @@ void moduleLight::init() {
 //###################################################################################
 // public
 //###################################################################################
-void moduleLight::cycle() {
+void moduleDistance::cycle() {
 	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
 		cycleCounter = 0;
 		calc();
@@ -56,44 +65,45 @@ void moduleLight::cycle() {
 	publishValues();
 }
 
-uint16_t moduleLight::getVersion() {
+uint16_t moduleDistance::getVersion() {
 	String SVN = "$Rev: 125 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleLight::changeDebug() {
+void moduleDistance::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
+	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDistance, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugLight\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWS("{\"id\":\"DebugDistance\",\"value\":" + String(Debug ? "true" : "false") + "}");
 	wpFZ.blink();
 }
 
-void moduleLight::publishSettings() {
+void moduleDistance::publishSettings() {
 	publishSettings(false);
 }
-void moduleLight::publishSettings(bool force) {
+void moduleDistance::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicHeight.c_str(), String(height).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicMaxVolume.c_str(), String(maxVolume).c_str());
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
 
-void moduleLight::publishValues() {
+void moduleDistance::publishValues() {
 	publishValues(false);
 }
-void moduleLight::publishValues(bool force) {
+void moduleDistance::publishValues(bool force) {
 	if(force) {
-		publishCountLight = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
+		publishCountVolume = wpFZ.publishQoS;
+		publishCountDistanceRaw = wpFZ.publishQoS;
+		publishCountDistanceAvg = wpFZ.publishQoS;
 	}
-	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
+	if(volumeLast != volume || ++publishCountVolume > wpFZ.publishQoS) {
 		publishValue();
 	}
 	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
@@ -108,41 +118,50 @@ void moduleLight::publishValues(bool force) {
 	}
 }
 
-void moduleLight::setSubscribes() {
+void moduleDistance::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicHeight.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicMaxVolume.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 
-void moduleLight::checkSubscribes(char* topic, String msg) {
+void moduleDistance::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
 		byte readMaxCycle = msg.toInt();
 		if(readMaxCycle <= 0) readMaxCycle = 1;
 		if(maxCycle != readMaxCycle) {
 			maxCycle = readMaxCycle;
-			EEPROM.write(wpEEPROM.byteMaxCycleLight, maxCycle);
+			EEPROM.write(wpEEPROM.byteMaxCycleDistance, maxCycle);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
 		}
 	}
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8_t readCorrection = msg.toInt();
+		uint8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteLightCorrection, correction);
+			EEPROM.write(wpEEPROM.byteDistanceCorrection, correction);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
-	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
-		bool readAvg = msg.toInt();
-		if(useAvg != readAvg) {
-			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseLightAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+	if(strcmp(topic, mqttTopicHeight.c_str()) == 0) {
+		uint8_t readHeight = msg.toInt();
+		if(height != readHeight) {
+			height = readHeight;
+			EEPROM.write(wpEEPROM.byteHeight, height);
 			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
+			wpFZ.DebugcheckSubscribes(mqttTopicHeight, String(height));
+		}
+	}
+	if(strcmp(topic, mqttTopicMaxVolume.c_str()) == 0) {
+		uint16_t readMaxVolume = msg.toInt();
+		if(maxVolume != readMaxVolume) {
+			maxVolume = readMaxVolume;
+			EEPROM.put(wpEEPROM.byteMaxVolume, maxVolume);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicMaxVolume, String(maxVolume));
 		}
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -161,37 +180,47 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 // private
 //###################################################################################
-void moduleLight::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
+void moduleDistance::publishValue() {
+	wpMqtt.mqttClient.publish(mqttTopicVolume.c_str(), String(volume).c_str());
+	wpRest.error = wpRest.error | !wpRest.sendRest("volume", String(volume));
 	wpRest.trySend = true;
-	lightLast = light;
+	volumeLast = volume;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Light", String(light), String(publishCountLight));
+		printPublishValueDebug("Volume", String(volume), String(publishCountVolume));
 	}
-	publishCountLight = 0;
+	publishCountVolume = 0;
 }
 
-void moduleLight::calc() {
-	float ar = lightMeter.readLightLevel();
-	uint16_t newLight = (uint16_t)ar;
-	if(ar >= 0) {
-		if(useAvg) {
-			newLight = calcAvg(newLight);
-		}
-		light = newLight + correction;
+void moduleDistance::calc() {
+	unsigned long duration;
+	// Sender kurz ausschalten um Störungen des Signal zu vermeiden
+	digitalWrite(trigPin, LOW);
+	delay(10);
+	// Signal senden
+	digitalWrite(trigPin, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(trigPin, LOW);
+	// Zeit messen, bis das Signal zurückkommt, mit timeout
+	duration = pulseIn(echoPin, HIGH, wpFZ.loopTime * 1000);
+	if(duration > 0) {
+		distanceRaw = (duration * 0.03432 / 2);
+		distanceAvg = calcAvg(distanceRaw) + correction;
+		if(height <= 0) height = 1; // durch 0
+		if(distanceAvg > height) distanceAvg = height;
+		volume = maxVolume - round(maxVolume * distanceAvg / height);
+		if(volume > maxVolume) volume = maxVolume;
 		error = false;
 		if(Debug) {
-			String logmessage = "Light: " + String(light) + " (" + String(newLight) + ")";
-			wpFZ.DebugWS(wpFZ.strDEBUG, "wpLight::calc", logmessage);
+			calcDistanceDebug("Distance", distanceAvg, distanceRaw);
 		}
+		delay(wpFZ.loopTime);
 	} else {
 		error = true;
 		String logmessage = "Sensor Failure";
-		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
+		wpFZ.DebugWS(wpFZ.strERRROR, "calcDistance", logmessage);
 	}
 }
-uint16_t moduleLight::calcAvg(uint16_t raw) {
+uint16_t moduleDistance::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -205,8 +234,11 @@ uint16_t moduleLight::calcAvg(uint16_t raw) {
 	avg += raw * avgLength;
 	return round(avg / avgCount);
 }
-
-void moduleLight::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleDistance::calcDistanceDebug(String name, uint8_t avg, uint8_t raw) {
+	String logmessage = name + ": " + String(avg) + " (" + String(raw) + ")";
+	wpFZ.DebugWS(wpFZ.strDEBUG, "calcDistance", logmessage);
+}
+void moduleDistance::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }

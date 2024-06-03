@@ -39,14 +39,26 @@ void setup() {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.init();
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.init();
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.init();
+	}
+	if(wpModules.useModuleBM) {
+		wpBM.init();
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.init();
+	}
+	if(wpModules.useModuleRain) {
+		wpRain.init();
 	}
 	if(wpModules.useModuleMoisture) {
 		wpMoisture.init();
 	}
-	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-		wpRelais.init();
+	if(wpModules.useModuleDistance) {
+		wpDistance.init();
 	}
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
@@ -71,17 +83,31 @@ void loop() {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.cycle();
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.cycle();
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.cycle();
 	}
-	if(wpModules.useModuleMoisture) {
-		wpMoisture.cycle();
+	if(wpModules.useModuleBM) {
+		wpBM.cycle();
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.cycle();
 	}
+	if(wpModules.useModuleRain) {
+		wpRain.cycle();
+	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.cycle();
+	}
+	if(wpModules.useModuleDistance) {
+		wpDistance.cycle();
+	}
 	
-	delay(wpFZ.loopTime);
+	if(!wpModules.useModuleDistance) {
+		delay(wpFZ.loopTime);
+	}
 }
 
 //###################################################################################
@@ -118,9 +144,13 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpFZ.getVersion());
 
 	buildChecker(v, wpDHT.getVersion());
+	buildChecker(v, wpLDR.getVersion());
 	buildChecker(v, wpLight.getVersion());
-	buildChecker(v, wpMoisture.getVersion());
+	buildChecker(v, wpBM.getVersion());
 	buildChecker(v, wpRelais.getVersion());
+	buildChecker(v, wpRain.getVersion());
+	buildChecker(v, wpMoisture.getVersion());
+	buildChecker(v, wpDistance.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16 moduleBuild) {

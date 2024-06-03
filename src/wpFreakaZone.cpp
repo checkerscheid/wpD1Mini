@@ -224,9 +224,16 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 	DebugWS(typ, func, msg, true);
 }
 void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
-	String toSend = getTime() + getOnlineTime() + typ + funcToString(func) + msg;
+	String msgheader = getTime() + getOnlineTime() + typ + funcToString(func);
+	String cssClass = "color-debug";
+	if(typ == wpFZ.strINFO) cssClass = "color-info";
+	if(typ == wpFZ.strWARN) cssClass = "color-warn";
+	if(typ == wpFZ.strERRROR) cssClass = "color-error";
+	String toSend = msgheader + msg;
 	Serial.println(toSend);
-	wpWebServer.webSocket.textAll("{\"msg\":\"" + toSend + "\",\"newline\":" + (newline ? "true" : "false") + "}");
+	wpWebServer.webSocket.textAll("{\"msgheader\":\"" + msgheader + "\"," +
+		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"," +
+		"\"newline\":" + (newline ? "true" : "false") + "}");
 }
 void wpFreakaZone::SendWS(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");

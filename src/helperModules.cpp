@@ -134,6 +134,17 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 		}
 	}
 
+	if(strcmp(topic, mqttTopicUseLDR.c_str()) == 0) {
+		bool readUseLDR = msg.toInt();
+		if(useModuleLDR != readUseLDR) {
+			useModuleLDR = readUseLDR;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseLDR, useModuleLDR);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleLDR\",\"value\":" + String(useModuleLDR ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseLDR, String(Debug));
+		}
+	}
 
 	if(strcmp(topic, mqttTopicUseLight.c_str()) == 0) {
 		bool readUseLight = msg.toInt();
@@ -158,7 +169,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
 		}
 	}
-	
+
 	if(strcmp(topic, mqttTopicUseRelais.c_str()) == 0) {
 		bool readUseRelais = msg.toInt();
 		if(useModuleRelais != readUseRelais) {
@@ -182,6 +193,39 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 		}
 	}
 
+	if(strcmp(topic, mqttTopicUseBM.c_str()) == 0) {
+		bool readUseBM = msg.toInt();
+		if(useModuleBM != readUseBM) {
+			useModuleBM = readUseBM;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleBM\",\"value\":" + String(useModuleBM ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
+		}
+	}
+	if(strcmp(topic, mqttTopicUseRain.c_str()) == 0) {
+		bool readUseRain = msg.toInt();
+		if(useModuleRain != readUseRain) {
+			useModuleRain = readUseRain;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRain, useModuleRain);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleRain\",\"value\":" + String(useModuleRain ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseRain, String(useModuleRain));
+		}
+	}
+	if(strcmp(topic, mqttTopicUseDistance.c_str()) == 0) {
+		bool readUseDistance = msg.toInt();
+		if(useModuleDistance != readUseDistance) {
+			useModuleDistance = readUseDistance;
+			bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseDistance, useModuleDistance);
+			EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleDistance\",\"value\":" + String(useModuleDistance ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseDistance, String(useModuleDistance));
+		}
+	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -213,14 +257,26 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.publishSettings(force);
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.publishSettings(force);
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.publishSettings(force);
+	}
+	if(wpModules.useModuleBM) {
+		wpBM.publishSettings(force);
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.publishSettings(force);
+	}
+	if(wpModules.useModuleRain) {
+		wpRain.publishSettings(force);
 	}
 	if(wpModules.useModuleMoisture) {
 		wpMoisture.publishSettings(force);
 	}
-	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-		wpRelais.publishSettings(force);
+	if(wpModules.useModuleDistance) {
+		wpDistance.publishSettings(force);
 	}
 }
 
@@ -242,14 +298,26 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.publishValues(force);
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.publishValues(force);
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.publishValues(force);
+	}
+	if(wpModules.useModuleBM) {
+		wpBM.publishValues(force);
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.publishValues(force);
+	}
+	if(wpModules.useModuleRain) {
+		wpRain.publishValues(force);
 	}
 	if(wpModules.useModuleMoisture) {
 		wpMoisture.publishValues(force);
 	}
-	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-		wpRelais.publishValues(force);
+	if(wpModules.useModuleDistance) {
+		wpDistance.publishValues(force);
 	}
 }
 
@@ -268,14 +336,26 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.setSubscribes();
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.setSubscribes();
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.setSubscribes();
+	}
+	if(wpModules.useModuleBM) {
+		wpBM.setSubscribes();
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.setSubscribes();
+	}
+	if(wpModules.useModuleRain) {
+		wpRain.setSubscribes();
 	}
 	if(wpModules.useModuleMoisture) {
 		wpMoisture.setSubscribes();
 	}
-	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-		wpRelais.setSubscribes();
+	if(wpModules.useModuleDistance) {
+		wpDistance.setSubscribes();
 	}
 }
 void helperModules::checkAllSubscribes(char* topic, String msg) {
@@ -292,14 +372,26 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 		wpDHT.checkSubscribes(topic, msg);
 	}
+	if(wpModules.useModuleLDR) {
+		wpLDR.checkSubscribes(topic, msg);
+	}
 	if(wpModules.useModuleLight) {
 		wpLight.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleBM) {
+		wpBM.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+		wpRelais.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleRain) {
+		wpRain.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleMoisture) {
 		wpMoisture.checkSubscribes(topic, msg);
 	}
-	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-		wpRelais.checkSubscribes(topic, msg);
+	if(wpModules.useModuleDistance) {
+		wpDistance.checkSubscribes(topic, msg);
 	}
 }
 //###################################################################################

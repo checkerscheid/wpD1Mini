@@ -46,13 +46,13 @@ class helperWebServer {
 		const int8_t cmdDebugWiFi = 9;
 
 		const int8_t cmdDebugDHT = 20;
-		const int8_t cmdDebugLight = 21;
-		const int8_t cmdDebugMoisture = 22;
-		const int8_t cmdDebugRelais = 23;
+		const int8_t cmdDebugLDR = 21;
+		const int8_t cmdDebugLight = 22;
+		const int8_t cmdDebugMoisture = 23;
+		const int8_t cmdDebugRain = 24;
+		const int8_t cmdDebugRelais = 25;
 		
-		const int8_t cmdDebugLDR = 102;
 		const int8_t cmdDebugBM = 104;
-		const int8_t cmdDebugRain = 106;
 		const int8_t cmdDebugDistance = 108;
 		int8_t doDebugChange;
 
@@ -114,6 +114,10 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.wpButton:hover { border-color:#AAA; }
 		.wpButton:active { border-color:#555; box-shadow:inset 2px 2px 5px 0px #222; color:#888; }
 		.bold { font-weight:bold; }
+		.color-debug { color: #aaa; text-shadow:0 0 3px #313131; }
+		.color-info { color: #ececfb; text-shadow:0 0 3px #000; }
+		.color-warn { color: #cebd2f; text-shadow:0 0 3px #12130c; }
+		.color-error { color: #df0d0d; text-shadow:0 0 3px #1e1414; }
 	</style>
 </head>
 <body>
@@ -172,7 +176,11 @@ function onMessage(event) {
 				WebSerialBox.removeChild(WebSerialBox.children[0]);
 			}
 		}
-		WebSerialBox.innerHTML = '<p>' + d.msg + '</p>' + WebSerialBox.innerHTML;
+		WebSerialBox.innerHTML =
+			'<p>' +
+				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
+				'<span>' + d.msgbody + '</span>' +
+			'</p>' + WebSerialBox.innerHTML;
 	}
 }
 function changeHandle(e) {
