@@ -5,3 +5,5 @@
 .vscode/ipch
 /.svn
 /.vscode
+*.h_old
+*.cpp_old
