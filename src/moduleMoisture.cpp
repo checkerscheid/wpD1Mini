@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 126                                                     $ #
+//# Revision     : $Rev:: 129                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 126 2024-06-03 03:11:41Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 129 2024-06-03 18:10:08Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -60,7 +60,7 @@ void moduleMoisture::cycle() {
 }
 
 uint16_t moduleMoisture::getVersion() {
-	String SVN = "$Rev: 126 $";
+	String SVN = "$Rev: 129 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -218,7 +218,13 @@ void moduleMoisture::calc() {
 			newMoisture = calcAvg(newMoisture);
 		}
 		//Divission 0
-		if((wet + dry) == 0) dry = 1;
+		if((wet - dry) == 0) {
+			wpFZ.DebugWS(wpFZ.strERRROR, "Moisture::calc", "risky math operation: '" + String(wet) + " (wet) - " + String(dry) + " (dry)'");
+			long i = 0;
+			do {
+				wet = ++i;
+			} while((wet - dry) > 0);
+		}
 		moisture = map(newMoisture, dry, wet, 0, 100);
 		if(moisture > 100) moisture = 100;
 		if(moisture < 0) moisture = 0;

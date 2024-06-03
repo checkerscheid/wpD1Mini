@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 128                                                     $ #
+//# Revision     : $Rev:: 129                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 128 2024-06-03 11:49:32Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 129 2024-06-03 18:10:08Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -53,7 +53,7 @@ void moduleRain::cycle() {
 }
 
 uint16_t moduleRain::getVersion() {
-	String SVN = "$Rev: 128 $";
+	String SVN = "$Rev: 129 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -178,6 +178,8 @@ void moduleRain::calc() {
 			calcedRain = calcAvg(newRain);
 		}
 		calcedRain = map(newRain, 1023, 0, 0, 500);
+		if(calcedRain > 500) calcedRain = 500;
+		if(calcedRain < 0) calcedRain = 0;
 		rain = (float)(calcedRain / 10.0) + correction;
 		error = false;
 		if(Debug) {
