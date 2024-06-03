@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 126                                                     $ #
+//# Revision     : $Rev:: 128                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.h 126 2024-06-03 03:11:41Z                $ #
+//# File-ID      : $Id:: moduleBM.h 128 2024-06-03 11:49:32Z                      $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBM_h
@@ -48,7 +48,7 @@ class moduleBM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 126 $";
+		String SVNh = "$Rev: 128 $";
 		uint8_t BMPin;
 		int16_t bmLast;
 		uint16_t publishCountBM;

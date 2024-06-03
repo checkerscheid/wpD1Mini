@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 126                                                     $ #
+//# Revision     : $Rev:: 128                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.h 126 2024-06-03 03:11:41Z                $ #
+//# File-ID      : $Id:: moduleLDR.h 128 2024-06-03 11:49:32Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLDR_h
@@ -50,7 +50,7 @@ class moduleLDR {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 126 $";
+		String SVNh = "$Rev: 128 $";
 		uint8_t LDRPin;
 		uint16_t cycleCounter;
 		int16_t LDRLast;

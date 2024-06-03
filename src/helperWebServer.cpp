@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 127                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 125 2024-06-03 03:11:11Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 127 2024-06-03 11:49:01Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -37,7 +37,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 125 $";
+	String SVN = "$Rev: 127 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
