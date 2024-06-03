@@ -488,12 +488,16 @@ void helperWebServer::doTheBlink() {
 
 String processor(const String& var) {
 	String returns;
+//###################################################################################
 	if(var == "IPADRESS")
 		return WiFi.localIP().toString();
+//###################################################################################
 	if(var == "DeviceName")
 		return wpFZ.DeviceName;
+//###################################################################################
 	if(var == "DeviceDescription")
 		return wpFZ.DeviceDescription;
+//###################################################################################
 	if(var == "CompiledWith") {
 		returns = "<ul>";
 		if(wpModules.useModuleDHT11) {
@@ -528,6 +532,7 @@ String processor(const String& var) {
 		}
 		return returns += "</ul>";
 	}
+//###################################################################################
 	if(var == "Debug") {
 		returns = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>";
 		returns += "<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") + " onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";
@@ -571,6 +576,7 @@ String processor(const String& var) {
 		}
 		return returns += "</ul>";
 	}
+//###################################################################################
 	if(var == "debugWebServer") {
 		String returns = "";
 		if(wpWebServer.Debug) {
