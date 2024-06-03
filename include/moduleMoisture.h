@@ -21,14 +21,14 @@
 class moduleMoisture {
 	public:
 		int16_t moisture;
-		bool Debug;
-		bool useAvg;
-		byte minValue;
-		uint16_t dry; // high value
-		uint16_t wet; // low value
+		bool Debug = false;
+		bool useAvg = false;
+		byte minValue = 30;
+		uint16_t dry = 1023; // high value
+		uint16_t wet = 0; // low value
 		bool error;
 		bool errorMin;
-		uint8_t maxCycle;
+		uint8_t maxCycle = 5;
 
 		// values
 		String mqttTopicMoisture;

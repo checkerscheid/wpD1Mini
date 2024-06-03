@@ -147,6 +147,41 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 		}
 	}
 
+	if(strcmp(topic, mqttTopicUseMoisture.c_str()) == 0) {
+		bool readUseMoisture = msg.toInt();
+		if(useModuleMoisture != readUseMoisture) {
+			useModuleMoisture = readUseMoisture;
+			bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
+			EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleMoisture\",\"value\":" + String(useModuleMoisture ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
+		}
+	}
+	
+	if(strcmp(topic, mqttTopicUseRelais.c_str()) == 0) {
+		bool readUseRelais = msg.toInt();
+		if(useModuleRelais != readUseRelais) {
+			useModuleRelais = readUseRelais;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRelais, useModuleRelais);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleRelais\",\"value\":" + String(useModuleRelais ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseRelais, String(useModuleRelais));
+		}
+	}
+	if(strcmp(topic, mqttTopicUseRelaisShield.c_str()) == 0) {
+		bool readUseRelaisShield = msg.toInt();
+		if(useModuleRelaisShield != readUseRelaisShield) {
+			useModuleRelaisShield = readUseRelaisShield;
+			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRelaisShield, useModuleRelaisShield);
+			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
+			EEPROM.commit();
+			wpFZ.SendWS("{\"id\":\"useModuleRelaisShield\",\"value\":" + String(useModuleRelaisShield ? "true" : "false") + "}");
+			wpFZ.DebugcheckSubscribes(mqttTopicUseRelaisShield, String(useModuleRelaisShield));
+		}
+	}
+
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -181,6 +216,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleLight) {
 		wpLight.publishSettings(force);
 	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.publishSettings(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishSettings(force);
 	}
@@ -207,6 +245,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleLight) {
 		wpLight.publishValues(force);
 	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.publishValues(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishValues(force);
 	}
@@ -230,6 +271,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleLight) {
 		wpLight.setSubscribes();
 	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.setSubscribes();
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.setSubscribes();
 	}
@@ -250,6 +294,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleLight) {
 		wpLight.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleMoisture) {
+		wpMoisture.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.checkSubscribes(topic, msg);

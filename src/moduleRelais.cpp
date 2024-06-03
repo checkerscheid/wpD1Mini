@@ -28,29 +28,22 @@ void moduleRelais::init() {
 	autoValue = false;
 	handValue = false;
 	handError = false;
-	handSet = false;
-	handValueSet = false;
-	// wpModules.useModuleMoisture {
-	waterEmpty = false;
-	pumpActive = false;
-	pumpPause = false;
-	// }
-	Debug = false;
 
 	// values
 	mqttTopicOut = wpFZ.DeviceName + "/Relais/Output";
 	mqttTopicAutoValue = wpFZ.DeviceName + "/Relais/Auto";
 	mqttTopicHandValue = wpFZ.DeviceName + "/Relais/Hand";
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/RelaisHand";
+	mqttTopicErrorWaterEmpty = wpFZ.DeviceName + "/ERROR/WaterEmpty";
 	// settings
 	// wpModules.useModuleMoisture {
-	mqttTopicWaterEmpty = wpFZ.DeviceName + "/settings/Relais/WaterEmpty";
 	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/PumpActive";
 	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/PumpPause";
 	// }
 	// commands
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/Relais/SetHand";
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/Relais/SetHandValue";
+	mqttTopicSetWaterEmpty = wpFZ.DeviceName + "/settings/Relais/SetWaterEmpty";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Relais";
 
 	outputLast = false;
@@ -104,13 +97,13 @@ void moduleRelais::publishSettings() {
 }
 void moduleRelais::publishSettings(bool force) {
 	if(wpModules.useModuleMoisture) {
-		wpMqtt.mqttClient.publish(mqttTopicWaterEmpty.c_str(), String(waterEmpty).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicPumpActive.c_str(), String(pumpActive).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicPumpPause.c_str(), String(pumpPause).c_str());
 	}
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetWaterEmpty.c_str(), String(waterEmptySet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
@@ -124,6 +117,7 @@ void moduleRelais::publishValues(bool force) {
 		publishCountAutoValue = wpFZ.publishQoS;
 		publishCountHandValue = wpFZ.publishQoS;
 		publishCountHandError = wpFZ.publishQoS;
+		publishCountWaterEmptyError = wpFZ.publishQoS;
 		publishCountDebug = wpFZ.publishQoS;
 	}
 	if(outputLast != output || ++publishCountOutput > wpFZ.publishQoS) {
@@ -149,9 +143,18 @@ void moduleRelais::publishValues(bool force) {
 		handErrorLast = handError;
 		wpMqtt.mqttClient.publish(mqttTopicErrorHand.c_str(), String(handError).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais Auto", String(handError), String(publishCountHandError));
+			printPublishValueDebug("Relais handError", String(handError), String(publishCountHandError));
 		}
 		publishCountHandError = 0;
+	}
+	if(waterEmptyError != waterEmptySet || ++publishCountWaterEmptyError > wpFZ.publishQoS) {
+		waterEmptyError = waterEmptySet;
+		wpMqtt.mqttClient.publish(mqttTopicErrorWaterEmpty.c_str(), String(waterEmptyError).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetWaterEmpty.c_str(), String(waterEmptyError).c_str());
+		if(wpMqtt.Debug) {
+			printPublishValueDebug("Relais waterEmptyError", String(waterEmptyError), String(publishCountWaterEmptyError));
+		}
+		publishCountWaterEmptyError = 0;
 	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
@@ -165,9 +168,9 @@ void moduleRelais::publishValues(bool force) {
 
 void moduleRelais::setSubscribes() {
 	if(wpModules.useModuleMoisture) {
-		wpMqtt.mqttClient.subscribe(mqttTopicWaterEmpty.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicPumpActive.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicPumpPause.c_str());
+		wpMqtt.mqttClient.subscribe(mqttTopicSetWaterEmpty.c_str());
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
@@ -176,15 +179,15 @@ void moduleRelais::setSubscribes() {
 
 void moduleRelais::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleMoisture) {
-		if(strcmp(topic, mqttTopicWaterEmpty.c_str()) == 0) {
-			bool readWaterEmpty = msg.toInt();
-			if(waterEmpty != readWaterEmpty) {
-				waterEmpty = readWaterEmpty;
-				bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitRelaisWaterEmpty, waterEmpty);
-				EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+		if(strcmp(topic, mqttTopicSetWaterEmpty.c_str()) == 0) {
+			bool readSetWaterEmpty = msg.toInt();
+			if(waterEmptySet != readSetWaterEmpty) {
+				waterEmptySet = readSetWaterEmpty;
+				bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
+				EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
 				EEPROM.commit();
-				wpFZ.DebugcheckSubscribes(mqttTopicWaterEmpty, String(waterEmpty));
-				wpFZ.SendWS("{\"id\":\"waterEmpty\",\"value\":" + String(waterEmpty ? "true" : "false") + "}");
+				wpFZ.DebugcheckSubscribes(mqttTopicSetWaterEmpty, String(waterEmptySet));
+				wpFZ.SendWS("{\"id\":\"waterEmpty\",\"value\":" + String(waterEmptySet ? "true" : "false") + "}");
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
@@ -280,7 +283,7 @@ void moduleRelais::calc() {
 }
 void moduleRelais::calcPump() {
 	if(wpModules.useModuleMoisture) {
-		if(!waterEmpty) {
+		if(!waterEmptyError) {
 			unsigned long m = millis();
 			// detect to dry soil
 			if(wpMoisture.errorMin && !pumpCycleActive) {

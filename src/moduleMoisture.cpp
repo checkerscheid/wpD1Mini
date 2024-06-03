@@ -21,14 +21,8 @@ moduleMoisture::moduleMoisture() {}
 void moduleMoisture::init() {
 	moisturePin = A0;
 	moisture = 0;
-	Debug = false;
-	useAvg = false;
-	minValue = 30;
-	dry = 1023;
-	wet = 0;
 	error = false;
 	errorMin = false;
-	maxCycle = 5;
 
 	// values
 	mqttTopicMoisture = wpFZ.DeviceName + "/Moisture";
@@ -167,7 +161,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicDry.c_str()) == 0) {
-		byte readDry = msg.toInt();
+		int readDry = msg.toInt();
 		if(readDry < 0) readDry = 0;
 		if(readDry > 1023) readDry = 1023;
 		if(dry != readDry) {
@@ -178,7 +172,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicWet.c_str()) == 0) {
-		byte readWet = msg.toInt();
+		int readWet = msg.toInt();
 		if(readWet < 0) readWet = 0;
 		if(readWet > 1023) readWet = 1023;
 		if(wet != readWet) {

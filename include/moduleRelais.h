@@ -24,29 +24,31 @@ class moduleRelais {
 		bool autoValue;
 		bool handValue;
 		bool handError;
-		bool handSet;
-		bool handValueSet;
+		bool handSet = false;
+		bool handValueSet = false;
 		// wpModules.useModuleMoisture {
-		bool waterEmpty;
+		bool waterEmptySet = false;
+		bool waterEmptyError;
 		uint8_t pumpActive;
 		uint16_t pumpPause;
 		// }
-		bool Debug;
+		bool Debug = false;
 
 		// values
 		String mqttTopicOut;
 		String mqttTopicAutoValue;
 		String mqttTopicHandValue;
 		String mqttTopicErrorHand;
+		String mqttTopicErrorWaterEmpty;
 		// settings
 		// wpModules.useModuleMoisture {
-		String mqttTopicWaterEmpty;
 		String mqttTopicPumpActive;
 		String mqttTopicPumpPause;
 		// }
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
+		String mqttTopicSetWaterEmpty;
 		String mqttTopicDebug;
 
 		moduleRelais();
@@ -72,6 +74,7 @@ class moduleRelais {
 		uint16_t publishCountHandValue;
 		bool handErrorLast;
 		uint16_t publishCountHandError;
+		uint16_t publishCountWaterEmptyError;
 		bool DebugLast;
 		uint16_t publishCountDebug;
 		// if wpModules.useMoisture

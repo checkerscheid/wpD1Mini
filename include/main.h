@@ -19,6 +19,7 @@
 #include <wpFreakaZone.h>
 
 uint16_t getVersion();
+void buildChecker(uint16_t &v, uint16 moduleBuild);
 uint16_t getBuild();
 String getStringVersion();
 uint16_t getGlobalBuild();

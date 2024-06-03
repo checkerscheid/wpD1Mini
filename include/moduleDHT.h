@@ -26,11 +26,11 @@ class moduleDHT {
 		int16_t temperature;
 		int16_t humidity;
 
-		bool Debug;
+		bool Debug = false;
 		bool error;
-		int8_t temperatureCorrection;
-		int8_t humidityCorrection;
-		uint8_t maxCycle;
+		int8_t temperatureCorrection = 0;
+		int8_t humidityCorrection = 0;
+		uint8_t maxCycle = 0;
 		// values
 		String mqttTopicTemperature;
 		String mqttTopicHumidity;

@@ -23,12 +23,12 @@
 class moduleLight {
 	public:
 		int16_t light;
-		bool useAvg;
+		bool useAvg = false;
 
-		bool Debug;
+		bool Debug = false;
 		bool error;
-		int16_t correction;
-		uint8_t maxCycle;
+		int16_t correction = 0;
+		uint8_t maxCycle = 5;
 		// values
 		String mqttTopicLight;
 		String mqttTopicError;

@@ -23,12 +23,7 @@ AS_BH1750 moduleLight::lightMeter;
 moduleLight::moduleLight() {}
 void moduleLight::init() {
 	light = 0;
-	useAvg = false;
-
-	Debug = false;
 	error = false;
-	correction = 0;
-	maxCycle = 5;
 	// values
 	mqttTopicLight = wpFZ.DeviceName + "/Light";
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/Light";

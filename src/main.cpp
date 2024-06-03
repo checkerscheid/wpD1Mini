@@ -106,21 +106,21 @@ String getStringVersion() {
 
 uint16_t getGlobalBuild() {
  	uint16_t v = 0;
-	BuildChecker(v, wpEEPROM.getVersion());
-	BuildChecker(v, wpFinder.getVersion());
-	BuildChecker(v, wpModules.getVersion());
-	BuildChecker(v, wpMqtt.getVersion());
-	BuildChecker(v, wpOnlineToggler.getVersion());
-	BuildChecker(v, wpRest.getVersion());
-	BuildChecker(v, wpUpdate.getVersion());
-	BuildChecker(v, wpWebServer.getVersion());
-	BuildChecker(v, wpWiFi.getVersion());
-	BuildChecker(v, wpFZ.getVersion());
+	buildChecker(v, wpEEPROM.getVersion());
+	buildChecker(v, wpFinder.getVersion());
+	buildChecker(v, wpModules.getVersion());
+	buildChecker(v, wpMqtt.getVersion());
+	buildChecker(v, wpOnlineToggler.getVersion());
+	buildChecker(v, wpRest.getVersion());
+	buildChecker(v, wpUpdate.getVersion());
+	buildChecker(v, wpWebServer.getVersion());
+	buildChecker(v, wpWiFi.getVersion());
+	buildChecker(v, wpFZ.getVersion());
 
-	BuildChecker(v, wpDHT.getVersion());
-	BuildChecker(v, wpLight.getVersion());
-	BuildChecker(v, wpMoisture.getVersion());
-	BuildChecker(v, wpRelais.getVersion());
+	buildChecker(v, wpDHT.getVersion());
+	buildChecker(v, wpLight.getVersion());
+	buildChecker(v, wpMoisture.getVersion());
+	buildChecker(v, wpRelais.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16 moduleBuild) {

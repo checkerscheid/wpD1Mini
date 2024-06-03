@@ -21,11 +21,7 @@ moduleDHT::moduleDHT() {}
 void moduleDHT::init() {
 	temperature = 0;
 	humidity = 0;
-	Debug = false;
 	error = false;
-	temperatureCorrection = 0;
-	humidityCorrection = 0;
-	maxCycle = 0;
 	// values
 	mqttTopicTemperature = wpFZ.DeviceName + "/Temperature";
 	mqttTopicHumidity = wpFZ.DeviceName + "/Humidity";
@@ -36,9 +32,6 @@ void moduleDHT::init() {
 	mqttTopicHumidityCorrection = wpFZ.DeviceName + "/settings/DHT/Correction/Humidity";
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/DHT";
-
-	temperatureCorrection = 0;
-	humidityCorrection = 0;
 
 	cycleCounter = 0;
 	errorLast = false;

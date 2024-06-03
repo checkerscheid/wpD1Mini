@@ -151,7 +151,7 @@ void helperEEPROM::readVars() {
 		// bitRain = 7;
 
 		bitsModules1 = EEPROM.read(addrBitsModules1);
-		// bitMoisture = 0;
+		wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 		// bitDistance = 1;
 		
 		bitsDebugBasis = EEPROM.read(addrBitsDebugBasis);
@@ -171,7 +171,7 @@ void helperEEPROM::readVars() {
 		// bitDebugBM = 3;
 		wpRelais.Debug = bitRead(bitsDebugModules, bitDebugRelais);
 		// bitDebugRain = 5;
-		// bitDebugMoisture = 6;
+		wpMoisture.Debug = bitRead(bitsDebugModules, bitDebugMoisture);
 		// bitDebugDistance = 7;
 		
 		bitsModulesSettings = EEPROM.read(addrBitsModulesSettings);
@@ -179,9 +179,9 @@ void helperEEPROM::readVars() {
 		wpLight.useAvg = bitRead(bitsModulesSettings, bitUseLightAvg);
 		wpRelais.handSet = bitRead(bitsModulesSettings, bitRelaisHand);
 		wpRelais.handValueSet = bitRead(bitsModulesSettings, bitRelaisHandValue);
-		wpRelais.waterEmpty = bitRead(bitsModulesSettings, bitRelaisWaterEmpty);
+		wpRelais.waterEmptySet = bitRead(bitsModulesSettings, bitRelaisWaterEmpty);
 		// bitUseRainAvg = 4;
-		// bitUseMoistureAvg = 5;
+		wpMoisture.useAvg = bitRead(bitsModulesSettings, bitUseMoistureAvg);
 
 /// byte values: byte 10 - 29
 		wpDHT.maxCycle = EEPROM.read(byteMaxCycleDHT);
@@ -193,8 +193,8 @@ void helperEEPROM::readVars() {
 		wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 		// byteMaxCycleRain = 15;
 		// byteRainCorrection = 16; // int8_t
-		// byteMaxCycleMoisture = 17;
-		// byteMoistureMin = 18;
+		wpMoisture.maxCycle = EEPROM.read(byteMaxCycleMoisture);
+		wpMoisture.minValue = EEPROM.read(byteMoistureMin);
 		// byteMaxCycleDistance = 19;
 		// byteDistanceCorrection = 20; // int8_t
 		// byteHeight = 21;
@@ -203,8 +203,8 @@ void helperEEPROM::readVars() {
 		EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
 		// byteThreshold = 36;
 		EEPROM.get(bytePumpPause, wpRelais.pumpPause);
-		// byteMoistureDry = 40;
-		// byteMoistureWet = 42;
+		EEPROM.get(byteMoistureDry, wpMoisture.dry);
+		EEPROM.get(byteMoistureWet, wpMoisture.wet);
 		// byteMaxVolume = 44;
 
 		readStringsFromEEPROM();
