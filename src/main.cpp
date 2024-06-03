@@ -196,7 +196,7 @@ void setup() {
 #endif
 #ifdef wpDistance
 	pinMode(trigPin, OUTPUT);
-	pinMode(echoPin, INPUT);
+	pinMode(echoPin, INPUT_PULLUP);
 	digitalWrite(trigPin, LOW);
 #endif
 }
@@ -1989,12 +1989,17 @@ void callbackMqttDebug(String topic, String value) {
 #ifdef wpDistance
 	void calcDistance() {
 		unsigned long duration;
-		digitalWrite(trigPin, HIGH);
-		delayMicroseconds(20);
+		// Sender kurz ausschalten um Störungen des Signal zu vermeiden
 		digitalWrite(trigPin, LOW);
+		delay(10);
+		// Signal senden
+		digitalWrite(trigPin, HIGH);
+		delayMicroseconds(10);
+		digitalWrite(trigPin, LOW);
+		// Zeit messen, bis das Signal zurückkommt, mit timeout
 		duration = pulseIn(echoPin, HIGH, loopTime * 1000);
 		if(duration > 0) {
-			distanceRaw = (duration * 0.034 / 2);
+			distanceRaw = (duration * 0.03432 / 2);
 			distanceAvg = calcDistanceAvg(distanceRaw) + wpFZ.distanceCorrection;
 			if(wpFZ.height <= 0) wpFZ.height = 1; // durch 0
 			if(distanceAvg > wpFZ.height) distanceAvg = wpFZ.height;
