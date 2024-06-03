@@ -1,0 +1,1 @@
+copy /y ".\.pio\build\D1Mini\firmware.bin" "\\d1miniupdate.freakazone.com\PlatformIO\Updates\"
