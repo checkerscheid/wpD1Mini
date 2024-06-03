@@ -162,3 +162,4 @@ uint16_t getBuild() {
 	uint16_t Build = getVersion();
 	return globalBuild > Build ? globalBuild : Build;
 }
+
