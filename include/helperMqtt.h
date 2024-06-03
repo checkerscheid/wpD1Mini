@@ -10,27 +10,50 @@
 //#                                                                                 #
 //# Revision     : $Rev:: 125                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 125 2024-06-03 03:11:11Z                          $ #
+//# File-ID      : $Id:: helperMqtt.h 125 2024-06-03 03:11:11Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef BasisEmpty_h
-#define BasisEmpty_h
+#ifndef helperMqtt_h
+#define helperMqtt_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+class helperMqtt {
+	public:
+		bool Debug = false;
+		// values
+		String mqttTopicMqttSince;
+		// settings
+		String mqttTopicMqttServer;
+		// commands
+		String mqttTopicForceMqttUpdate;
+		String mqttTopicForceRenewValue;
+		String mqttTopicDebug;
 
-uint16_t getVersion();
-void buildChecker(uint16_t &v, uint16 moduleBuild);
-uint16_t getBuild();
-String getStringVersion();
-uint16_t getGlobalBuild();
-void BuildChecker(uint16_t &v, uint16 moduleBuild);
+		String MqttSince;
 
-//void publishValuesSystem();
+		static WiFiClient wifiClient;
+		static PubSubClient mqttClient;
 
-String SVNh = "$Rev: 125 $";
-// counter
-uint16_t publishCountRssi = 0;
+		helperMqtt();
+		void init();
+		void cycle();
+		uint16_t getVersion();
+		void changeDebug();
 
-// value stores for Com
-int rssi = 0;
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+	private:
+		String SVNh = "$Rev: 125 $";
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
+		void connectMqtt();
+		static void callbackMqtt(char*, byte*, unsigned int);
+		unsigned long lastConnectTry;
+};
+extern helperMqtt wpMqtt;
 #endif
