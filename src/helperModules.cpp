@@ -118,6 +118,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT11, useModuleDHT11);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleDHT11\",\"value\":" + String(useModuleDHT11 ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseDHT11, String(Debug));
 		}
@@ -129,6 +130,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT22, useModuleDHT22);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleDHT22\",\"value\":" + String(useModuleDHT22 ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseDHT22, String(Debug));
 		}
@@ -141,6 +143,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseLDR, useModuleLDR);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleLDR\",\"value\":" + String(useModuleLDR ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseLDR, String(Debug));
 		}
@@ -153,6 +156,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseLight, useModuleLight);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleLight\",\"value\":" + String(useModuleLight ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseLight, String(Debug));
 		}
@@ -165,6 +169,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
 			EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleMoisture\",\"value\":" + String(useModuleMoisture ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
 		}
@@ -177,6 +182,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRelais, useModuleRelais);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleRelais\",\"value\":" + String(useModuleRelais ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseRelais, String(useModuleRelais));
 		}
@@ -188,6 +194,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRelaisShield, useModuleRelaisShield);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleRelaisShield\",\"value\":" + String(useModuleRelaisShield ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseRelaisShield, String(useModuleRelaisShield));
 		}
@@ -200,6 +207,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleBM\",\"value\":" + String(useModuleBM ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
 		}
@@ -211,6 +219,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRain, useModuleRain);
 			EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleRain\",\"value\":" + String(useModuleRain ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseRain, String(useModuleRain));
 		}
@@ -222,6 +231,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseDistance, useModuleDistance);
 			EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
 			EEPROM.commit();
+			wpFZ.restartRequired = true;
 			wpFZ.SendWS("{\"id\":\"useModuleDistance\",\"value\":" + String(useModuleDistance ? "true" : "false") + "}");
 			wpFZ.DebugcheckSubscribes(mqttTopicUseDistance, String(useModuleDistance));
 		}
