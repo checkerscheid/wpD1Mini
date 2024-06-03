@@ -54,8 +54,10 @@ class wpFreakaZone {
 		const uint16_t finderListenPort = 51346;
 		const uint16_t loopTime = 200; // ms
 		const uint16_t minute10  = 5 * 60 * 10;
-		const uint16_t minute5 = 5 * 60 * 10;
-		const uint16_t minute2 = 5 * 60 * 10;
+		const uint16_t minute5 = 5 * 60 * 5;
+		const uint16_t minute2 = 5 * 60 * 2;
+		const uint16_t sekunde30 = 5 * 30;
+		const uint16_t sekunde10 = 5 * 10;
 		const uint16_t publishQoS = minute10; // 5 because loopTime = 200
 
 		uint16_t MajorVersion = 3;
@@ -74,6 +76,7 @@ class wpFreakaZone {
 		String DeviceName;
 		String DeviceDescription;
 		bool calcValues;
+		bool restartRequired;
 
 		// values
 		String mqttTopicRestartRequired;
@@ -108,6 +111,7 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		void DebugWS(String typ, String func, String msg, bool newline);
 		void SendWS(String msg);
+		void SendRestartRequired(String msg);
 		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();
@@ -121,7 +125,9 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 	private:
 		String SVNh = "$Rev: 127 $";
-		uint16_t publishCountOnDuration = 0;
+		uint16_t publishCountOnDuration;
+		bool restartRequiredLast;
+		uint16_t publishCountRestartRequired;
 };
 extern wpFreakaZone wpFZ;
 

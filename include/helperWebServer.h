@@ -104,9 +104,10 @@ const char index_html[] PROGMEM = R"rawliteral(
 		div.ul { display:flex; }
 		ul { margin-left:20px; list-style:none; }
 		hr { height:1px; border:none; margin:5px 5%; background-color:#CCC; }
-		#WebSerialBox, .ul ul { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
-		.ul ul { box-shadow: 3px 3px 5px #222; }
+		#restartRequired.active, #WebSerialBox, .ul ul { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
+		#restartRequired.active, .ul ul { box-shadow: 3px 3px 5px #222; }
 		.ul input { margin-right:5px; }
+		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
 			line-height:16px; font-size:13px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
@@ -114,14 +115,15 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.wpButton:hover { border-color:#AAA; }
 		.wpButton:active { border-color:#555; box-shadow:inset 2px 2px 5px 0px #222; color:#888; }
 		.bold { font-weight:bold; }
-		.color-debug { color: #aaa; text-shadow:0 0 3px #313131; }
-		.color-info { color: #ececfb; text-shadow:0 0 3px #000; }
-		.color-warn { color: #cebd2f; text-shadow:0 0 3px #12130c; }
-		.color-error { color: #df0d0d; text-shadow:0 0 3px #1e1414; }
+		.color-debug { color:#aaa; text-shadow:0 0 3px #313131; }
+		.color-info { color:#ececfb; text-shadow:0 0 3px #000; }
+		.color-warn { color:#cebd2f; text-shadow:0 0 3px #12130c; }
+		.color-error { color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 	</style>
 </head>
 <body>
 	<div id="FreakaZoneWebSerial">
+		<div id="restartRequired"></div>
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription%</h2>
 		<div class="ul">
@@ -170,6 +172,12 @@ function onMessage(event) {
 	const d = JSON.parse(event.data);
 	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
 		document.getElementById(d.msg.id).checked = d.msg.value;;
+	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
+		if(d.msg) {
+			let restartRequired = document.getElementById('restartRequired');
+			restartRequired.classList.add('active');
+			restartRequired.innerHTML = '!!! Restart Required !!!'
+		}
 	} else {
 		if(!d.newline) {
 			if(WebSerialBox.hasChildNodes()) {
