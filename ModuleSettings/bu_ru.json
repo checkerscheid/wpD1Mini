@@ -1,16 +1,16 @@
 {
 	"FreakaZoneDevice": {
-		"DeviceName": "SZ_RU",
-		"DeviceDescription": "Schlafzimmer Raumueberwachung",
+		"DeviceName": "BU_RU",
+		"DeviceDescription": "Buero Raumueberwachung",
 		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
 		"Version": "Build 118.118",
-		"MAC": "08:F9:E0:6E:55:90",
-		"miniMAC": "08f9e06e5590",
+		"MAC": "08:F9:E0:6C:0A:CB",
+		"miniMAC": "08f9e06c0acb",
 		"UpdateMode": false,
 		"calcValues": true,
 		"HT": {
 			"MaxCycleHT": 50,
-			"TemperatureCorrection": -3.50,
+			"TemperatureCorrection": -2.50,
 			"HumidityCorrection": 0.00
 		},
 		"LDR": {
@@ -18,14 +18,21 @@
 			"useLDRAvg": 0,
 			"LDRCorrection": 0
 		},
+		"BM": {
+			"LDR": {
+				"Threshold": 200,
+				"LightToTurnOn": "shellies/RGBW2/color/0/command"
+			}
+		},
 		"Debug": {
 			"EEPROM": false,
 			"WiFi": false,
 			"MQTT": false,
 			"Search": false,
 			"Rest": false,
-			"HT11": true,
-			"LDR": true
+			"HT11": false,
+			"LDR": true,
+			"BM": false
 		}
 	}
 }

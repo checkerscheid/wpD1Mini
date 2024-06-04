@@ -1,1 +1,38 @@
-{"FreakaZoneDevice":{"DeviceName":"KU_RU","DeviceDescription":"Kueche Raumueberwachung","wpFreakaZoneVersion":"V 2.5 Build 117.117","Version":"Build 118.118","MAC":"08:F9:E0:6E:5E:8A","miniMAC":"08f9e06e5e8a","UpdateMode":false,"calcValues":true,"HT":{"MaxCycleHT":50,"TemperatureCorrection":-3.90,"HumidityCorrection":0.00},"LDR":{"MaxCycleLDR":50,"useLDRAvg":0,"LDRCorrection":0},"BM":{"LDR":{"Threshold":630,"LightToTurnOn":"http://wpLicht:turner@172.17.80.132/relay/0?turn=on"}},"Debug":{"EEPROM":false,"WiFi":false,"MQTT":false,"Search":false,"Rest":false,"HT11":false,"LDR":true,"BM":true}}}
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "KU_RU",
+		"DeviceDescription": "Kueche Raumueberwachung",
+		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
+		"Version": "Build 118.118",
+		"MAC": "08:F9:E0:6E:5E:8A",
+		"miniMAC": "08f9e06e5e8a",
+		"UpdateMode": false,
+		"calcValues": true,
+		"HT": {
+			"MaxCycleHT": 50,
+			"TemperatureCorrection": -3.90,
+			"HumidityCorrection": 0.00
+		},
+		"LDR": {
+			"MaxCycleLDR": 50,
+			"useLDRAvg": 0,
+			"LDRCorrection": 0
+		},
+		"BM": {
+			"LDR": {
+				"Threshold": 630,
+				"LightToTurnOn": "http://wpLicht:turner@172.17.80.132/relay/0?turn=on"
+			}
+		},
+		"Debug": {
+			"EEPROM": false,
+			"WiFi": false,
+			"MQTT": false,
+			"Search": false,
+			"Rest": false,
+			"HT11": false,
+			"LDR": true,
+			"BM": true
+		}
+	}
+}
