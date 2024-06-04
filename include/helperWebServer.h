@@ -192,8 +192,8 @@ function onMessage(event) {
 	}
 }
 function changeHandle(e) {
-	xmlHttp.open( "GET", "/setDebug?Debug=" + e.target.id, false);
-	xmlHttp.send( null );
+	xmlHttp.open("GET", "/setDebug?Debug=" + e.target.id, false);
+	xmlHttp.send(null);
 }
 function cmdHandle(e) {
 	xmlHttp.open("GET", "/setCmd?cmd=" + e.target.id, false);
