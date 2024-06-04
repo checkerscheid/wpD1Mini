@@ -120,7 +120,7 @@ class helperEEPROM {
 		String SVNh = "$Rev: 125 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
-		const byte byteStartForString0 = 500;
+		const uint16_t addrStartForString0 = 500;
 		String readStringFromEEPROM(int addrOffset, String defaultString);
 		int writeStringToEEPROM(int addrOffset, String &strToWrite);
 		void readVars();
