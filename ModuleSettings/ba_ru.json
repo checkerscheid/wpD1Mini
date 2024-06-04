@@ -1,0 +1,38 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "BA_RU",
+		"DeviceDescription": "Bad Raumueberwachung",
+		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
+		"Version": "Build 118.118",
+		"MAC": "08:F9:E0:6C:09:F9",
+		"miniMAC": "08f9e06c09f9",
+		"UpdateMode": false,
+		"calcValues": true,
+		"HT": {
+			"MaxCycleHT": 50,
+			"TemperatureCorrection": -0.60,
+			"HumidityCorrection": 0.00
+		},
+		"LDR": {
+			"MaxCycleLDR": 50,
+			"useLDRAvg": 0,
+			"LDRCorrection": 0
+		},
+		"BM": {
+			"LDR": {
+				"Threshold": 200,
+				"LightToTurnOn": "BA_SP/command/switch:0"
+			}
+		},
+		"Debug": {
+			"EEPROM": false,
+			"WiFi": false,
+			"MQTT": false,
+			"Search": false,
+			"Rest": false,
+			"HT11": false,
+			"LDR": false,
+			"BM": false
+		}
+	}
+}
