@@ -69,9 +69,11 @@ void moduleRelais::init() {
 // public
 //###################################################################################
 void moduleRelais::cycle() {
-	calc();
-	if(wpModules.useModuleMoisture) {
-		calcPump();
+	if(wpFZ.calcValues) {
+		calc();
+		if(wpModules.useModuleMoisture) {
+			calcPump();
+		}
 	}
 	publishValues();
 }
