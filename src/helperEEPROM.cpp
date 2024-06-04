@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 127                                                     $ #
+//# Revision     : $Rev:: 130                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 127 2024-06-03 11:49:01Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 130 2024-06-04 01:09:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -20,8 +20,8 @@ helperEEPROM wpEEPROM;
 helperEEPROM::helperEEPROM() {}
 void helperEEPROM::init() {
 	EEPROM.begin(4095);
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 	readVars();
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 }
 
 //###################################################################################
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 127 $";
+	String SVN = "$Rev: 130 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

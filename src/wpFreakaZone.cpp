@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 127                                                     $ #
+//# Revision     : $Rev:: 130                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 127 2024-06-03 11:49:01Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 130 2024-06-04 01:09:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -20,8 +20,6 @@ wpFreakaZone::wpFreakaZone() {}
 
 void wpFreakaZone::init(String deviceName) {
 	configTime(TZ, NTP_SERVER);
-	DeviceName = deviceName;
-	DeviceDescription = deviceName;
 	calcValues = true;
 	restartRequired = false;
 
@@ -53,7 +51,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16_t wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 127 $";
+	String SVN = "$Rev: 130 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
