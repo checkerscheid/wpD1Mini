@@ -66,6 +66,10 @@ void moduleBM::publishSettings() {
 	publishSettings(false);
 }
 void moduleBM::publishSettings(bool force) {
+	if(wpModules.useModuleLDR) {
+		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
+	}
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}

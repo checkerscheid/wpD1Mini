@@ -145,11 +145,11 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDHT, Debug);
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLDR, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugDHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWS("{\"id\":\"DebugLDR\",\"value\":" + String(Debug ? "true" : "false") + "}");
 		}
 	}
 }
@@ -176,7 +176,7 @@ void moduleLDR::calc() {
 		if(useAvg) {
 			newLDR = calcAvg(newLDR);
 		}
-		LDR = newLDR + correction;
+		LDR = (1023 - newLDR) + correction;
 		error = false;
 		if(Debug) {
 			String logmessage = "LDR: " + String(LDR) + " (" + String(newLDR) + ")";

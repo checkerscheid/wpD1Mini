@@ -52,8 +52,8 @@ void helperEEPROM::readStringsFromEEPROM() {
 	wpFZ.DeviceName = readStringFromEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = byteStartForString + 1 + wpFZ.DeviceName.length();
 	wpFZ.DeviceDescription = readStringFromEEPROM(byteStartForString, wpFZ.DeviceDescription);
-	//byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
-	//wpFZ.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpFZ.lightToTurnOn);
+	byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
+	wpBM.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM.lightToTurnOn);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
