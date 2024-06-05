@@ -37,6 +37,7 @@ void wpFreakaZone::init(String deviceName) {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 
+	publishCountCalcValues = 0;
 	publishCountOnDuration = 0;
 	restartRequiredLast = false;
 	publishCountRestartRequired = 0;
@@ -157,7 +158,6 @@ void wpFreakaZone::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicDeviceDescription.c_str(), DeviceDescription.c_str());
 	wpMqtt.mqttClient.publish(mqttTopicVersion.c_str(), Version.c_str());
 	wpMqtt.mqttClient.publish(mqttTopicOnSince.c_str(), OnSince.c_str());
-	wpMqtt.mqttClient.publish(mqttTopicCalcValues.c_str(), String(calcValues).c_str());
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetDeviceName.c_str(), String(DeviceName).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetDeviceDescription.c_str(), String(DeviceDescription).c_str());
@@ -175,6 +175,12 @@ void wpFreakaZone::publishValues(bool force) {
 	if(++publishCountOnDuration > minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
 		publishCountOnDuration = 0;
+	}
+	if(calcValuesLast != calcValues || publishCountCalcValues > wpFZ.publishQoS) {
+		calcValuesLast = calcValues;
+		wpMqtt.mqttClient.publish(mqttTopicCalcValues.c_str(), String(calcValues).c_str());
+		wpFZ.SendWSDebug("CalcValues", wpFZ.calcValues);
+		publishCountCalcValues = 0;
 	}
 	if(restartRequired) {
 		if(!restartRequiredLast) {
@@ -226,7 +232,6 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 		bool readCalcValues = msg.toInt();
 		if(wpFZ.calcValues != readCalcValues) {
 			wpFZ.calcValues = readCalcValues;
-			wpFZ.SendWS("{\"id\":\"CalcValues\",\"value\":" + String(wpFZ.calcValues ? "true" : "false") + "}");
 			DebugcheckSubscribes(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
@@ -251,7 +256,15 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"," +
 		"\"newline\":" + (newline ? "true" : "false") + "}");
 }
-void wpFreakaZone::SendWS(String msg) {
+// void wpFreakaZone::SendWS(String msg) {
+// 	wpWebServer.webSocket.textAll(msg);
+// }
+void wpFreakaZone::SendWSModule(String useModul, bool active) {
+	String msg = "{\"id\":\"" + useModul + "\",\"value\":" + String(active ? "true" : "false") + "}";
+	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::SendWSDebug(String moduleDebug, bool active) {
+	String msg = "{\"id\":\"" + moduleDebug + "\",\"value\":" + String(active ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
 }
 void wpFreakaZone::SendRestartRequired(String msg) {

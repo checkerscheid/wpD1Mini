@@ -43,7 +43,7 @@ void helperEEPROM::changeDebug() {
 	bitWrite(bitsDebugBasis, bitDebugEEPROM, Debug);
 	EEPROM.write(addrBitsDebugBasis, bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugEEPROM", Debug);
 	wpFZ.blink();
 }
 
@@ -96,7 +96,7 @@ void helperEEPROM::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugEEPROM, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugEEPROM\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugEEPROM", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}

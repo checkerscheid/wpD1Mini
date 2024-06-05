@@ -65,7 +65,7 @@ void helperMqtt::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugMqtt", Debug);
 	wpFZ.blink();
 }
 
@@ -160,7 +160,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 				bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
 				EEPROM.write(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi);
 				EEPROM.commit();
-				wpFZ.SendWS("{\"id\":\"DebugMqtt\",\"value\":" + String(wpMqtt.Debug ? "true" : "false") + "}");
+				wpFZ.SendWSDebug("DebugMqtt", wpMqtt.Debug);
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebug, String(wpMqtt.Debug));
 			}
 		}
