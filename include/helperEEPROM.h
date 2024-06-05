@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 131                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 125 2024-06-03 03:11:11Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 131 2024-06-05 03:01:06Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -117,7 +117,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 125 $";
+		String SVNh = "$Rev: 131 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		const uint16_t addrStartForString0 = 500;

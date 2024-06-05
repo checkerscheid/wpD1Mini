@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 131                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperRest.cpp 125 2024-06-03 03:11:11Z                  $ #
+//# File-ID      : $Id:: helperRest.cpp 131 2024-06-05 03:01:06Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperRest.h>
@@ -38,7 +38,7 @@ void helperRest::cycle() {
 }
 
 uint16_t helperRest::getVersion() {
-	String SVN = "$Rev: 125 $";
+	String SVN = "$Rev: 131 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

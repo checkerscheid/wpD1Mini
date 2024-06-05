@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 128                                                     $ #
+//# Revision     : $Rev:: 131                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 128 2024-06-03 11:49:32Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 131 2024-06-05 03:01:06Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -47,7 +47,7 @@ void moduleBM::cycle() {
 }
 
 uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 128 $";
+	String SVN = "$Rev: 131 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

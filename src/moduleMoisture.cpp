@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 129                                                     $ #
+//# Revision     : $Rev:: 131                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 129 2024-06-03 18:10:08Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 131 2024-06-05 03:01:06Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -60,7 +60,7 @@ void moduleMoisture::cycle() {
 }
 
 uint16_t moduleMoisture::getVersion() {
-	String SVN = "$Rev: 129 $";
+	String SVN = "$Rev: 131 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
