@@ -148,7 +148,7 @@ void moduleBM::publishValue() {
 				if(lightToTurnOn.startsWith("http://")) {
 					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
 					wpRest.trySend = true;
-					lm += ", send REST '" + lightToTurnOn + "': 'On'";
+					lm += ", send REST '" + lightToTurnOn + "'";
 				} else {
 					wpMqtt.mqttClient.publish(lightToTurnOn.c_str(), String("on").c_str());
 					lm += ", send MQTT '" + lightToTurnOn + "': 'On'";
