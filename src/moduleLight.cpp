@@ -68,7 +68,7 @@ void moduleLight::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugLight\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugLight", Debug);
 	wpFZ.blink();
 }
 
@@ -149,11 +149,11 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDHT, Debug);
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugDHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugLight", Debug);
 		}
 	}
 }

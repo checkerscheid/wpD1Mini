@@ -35,6 +35,18 @@ class helperWebServer {
 		const int8_t cmdScanWiFi = 9;
 		int8_t doCommand;
 
+		const int8_t cmdModuleDHT11 = 1;
+		const int8_t cmdModuleDHT22 = 2;
+		const int8_t cmdModuleLDR = 3;
+		const int8_t cmdModuleLight = 4;
+		const int8_t cmdModuleBM = 5;
+		const int8_t cmdModuleRelais = 6;
+		const int8_t cmdModuleRelaisShield = 7;
+		const int8_t cmdModuleRain = 8;
+		const int8_t cmdModuleMoisture = 9;
+		const int8_t cmdModuleDistance = 10;
+		int8_t doModuleChange;
+
 		const int8_t cmdDebugEEPROM = 1;
 		const int8_t cmdDebugFinder = 2;
 		const int8_t cmdDebugModules = 3;
@@ -69,9 +81,11 @@ class helperWebServer {
 		
 		void setupWebServer();
 		void setCommand(int8_t command);
+		void setModuleChange(int8_t modul);
 		void setDebugChange(int8_t debug);
 		void setBlink();
 		void doTheCommand();
+		void doTheModuleChange();
 		void doTheDebugChange();
 		void doTheBlink();
 		
@@ -130,13 +144,16 @@ const char index_html[] PROGMEM = R"rawliteral(
 			%Debug%
 			%CompiledWith%
 			<ul>
+				<li><li><span class='bold'>Device:</span></li><hr /></li>
+				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
-				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">UpdateFW</span></li>
-				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">UpdateCheck</span></li>
-				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">UpdateHTTP</span></li>
-				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
-				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">ScanWiFi</span></li>
+				<li><li><span class='bold'>Updates:</span></li><hr /></li>
+				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li>
+				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
+				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
+				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
+				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
 		</div>
@@ -171,7 +188,9 @@ function onMessage(event) {
 	%debugWebServer%
 	const d = JSON.parse(event.data);
 	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
-		document.getElementById(d.msg.id).checked = d.msg.value;;
+		document.getElementById(d.msg.id).checked = d.msg.value;
+	} else if(typeof d.cmd != undefined && d.cmd == 'setModule') {
+		document.getElementById(d.msg.id).checked = d.msg.value;
 	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
 		if(d.msg) {
 			let restartRequired = document.getElementById('restartRequired');
@@ -191,7 +210,11 @@ function onMessage(event) {
 			'</p>' + WebSerialBox.innerHTML;
 	}
 }
-function changeHandle(e) {
+function changeModule(e) {
+	xmlHttp.open("GET", "/setModule?Module=" + e.target.id, false);
+	xmlHttp.send(null);
+}
+function changeDebug(e) {
 	xmlHttp.open("GET", "/setDebug?Debug=" + e.target.id, false);
 	xmlHttp.send(null);
 }

@@ -43,7 +43,7 @@ void helperFinder::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugFinder", Debug);
 	wpFZ.blink();
 }
 
@@ -79,7 +79,7 @@ void helperFinder::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
 			EEPROM.commit();
-			wpFZ.SendWS("{\"id\":\"DebugFinder\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugFinder", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}

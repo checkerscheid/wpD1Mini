@@ -64,7 +64,7 @@ void moduleLDR::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLDR, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugLDR\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugLDR", Debug);
 	wpFZ.blink();
 }
 
@@ -149,7 +149,7 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugLDR\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugLDR", Debug);
 		}
 	}
 }

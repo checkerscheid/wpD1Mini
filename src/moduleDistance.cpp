@@ -77,7 +77,7 @@ void moduleDistance::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDistance, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugDistance\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugDistance", Debug);
 	wpFZ.blink();
 }
 
@@ -168,11 +168,11 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDHT, Debug);
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDistance, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugDHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugugDistance", Debug);
 		}
 	}
 }

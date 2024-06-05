@@ -90,7 +90,7 @@ void moduleRelais::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRelais, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugRelais\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugRelais", Debug);
 	wpFZ.blink();
 }
 
@@ -189,7 +189,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 				EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicSetWaterEmpty, String(waterEmptySet));
-				wpFZ.SendWS("{\"id\":\"waterEmpty\",\"value\":" + String(waterEmptySet ? "true" : "false") + "}");
+				wpFZ.SendWSDebug("waterEmpty", waterEmptySet);
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
@@ -239,7 +239,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugRelais\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugRelais", Debug);
 		}
 	}
 }

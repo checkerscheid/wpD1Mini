@@ -71,7 +71,7 @@ void moduleMoisture::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugMoisture, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 	EEPROM.commit();
-	wpFZ.SendWS("{\"id\":\"DebugMoisture\",\"value\":" + String(Debug ? "true" : "false") + "}");
+	wpFZ.SendWSDebug("DebugMoisture", Debug);
 	wpFZ.blink();
 }
 
@@ -186,11 +186,11 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDHT, Debug);
+			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugMoisture, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWS("{\"id\":\"DebugDHT\",\"value\":" + String(Debug ? "true" : "false") + "}");
+			wpFZ.SendWSDebug("DebugMoisture", Debug);
 		}
 	}
 }
