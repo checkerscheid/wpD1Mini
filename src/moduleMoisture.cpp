@@ -68,8 +68,8 @@ uint16_t moduleMoisture::getVersion() {
 
 void moduleMoisture::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugMoisture, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugMoisture", Debug);
 	wpFZ.blink();
@@ -143,8 +143,8 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseMoistureAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseMoistureAvg, useAvg);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
@@ -186,8 +186,8 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugMoisture, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugMoisture", Debug);

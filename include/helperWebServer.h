@@ -45,6 +45,7 @@ class helperWebServer {
 		const int8_t cmdModuleRain = 8;
 		const int8_t cmdModuleMoisture = 9;
 		const int8_t cmdModuleDistance = 10;
+		const int8_t cmdModuleOled096 = 11;
 		int8_t doModuleChange;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -60,12 +61,12 @@ class helperWebServer {
 		const int8_t cmdDebugDHT = 20;
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
-		const int8_t cmdDebugMoisture = 23;
-		const int8_t cmdDebugRain = 24;
-		const int8_t cmdDebugRelais = 25;
-		
-		const int8_t cmdDebugBM = 104;
-		const int8_t cmdDebugDistance = 108;
+		const int8_t cmdDebugBM = 23;
+		const int8_t cmdDebugRelais = 24;
+		const int8_t cmdDebugRain = 25;
+		const int8_t cmdDebugMoisture = 26;
+		const int8_t cmdDebugDistance = 27;
+		const int8_t cmdDebugOled096 = 28;
 		int8_t doDebugChange;
 
 		int8_t doBlink;

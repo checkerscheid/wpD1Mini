@@ -55,8 +55,8 @@ uint16_t moduleBM::getVersion() {
 
 void moduleBM::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugBM, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugBM", Debug);
 	wpFZ.blink();
@@ -124,8 +124,8 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugBM, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugBM", Debug);

@@ -56,8 +56,8 @@ uint16_t helperWiFi::getVersion() {
 
 void helperWiFi::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugWiFi", Debug);
 	wpFZ.blink();
@@ -156,8 +156,8 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugWiFi, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+			bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
 			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugWiFi", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));

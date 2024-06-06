@@ -61,8 +61,8 @@ uint16_t moduleLDR::getVersion() {
 
 void moduleLDR::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLDR, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugLDR", Debug);
 	wpFZ.blink();
@@ -135,8 +135,8 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseLdrAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseLdrAvg, useAvg);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
@@ -145,8 +145,8 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLDR, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugLDR", Debug);

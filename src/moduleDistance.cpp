@@ -24,14 +24,13 @@ void moduleDistance::init() {
 	pinMode(trigPin, OUTPUT);
 	pinMode(echoPin, INPUT_PULLUP);
 	volume = 0;
-	height = 0;
 	distanceRaw = 0;
 	distanceAvg = 0;
 	error = false;
 	// values
 	mqttTopicVolume = wpFZ.DeviceName + "/Volume";
-	mqttTopicdistanceRaw = wpFZ.DeviceName + "/Distance/Raw";
-	mqttTopicdistanceAvg = wpFZ.DeviceName + "/Distance/Avg";
+	mqttTopicDistanceRaw = wpFZ.DeviceName + "/Distance/Raw";
+	mqttTopicDistanceAvg = wpFZ.DeviceName + "/Distance/Avg";
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/Distance";
 	// settings
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Distance/maxCycle";
@@ -57,10 +56,10 @@ void moduleDistance::init() {
 //###################################################################################
 // public
 //###################################################################################
-void moduleDistance::cycle() {
-	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
-		cycleCounter = 0;
+void moduleDistance::cycle() {	if(
+	wpFZ.calcValues && ++cycleCounter >= maxCycle) {
 		calc();
+		cycleCounter = 0;
 	}
 	publishValues();
 }
@@ -74,8 +73,8 @@ uint16_t moduleDistance::getVersion() {
 
 void moduleDistance::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDistance, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugDistance", Debug);
 	wpFZ.blink();
@@ -105,6 +104,12 @@ void moduleDistance::publishValues(bool force) {
 	}
 	if(volumeLast != volume || ++publishCountVolume > wpFZ.publishQoS) {
 		publishValue();
+	}
+	if(distanceRawLast != distanceRaw || ++publishCountDistanceRaw > wpFZ.publishQoS) {
+		publishDistanceRaw();
+	}
+	if(distanceAvgLast != distanceAvg || ++publishCountDistanceAvg > wpFZ.publishQoS) {
+		publishDistanceAvg();
 	}
 	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
 		errorLast = error;
@@ -168,8 +173,8 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugDistance, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugugDistance", Debug);
@@ -182,13 +187,31 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleDistance::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicVolume.c_str(), String(volume).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("volume", String(volume));
+	wpRest.error = wpRest.error | !wpRest.sendRest("vol", String(volume));
 	wpRest.trySend = true;
 	volumeLast = volume;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("Volume", String(volume), String(publishCountVolume));
 	}
 	publishCountVolume = 0;
+}
+
+void moduleDistance::publishDistanceRaw() {
+	wpMqtt.mqttClient.publish(mqttTopicDistanceRaw.c_str(), String(distanceRaw).c_str());
+	distanceRawLast = distanceRaw;
+	if(wpMqtt.Debug) {
+		printPublishValueDebug("DistanceRaw", String(distanceRaw), String(publishCountDistanceRaw));
+	}
+	publishCountDistanceRaw = 0;
+}
+
+void moduleDistance::publishDistanceAvg() {
+	wpMqtt.mqttClient.publish(mqttTopicDistanceAvg.c_str(), String(distanceAvg).c_str());
+	distanceAvgLast = distanceAvg;
+	if(wpMqtt.Debug) {
+		printPublishValueDebug("DistanceAvg", String(distanceAvg), String(publishCountDistanceAvg));
+	}
+	publishCountDistanceAvg = 0;
 }
 
 void moduleDistance::calc() {
@@ -203,17 +226,16 @@ void moduleDistance::calc() {
 	// Zeit messen, bis das Signal zurückkommt, mit timeout
 	duration = pulseIn(echoPin, HIGH, wpFZ.loopTime * 1000);
 	if(duration > 0) {
-		distanceRaw = (duration * 0.03432 / 2);
+		distanceRaw = (duration * 0.03432 / 2) * 100;
 		distanceAvg = calcAvg(distanceRaw) + correction;
 		if(height <= 0) height = 1; // durch 0
-		if(distanceAvg > height) distanceAvg = height;
-		volume = maxVolume - round(maxVolume * distanceAvg / height);
+		if(distanceAvg > height * 100) distanceAvg = height * 100;
+		volume = maxVolume - round(maxVolume * distanceAvg / (height * 100));
 		if(volume > maxVolume) volume = maxVolume;
 		error = false;
 		if(Debug) {
 			calcDistanceDebug("Distance", distanceAvg, distanceRaw);
 		}
-		delay(wpFZ.loopTime);
 	} else {
 		error = true;
 		String logmessage = "Sensor Failure";
@@ -221,7 +243,7 @@ void moduleDistance::calc() {
 	}
 }
 uint16_t moduleDistance::calcAvg(uint16_t raw) {
-	long avg = 0;
+	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
 	for(int i = 0; i < avgLength - 1; i++) {
@@ -234,7 +256,7 @@ uint16_t moduleDistance::calcAvg(uint16_t raw) {
 	avg += raw * avgLength;
 	return round(avg / avgCount);
 }
-void moduleDistance::calcDistanceDebug(String name, uint8_t avg, uint8_t raw) {
+void moduleDistance::calcDistanceDebug(String name, uint16_t avg, uint16_t raw) {
 	String logmessage = name + ": " + String(avg) + " (" + String(raw) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "calcDistance", logmessage);
 }

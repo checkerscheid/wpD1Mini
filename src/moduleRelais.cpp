@@ -87,8 +87,8 @@ uint16_t moduleRelais::getVersion() {
 
 void moduleRelais::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRelais, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugRelais", Debug);
 	wpFZ.blink();
@@ -185,8 +185,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			bool readSetWaterEmpty = msg.toInt();
 			if(waterEmptySet != readSetWaterEmpty) {
 				waterEmptySet = readSetWaterEmpty;
-				bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
-				EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+				bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
+				EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicSetWaterEmpty, String(waterEmptySet));
 				wpFZ.SendWSDebug("waterEmpty", waterEmptySet);
@@ -215,8 +215,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHand = msg.toInt();
 		if(handSet != readSetHand) {
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitRelaisHand, handSet);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisHand, handSet);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
@@ -225,8 +225,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
 			handValueSet = readSetHandValue;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitRelaisHandValue, handValueSet);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisHandValue, handValueSet);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
@@ -235,8 +235,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRelais, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugRelais", Debug);

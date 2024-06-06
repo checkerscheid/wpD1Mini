@@ -17,12 +17,12 @@
 #define moduleLight_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <Wire.h>
 #include <AS_BH1750.h>
+#include <Wire.h>
 
 class moduleLight {
 	public:
-		int16_t light;
+		uint16_t light;
 		bool useAvg = false;
 
 		bool Debug = false;
@@ -58,7 +58,7 @@ class moduleLight {
 		uint16_t cycleCounter;
 		bool errorLast;
 		uint16_t publishCountError;
-		int16_t lightLast;
+		uint16_t lightLast;
 		uint16_t publishCountLight;
 		bool DebugLast;
 		uint16_t publishCountDebug;

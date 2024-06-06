@@ -65,8 +65,8 @@ uint16_t moduleLight::getVersion() {
 
 void moduleLight::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugLight", Debug);
 	wpFZ.blink();
@@ -139,8 +139,8 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseLightAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseLightAvg, useAvg);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
@@ -149,8 +149,8 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugLight, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugLight", Debug);
@@ -192,7 +192,7 @@ void moduleLight::calc() {
 	}
 }
 uint16_t moduleLight::calcAvg(uint16_t raw) {
-	long avg = 0;
+	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
 	for(int i = 0; i < avgLength - 1; i++) {

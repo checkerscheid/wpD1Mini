@@ -60,6 +60,9 @@ void setup() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.init();
 	}
+	if(wpModules.useModuleOled096) {
+		wpOled096.init();
+	}
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
@@ -69,6 +72,8 @@ void setup() {
 // loop
 //###################################################################################
 void loop() {
+	wpRest.trySend = false;
+	wpRest.error = false;
 	wpFZ.cycle();
 	wpEEPROM.cycle();
 	wpWiFi.cycle();
@@ -76,7 +81,6 @@ void loop() {
 	wpModules.cycle();
 	wpOnlineToggler.cycle();
 	wpFinder.cycle();
-	wpRest.cycle();
 	wpUpdate.cycle();
 	wpWebServer.cycle();
 	if(!wpFZ.restartRequired) {
@@ -104,12 +108,12 @@ void loop() {
 		if(wpModules.useModuleDistance) {
 			wpDistance.cycle();
 		}
-		if(!wpModules.useModuleDistance) {
-			delay(wpFZ.loopTime);
+		if(wpModules.useModuleOled096) {
+			wpOled096.cycle();
 		}
-	} else {
-		delay(wpFZ.loopTime);
 	}
+	wpRest.cycle();
+	delay(wpFZ.loopTime);
 }
 
 //###################################################################################
@@ -153,6 +157,7 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
+	buildChecker(v, wpOled096.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16 moduleBuild) {

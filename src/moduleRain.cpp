@@ -61,8 +61,8 @@ uint16_t moduleRain::getVersion() {
 
 void moduleRain::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRain, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugRain", Debug);
 	wpFZ.blink();
@@ -135,8 +135,8 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings, wpEEPROM.bitUseRainAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings, wpEEPROM.bitsModulesSettings);
+			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseRainAvg, useAvg);
+			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
@@ -145,8 +145,8 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules, wpEEPROM.bitDebugRain, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules, wpEEPROM.bitsDebugModules);
+			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 			wpFZ.SendWSDebug("DebugRain", Debug);
