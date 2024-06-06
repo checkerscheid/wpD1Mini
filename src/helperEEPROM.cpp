@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 132 2024-06-06 11:07:48Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 135 2024-06-06 14:04:54Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 135 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -153,7 +153,6 @@ void helperEEPROM::readVars() {
 		bitsModules1 = EEPROM.read(addrBitsModules1);
 		wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 		wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
-		wpModules.useModuleOled096 = bitRead(bitsModules1, bitUseOled096);
 		
 		bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
 		Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);

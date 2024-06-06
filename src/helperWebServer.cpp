@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 132 2024-06-06 11:07:48Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 135 2024-06-06 14:04:54Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 135 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -192,10 +192,6 @@ void helperWebServer::setupWebServer() {
 			message += wpFZ.JsonKeyValue("height", String(wpDistance.height));
 			message += "},";
 		}
-		if(wpModules.useModuleOled096) {
-			message += "\"Oled096\":{";
-			message += "},";
-		}
 		message += "\"Debug\":{";
 		message += wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + ",";
@@ -244,8 +240,7 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Oled096", wpModules.useModuleOled096 ? "true" : "false");
+		message += wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false");
 		message += "}}}";
 		request->send(200, "application/json", message.c_str());
 	});
@@ -371,10 +366,6 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugMoisture");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugMoisture);
 			}
-			if(request->getParam("Debug")->value() == "DebugOled096") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugOled096");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugOled096);
-			}
 		}
 		request->send(200);
 		wpWebServer.setBlink();
@@ -492,7 +483,6 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
 		if(doModuleChange == cmdModuleMoisture) wpModules.changeModuleMoisture(!wpModules.useModuleMoisture);
 		if(doModuleChange == cmdModuleDistance) wpModules.changeModuleDistance(!wpModules.useModuleDistance);
-		if(doModuleChange == cmdModuleOled096) wpModules.changeModuleOled096(!wpModules.useModuleOled096);
 		doModuleChange = cmdDoNothing;
 	}
 }
@@ -564,9 +554,7 @@ String processor(const String& var) {
 		"<li><input id='useMoisture' type='checkbox'" + String(wpModules.useModuleMoisture ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useMoisture'>wpMoisture</label></li>" +
 		"<li><input id='useDistance' type='checkbox'" + String(wpModules.useModuleDistance ? " checked" : "") +
-			" onchange='changeModule(event)' /><label for='useDistance'>wpDistance</label></li>" +
-		"<li><input id='useOled096' type='checkbox'" + String(wpModules.useModuleOled096 ? " checked" : "") +
-			" onchange='changeModule(event)' /><label for='useOled096'>wpOled096</label></li>";
+			" onchange='changeModule(event)' /><label for='useDistance'>wpDistance</label></li>";
 		return returns += "</ul>";
 	}
 //###################################################################################

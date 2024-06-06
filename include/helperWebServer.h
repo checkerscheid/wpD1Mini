@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 132 2024-06-06 11:07:48Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 135 2024-06-06 14:04:54Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -45,7 +45,6 @@ class helperWebServer {
 		const int8_t cmdModuleRain = 8;
 		const int8_t cmdModuleMoisture = 9;
 		const int8_t cmdModuleDistance = 10;
-		const int8_t cmdModuleOled096 = 11;
 		int8_t doModuleChange;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -66,7 +65,6 @@ class helperWebServer {
 		const int8_t cmdDebugRain = 25;
 		const int8_t cmdDebugMoisture = 26;
 		const int8_t cmdDebugDistance = 27;
-		const int8_t cmdDebugOled096 = 28;
 		int8_t doDebugChange;
 
 		int8_t doBlink;
@@ -97,7 +95,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 132 $";
+		String SVNh = "$Rev: 135 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };

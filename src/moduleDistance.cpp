@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 132 2024-06-06 11:07:48Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 135 2024-06-06 14:04:54Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -65,7 +65,7 @@ void moduleDistance::cycle() {	if(
 }
 
 uint16_t moduleDistance::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 135 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -226,11 +226,11 @@ void moduleDistance::calc() {
 	// Zeit messen, bis das Signal zurückkommt, mit timeout
 	duration = pulseIn(echoPin, HIGH, wpFZ.loopTime * 1000);
 	if(duration > 0) {
-		distanceRaw = (duration * 0.03432 / 2) * 100;
-		distanceAvg = calcAvg(distanceRaw) + correction;
+		distanceRaw = ((duration * 0.03432 / 2) * 10) + correction;
+		distanceAvg = calcAvg(distanceRaw);
 		if(height <= 0) height = 1; // durch 0
-		if(distanceAvg > height * 100) distanceAvg = height * 100;
-		volume = maxVolume - round(maxVolume * distanceAvg / (height * 100));
+		if(distanceAvg > height * 10) distanceAvg = height * 10;
+		volume = maxVolume - round(maxVolume * distanceAvg / (height * 10));
 		if(volume > maxVolume) volume = maxVolume;
 		error = false;
 		if(Debug) {

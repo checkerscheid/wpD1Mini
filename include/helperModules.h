@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 132 2024-06-06 11:07:48Z                 $ #
+//# File-ID      : $Id:: helperModules.h 135 2024-06-06 14:04:54Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -32,7 +32,6 @@ class helperModules {
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
-		bool useModuleOled096 = false;
 
 		// commands
 		String mqttTopicDebug;
@@ -47,7 +46,6 @@ class helperModules {
 		String mqttTopicUseRain;
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
-		String mqttTopicUseOled096;
 
 		helperModules();
 		void init();
@@ -73,7 +71,6 @@ class helperModules {
 		void changeModuleRain(bool newValue);
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
-		void changeModuleOled096(bool newValue);
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -82,7 +79,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 132 $";
+		String SVNh = "$Rev: 135 $";
 		bool useDHT11Last = false;
 		uint16 publishCountUseDHT11 = 0;
 		bool useDHT22Last = false;
@@ -103,8 +100,6 @@ class helperModules {
 		uint16 publishCountUseMoisture = 0;
 		bool useDistanceLast = false;
 		uint16 publishCountUseDistance = 0;
-		bool useOled096Last = false;
-		uint16 publishCountUseOled096 = 0;
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };

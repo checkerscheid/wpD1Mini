@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 135                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 132 2024-06-06 11:07:48Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 135 2024-06-06 14:04:54Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -33,7 +33,6 @@ void helperModules::init() {
 	mqttTopicUseRain = wpFZ.DeviceName + "/settings/useModule/Rain";
 	mqttTopicUseMoisture = wpFZ.DeviceName + "/settings/useModule/Moisture";
 	mqttTopicUseDistance = wpFZ.DeviceName + "/settings/useModule/Distance";
-	mqttTopicUseOled096 = wpFZ.DeviceName + "/settings/useModule/Oled096";
 
 	choosenDHTmodul = 0;
 	if(useModuleDHT11) {
@@ -52,7 +51,7 @@ void helperModules::cycle() {
 }
 
 uint16_t helperModules::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 135 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -140,12 +139,6 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useDistance", useModuleDistance);
 		publishCountUseDistance = 0;
 	}
-	if(useOled096Last != useModuleOled096 || publishCountUseOled096 > wpFZ.publishQoS) {
-		useOled096Last = useModuleOled096;
-		wpMqtt.mqttClient.publish(mqttTopicUseOled096.c_str(), String(useModuleOled096).c_str());
-		wpFZ.SendWSModule("useOled096", useModuleOled096);
-		publishCountUseOled096 = 0;
-	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
@@ -165,7 +158,6 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseMoisture.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseDistance.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseOled096.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperModules::checkSubscribes(char* topic, String msg) {
@@ -208,10 +200,6 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicUseDistance.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
 		changeModuleDistance(readUseModule);
-	}
-	if(strcmp(topic, mqttTopicUseOled096.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
-		changeModuleOled096(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
@@ -335,17 +323,6 @@ void helperModules::changeModuleDistance(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseDistance, String(useModuleDistance));
 	}
 }
-void helperModules::changeModuleOled096(bool newValue) {
-	if(useModuleOled096 != newValue) {
-		useModuleOled096 = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseOled096, useModuleOled096);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
-		EEPROM.commit();
-		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleOled096", useModuleOled096);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseOled096, String(useModuleOled096));
-	}
-}
 
 
 void helperModules::publishAllSettings() {
@@ -386,9 +363,6 @@ void helperModules::publishAllSettings(bool force) {
 	}
 	if(wpModules.useModuleDistance) {
 		wpDistance.publishSettings(force);
-	}
-	if(wpModules.useModuleOled096) {
-		wpOled096.publishSettings(force);
 	}
 }
 
@@ -431,9 +405,6 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleDistance) {
 		wpDistance.publishValues(force);
 	}
-	if(wpModules.useModuleOled096) {
-		wpOled096.publishValues(force);
-	}
 }
 
 void helperModules::setAllSubscribes() {
@@ -472,9 +443,6 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.setSubscribes();
 	}
-	if(wpModules.useModuleOled096) {
-		wpOled096.setSubscribes();
-	}
 }
 void helperModules::checkAllSubscribes(char* topic, String msg) {
 	wpFZ.checkSubscribes(topic, msg);
@@ -510,9 +478,6 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleDistance) {
 		wpDistance.checkSubscribes(topic, msg);
-	}
-	if(wpModules.useModuleOled096) {
-		wpOled096.checkSubscribes(topic, msg);
 	}
 }
 //###################################################################################
