@@ -234,9 +234,6 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.Debug ? "true" : "false");
 		}
-		if(wpModules.useModuleOled096) {
-			message += "," + wpFZ.JsonKeyValue("Oled096", wpOled096.Debug ? "true" : "false");
-		}
 		message += "},\"useModul\":{";
 		message += wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + ",";
@@ -519,7 +516,6 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugRain) wpRain.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
-		if(doDebugChange == cmdDebugOled096) wpOled096.changeDebug();
 		doDebugChange = cmdDoNothing;
 	}
 }
@@ -633,10 +629,6 @@ String processor(const String& var) {
 		if(wpModules.useModuleDistance) {
 			returns += "<li><input id='DebugDistance' type='checkbox'" + String(wpDistance.Debug ? " checked='checked'" : "") +
 				" onchange='changeDebug(event)' /><label for='DebugDistance'>Distance</label></li>";
-		}
-		if(wpModules.useModuleOled096) {
-			returns += "<li><input id='DebugOled096' type='checkbox'" + String(wpOled096.Debug ? " checked='checked'" : "") +
-				" onchange='changeDebug(event)' /><label for='DebugOled096'>Oled096</label></li>";
 		}
 		return returns += "</ul>";
 	}

@@ -166,7 +166,6 @@ void helperEEPROM::readVars() {
 		wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
 
 		bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
-		wpOled096.Debug = bitRead(bitsDebugBasis1, bitDebugOled096);
 
 		bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
 		wpDHT.Debug = bitRead(bitsDebugModules0, bitDebugDHT);

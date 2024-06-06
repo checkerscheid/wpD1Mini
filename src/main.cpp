@@ -60,9 +60,6 @@ void setup() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.init();
 	}
-	if(wpModules.useModuleOled096) {
-		wpOled096.init();
-	}
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
@@ -107,9 +104,6 @@ void loop() {
 		}
 		if(wpModules.useModuleDistance) {
 			wpDistance.cycle();
-		}
-		if(wpModules.useModuleOled096) {
-			wpOled096.cycle();
 		}
 	}
 	wpRest.cycle();
@@ -157,7 +151,6 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
-	buildChecker(v, wpOled096.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16 moduleBuild) {
