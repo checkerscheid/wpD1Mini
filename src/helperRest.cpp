@@ -34,6 +34,9 @@ void helperRest::init() {
 // public
 //###################################################################################
 void helperRest::cycle() {
+	if(trySend) {
+		errorIsSet = error;
+	}
 	publishValues();
 }
 
@@ -46,8 +49,8 @@ uint16_t helperRest::getVersion() {
 
 void helperRest::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugRest, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugRest", Debug);
 	wpFZ.blink();
@@ -126,9 +129,9 @@ void helperRest::publishValues(bool force) {
 		publishCountError = wpFZ.publishQoS;
 		publishCountDebug = wpFZ.publishQoS;
 	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+	if(errorLast != errorIsSet || ++publishCountError > wpFZ.publishQoS) {
+		errorLast = errorIsSet;
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(errorIsSet).c_str());
 		publishCountError = 0;
 	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
@@ -146,8 +149,8 @@ void helperRest::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis, wpEEPROM.bitDebugFinder, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis, wpEEPROM.bitsDebugBasis);
+			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugRest", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));

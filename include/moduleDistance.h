@@ -21,8 +21,8 @@
 class moduleDistance {
 	public:
 		uint16_t volume;
-		uint8_t distanceRaw = 0;
-		uint8_t distanceAvg = 0;
+		uint16_t distanceRaw;
+		uint16_t distanceAvg;
 		bool Debug = false;
 		uint8_t height = 120;
 		uint16_t maxVolume = 6000;
@@ -32,8 +32,8 @@ class moduleDistance {
 
 		// values
 		String mqttTopicVolume;
-		String mqttTopicdistanceRaw;
-		String mqttTopicdistanceAvg;
+		String mqttTopicDistanceRaw;
+		String mqttTopicDistanceAvg;
 		String mqttTopicError;
 		// settings
 		String mqttTopicMaxCycle;
@@ -60,11 +60,11 @@ class moduleDistance {
 		uint8_t trigPin;
 		uint8_t echoPin;
 		uint16_t cycleCounter;
-		uint8_t volumeLast;
+		uint16_t volumeLast;
 		uint16_t publishCountVolume;
-		uint8_t distanceRawLast;
+		uint16_t distanceRawLast;
 		uint16_t publishCountDistanceRaw;
-		uint8_t distanceAvgLast;
+		uint16_t distanceAvgLast;
 		uint16_t publishCountDistanceAvg;
 		bool errorLast;
 		uint16_t publishCountError;
@@ -74,9 +74,11 @@ class moduleDistance {
 		int avgValues[avgLength];
 
 		void publishValue();
+		void publishDistanceRaw();
+		void publishDistanceAvg();
 		void calc();
 		uint16_t calcAvg(uint16_t raw);
-		void calcDistanceDebug(String name, uint8_t avg, uint8_t raw);
+		void calcDistanceDebug(String name, uint16_t avg, uint16_t raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 };
 extern moduleDistance wpDistance;

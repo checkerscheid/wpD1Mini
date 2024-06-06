@@ -38,39 +38,47 @@ class helperEEPROM {
 		byte bitsModules1;
 		const byte bitUseMoisture = 0; // include in bitsModules1
 		const byte bitUseDistance = 1; // include in bitsModules1
+		const byte bitUseOled096 = 2; // include in bitsModules1
 		
-		const byte addrBitsDebugBasis = 2;
-		byte bitsDebugBasis;
-		const byte bitDebugEEPROM = 0; // include in bitsDebugBasis
-		const byte bitDebugFinder = 1; // include in bitsDebugBasis
-		const byte bitDebugModules = 2; // include in bitsDebugBasis
-		const byte bitDebugMqtt = 3; // include in bitsDebugBasis
-		const byte bitDebugOnlineToggler = 4; // include in bitsDebugBasis
-		const byte bitDebugRest = 5; // include in bitsDebugBasis
-		const byte bitDebugUpdate = 6; // include in bitsDebugBasis
-		const byte bitDebugWebServer = 7; // include in bitsDebugBasis
-		const byte bitDebugWiFi = 8; // include in bitsDebugBasis
+		const byte addrBitsDebugBasis0 = 2;
+		byte bitsDebugBasis0;
+		const byte bitDebugEEPROM = 0; // include in bitsDebugBasis0
+		const byte bitDebugFinder = 1; // include in bitsDebugBasis0
+		const byte bitDebugModules = 2; // include in bitsDebugBasis0
+		const byte bitDebugMqtt = 3; // include in bitsDebugBasis0
+		const byte bitDebugOnlineToggler = 4; // include in bitsDebugBasis0
+		const byte bitDebugRest = 5; // include in bitsDebugBasis0
+		const byte bitDebugUpdate = 6; // include in bitsDebugBasis0
+		const byte bitDebugWebServer = 7; // include in bitsDebugBasis0
 		
-		const byte addrBitsDebugModules = 3;
-		byte bitsDebugModules;
-		const byte bitDebugDHT = 0; // include in bitsDebugModules
-		const byte bitDebugLDR = 1; // include in bitsDebugModules
-		const byte bitDebugLight = 2; // include in bitsDebugModules
-		const byte bitDebugBM = 3; // include in bitsDebugModules
-		const byte bitDebugRelais = 4; // include in bitsDebugModules
-		const byte bitDebugRain = 5; // include in bitsDebugModules
-		const byte bitDebugMoisture = 6; // include in bitsDebugModules
-		const byte bitDebugDistance = 7; // include in bitsDebugModules
+		const byte addrBitsDebugBasis1 = 3;
+		byte bitsDebugBasis1;
+		const byte bitDebugWiFi = 8; // include in bitsDebugBasis1
 		
-		const byte addrBitsModulesSettings = 5;
-		byte bitsModulesSettings;
-		const byte bitUseLdrAvg = 0; // include in bitsModulesSettings
-		const byte bitUseLightAvg = 1; // include in bitsModulesSettings
-		const byte bitRelaisHand = 2; // include in bitsModulesSettings
-		const byte bitRelaisHandValue = 3; // include in bitsModulesSettings
-		const byte bitRelaisWaterEmpty = 4; // include in bitsModulesSettings
-		const byte bitUseRainAvg = 5; // include in bitsModulesSettings
-		const byte bitUseMoistureAvg = 6; // include in bitsModulesSettings
+		const byte addrBitsDebugModules0 = 4;
+		byte bitsDebugModules0;
+		const byte bitDebugDHT = 0; // include in bitsDebugModules0
+		const byte bitDebugLDR = 1; // include in bitsDebugModules0
+		const byte bitDebugLight = 2; // include in bitsDebugModules0
+		const byte bitDebugBM = 3; // include in bitsDebugModules0
+		const byte bitDebugRelais = 4; // include in bitsDebugModules0
+		const byte bitDebugRain = 5; // include in bitsDebugModules0
+		const byte bitDebugMoisture = 6; // include in bitsDebugModules0
+		const byte bitDebugDistance = 7; // include in bitsDebugModules0
+		
+		const byte addrBitsDebugModules1 = 5;
+		byte bitsDebugModules1;
+		const byte bitDebugOled096 = 0; // include in bitsDebugModules1
+
+		const byte addrBitsModulesSettings0 = 6;
+		byte bitsModulesSettings0;
+		const byte bitUseLdrAvg = 0; // include in bitsModulesSettings0
+		const byte bitUseLightAvg = 1; // include in bitsModulesSettings0
+		const byte bitRelaisHand = 2; // include in bitsModulesSettings0
+		const byte bitRelaisHandValue = 3; // include in bitsModulesSettings0
+		const byte bitRelaisWaterEmpty = 4; // include in bitsModulesSettings0
+		const byte bitUseRainAvg = 5; // include in bitsModulesSettings0
+		const byte bitUseMoistureAvg = 6; // include in bitsModulesSettings0
 
 /// byte values: byte 10 - 29
 		const byte byteMaxCycleDHT = 10;

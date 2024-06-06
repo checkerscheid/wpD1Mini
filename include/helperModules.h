@@ -32,6 +32,7 @@ class helperModules {
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
+		bool useModuleOled096 = false;
 
 		// commands
 		String mqttTopicDebug;
@@ -46,6 +47,7 @@ class helperModules {
 		String mqttTopicUseRain;
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
+		String mqttTopicUseOled096;
 
 		helperModules();
 		void init();
@@ -71,6 +73,7 @@ class helperModules {
 		void changeModuleRain(bool newValue);
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
+		void changeModuleOled096(bool newValue);
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -100,6 +103,8 @@ class helperModules {
 		uint16 publishCountUseMoisture = 0;
 		bool useDistanceLast = false;
 		uint16 publishCountUseDistance = 0;
+		bool useOled096Last = false;
+		uint16 publishCountUseOled096 = 0;
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };

@@ -6,42 +6,31 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 29.05.2024                                                       #
+//# Date         : 05.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 123                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 125 2024-06-03 03:11:11Z                   $ #
+//# File-ID      : $Id:: helperRest.h 123 2024-06-02 04:37:07Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleLight_h
-#define moduleLight_h
+#ifndef moduleOled096_h
+#define moduleOled096_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <AS_BH1750.h>
+#include <U8g2lib.h>
 #include <Wire.h>
-
-class moduleLight {
+const char COPYRIGHT_SYMBOL[] = { 0xa9, '\0' };
+class moduleOled096 {
 	public:
-		uint16_t light;
-		bool useAvg = false;
-
 		bool Debug = false;
-		bool error;
-		int16_t correction = 0;
-		uint8_t maxCycle = 5;
-		// values
-		String mqttTopicLight;
-		String mqttTopicError;
 		// settings
-		String mqttTopicMaxCycle;
-		String mqttTopicCorrection;
-		String mqttTopicUseAvg;
 		// commands
+		String mqttTopicError;
 		String mqttTopicDebug;
 		
-		static AS_BH1750 lightMeter;
+		bool error = false;
 
-		moduleLight();
+		moduleOled096();
 		void init();
 		void cycle();
 		uint16_t getVersion();
@@ -54,24 +43,52 @@ class moduleLight {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 125 $";
-		uint16_t cycleCounter;
-		bool errorLast;
-		uint16_t publishCountError;
-		uint16_t lightLast;
-		uint16_t publishCountLight;
-		bool DebugLast;
-		uint16_t publishCountDebug;
-		static const uint8_t avgLength = 128;
-		int avgValues[avgLength];
+		String SVNh = "$Rev: 123 $";
+		U8G2_SSD1306_128X64_NONAME_F_HW_I2C* u8g2;
+		bool errorLast = false;
+		uint16_t publishCountError = 0;
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
+		uint16_t displayCounter;
+		uint16_t displayChecker;
 
-		void publishValue();
-		void calc();
-		uint16_t calcAvg(uint16_t raw);
-		void printCalcError(String name);
-		void printCalcDebug(String name, int16_t value, float raw);
-		void printPublishValueDebug(String name, String value, String publishCount);
+		uint8_t X;
+		uint8_t Y;
+		String mqttTopicX;
+		String mqttTopicY;
+		uint8_t FX;
+		uint8_t FY;
+		String mqttTopicFX;
+		String mqttTopicFY;
+
+		uint8_t TX;
+		uint8_t TY;
+		String mqttTopicTX;
+		String mqttTopicTY;
+		uint8_t HX;
+		uint8_t HY;
+		String mqttTopicHX;
+		String mqttTopicHY;
+
+		uint8_t TTX;
+		uint8_t TTY;
+		String mqttTopicTTX;
+		String mqttTopicTTY;
+		uint8_t THX;
+		uint8_t THY;
+		String mqttTopicTHX;
+		String mqttTopicTHY;
+
+		void u8g2_temp_hum();
+		void u8g2_FreakaZone();
+		void u8g2_prepare();
+		void u8g2_box_frame();
+		void u8g2_r_frame_box();
+		void u8g2_disc_circle();
+		void u8g2_string_orientation();
+		void u8g2_line();
+		void u8g2_triangle();
+		void u8g2_unicode();
 };
-extern moduleLight wpLight;
-
+extern moduleOled096 wpOled096;
 #endif

@@ -30,6 +30,7 @@ class helperRest {
 		
 		bool error = false;
 		bool trySend = false;
+		bool errorIsSet = false;
 
 		helperRest();
 		void init();

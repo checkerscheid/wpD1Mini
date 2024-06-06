@@ -35,6 +35,7 @@
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
+#include <moduleOled096.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
