@@ -24,33 +24,60 @@ void moduleOled096::init() {
 	// commands
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/Oled096";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Oled096";
-
-	mqttTopicX = wpFZ.DeviceName + "/X";
-	mqttTopicY = wpFZ.DeviceName + "/Y";
-	X = 72;
-	Y = 19;
+	// FreakaZone - Z
+	mqttTopicZX = wpFZ.DeviceName + "/ZX";
+	mqttTopicZY = wpFZ.DeviceName + "/ZY";
+	ZX = 72;
+	ZY = 19;
+	// FreakaZone
 	mqttTopicFX = wpFZ.DeviceName + "/FX";
 	mqttTopicFY = wpFZ.DeviceName + "/FY";
 	FX = 11;
 	FY = 20;
 
+	// Temperatur
 	mqttTopicTX = wpFZ.DeviceName + "/TX";
 	mqttTopicTY = wpFZ.DeviceName + "/TY";
 	TX = 52;
 	TY = 13;
+	// Temperatur Text
 	mqttTopicTTX = wpFZ.DeviceName + "/TTX";
 	mqttTopicTTY = wpFZ.DeviceName + "/TTY";
 	TTX = 0;
 	TTY = 0;
 
+	// Humidity
 	mqttTopicHX = wpFZ.DeviceName + "/HX";
 	mqttTopicHY = wpFZ.DeviceName + "/HY";
-	HX = 37;
-	HY = 44;
+	HX = 38;
+	HY = 45;
+	// Humidity Text
 	mqttTopicTHX = wpFZ.DeviceName + "/THX";
 	mqttTopicTHY = wpFZ.DeviceName + "/THY";
 	THX = 0;
 	THY = 31;
+
+	// Moisture
+	mqttTopicMX = wpFZ.DeviceName + "/MX";
+	mqttTopicMY = wpFZ.DeviceName + "/MY";
+	MX = 70;
+	MY = 25;
+	// Moisture Text
+	mqttTopicTMX = wpFZ.DeviceName + "/TMX";
+	mqttTopicTMY = wpFZ.DeviceName + "/TMY";
+	TMX = 0;
+	TMY = 11;
+
+	// Pia
+	mqttTopicPX = wpFZ.DeviceName + "/PX";
+	mqttTopicPY = wpFZ.DeviceName + "/PY";
+	PX = 50;
+	PY = 25;
+	// Pia Text
+	mqttTopicTPX = wpFZ.DeviceName + "/TPX";
+	mqttTopicTPY = wpFZ.DeviceName + "/TPY";
+	TPX = 0;
+	TPY = 11;
 	
 	u8g2 = new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
 	u8g2->begin();
@@ -64,18 +91,18 @@ void moduleOled096::init() {
 //###################################################################################
 void moduleOled096::cycle() {
 	if(displayCounter == 0) {
-		u8g2->clearBuffer();
-		u8g2_prepare();
-		u8g2_FreakaZone();
-		u8g2->sendBuffer();
+		FreakaZone();
 	}
 	if(displayCounter == 10) {
-		u8g2->clearBuffer();
-		u8g2_prepare();
-		u8g2_temp_hum();
-		u8g2->sendBuffer();
+		temp_hum();
 	}
-	if(++displayCounter > 60) {
+	if(displayCounter == 60) {
+		moisture();
+	}
+	if(displayCounter == 110) {
+		pia();
+	}
+	if(++displayCounter > 160) {
 		displayCounter = 0;
 	}
 	publishValues();
@@ -128,8 +155,8 @@ void moduleOled096::publishValues(bool force) {
 
 void moduleOled096::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicX.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicY.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicZX.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicZY.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicFX.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicFY.c_str());
 
@@ -141,6 +168,14 @@ void moduleOled096::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicHY.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicTHX.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicTHY.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicMX.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicMY.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTMX.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTMY.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicPX.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicPY.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTPX.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTPY.c_str());
 }
 void moduleOled096::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -154,8 +189,8 @@ void moduleOled096::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
-	if(strcmp(topic, mqttTopicX.c_str()) == 0) X = msg.toInt();
-	if(strcmp(topic, mqttTopicY.c_str()) == 0) Y = msg.toInt();
+	if(strcmp(topic, mqttTopicZX.c_str()) == 0) ZX = msg.toInt();
+	if(strcmp(topic, mqttTopicZY.c_str()) == 0) ZY = msg.toInt();
 	if(strcmp(topic, mqttTopicFX.c_str()) == 0) FX = msg.toInt();
 	if(strcmp(topic, mqttTopicFY.c_str()) == 0) FY = msg.toInt();
 	
@@ -168,6 +203,16 @@ void moduleOled096::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicHY.c_str()) == 0) HY = msg.toInt();
 	if(strcmp(topic, mqttTopicTHX.c_str()) == 0) THX = msg.toInt();
 	if(strcmp(topic, mqttTopicTHY.c_str()) == 0) THY = msg.toInt();
+
+	if(strcmp(topic, mqttTopicMX.c_str()) == 0) MX = msg.toInt();
+	if(strcmp(topic, mqttTopicMY.c_str()) == 0) MY = msg.toInt();
+	if(strcmp(topic, mqttTopicTMX.c_str()) == 0) TMX = msg.toInt();
+	if(strcmp(topic, mqttTopicTMY.c_str()) == 0) TMY = msg.toInt();
+
+	if(strcmp(topic, mqttTopicPX.c_str()) == 0) PX = msg.toInt();
+	if(strcmp(topic, mqttTopicPY.c_str()) == 0) PY = msg.toInt();
+	if(strcmp(topic, mqttTopicTPX.c_str()) == 0) TPX = msg.toInt();
+	if(strcmp(topic, mqttTopicTPY.c_str()) == 0) TPY = msg.toInt();
 }
 
 //###################################################################################
@@ -175,13 +220,20 @@ void moduleOled096::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 
 void moduleOled096::u8g2_prepare() {
-	u8g2->setFont(u8g2_font_6x10_tf); 
 	u8g2->setFontRefHeightExtendedText(); 
 	u8g2->setDrawColor(1);
 	u8g2->setFontPosTop();
 	u8g2->setFontDirection(0);
 }
-void moduleOled096::u8g2_temp_hum() {
+void moduleOled096::FreakaZone() {
+	u8g2->clearBuffer();
+	u8g2->setFont(u8g2_font_helvB14_tf);
+	u8g2->drawStr(ZX, ZY, "Z");
+	u8g2->drawStr(FX, FY, "FreakaZone");
+	u8g2->sendBuffer();
+}
+void moduleOled096::temp_hum() {
+	u8g2->clearBuffer();
 	u8g2->setFont(u8g2_font_6x10_tf);
 	u8g2->drawStr(TTX, TTY, "Temperature:");
 	u8g2->setFont(u8g2_font_helvB14_tf);
@@ -190,62 +242,21 @@ void moduleOled096::u8g2_temp_hum() {
 	u8g2->drawStr(THX, THY, "Humidity:");
 	u8g2->setFont(u8g2_font_helvB14_tf);
 	u8g2->drawStr(HX, HY, (String(wpDHT.humidity / 100.0) + " %rF").c_str());
+	u8g2->sendBuffer();
 }
-void moduleOled096::u8g2_FreakaZone() {
+void moduleOled096::moisture() {
+	u8g2->clearBuffer();
+	u8g2->setFont(u8g2_font_6x10_tf);
+	u8g2->drawStr(TMX, TMY, "Moisture:");
 	u8g2->setFont(u8g2_font_helvB14_tf);
-	u8g2->drawStr(X, Y, "Z");
-	u8g2->drawStr(FX, FY, "FreakaZone");
+	u8g2->drawStr(MX, MY, (String(wpMoisture.moisture) + " %").c_str());
+	u8g2->sendBuffer();
 }
-void moduleOled096::u8g2_box_frame() {
-	u8g2->drawStr(0, 0, "drawBox");
-	u8g2->drawBox(5, 10, 20, 10);
-	u8g2->drawStr(60, 0, "drawFrame");
-	u8g2->drawFrame(65, 10, 20, 10);
-}
-void moduleOled096::u8g2_r_frame_box() {
-	u8g2->drawStr(0, 0, "drawRFrame");
-	u8g2->drawRFrame(5, 10, 40, 15, 3);
-	u8g2->drawStr(70, 0, "drawRBox");
-	u8g2->drawRBox(70, 10, 25, 15, 3);
-}
-void moduleOled096::u8g2_disc_circle() {
-	u8g2->drawStr(0, 0, "drawDisc");
-	u8g2->drawDisc(10, 18, 9);
-	u8g2->drawDisc(30, 16, 7);
-	u8g2->drawStr(60, 0, "drawCircle");
-	u8g2->drawCircle(70, 18, 9);
-	u8g2->drawCircle(90, 16, 7);
-}
-void moduleOled096::u8g2_string_orientation() {
-	u8g2->setFontDirection(0);
-	u8g2->drawStr(5, 15, "0");
-	u8g2->setFontDirection(3);
-	u8g2->drawStr(40, 25, "90");
-	u8g2->setFontDirection(2);
-	u8g2->drawStr(75, 15, "180");
-	u8g2->setFontDirection(1);
-	u8g2->drawStr(100, 10, "270");
-}
-void moduleOled096::u8g2_line() {
-	u8g2->drawStr( 0, 0, "drawLine");
-	u8g2->drawLine(7, 10, 40, 32);
-	u8g2->drawLine(14, 10, 60, 32);
-	u8g2->drawLine(28, 10, 80, 32);
-	u8g2->drawLine(35, 10, 100, 32);
-}
-void moduleOled096::u8g2_triangle() {
-	u8g2->drawStr( 0, 0, "drawTriangle");
-	u8g2->drawTriangle(14, 7, 45, 30, 10, 32);
-}
-void moduleOled096::u8g2_unicode() {
-	u8g2->drawStr(0, 0, "Unicode");
-	u8g2->setFont(u8g2_font_unifont_t_symbols);
-	u8g2->setFontPosTop();
-	u8g2->setFontDirection(0);
-	u8g2->drawUTF8(10, 15, "☀");
-	u8g2->drawUTF8(30, 15, "☁");
-	u8g2->drawUTF8(50, 15, "☂");
-	u8g2->drawUTF8(70, 15, "☔");
-	u8g2->drawUTF8(95, 15, COPYRIGHT_SYMBOL);  //COPYRIGHT SIMBOL
-	u8g2->drawUTF8(115, 15, "\xb0");  // DEGREE SYMBOL
+void moduleOled096::pia() {
+	u8g2->clearBuffer();
+	u8g2->setFont(u8g2_font_6x10_tf);
+	u8g2->drawStr(TPX, TPY, "Hallo");
+	u8g2->setFont(u8g2_font_helvB14_tf);
+	u8g2->drawStr(PX, PY, "Pia");
+	u8g2->sendBuffer();
 }

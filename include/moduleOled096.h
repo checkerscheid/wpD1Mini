@@ -19,7 +19,6 @@
 #include <wpFreakaZone.h>
 #include <U8g2lib.h>
 #include <Wire.h>
-const char COPYRIGHT_SYMBOL[] = { 0xa9, '\0' };
 class moduleOled096 {
 	public:
 		bool Debug = false;
@@ -52,10 +51,10 @@ class moduleOled096 {
 		uint16_t displayCounter;
 		uint16_t displayChecker;
 
-		uint8_t X;
-		uint8_t Y;
-		String mqttTopicX;
-		String mqttTopicY;
+		uint8_t ZX;
+		uint8_t ZY;
+		String mqttTopicZX;
+		String mqttTopicZY;
 		uint8_t FX;
 		uint8_t FY;
 		String mqttTopicFX;
@@ -79,16 +78,29 @@ class moduleOled096 {
 		String mqttTopicTHX;
 		String mqttTopicTHY;
 
-		void u8g2_temp_hum();
-		void u8g2_FreakaZone();
+		uint8_t MX;
+		uint8_t MY;
+		String mqttTopicMX;
+		String mqttTopicMY;
+		uint8_t TMX;
+		uint8_t TMY;
+		String mqttTopicTMX;
+		String mqttTopicTMY;
+
+		uint8_t PX;
+		uint8_t PY;
+		String mqttTopicPX;
+		String mqttTopicPY;
+		uint8_t TPX;
+		uint8_t TPY;
+		String mqttTopicTPX;
+		String mqttTopicTPY;
+
 		void u8g2_prepare();
-		void u8g2_box_frame();
-		void u8g2_r_frame_box();
-		void u8g2_disc_circle();
-		void u8g2_string_orientation();
-		void u8g2_line();
-		void u8g2_triangle();
-		void u8g2_unicode();
+		void FreakaZone();
+		void temp_hum();
+		void moisture();
+		void pia();
 };
 extern moduleOled096 wpOled096;
 #endif
