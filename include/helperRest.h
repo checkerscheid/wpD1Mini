@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 123                                                     $ #
+//# Revision     : $Rev:: 132                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperRest.h 123 2024-06-02 04:37:07Z                    $ #
+//# File-ID      : $Id:: helperRest.h 132 2024-06-06 11:07:48Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperRest_h
@@ -48,7 +48,7 @@ class helperRest {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 123 $";
+		String SVNh = "$Rev: 132 $";
 		bool errorLast = false;
 		uint16_t publishCountError = 0;
 		bool DebugLast = false;

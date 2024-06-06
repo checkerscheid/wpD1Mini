@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 128                                                     $ #
+//# Revision     : $Rev:: 132                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 128 2024-06-03 11:49:32Z                $ #
+//# File-ID      : $Id:: moduleDistance.h 132 2024-06-06 11:07:48Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDistance_h
@@ -56,7 +56,7 @@ class moduleDistance {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 128 $";
+		String SVNh = "$Rev: 132 $";
 		uint8_t trigPin;
 		uint8_t echoPin;
 		uint16_t cycleCounter;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 132                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 125 2024-06-03 03:11:11Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 132 2024-06-06 11:07:48Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -54,7 +54,7 @@ class moduleLight {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 125 $";
+		String SVNh = "$Rev: 132 $";
 		uint16_t cycleCounter;
 		bool errorLast;
 		uint16_t publishCountError;
