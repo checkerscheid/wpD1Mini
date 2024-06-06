@@ -69,13 +69,13 @@ void moduleOled096::cycle() {
 		u8g2_FreakaZone();
 		u8g2->sendBuffer();
 	}
-	if(displayCounter > 0 && displayCounter % 5 == 0) {
+	if(displayCounter == 10) {
 		u8g2->clearBuffer();
 		u8g2_prepare();
 		u8g2_temp_hum();
 		u8g2->sendBuffer();
 	}
-	if(++displayCounter >= 60) {
+	if(++displayCounter > 60) {
 		displayCounter = 0;
 	}
 	publishValues();
