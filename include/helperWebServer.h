@@ -35,18 +35,6 @@ class helperWebServer {
 		const int8_t cmdScanWiFi = 9;
 		int8_t doCommand;
 
-		const int8_t cmdModuleDHT11 = 1;
-		const int8_t cmdModuleDHT22 = 2;
-		const int8_t cmdModuleLDR = 3;
-		const int8_t cmdModuleLight = 4;
-		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleRelais = 6;
-		const int8_t cmdModuleRelaisShield = 7;
-		const int8_t cmdModuleRain = 8;
-		const int8_t cmdModuleMoisture = 9;
-		const int8_t cmdModuleDistance = 10;
-		int8_t doModuleChange;
-
 		const int8_t cmdDebugEEPROM = 1;
 		const int8_t cmdDebugFinder = 2;
 		const int8_t cmdDebugModules = 3;
@@ -66,6 +54,18 @@ class helperWebServer {
 		const int8_t cmdDebugMoisture = 26;
 		const int8_t cmdDebugDistance = 27;
 		int8_t doDebugChange;
+
+		const int8_t cmdModuleDHT11 = 1;
+		const int8_t cmdModuleDHT22 = 2;
+		const int8_t cmdModuleLDR = 3;
+		const int8_t cmdModuleLight = 4;
+		const int8_t cmdModuleBM = 5;
+		const int8_t cmdModuleRelais = 6;
+		const int8_t cmdModuleRelaisShield = 7;
+		const int8_t cmdModuleRain = 8;
+		const int8_t cmdModuleMoisture = 9;
+		const int8_t cmdModuleDistance = 10;
+		int8_t doModuleChange;
 
 		int8_t doBlink;
 
@@ -106,7 +106,10 @@ const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>FreakaZone %DeviceName% Webserial</title>
+	<title>%DeviceName% Webserial</title>
+	<meta charset="utf-8" />
+	<meta name="author" content="Christian Scheid" />
+	<meta name="company" content="FreakaZone" />
 	<style>
 		body { background-color:#606060; color:#ececfb; }
 		* { margin:0; padding:0; }

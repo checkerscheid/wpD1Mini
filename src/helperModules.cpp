@@ -179,7 +179,7 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseMoisture.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
-		changeModuleBM(readUseModule);
+		changeModuleMoisture(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseRelais.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
@@ -191,11 +191,11 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseBM.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
-		changeModuleRain(readUseModule);
+		changeModuleBM(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseRain.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
-		changeModuleMoisture(readUseModule);
+		changeModuleRain(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseDistance.c_str()) == 0) {
 		bool readUseModule = msg.toInt();
@@ -258,14 +258,14 @@ void helperModules::changeModuleLight(bool newValue) {
 	}
 }
 void helperModules::changeModuleBM(bool newValue) {
-	if(useModuleMoisture != newValue) {
-		useModuleMoisture = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+	if(useModuleBM != newValue) {
+		useModuleBM = newValue;
+		bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
+		EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleMoisture", useModuleMoisture);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
+		wpFZ.SendWSDebug("useModuleBM", useModuleBM);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
 	}
 }
 void helperModules::changeModuleRelais(bool newValue) {
@@ -291,17 +291,6 @@ void helperModules::changeModuleRelaisShield(bool newValue) {
 	}
 }
 void helperModules::changeModuleRain(bool newValue) {
-	if(useModuleBM != newValue) {
-		useModuleBM = newValue;
-		bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
-		EEPROM.write(wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0);
-		EEPROM.commit();
-		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleBM", useModuleBM);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
-	}
-}
-void helperModules::changeModuleMoisture(bool newValue) {
 	if(useModuleRain != newValue) {
 		useModuleRain = newValue;
 		bitWrite(wpEEPROM.bitsModules0, wpEEPROM.bitUseRain, useModuleRain);
@@ -310,6 +299,17 @@ void helperModules::changeModuleMoisture(bool newValue) {
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRain", useModuleRain);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRain, String(useModuleRain));
+	}
+}
+void helperModules::changeModuleMoisture(bool newValue) {
+	if(useModuleMoisture != newValue) {
+		useModuleMoisture = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleMoisture", useModuleMoisture);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
 	}
 }
 void helperModules::changeModuleDistance(bool newValue) {
