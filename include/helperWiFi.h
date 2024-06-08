@@ -21,6 +21,7 @@
 class helperWiFi {
 	public:
 		bool Debug = false;
+		bool sendRest = false;
 		// values
 		String mqttTopicRssi;
 		String mqttTopicWiFiSince;
@@ -30,6 +31,7 @@ class helperWiFi {
 		String mqttTopicMac;
 		// commands
 		String mqttTopicDebug;
+		String mqttTopicSendRest;
 
 		String WiFiSince;
 
@@ -38,6 +40,7 @@ class helperWiFi {
 		void cycle();
 		uint16_t getVersion();
 		void changeDebug();
+		void changeSendRest();
 		void setupWiFi();
 		void scanWiFi();
 		
@@ -53,6 +56,11 @@ class helperWiFi {
 		uint16_t publishCountDebug = 0;
 		uint16_t publishCountRssi = 0;
 		String printEncryptionType(int thisType);
+		uint16_t addrSendRest;
+		byte byteSendRest;
+		uint8_t bitSendRest;
+		bool sendRestLast;
+		uint16_t publishCountSendRest;
 };
 extern helperWiFi wpWiFi;
 #endif

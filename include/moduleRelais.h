@@ -20,6 +20,7 @@
 
 class moduleRelais {
 	public:
+		moduleRelais();
 		bool output;
 		bool autoValue;
 		bool handValue;
@@ -32,7 +33,6 @@ class moduleRelais {
 		uint8_t pumpActive;
 		uint16_t pumpPause;
 		// }
-		bool Debug = false;
 
 		// values
 		String mqttTopicOut;
@@ -49,14 +49,22 @@ class moduleRelais {
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
 		String mqttTopicSetWaterEmpty;
-		String mqttTopicDebug;
 
-		moduleRelais();
+		// section to copy
+		bool sendRest = false;
+		bool Debug = false;
+		bool error = false;
+		uint8_t maxCycle = 5;
+		String mqttTopicMaxCycle;
+		String mqttTopicSendRest;
+		String mqttTopicDebug;
+		String mqttTopicError;
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
+		void changeSendRest();
+		void changeDebug();
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
@@ -64,7 +72,6 @@ class moduleRelais {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 126 $";
 		uint8_t relaisPin;
 		bool outputLast;
 		uint16_t publishCountOutput;
@@ -75,8 +82,6 @@ class moduleRelais {
 		bool handErrorLast;
 		uint16_t publishCountHandError;
 		uint16_t publishCountWaterEmptyError;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		// if wpModules.useMoisture
 		bool pumpCycleActive;
 		bool pumpStarted;
@@ -92,6 +97,28 @@ class moduleRelais {
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
 		void printCalcDebug(String name, int16_t value, float raw);
+
+		// section to config and copy
+		String ModuleName;
+		uint16_t addrMaxCycle;
+		uint16_t addrSendRest;
+		byte byteSendRest;
+		uint8_t bitSendRest;
+		uint16_t addrDebug;
+		byte byteDebug;
+		uint8_t bitDebug;
+		String SVNh = "$Rev: 128 $";
+		uint8_t cycleCounter;
+		bool sendRestLast;
+		uint16_t publishCountSendRest;
+		bool DebugLast;
+		uint16_t publishCountDebug;
+		bool errorLast;
+		uint16_t publishCountError;
+		void publishDefaultSettings(bool force);
+		void publishDefaultValues(bool force);
+		void setDefaultSubscribes();
+		void checkDefaultSubscribes(char* topic, String msg);
 };
 extern moduleRelais wpRelais;
 

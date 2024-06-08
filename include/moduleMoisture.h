@@ -20,35 +20,38 @@
 
 class moduleMoisture {
 	public:
+		moduleMoisture();
 		int16_t moisture;
-		bool Debug = false;
 		bool useAvg = false;
 		byte minValue = 30;
 		uint16_t dry = 1023; // high value
 		uint16_t wet = 0; // low value
-		bool error;
 		bool errorMin;
-		uint8_t maxCycle = 5;
 
 		// values
 		String mqttTopicMoisture;
-		String mqttTopicError;
 		String mqttTopicErrorMin;
 		// settings
-		String mqttTopicMaxCycle;
 		String mqttTopicUseAvg;
 		String mqttTopicMin;
 		String mqttTopicDry;
 		String mqttTopicWet;
-		// commands
-		String mqttTopicDebug;
 
-		moduleMoisture();
+		// section to copy
+		bool sendRest = false;
+		bool Debug = false;
+		bool error = false;
+		uint8_t maxCycle = 5;
+		String mqttTopicMaxCycle;
+		String mqttTopicSendRest;
+		String mqttTopicDebug;
+		String mqttTopicError;
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
+		void changeSendRest();
+		void changeDebug();
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
@@ -56,17 +59,11 @@ class moduleMoisture {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 126 $";
 		uint8_t moisturePin;
-		uint16_t cycleCounter;
 		int16_t moistureLast;
 		uint16_t publishCountMoisture;
-		bool errorLast;
-		uint16_t publishCountError;
 		bool errorMinLast;
 		uint16_t publishCountErrorMin;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
@@ -74,6 +71,28 @@ class moduleMoisture {
 		void calc();
 		uint16_t calcAvg(uint16_t raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
+
+		// section to config and copy
+		String ModuleName;
+		uint16_t addrMaxCycle;
+		uint16_t addrSendRest;
+		byte byteSendRest;
+		uint8_t bitSendRest;
+		uint16_t addrDebug;
+		byte byteDebug;
+		uint8_t bitDebug;
+		String SVNh = "$Rev: 128 $";
+		uint8_t cycleCounter;
+		bool sendRestLast;
+		uint16_t publishCountSendRest;
+		bool DebugLast;
+		uint16_t publishCountDebug;
+		bool errorLast;
+		uint16_t publishCountError;
+		void publishDefaultSettings(bool force);
+		void publishDefaultValues(bool force);
+		void setDefaultSubscribes();
+		void checkDefaultSubscribes(char* topic, String msg);
 };
 extern moduleMoisture wpMoisture;
 

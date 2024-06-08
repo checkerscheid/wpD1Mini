@@ -19,6 +19,9 @@ helperWiFi wpWiFi;
 
 helperWiFi::helperWiFi() {}
 void helperWiFi::init() {
+	addrSendRest = wpEEPROM.addrBitsSendRestBasis0;
+	byteSendRest = wpEEPROM.bitsSendRestBasis0;
+	bitSendRest = wpEEPROM.bitSendRestRssi;
 	// values
 	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
 	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
@@ -26,12 +29,15 @@ void helperWiFi::init() {
 	mqttTopicSsid = wpFZ.DeviceName + "/info/WiFi/SSID";
 	mqttTopicIp = wpFZ.DeviceName + "/info/WiFi/Ip";
 	mqttTopicMac = wpFZ.DeviceName + "/info/WiFi/Mac";
+	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/WiFi";
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
 	setupWiFi();
 	// because DateTime Only works with NTP Server
 	wpFZ.OnSince = wpFZ.getDateTime();
+	sendRestLast = false;
+	publishCountSendRest = 0;
 }
 
 //###################################################################################
@@ -54,6 +60,13 @@ uint16_t helperWiFi::getVersion() {
 	return v > vh ? v : vh;
 }
 
+void helperWiFi::changeSendRest() {
+	sendRest = !sendRest;
+	bitWrite(byteSendRest, bitSendRest, sendRest);
+	EEPROM.write(addrSendRest, byteSendRest);
+	EEPROM.commit();
+	wpFZ.blink();
+}
 void helperWiFi::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
@@ -125,6 +138,7 @@ void helperWiFi::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str());
 	wpMqtt.mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str());
 	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
@@ -137,6 +151,12 @@ void helperWiFi::publishValues(bool force) {
 		publishCountDebug = wpFZ.publishQoS;
 		publishCountRssi = wpFZ.minute2;
 	}
+	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
+		sendRestLast = sendRest;
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		wpFZ.SendWSSendRest("SendRestWiFi", sendRest);
+		publishCountSendRest = 0;
+	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
@@ -144,14 +164,29 @@ void helperWiFi::publishValues(bool force) {
 	}
 	if(++publishCountRssi > wpFZ.minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
+		if(sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("rssi", String(WiFi.RSSI()));
+			wpRest.trySend = true;
+		}
 		publishCountRssi = 0;
 	}
 }
 
 void helperWiFi::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperWiFi::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
+		bool readSendRest = msg.toInt();
+		if(sendRest != readSendRest) {
+			sendRest = readSendRest;
+			bitWrite(byteSendRest, bitSendRest, sendRest);
+			EEPROM.write(addrSendRest, byteSendRest);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
+		}
+	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {

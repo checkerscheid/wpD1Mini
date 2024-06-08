@@ -19,25 +19,41 @@ moduleBM wpBM;
 
 moduleBM::moduleBM() {}
 void moduleBM::init() {
+	// section to config and copy
+	ModuleName = "BM";
+	addrSendRest = wpEEPROM.addrBitsSendRestModules0;
+	byteSendRest = wpEEPROM.bitsSendRestModules0;
+	bitSendRest = wpEEPROM.bitSendRestBM;
+	addrDebug = wpEEPROM.addrBitsDebugModules0;
+	byteDebug = wpEEPROM.bitsDebugModules0;
+	bitDebug = wpEEPROM.bitDebugBM;
+
+	// section for define
 	BMPin = D5;
 	pinMode(BMPin, INPUT_PULLUP);
 	bm = 0;
-	// values
-	mqttTopicBM = wpFZ.DeviceName + "/BM";
-	// settings
-	mqttTopicThreshold = wpFZ.DeviceName + "/settings/BM/Threshold";
-	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/BM/LightToTurnOn";
-	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/BM";
+	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
+	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
+	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
 	bmLast = 0;
 	publishCountBM = 0;
+
+	// section to copy
+	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + ModuleName;
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/" + ModuleName;
+	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + ModuleName;
+	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
+
+	sendRestLast = false;
+	publishCountSendRest = 0;
 	DebugLast = false;
 	publishCountDebug = 0;
+	errorLast = false;
+	publishCountError = 0;
 }
 
-//###################################################################################
-// public
+
 //###################################################################################
 void moduleBM::cycle() {
 	if(wpFZ.calcValues) {
@@ -45,23 +61,6 @@ void moduleBM::cycle() {
 	}
 	publishValues();
 }
-
-uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
-	return v > vh ? v : vh;
-}
-
-void moduleBM::changeDebug() {
-	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugBM", Debug);
-	wpFZ.blink();
-}
-
 void moduleBM::publishSettings() {
 	publishSettings(false);
 }
@@ -70,37 +69,27 @@ void moduleBM::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
 	}
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-	}
+	publishDefaultSettings(force);
 }
-
 void moduleBM::publishValues() {
 	publishValues(false);
 }
 void moduleBM::publishValues(bool force) {
 	if(force) {
 		publishCountBM = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
 	}
 	if(bmLast != bm || ++publishCountBM > wpFZ.publishQoS) {
 		publishValue();
 	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
-	}
+	publishDefaultValues(force);
 }
-
 void moduleBM::setSubscribes() {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 	}
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	setDefaultSubscribes();
 }
-
 void moduleBM::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
@@ -120,26 +109,14 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 			}
 		}
 	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWSDebug("DebugBM", Debug);
-		}
-	}
+	checkDefaultSubscribes(topic, msg);
 }
-
-//###################################################################################
-// private
-//###################################################################################
 void moduleBM::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("bm", String(bm));
-	wpRest.trySend = true;
+	if(sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("bm", String(bm));
+		wpRest.trySend = true;
+	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
 		if(bm && wpLDR.LDR <= threshold) {
@@ -162,7 +139,10 @@ void moduleBM::publishValue() {
 	}
 	publishCountBM = 0;
 }
-
+void moduleBM::printPublishValueDebug(String name, String value, String publishCount) {
+	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
+	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
 void moduleBM::calc() {
 	if(digitalRead(BMPin) == LOW) {
 		bm = false;
@@ -177,7 +157,84 @@ void moduleBM::calc() {
 	}
 }
 
-void moduleBM::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+
+//###################################################################################
+// section to copy
+//###################################################################################
+uint16_t moduleBM::getVersion() {
+	String SVN = "$Rev: 132 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+void moduleBM::changeSendRest() {
+	sendRest = !sendRest;
+	bitWrite(byteSendRest, bitSendRest, sendRest);
+	EEPROM.write(addrSendRest, byteSendRest);
+	EEPROM.commit();
+	wpFZ.blink();
+}
+void moduleBM::changeDebug() {
+	Debug = !Debug;
+	bitWrite(byteDebug, bitDebug, Debug);
+	EEPROM.write(addrDebug, byteDebug);
+	EEPROM.commit();
+	wpFZ.blink();
+}
+void moduleBM::publishDefaultSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+	}
+}
+void moduleBM::publishDefaultValues(bool force) {
+	if(force) {
+		publishCountSendRest = wpFZ.publishQoS;
+		publishCountDebug = wpFZ.publishQoS;
+		publishCountError = wpFZ.publishQoS;
+	}
+	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
+		sendRestLast = sendRest;
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		wpFZ.SendWSSendRest("sendRest" + ModuleName, sendRest);
+		publishCountSendRest = 0;
+	}
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		wpFZ.SendWSDebug("Debug" + ModuleName, Debug);
+		publishCountDebug = 0;
+	}
+	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
+		errorLast = error;
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+		publishCountError = 0;
+	}
+}
+void moduleBM::setDefaultSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+}
+void moduleBM::checkDefaultSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
+		bool readSendRest = msg.toInt();
+		if(sendRest != readSendRest) {
+			sendRest = readSendRest;
+			bitWrite(byteSendRest, bitSendRest, sendRest);
+			EEPROM.write(addrSendRest, byteSendRest);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
+		}
+	}
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(byteDebug, bitDebug, Debug);
+			EEPROM.write(addrDebug, byteDebug);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
+		}
+	}
 }

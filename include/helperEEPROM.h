@@ -22,87 +22,132 @@ class helperEEPROM {
 	public:
 		bool Debug = false;
 
-/// bool values: byte 0 - 9
-		const byte addrBitsModules0 = 0;
+//###################################################################################
+/// bool values: byte 0 - 19
+		const uint16_t addrBitsModules0 = 0;
 		byte bitsModules0;
-		const byte bitUseDHT11 = 0; // include in bitsModules0
-		const byte bitUseDHT22 = 1; // include in bitsModules0
-		const byte bitUseLDR = 2; // include in bitsModules0
-		const byte bitUseLight = 3; // include in bitsModules0
-		const byte bitUseBM = 4; // include in bitsModules0
-		const byte bitUseRelais = 5; // include in bitsModules0
-		const byte bitUseRelaisShield = 6; // include in bitsModules0
-		const byte bitUseRain = 7; // include in bitsModules0
+		const uint8_t bitUseDHT11 = 0; // include in bitsModules0
+		const uint8_t bitUseDHT22 = 1; // include in bitsModules0
+		const uint8_t bitUseLDR = 2; // include in bitsModules0
+		const uint8_t bitUseLight = 3; // include in bitsModules0
+		const uint8_t bitUseBM = 4; // include in bitsModules0
+		const uint8_t bitUseRelais = 5; // include in bitsModules0
+		const uint8_t bitUseRelaisShield = 6; // include in bitsModules0
+		const uint8_t bitUseRain = 7; // include in bitsModules0
 
-		const byte addrBitsModules1 = 1;
+		const uint16_t addrBitsModules1 = 1;
 		byte bitsModules1;
-		const byte bitUseMoisture = 0; // include in bitsModules1
-		const byte bitUseDistance = 1; // include in bitsModules1
+		const uint8_t bitUseMoisture = 0; // include in bitsModules1
+		const uint8_t bitUseDistance = 1; // include in bitsModules1
 		
-		const byte addrBitsDebugBasis0 = 2;
+		const uint16_t addrBitsModules2 = 2;
+		byte bitsModules2;
+
+//###################################################################################
+
+		const uint16_t addrBitsSendRestBasis0 = 3;
+		byte bitsSendRestBasis0;
+		const uint8_t bitSendRestRssi = 0; // include in bitsSendRestBasis0
+
+		const uint16_t addrBitsDebugBasis0 = 4;
 		byte bitsDebugBasis0;
-		const byte bitDebugEEPROM = 0; // include in bitsDebugBasis0
-		const byte bitDebugFinder = 1; // include in bitsDebugBasis0
-		const byte bitDebugModules = 2; // include in bitsDebugBasis0
-		const byte bitDebugMqtt = 3; // include in bitsDebugBasis0
-		const byte bitDebugOnlineToggler = 4; // include in bitsDebugBasis0
-		const byte bitDebugRest = 5; // include in bitsDebugBasis0
-		const byte bitDebugUpdate = 6; // include in bitsDebugBasis0
-		const byte bitDebugWebServer = 7; // include in bitsDebugBasis0
+		const uint8_t bitDebugEEPROM = 0; // include in bitsDebugBasis0
+		const uint8_t bitDebugFinder = 1; // include in bitsDebugBasis0
+		const uint8_t bitDebugModules = 2; // include in bitsDebugBasis0
+		const uint8_t bitDebugMqtt = 3; // include in bitsDebugBasis0
+		const uint8_t bitDebugOnlineToggler = 4; // include in bitsDebugBasis0
+		const uint8_t bitDebugRest = 5; // include in bitsDebugBasis0
+		const uint8_t bitDebugUpdate = 6; // include in bitsDebugBasis0
+		const uint8_t bitDebugWebServer = 7; // include in bitsDebugBasis0
 		
-		const byte addrBitsDebugBasis1 = 3;
+		const uint16_t addrBitsDebugBasis1 = 5;
 		byte bitsDebugBasis1;
-		const byte bitDebugWiFi = 8; // include in bitsDebugBasis1
+		const uint8_t bitDebugWiFi = 0; // include in bitsDebugBasis1
+
+//###################################################################################
+
+		const uint16_t addrBitsSendRestModules0 = 6;
+		byte bitsSendRestModules0;
+		const uint8_t bitSendRestDHT = 0; // include in bitsSendRestModules0
+		const uint8_t bitSendRestLDR = 1; // include in bitsSendRestModules0
+		const uint8_t bitSendRestLight = 2; // include in bitsSendRestModules0
+		const uint8_t bitSendRestBM = 3; // include in bitsSendRestModules0
+		const uint8_t bitSendRestRelais = 4; // include in bitsSendRestModules0
+		const uint8_t bitSendRestRain = 5; // include in bitsSendRestModules0
+		const uint8_t bitSendRestMoisture = 6; // include in bitsSendRestModules0
+		const uint8_t bitSendRestDistance = 7; // include in bitsSendRestModules0
 		
-		const byte addrBitsDebugModules0 = 4;
+		const uint16_t addrBitsSendRestModules1 = 7;
+		byte bitsSendRestModules1;
+		
+		const uint16_t addrBitsSendRestModules2 = 8;
+		byte bitsSendRestModules2;
+
+//###################################################################################
+
+		const uint16_t addrBitsDebugModules0 = 9;
 		byte bitsDebugModules0;
-		const byte bitDebugDHT = 0; // include in bitsDebugModules0
-		const byte bitDebugLDR = 1; // include in bitsDebugModules0
-		const byte bitDebugLight = 2; // include in bitsDebugModules0
-		const byte bitDebugBM = 3; // include in bitsDebugModules0
-		const byte bitDebugRelais = 4; // include in bitsDebugModules0
-		const byte bitDebugRain = 5; // include in bitsDebugModules0
-		const byte bitDebugMoisture = 6; // include in bitsDebugModules0
-		const byte bitDebugDistance = 7; // include in bitsDebugModules0
+		const uint8_t bitDebugDHT = 0; // include in bitsDebugModules0
+		const uint8_t bitDebugLDR = 1; // include in bitsDebugModules0
+		const uint8_t bitDebugLight = 2; // include in bitsDebugModules0
+		const uint8_t bitDebugBM = 3; // include in bitsDebugModules0
+		const uint8_t bitDebugRelais = 4; // include in bitsDebugModules0
+		const uint8_t bitDebugRain = 5; // include in bitsDebugModules0
+		const uint8_t bitDebugMoisture = 6; // include in bitsDebugModules0
+		const uint8_t bitDebugDistance = 7; // include in bitsDebugModules0
 		
-		const byte addrBitsDebugModules1 = 5;
+		const uint16_t addrBitsDebugModules1 = 10;
 		byte bitsDebugModules1;
+		
+		const uint16_t addrBitsDebugModules2 = 11;
+		byte bitsDebugModules2;
 
-		const byte addrBitsModulesSettings0 = 6;
-		byte bitsModulesSettings0;
-		const byte bitUseLdrAvg = 0; // include in bitsModulesSettings0
-		const byte bitUseLightAvg = 1; // include in bitsModulesSettings0
-		const byte bitRelaisHand = 2; // include in bitsModulesSettings0
-		const byte bitRelaisHandValue = 3; // include in bitsModulesSettings0
-		const byte bitRelaisWaterEmpty = 4; // include in bitsModulesSettings0
-		const byte bitUseRainAvg = 5; // include in bitsModulesSettings0
-		const byte bitUseMoistureAvg = 6; // include in bitsModulesSettings0
+//###################################################################################
 
-/// byte values: byte 10 - 29
-		const byte byteMaxCycleDHT = 10;
-		const byte byteTemperatureCorrection = 11; // int8_t * 10
-		const byte byteHumidityCorrection = 12; // int8_t * 10
-		const byte byteMaxCycleLDR = 13;
-		const byte byteLDRCorrection = 14; // int8_t
-		const byte byteMaxCycleLight = 15;
-		const byte bytePumpActive = 16;
-		const byte byteMaxCycleRain = 17;
-		const byte byteRainCorrection = 18; // int8_t
-		const byte byteMaxCycleMoisture = 19;
-		const byte byteMoistureMin = 20;
-		const byte byteMaxCycleDistance = 21;
-		const byte byteDistanceCorrection = 22; // int8_t
-		const byte byteHeight = 23;
+		const uint16_t addrBitsSettingsModules0 = 12;
+		byte bitsSettingsModules0;
+		const uint8_t bitUseLdrAvg = 0; // include in bitsSettingsModules0
+		const uint8_t bitUseLightAvg = 1; // include in bitsSettingsModules0
+		const uint8_t bitRelaisHand = 2; // include in bitsSettingsModules0
+		const uint8_t bitRelaisHandValue = 3; // include in bitsSettingsModules0
+		const uint8_t bitRelaisWaterEmpty = 4; // include in bitsSettingsModules0
+		const uint8_t bitUseRainAvg = 5; // include in bitsSettingsModules0
+		const uint8_t bitUseMoistureAvg = 6; // include in bitsSettingsModules0
 
-/// byte values: 2byte 30 - 59
-		const byte byteLightCorrection = 30; // int16_t
-		const byte byteThreshold = 32;
-		const byte bytePumpPause = 34;
-		const byte byteMoistureDry = 36;
-		const byte byteMoistureWet = 38;
-		const byte byteMaxVolume = 40;
+		const uint16_t addrBitsSettingsModules1 = 13;
+		byte bitsSettingsModules1;
 
-/// byte values: 4byte 60 - 99
+		const uint16_t addrBitsSettingsModules2 = 14;
+		byte bitsSettingsModules2;
+		
+//###################################################################################
+/// byte values: byte 20 - 49
+		const uint16_t byteMaxCycleDHT = 20;
+		const uint16_t byteTemperatureCorrection = 21; // int8_t * 10
+		const uint16_t byteHumidityCorrection = 22; // int8_t * 10
+		const uint16_t byteMaxCycleLDR = 23;
+		const uint16_t byteLDRCorrection = 24; // int8_t
+		const uint16_t byteMaxCycleLight = 25;
+		const uint16_t bytePumpActive = 26;
+		const uint16_t byteMaxCycleRain = 27;
+		const uint16_t byteRainCorrection = 28; // int8_t
+		const uint16_t byteMaxCycleMoisture = 29;
+		const uint16_t byteMoistureMin = 30;
+		const uint16_t byteMaxCycleDistance = 31;
+		const uint16_t byteDistanceCorrection = 32; // int8_t
+		const uint16_t byteHeight = 33;
+
+//###################################################################################
+/// byte values: 2byte 50 - 79
+		const uint16_t byteLightCorrection = 50; // int16_t
+		const uint16_t byteThreshold = 52;
+		const uint16_t bytePumpPause = 54;
+		const uint16_t byteMoistureDry = 56;
+		const uint16_t byteMoistureWet = 58;
+		const uint16_t byteMaxVolume = 60;
+
+//###################################################################################
+/// byte values: 4byte 80 - 99
 
 		uint16_t byteStartForString;
 
@@ -115,6 +160,7 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
+		void saveBool(uint16_t &addr, byte &by, uint8_t &bi, bool v);
 
 		void publishSettings();
 		void publishSettings(bool force);

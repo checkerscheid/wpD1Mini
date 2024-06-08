@@ -19,26 +19,41 @@ moduleRain wpRain;
 
 moduleRain::moduleRain() {}
 void moduleRain::init() {
+	// section to config and copy
+	ModuleName = "Rain";
+	addrMaxCycle = wpEEPROM.byteMaxCycleRain;
+	addrSendRest = wpEEPROM.addrBitsSendRestModules0;
+	byteSendRest = wpEEPROM.bitsSendRestModules0;
+	bitSendRest = wpEEPROM.bitSendRestRain;
+	addrDebug = wpEEPROM.addrBitsDebugModules0;
+	byteDebug = wpEEPROM.bitsDebugModules0;
+	bitDebug = wpEEPROM.bitDebugRain;
+
+	// section for define
 	RainPin = A0;
 	rain = 0;
-	error = false;
 	// values
-	mqttTopicRain = wpFZ.DeviceName + "/Rain";
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/Rain";
+	mqttTopicRain = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Rain/maxCycle";
-	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Rain/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/Rain/useAvg";
-	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Rain";
+	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
+	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + ModuleName + "/useAvg";
 
-	cycleCounter = 0;
-	errorLast = false;
-	publishCountError = 0;
 	rainLast = 0;
 	publishCountRain = 0;
+
+	// section to copy
+	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
+	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + ModuleName;
+	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/" + ModuleName;
+	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + ModuleName;
+
+	cycleCounter = 0;
+	sendRestLast = false;
+	publishCountSendRest = 0;
 	DebugLast = false;
 	publishCountDebug = 0;
+	errorLast = false;
+	publishCountError = 0;
 }
 
 //###################################################################################
@@ -46,38 +61,19 @@ void moduleRain::init() {
 //###################################################################################
 void moduleRain::cycle() {
 	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
-		cycleCounter = 0;
 		calc();
+		cycleCounter = 0;
 	}
 	publishValues();
-}
-
-uint16_t moduleRain::getVersion() {
-	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
-	return v > vh ? v : vh;
-}
-
-void moduleRain::changeDebug() {
-	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugRain", Debug);
-	wpFZ.blink();
 }
 
 void moduleRain::publishSettings() {
 	publishSettings(false);
 }
 void moduleRain::publishSettings(bool force) {
-	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-	}
+	publishDefaultSettings(force);
 }
 
 void moduleRain::publishValues() {
@@ -86,42 +82,20 @@ void moduleRain::publishValues() {
 void moduleRain::publishValues(bool force) {
 	if(force) {
 		publishCountRain = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
 	}
 	if(rainLast != rain || ++publishCountRain > wpFZ.publishQoS) {
 		publishValue();
 	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
-	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
-	}
+	publishDefaultValues(force);
 }
 
 void moduleRain::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	setDefaultSubscribes();
 }
 
 void moduleRain::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		byte readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(wpEEPROM.byteMaxCycleRain, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
 		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
@@ -135,23 +109,13 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 		bool readAvg = msg.toInt();
 		if(useAvg != readAvg) {
 			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseRainAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
+			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseRainAvg, useAvg);
+			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
 	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWSDebug("DebugRain", Debug);
-		}
-	}
+	checkDefaultSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -159,8 +123,10 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleRain::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicRain.c_str(), String(rain).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("rain", String(rain));
-	wpRest.trySend = true;
+	if(sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("rain", String(rain));
+		wpRest.trySend = true;
+	}
 	rainLast = rain;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("Rain", String(rain), String(publishCountRain));
@@ -210,4 +176,96 @@ uint16_t moduleRain::calcAvg(uint16_t raw) {
 void moduleRain::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
+
+//###################################################################################
+// section to copy
+//###################################################################################
+uint16_t moduleRain::getVersion() {
+	String SVN = "$Rev: 132 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+void moduleRain::changeSendRest() {
+	sendRest = !sendRest;
+	bitWrite(byteSendRest, bitSendRest, sendRest);
+	EEPROM.write(addrSendRest, byteSendRest);
+	EEPROM.commit();
+	wpFZ.blink();
+}
+void moduleRain::changeDebug() {
+	Debug = !Debug;
+	bitWrite(byteDebug, bitDebug, Debug);
+	EEPROM.write(addrDebug, byteDebug);
+	EEPROM.commit();
+	wpFZ.blink();
+}
+void moduleRain::publishDefaultSettings(bool force) {
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+	}
+}
+void moduleRain::publishDefaultValues(bool force) {
+	if(force) {
+		publishCountSendRest = wpFZ.publishQoS;
+		publishCountDebug = wpFZ.publishQoS;
+		publishCountError = wpFZ.publishQoS;
+	}
+	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
+		sendRestLast = sendRest;
+		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		wpFZ.SendWSSendRest("sendRest" + ModuleName, sendRest);
+		publishCountSendRest = 0;
+	}
+	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+		DebugLast = Debug;
+		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
+		wpFZ.SendWSDebug("Debug" + ModuleName, Debug);
+		publishCountDebug = 0;
+	}
+	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
+		errorLast = error;
+		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
+		publishCountError = 0;
+	}
+}
+void moduleRain::setDefaultSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+}
+void moduleRain::checkDefaultSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
+		uint8_t readMaxCycle = msg.toInt();
+		if(readMaxCycle <= 0) readMaxCycle = 1;
+		if(maxCycle != readMaxCycle) {
+			maxCycle = readMaxCycle;
+			EEPROM.write(addrMaxCycle, maxCycle);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
+		}
+	}
+	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
+		bool readSendRest = msg.toInt();
+		if(sendRest != readSendRest) {
+			sendRest = readSendRest;
+			bitWrite(byteSendRest, bitSendRest, sendRest);
+			EEPROM.write(addrSendRest, byteSendRest);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
+		}
+	}
+	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
+		bool readDebug = msg.toInt();
+		if(Debug != readDebug) {
+			Debug = readDebug;
+			bitWrite(byteDebug, bitDebug, Debug);
+			EEPROM.write(addrDebug, byteDebug);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
+		}
+	}
 }

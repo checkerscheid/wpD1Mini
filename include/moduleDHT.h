@@ -23,33 +23,37 @@
 
 class moduleDHT {
 	public:
-		int16_t temperature;
-		int16_t humidity;
-
-		bool Debug = false;
-		bool error;
-		int8_t temperatureCorrection = 0;
-		int8_t humidityCorrection = 0;
-		uint8_t maxCycle = 0;
-		// values
-		String mqttTopicTemperature;
-		String mqttTopicHumidity;
-		String mqttTopicError;
-		// settings
-		String mqttTopicMaxCycle;
-		String mqttTopicTemperatureCorrection;
-		String mqttTopicHumidityCorrection;
-		// commands
-		String mqttTopicDebug;
-		
+		moduleDHT();
 		DHT* dht;
 
-		moduleDHT();
+		// section for define
+		int16_t temperature;
+		int16_t humidity;
+		int8_t temperatureCorrection = 0;
+		int8_t humidityCorrection = 0;
+
+		String mqttTopicTemperature;
+		String mqttTopicHumidity;
+
+		String mqttTopicTemperatureCorrection;
+		String mqttTopicHumidityCorrection;
+		
+
+		// section to copy
+		bool sendRest = false;
+		bool Debug = false;
+		bool error = false;
+		uint8_t maxCycle = 5;
+		String mqttTopicMaxCycle;
+		String mqttTopicSendRest;
+		String mqttTopicDebug;
+		String mqttTopicError;
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
+		void changeSendRest();
+		void changeDebug();
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
@@ -57,16 +61,10 @@ class moduleDHT {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 125 $";
-		uint16_t cycleCounter;
-		bool errorLast;
-		uint16_t publishCountError;
 		int16_t temperatureLast;
 		uint16_t publishCountTemperature;
 		int16_t humidityLast;
 		uint16_t publishCountHumidity;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 
 		void publishValueTemp();
 		void publishValueHum();
@@ -74,6 +72,29 @@ class moduleDHT {
 		void printCalcError(String name);
 		void printCalcDebug(String name, int16_t value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
+
+
+		// section to config and copy
+		String ModuleName;
+		uint16_t addrMaxCycle;
+		uint16_t addrSendRest;
+		byte byteSendRest;
+		uint8_t bitSendRest;
+		uint16_t addrDebug;
+		byte byteDebug;
+		uint8_t bitDebug;
+		String SVNh = "$Rev: 128 $";
+		uint8_t cycleCounter;
+		bool sendRestLast;
+		uint16_t publishCountSendRest;
+		bool DebugLast;
+		uint16_t publishCountDebug;
+		bool errorLast;
+		uint16_t publishCountError;
+		void publishDefaultSettings(bool force);
+		void publishDefaultValues(bool force);
+		void setDefaultSubscribes();
+		void checkDefaultSubscribes(char* topic, String msg);
 };
 extern moduleDHT wpDHT;
 

@@ -259,12 +259,16 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 // void wpFreakaZone::SendWS(String msg) {
 // 	wpWebServer.webSocket.textAll(msg);
 // }
-void wpFreakaZone::SendWSModule(String useModul, bool active) {
-	String msg = "{\"id\":\"" + useModul + "\",\"value\":" + String(active ? "true" : "false") + "}";
+void wpFreakaZone::SendWSModule(String htmlId, bool value) {
+	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
 }
-void wpFreakaZone::SendWSDebug(String moduleDebug, bool active) {
-	String msg = "{\"id\":\"" + moduleDebug + "\",\"value\":" + String(active ? "true" : "false") + "}";
+void wpFreakaZone::SendWSSendRest(String htmlId, bool value) {
+	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
+	wpWebServer.webSocket.textAll("{\"cmd\":\"setSendRest\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
+	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
