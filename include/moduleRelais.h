@@ -17,9 +17,12 @@
 #define moduleRelais_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <moduleBase.h>
 
 class moduleRelais {
 	public:
+		moduleRelais();
+		moduleBase* mb;
 		bool output;
 		bool autoValue;
 		bool handValue;
@@ -32,7 +35,6 @@ class moduleRelais {
 		uint8_t pumpActive;
 		uint16_t pumpPause;
 		// }
-		bool Debug = false;
 
 		// values
 		String mqttTopicOut;
@@ -49,13 +51,11 @@ class moduleRelais {
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
 		String mqttTopicSetWaterEmpty;
-		String mqttTopicDebug;
 
-		moduleRelais();
+		// section to copy
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -63,8 +63,14 @@ class moduleRelais {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool Debug();
+		bool Debug(bool debug);
 	private:
-		String SVNh = "$Rev: 126 $";
 		uint8_t relaisPin;
 		bool outputLast;
 		uint16_t publishCountOutput;
@@ -75,8 +81,6 @@ class moduleRelais {
 		bool handErrorLast;
 		uint16_t publishCountHandError;
 		uint16_t publishCountWaterEmptyError;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		// if wpModules.useMoisture
 		bool pumpCycleActive;
 		bool pumpStarted;
@@ -92,6 +96,10 @@ class moduleRelais {
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
 		void printCalcDebug(String name, int16_t value, float raw);
+
+		// section to config and copy
+		String ModuleName;
+		String SVNh = "$Rev: 128 $";
 };
 extern moduleRelais wpRelais;
 

@@ -35,6 +35,17 @@ class helperWebServer {
 		const int8_t cmdScanWiFi = 9;
 		int8_t doCommand;
 
+		const int8_t cmdSendRestWiFi = 1;
+		const int8_t cmdSendRestDHT = 2;
+		const int8_t cmdSendRestLDR = 3;
+		const int8_t cmdSendRestLight = 4;
+		const int8_t cmdSendRestBM = 5;
+		const int8_t cmdSendRestRelais = 6;
+		const int8_t cmdSendRestRain = 7;
+		const int8_t cmdSendRestMoisture = 8;
+		const int8_t cmdSendRestDistance = 9;
+		int8_t doSendRestChange;
+
 		const int8_t cmdDebugEEPROM = 1;
 		const int8_t cmdDebugFinder = 2;
 		const int8_t cmdDebugModules = 3;
@@ -81,10 +92,12 @@ class helperWebServer {
 		void setupWebServer();
 		void setCommand(int8_t command);
 		void setModuleChange(int8_t modul);
+		void setSendRestChange(int8_t sendRest);
 		void setDebugChange(int8_t debug);
 		void setBlink();
 		void doTheCommand();
 		void doTheModuleChange();
+		void doTheSendRestChange();
 		void doTheDebugChange();
 		void doTheBlink();
 		
@@ -144,6 +157,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		<h2>%DeviceDescription%</h2>
 		<div class="ul">
 			%Debug%
+			%SendRest%
 			%CompiledWith%
 			<ul>
 				<li><li><span class='bold'>Device:</span></li><hr /></li>
@@ -191,6 +205,8 @@ function onMessage(event) {
 	const d = JSON.parse(event.data);
 	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
 		document.getElementById(d.msg.id).checked = d.msg.value;
+	} else if(typeof d.cmd != undefined && d.cmd == 'setSendRest') {
+		document.getElementById(d.msg.id).checked = d.msg.value;
 	} else if(typeof d.cmd != undefined && d.cmd == 'setModule') {
 		document.getElementById(d.msg.id).checked = d.msg.value;
 	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
@@ -214,6 +230,10 @@ function onMessage(event) {
 }
 function changeModule(e) {
 	xmlHttp.open("GET", "/setModule?Module=" + e.target.id, false);
+	xmlHttp.send(null);
+}
+function changeSendRest(e) {
+	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
 	xmlHttp.send(null);
 }
 function changeDebug(e) {

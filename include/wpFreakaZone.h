@@ -27,6 +27,7 @@
 #include <helperUpdate.h>
 #include <helperWebServer.h>
 #include <helperWiFi.h>
+#include <moduleBase.h>
 #include <moduleDHT.h>
 #include <moduleLDR.h>
 #include <moduleLight.h>
@@ -111,8 +112,9 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		void DebugWS(String typ, String func, String msg, bool newline);
 		//void SendWS(String msg);
-		void SendWSModule(String useModule, bool active);
-		void SendWSDebug(String moduleDebug, bool active);
+		void SendWSModule(String htmlId, bool value);
+		void SendWSSendRest(String htmlId, bool value);
+		void SendWSDebug(String htmlId, bool value);
 		void SendRestartRequired(String msg);
 		void DebugcheckSubscribes(String topic, String value);
 

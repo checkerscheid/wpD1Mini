@@ -17,35 +17,28 @@
 #define moduleLight_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <moduleBase.h>
 #include <AS_BH1750.h>
 #include <Wire.h>
 
 class moduleLight {
 	public:
+		moduleLight();
+		moduleBase* mb;
 		uint16_t light;
-		bool useAvg = false;
-
-		bool Debug = false;
-		bool error;
 		int16_t correction = 0;
-		uint8_t maxCycle = 5;
+
 		// values
 		String mqttTopicLight;
-		String mqttTopicError;
 		// settings
-		String mqttTopicMaxCycle;
 		String mqttTopicCorrection;
-		String mqttTopicUseAvg;
-		// commands
-		String mqttTopicDebug;
 		
-		static AS_BH1750 lightMeter;
+		AS_BH1750 *lightMeter;
 
-		moduleLight();
+		// section to copy
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -53,15 +46,20 @@ class moduleLight {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool UseAvg();
+		bool UseAvg(bool useAvg);
+		bool Debug();
+		bool Debug(bool debug);
+		uint8_t MaxCycle();
+		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
-		String SVNh = "$Rev: 132 $";
-		uint16_t cycleCounter;
-		bool errorLast;
-		uint16_t publishCountError;
 		uint16_t lightLast;
 		uint16_t publishCountLight;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
@@ -71,6 +69,10 @@ class moduleLight {
 		void printCalcError(String name);
 		void printCalcDebug(String name, int16_t value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
+
+		// section to config and copy
+		String ModuleName;
+		String SVNh = "$Rev: 128 $";
 };
 extern moduleLight wpLight;
 

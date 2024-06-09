@@ -17,37 +17,30 @@
 #define moduleMoisture_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <moduleBase.h>
 
 class moduleMoisture {
 	public:
+		moduleMoisture();
+		moduleBase* mb;
 		int16_t moisture;
-		bool Debug = false;
-		bool useAvg = false;
 		byte minValue = 30;
 		uint16_t dry = 1023; // high value
 		uint16_t wet = 0; // low value
-		bool error;
 		bool errorMin;
-		uint8_t maxCycle = 5;
 
 		// values
 		String mqttTopicMoisture;
-		String mqttTopicError;
 		String mqttTopicErrorMin;
 		// settings
-		String mqttTopicMaxCycle;
-		String mqttTopicUseAvg;
 		String mqttTopicMin;
 		String mqttTopicDry;
 		String mqttTopicWet;
-		// commands
-		String mqttTopicDebug;
 
-		moduleMoisture();
+		// section to copy
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -55,18 +48,23 @@ class moduleMoisture {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool UseAvg();
+		bool UseAvg(bool useAvg);
+		bool Debug();
+		bool Debug(bool debug);
+		uint8_t MaxCycle();
+		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
-		String SVNh = "$Rev: 126 $";
 		uint8_t moisturePin;
-		uint16_t cycleCounter;
 		int16_t moistureLast;
 		uint16_t publishCountMoisture;
-		bool errorLast;
-		uint16_t publishCountError;
 		bool errorMinLast;
 		uint16_t publishCountErrorMin;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
@@ -74,6 +72,10 @@ class moduleMoisture {
 		void calc();
 		uint16_t calcAvg(uint16_t raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
+
+		// section to config and copy
+		String ModuleName;
+		String SVNh = "$Rev: 128 $";
 };
 extern moduleMoisture wpMoisture;
 

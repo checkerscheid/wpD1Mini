@@ -63,6 +63,12 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
 }
 
+void helperEEPROM::saveBool(uint16_t &addr, byte &by, uint8_t &bi, bool v) {
+	bitWrite(by, bi, v);
+	EEPROM.write(addr, by);
+	EEPROM.commit();
+}
+
 void helperEEPROM::publishSettings() {
 	publishSettings(false);
 }
@@ -139,78 +145,102 @@ int helperEEPROM::writeStringToEEPROM(int addrOffset, String &strToWrite) {
 }
 
 void helperEEPROM::readVars() {
-	/// bool values: byte 0 - 9
-		bitsModules0 = EEPROM.read(addrBitsModules0);
-		wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
-		wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
-		wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
-		wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
-		wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
-		wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
-		wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
-		wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
+/// bool values: byte 0 - 19
+	bitsModules0 = EEPROM.read(addrBitsModules0);
+	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
+	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
+	wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
+	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
+	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
+	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
+	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
+	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 
-		bitsModules1 = EEPROM.read(addrBitsModules1);
-		wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
-		wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
-		
-		bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
-		Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
-		wpWiFi.Debug = bitRead(bitsDebugBasis0, bitDebugWiFi);
-		wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt);
-		wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder);
-		wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
-		wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
-		wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler);
-		wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
+	bitsModules1 = EEPROM.read(addrBitsModules1);
+	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
+	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
 
-		bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
+//###################################################################################
 
-		bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
-		wpDHT.Debug = bitRead(bitsDebugModules0, bitDebugDHT);
-		wpLDR.Debug = bitRead(bitsDebugModules0, bitDebugLDR);
-		wpLight.Debug = bitRead(bitsDebugModules0, bitDebugLight);
-		wpBM.Debug = bitRead(bitsDebugModules0, bitDebugBM);
-		wpRelais.Debug = bitRead(bitsDebugModules0, bitDebugRelais);
-		wpRain.Debug = bitRead(bitsDebugModules0, bitDebugRain);
-		wpMoisture.Debug = bitRead(bitsDebugModules0, bitDebugMoisture);
-		wpDistance.Debug = bitRead(bitsDebugModules0, bitDebugDistance);
+	bitsSendRestBasis0 = EEPROM.read(addrBitsSendRestBasis0);
+	wpWiFi.sendRest = bitRead(bitSendRestRssi, bitsSendRestBasis0);
 
-		bitsDebugModules1 = EEPROM.read(addrBitsDebugModules1);
-		wpWiFi.Debug = bitRead(bitsDebugModules1, bitDebugWiFi);
-		
-		bitsModulesSettings0 = EEPROM.read(addrBitsModulesSettings0);
-		wpLDR.useAvg = bitRead(bitsModulesSettings0, bitUseLdrAvg);
-		wpLight.useAvg = bitRead(bitsModulesSettings0, bitUseLightAvg);
-		wpRelais.handSet = bitRead(bitsModulesSettings0, bitRelaisHand);
-		wpRelais.handValueSet = bitRead(bitsModulesSettings0, bitRelaisHandValue);
-		wpRelais.waterEmptySet = bitRead(bitsModulesSettings0, bitRelaisWaterEmpty);
-		wpRain.useAvg = bitRead(bitsModulesSettings0, bitUseRainAvg);
-		wpMoisture.useAvg = bitRead(bitsModulesSettings0, bitUseMoistureAvg);
+	bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
+	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
+	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder);
+	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
+	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt);
+	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler);
+	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
+	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate);
+	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
 
-/// byte values: byte 10 - 29
-		wpDHT.maxCycle = EEPROM.read(byteMaxCycleDHT);
-		wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
-		wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
-		wpLDR.maxCycle = EEPROM.read(byteMaxCycleLDR);
-		wpLDR.correction = EEPROM.read(byteLDRCorrection);
-		wpLight.maxCycle = EEPROM.read(byteMaxCycleLight);
-		wpRelais.pumpActive = EEPROM.read(bytePumpActive);
-		wpRain.maxCycle = EEPROM.read(byteMaxCycleRain);
-		wpRain.correction = EEPROM.read(byteRainCorrection);
-		wpMoisture.maxCycle = EEPROM.read(byteMaxCycleMoisture);
-		wpMoisture.minValue = EEPROM.read(byteMoistureMin);
-		wpDistance.maxCycle = EEPROM.read(byteMaxCycleDistance);
-		wpDistance.correction = EEPROM.read(byteDistanceCorrection);
-		wpDistance.height = EEPROM.read(byteHeight);
+	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
+	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
 
-/// byte values: 2byte 30 - 59
-		EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
-		EEPROM.get(byteThreshold, wpBM.threshold);
-		EEPROM.get(bytePumpPause, wpRelais.pumpPause);
-		EEPROM.get(byteMoistureDry, wpMoisture.dry);
-		EEPROM.get(byteMoistureWet, wpMoisture.wet);
-		EEPROM.get(byteMaxVolume, wpDistance.volume);
+//###################################################################################
 
-		readStringsFromEEPROM();
+	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
+	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
+	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
+	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
+	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
+	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
+	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
+	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
+	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
+
+//###################################################################################
+
+	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
+	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
+	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
+	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
+	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
+	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
+	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
+	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
+	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
+
+//###################################################################################
+
+	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
+	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
+	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
+	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
+	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue);
+	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
+	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg));
+	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
+
+//###################################################################################
+/// byte values: byte 20 - 49
+	wpDHT.MaxCycle(EEPROM.read(byteMaxCycleDHT));
+	wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
+	wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
+	wpLDR.MaxCycle(EEPROM.read(byteMaxCycleLDR));
+	wpLDR.correction = EEPROM.read(byteLDRCorrection);
+	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
+	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
+	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));
+	wpRain.correction = EEPROM.read(byteRainCorrection);
+	wpMoisture.MaxCycle(EEPROM.read(byteMaxCycleMoisture));
+	wpMoisture.minValue = EEPROM.read(byteMoistureMin);
+	wpDistance.MaxCycle(EEPROM.read(byteMaxCycleDistance));
+	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
+	wpDistance.height = EEPROM.read(byteHeight);
+
+//###################################################################################
+/// byte values: 2byte 50 - 79
+	EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
+	EEPROM.get(byteThreshold, wpBM.threshold);
+	EEPROM.get(bytePumpPause, wpRelais.pumpPause);
+	EEPROM.get(byteMoistureDry, wpMoisture.dry);
+	EEPROM.get(byteMoistureWet, wpMoisture.wet);
+	EEPROM.get(byteMaxVolume, wpDistance.volume);
+
+//###################################################################################
+/// byte values: 4byte 80 - 99
+
+	readStringsFromEEPROM();
 }

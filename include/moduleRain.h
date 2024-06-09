@@ -17,31 +17,24 @@
 #define moduleRain_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <moduleBase.h>
 
 class moduleRain {
 	public:
+		moduleRain();
+		moduleBase* mb;
 		uint16_t rain;
-		bool Debug = false;
-		bool useAvg = false;
 		int8_t correction = 0;
-		bool error;
-		uint8_t maxCycle = 5;
 
 		// values
 		String mqttTopicRain;
-		String mqttTopicError;
 		// settings
-		String mqttTopicMaxCycle;
 		String mqttTopicCorrection;
-		String mqttTopicUseAvg;
-		// commands
-		String mqttTopicDebug;
 
-		moduleRain();
+		// section to copy
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -49,16 +42,21 @@ class moduleRain {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool UseAvg();
+		bool UseAvg(bool useAvg);
+		bool Debug();
+		bool Debug(bool debug);
+		uint8_t MaxCycle();
+		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
-		String SVNh = "$Rev: 128 $";
 		uint8_t RainPin;
-		uint16_t cycleCounter;
 		int16_t rainLast;
 		uint16_t publishCountRain;
-		bool errorLast;
-		uint16_t publishCountError;
-		bool DebugLast;
-		uint16_t publishCountDebug;
 		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
@@ -66,6 +64,10 @@ class moduleRain {
 		void calc();
 		uint16_t calcAvg(uint16_t raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
+
+		// section to config and copy
+		String ModuleName;
+		String SVNh = "$Rev: 128 $";
 };
 extern moduleRain wpRain;
 

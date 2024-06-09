@@ -17,8 +17,14 @@
 
 moduleRelais wpRelais;
 
-moduleRelais::moduleRelais() {}
+moduleRelais::moduleRelais() {
+	// section to config and copy
+	ModuleName = "Relais";
+	mb = new moduleBase(ModuleName);
+}
 void moduleRelais::init() {
+
+	// section for define
 	relaisPin = D6;
 	if(wpModules.useModuleRelaisShield) {
 		relaisPin = D1;
@@ -30,21 +36,20 @@ void moduleRelais::init() {
 	handError = false;
 
 	// values
-	mqttTopicOut = wpFZ.DeviceName + "/Relais/Output";
-	mqttTopicAutoValue = wpFZ.DeviceName + "/Relais/Auto";
-	mqttTopicHandValue = wpFZ.DeviceName + "/Relais/Hand";
-	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/RelaisHand";
+	mqttTopicOut = wpFZ.DeviceName + "/" + ModuleName + "/Output";
+	mqttTopicAutoValue = wpFZ.DeviceName + "/" + ModuleName + "/Auto";
+	mqttTopicHandValue = wpFZ.DeviceName + "/" + ModuleName + "/Hand";
+	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
 	mqttTopicErrorWaterEmpty = wpFZ.DeviceName + "/ERROR/WaterEmpty";
 	// settings
 	// wpModules.useModuleMoisture {
-	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/Relais/PumpActive";
-	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/Relais/PumpPause";
+	mqttTopicPumpActive = wpFZ.DeviceName + "/settings/" + ModuleName + "/PumpActive";
+	mqttTopicPumpPause = wpFZ.DeviceName + "/settings/" + ModuleName + "/PumpPause";
 	// }
 	// commands
-	mqttTopicSetHand = wpFZ.DeviceName + "/settings/Relais/SetHand";
-	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/Relais/SetHandValue";
-	mqttTopicSetWaterEmpty = wpFZ.DeviceName + "/settings/Relais/SetWaterEmpty";
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Relais";
+	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
+	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
+	mqttTopicSetWaterEmpty = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetWaterEmpty";
 
 	outputLast = false;
 	publishCountOutput = 0;
@@ -54,8 +59,6 @@ void moduleRelais::init() {
 	publishCountHandValue = 0;
 	handErrorLast = false;
 	publishCountHandError = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
 	// if wpModules.useMoisture
 	pumpCycleActive = false;
 	pumpStarted = false;
@@ -63,6 +66,10 @@ void moduleRelais::init() {
 	pumpTimeStart = 0;
 	pumpTimePause = 0;
 	// }
+
+	// section to copy
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
 }
 
 //###################################################################################
@@ -78,22 +85,6 @@ void moduleRelais::cycle() {
 	publishValues();
 }
 
-uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
-	return v > vh ? v : vh;
-}
-
-void moduleRelais::changeDebug() {
-	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugRelais", Debug);
-	wpFZ.blink();
-}
-
 void moduleRelais::publishSettings() {
 	publishSettings(false);
 }
@@ -106,8 +97,8 @@ void moduleRelais::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetWaterEmpty.c_str(), String(waterEmptySet).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
+	mb->publishSettings(force);
 }
 
 void moduleRelais::publishValues() {
@@ -120,7 +111,6 @@ void moduleRelais::publishValues(bool force) {
 		publishCountHandValue = wpFZ.publishQoS;
 		publishCountHandError = wpFZ.publishQoS;
 		publishCountWaterEmptyError = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
 	}
 	if(outputLast != output || ++publishCountOutput > wpFZ.publishQoS) {
 		publishValue();
@@ -158,14 +148,7 @@ void moduleRelais::publishValues(bool force) {
 		}
 		publishCountWaterEmptyError = 0;
 	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais Debug", String(Debug), String(publishCountDebug));
-		}
-		publishCountDebug = 0;
-	}
+	mb->publishValues(force);
 }
 
 void moduleRelais::setSubscribes() {
@@ -176,7 +159,7 @@ void moduleRelais::setSubscribes() {
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	mb->setSubscribes();
 }
 
 void moduleRelais::checkSubscribes(char* topic, String msg) {
@@ -185,8 +168,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			bool readSetWaterEmpty = msg.toInt();
 			if(waterEmptySet != readSetWaterEmpty) {
 				waterEmptySet = readSetWaterEmpty;
-				bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
-				EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
+				bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
+				EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicSetWaterEmpty, String(waterEmptySet));
 				wpFZ.SendWSDebug("waterEmpty", waterEmptySet);
@@ -215,8 +198,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHand = msg.toInt();
 		if(handSet != readSetHand) {
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisHand, handSet);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
+			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHand, handSet);
+			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
@@ -225,23 +208,13 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
 			handValueSet = readSetHandValue;
-			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitRelaisHandValue, handValueSet);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
+			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHandValue, handValueSet);
+			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWSDebug("DebugRelais", Debug);
-		}
-	}
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -249,8 +222,10 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleRelais::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("relais", String(output));
-	wpRest.trySend = true;
+	if(mb->sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("relais", String(output));
+		wpRest.trySend = true;
+	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("Relais", String(output), String(publishCountOutput));
@@ -272,13 +247,13 @@ void moduleRelais::calc() {
 	}
 	if(output && digitalRead(relaisPin) == LOW) {
 		digitalWrite(relaisPin, HIGH);
-		if(Debug) {
+		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calc", "Relais turns on");
 		}
 	}
 	if(!output && digitalRead(relaisPin) == HIGH) {
 		digitalWrite(relaisPin, LOW);
-		if(Debug) {
+		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calc", "Relais turns off");
 		}
 	}
@@ -292,7 +267,7 @@ void moduleRelais::calcPump() {
 				pumpCycleActive = true;
 				pumpStarted = false;
 				pumpInPause = false;
-				if(Debug) {
+				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "Detect 'toDry', start Pump Cycle");
 				}
 			}
@@ -301,7 +276,7 @@ void moduleRelais::calcPump() {
 				autoValue = true;
 				pumpStarted = true;
 				pumpTimeStart = m;
-				if(Debug) {
+				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "start 'pump' (" + String(pumpTimeStart) + ")");
 				}
 			}
@@ -311,7 +286,7 @@ void moduleRelais::calcPump() {
 					autoValue = false;
 					pumpInPause = true;
 					pumpTimePause = m;
-					if(Debug) {
+					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pump', start 'pumpPause' (" + String(pumpTimePause) + ")");
 					}
 				}
@@ -322,7 +297,7 @@ void moduleRelais::calcPump() {
 					pumpCycleActive = false;
 					pumpStarted = false;
 					pumpInPause = false;
-					if(Debug) {
+					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pumpPause' and reset");
 					}
 				}
@@ -334,4 +309,35 @@ void moduleRelais::calcPump() {
 void moduleRelais::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
+
+//###################################################################################
+// section to copy
+//###################################################################################
+uint16_t moduleRelais::getVersion() {
+	String SVN = "$Rev: 132 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
+void moduleRelais::changeSendRest() {
+	mb->changeSendRest();
+}
+void moduleRelais::changeDebug() {
+	mb->changeDebug();
+}
+bool moduleRelais::SendRest() {
+	return mb->sendRest;
+}
+bool moduleRelais::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
+}
+bool moduleRelais::Debug() {
+	return mb->debug;
+}
+bool moduleRelais::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
 }

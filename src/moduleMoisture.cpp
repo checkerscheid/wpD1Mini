@@ -17,76 +17,57 @@
 
 moduleMoisture wpMoisture;
 
-moduleMoisture::moduleMoisture() {}
+moduleMoisture::moduleMoisture() {
+	// section to config and copy
+	ModuleName = "Moisture";
+	mb = new moduleBase(ModuleName);
+}
 void moduleMoisture::init() {
+
+	// section for define
 	moisturePin = A0;
 	moisture = 0;
-	error = false;
 	errorMin = false;
 
 	// values
-	mqttTopicMoisture = wpFZ.DeviceName + "/Moisture";
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/Moisture";
-	mqttTopicErrorMin = wpFZ.DeviceName + "/ERROR/MoistureMin";
+	mqttTopicMoisture = wpFZ.DeviceName + "/" + ModuleName;
+	mqttTopicErrorMin = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Min";
 	// settings
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Moisture/maxCycle";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/Moisture/useAvg";
-	mqttTopicMin = wpFZ.DeviceName + "/settings/Moisture/Min";
-	mqttTopicDry = wpFZ.DeviceName + "/settings/Moisture/Dry";
-	mqttTopicWet = wpFZ.DeviceName + "/settings/Moisture/Wet";
-	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Moisture";
+	mqttTopicMin = wpFZ.DeviceName + "/settings/" + ModuleName + "/Min";
+	mqttTopicDry = wpFZ.DeviceName + "/settings/" + ModuleName + "/Dry";
+	mqttTopicWet = wpFZ.DeviceName + "/settings/" + ModuleName + "/Wet";
 
-	cycleCounter = 0;
 	moistureLast = 0;
 	publishCountMoisture = 0;
-	errorLast = false;
-	publishCountError = 0;
 	errorMinLast = false;
 	publishCountErrorMin = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
+
+	// section to copy
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestMoisture);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture);
+	mb->initError();
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleMoisture);
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleMoisture::cycle() {
-	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
-		cycleCounter = 0;
+	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
+		mb->cycleCounter = 0;
 	}
 	publishValues();
-}
-
-uint16_t moduleMoisture::getVersion() {
-	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
-	return v > vh ? v : vh;
-}
-
-void moduleMoisture::changeDebug() {
-	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugMoisture", Debug);
-	wpFZ.blink();
 }
 
 void moduleMoisture::publishSettings() {
 	publishSettings(false);
 }
 void moduleMoisture::publishSettings(bool force) {
-	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicMin.c_str(), String(minValue).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicDry.c_str(), String(dry).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicWet.c_str(), String(wet).c_str());
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-	}
+	mb->publishSettings(force);
 }
 
 void moduleMoisture::publishValues() {
@@ -95,60 +76,27 @@ void moduleMoisture::publishValues() {
 void moduleMoisture::publishValues(bool force) {
 	if(force) {
 		publishCountMoisture = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
 		publishCountErrorMin = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
 	}
 	if(moistureLast != moisture || ++publishCountMoisture > wpFZ.publishQoS) {
 		publishValue();
-	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
 	}
 	if(errorMinLast != errorMin || ++publishCountErrorMin > wpFZ.publishQoS) {
 		errorMinLast = errorMin;
 		wpMqtt.mqttClient.publish(mqttTopicErrorMin.c_str(), String(errorMin).c_str());
 		publishCountErrorMin = 0;
 	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
-	}
+	mb->publishValues(force);
 }
 
 void moduleMoisture::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicMin.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDry.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicWet.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	mb->setSubscribes();
 }
 
 void moduleMoisture::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		byte readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(wpEEPROM.byteMaxCycleMoisture, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
-	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
-		bool readAvg = msg.toInt();
-		if(useAvg != readAvg) {
-			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsModulesSettings0, wpEEPROM.bitUseMoistureAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsModulesSettings0, wpEEPROM.bitsModulesSettings0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
-		}
-	}
 	if(strcmp(topic, mqttTopicMin.c_str()) == 0) {
 		byte readMin = msg.toInt();
 		if(readMin < 0) readMin = 0;
@@ -182,17 +130,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicWet, String(wet));
 		}
 	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWSDebug("DebugMoisture", Debug);
-		}
-	}
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -200,8 +138,10 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleMoisture::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicMoisture.c_str(), String(moisture).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("moisture", String(moisture));
-	wpRest.trySend = true;
+	if(mb->sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("moisture", String(moisture));
+		wpRest.trySend = true;
+	}
 	moistureLast = moisture;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("Moisture", String(moisture), String(publishCountMoisture));
@@ -214,7 +154,7 @@ void moduleMoisture::calc() {
 	if(!isnan(newMoisture)) {
 		if(newMoisture > 1023) newMoisture = 1023;
 		if(newMoisture < 0) newMoisture = 0;
-		if(useAvg) {
+		if(mb->useAvg) {
 			newMoisture = calcAvg(newMoisture);
 		}
 		//Divission 0
@@ -230,13 +170,13 @@ void moduleMoisture::calc() {
 		if(moisture < 0) moisture = 0;
 		if(moisture < minValue) errorMin = true;
 		if(moisture > minValue) errorMin = false;
-		error = false;
-		if(Debug) {
+		mb->error = false;
+		if(mb->debug) {
 			String logmessage = "Moisture: " + String(moisture) + " (" + String(newMoisture) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcMoisture", logmessage);
 		}
 	} else {
-		error = true;
+		mb->error = true;
 		String logmessage = "Sensor Failure";
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcMoisture", logmessage);
 	}
@@ -260,4 +200,49 @@ uint16_t moduleMoisture::calcAvg(uint16_t raw) {
 void moduleMoisture::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
+
+//###################################################################################
+// section to copy
+//###################################################################################
+uint16_t moduleMoisture::getVersion() {
+	String SVN = "$Rev: 132 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
+void moduleMoisture::changeSendRest() {
+	mb->changeSendRest();
+}
+void moduleMoisture::changeDebug() {
+	mb->changeDebug();
+}
+bool moduleMoisture::SendRest() {
+	return mb->sendRest;
+}
+bool moduleMoisture::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
+}
+bool moduleMoisture::UseAvg() {
+	return mb->useAvg;
+}
+bool moduleMoisture::UseAvg(bool useAvg) {
+	mb->useAvg = useAvg;
+	return true;
+}
+bool moduleMoisture::Debug() {
+	return mb->debug;
+}
+bool moduleMoisture::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
+}
+uint8_t moduleMoisture::MaxCycle(){
+	return mb->maxCycle;
+}
+uint8_t moduleMoisture::MaxCycle(uint8_t maxCycle){
+	mb->maxCycle = maxCycle;
+	return 0;
 }

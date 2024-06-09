@@ -17,8 +17,14 @@
 
 moduleDistance wpDistance;
 
-moduleDistance::moduleDistance() {}
+moduleDistance::moduleDistance() {
+	// section to config and copy
+	ModuleName = "Distance";
+	mb = new moduleBase(ModuleName);
+}
 void moduleDistance::init() {
+
+	// section for define
 	trigPin = D1;
 	echoPin = D2;
 	pinMode(trigPin, OUTPUT);
@@ -26,71 +32,47 @@ void moduleDistance::init() {
 	volume = 0;
 	distanceRaw = 0;
 	distanceAvg = 0;
-	error = false;
 	// values
 	mqttTopicVolume = wpFZ.DeviceName + "/Volume";
-	mqttTopicDistanceRaw = wpFZ.DeviceName + "/Distance/Raw";
-	mqttTopicDistanceAvg = wpFZ.DeviceName + "/Distance/Avg";
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/Distance";
+	mqttTopicDistanceRaw = wpFZ.DeviceName + "/" + ModuleName + "/Raw";
+	mqttTopicDistanceAvg = wpFZ.DeviceName + "/" + ModuleName + "/Avg";
 	// settings
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/Distance/maxCycle";
-	mqttTopicCorrection = wpFZ.DeviceName + "/settings/Distance/correction";
-	mqttTopicHeight = wpFZ.DeviceName + "/settings/Distance/Height";
-	mqttTopicMaxVolume = wpFZ.DeviceName + "/settings/Distance/maxVolume";
-	// commands
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Distance";
+	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/correction";
+	mqttTopicHeight = wpFZ.DeviceName + "/settings/" + ModuleName + "/Height";
+	mqttTopicMaxVolume = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxVolume";
 
-	cycleCounter = 0;
 	volumeLast = 0;
 	publishCountVolume = 0;
 	distanceRawLast = 0;
 	publishCountDistanceRaw = 0;
 	distanceAvgLast = 0;
 	publishCountDistanceAvg = 0;
-	errorLast = false;
-	publishCountError = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
+
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDistance);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance);
+	mb->initError();
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleDistance);
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleDistance::cycle() {	if(
-	wpFZ.calcValues && ++cycleCounter >= maxCycle) {
+	wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
-		cycleCounter = 0;
+		mb->cycleCounter = 0;
 	}
 	publishValues();
-}
-
-uint16_t moduleDistance::getVersion() {
-	String SVN = "$Rev: 135 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
-	return v > vh ? v : vh;
-}
-
-void moduleDistance::changeDebug() {
-	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugDistance", Debug);
-	wpFZ.blink();
 }
 
 void moduleDistance::publishSettings() {
 	publishSettings(false);
 }
 void moduleDistance::publishSettings(bool force) {
-	wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicHeight.c_str(), String(height).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicMaxVolume.c_str(), String(maxVolume).c_str());
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-	}
+	mb->publishSettings(force);
 }
 
 void moduleDistance::publishValues() {
@@ -111,37 +93,17 @@ void moduleDistance::publishValues(bool force) {
 	if(distanceAvgLast != distanceAvg || ++publishCountDistanceAvg > wpFZ.publishQoS) {
 		publishDistanceAvg();
 	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
-	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
-	}
+	mb->publishValues(force);
 }
 
 void moduleDistance::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicHeight.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicMaxVolume.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+	mb->setSubscribes();
 }
 
 void moduleDistance::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		byte readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(wpEEPROM.byteMaxCycleDistance, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
 		uint8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
@@ -169,17 +131,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicMaxVolume, String(maxVolume));
 		}
 	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-			wpFZ.SendWSDebug("DebugugDistance", Debug);
-		}
-	}
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -187,8 +139,10 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleDistance::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicVolume.c_str(), String(volume).c_str());
-	wpRest.error = wpRest.error | !wpRest.sendRest("vol", String(volume));
-	wpRest.trySend = true;
+	if(mb->sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("vol", String(volume));
+		wpRest.trySend = true;
+	}
 	volumeLast = volume;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("Volume", String(volume), String(publishCountVolume));
@@ -232,12 +186,12 @@ void moduleDistance::calc() {
 		if(distanceAvg > height * 10) distanceAvg = height * 10;
 		volume = maxVolume - round(maxVolume * distanceAvg / (height * 10));
 		if(volume > maxVolume) volume = maxVolume;
-		error = false;
-		if(Debug) {
+		mb->error = false;
+		if(mb->debug) {
 			calcDistanceDebug("Distance", distanceAvg, distanceRaw);
 		}
 	} else {
-		error = true;
+		mb->error = true;
 		String logmessage = "Sensor Failure";
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcDistance", logmessage);
 	}
@@ -263,4 +217,43 @@ void moduleDistance::calcDistanceDebug(String name, uint16_t avg, uint16_t raw) 
 void moduleDistance::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+}
+
+
+//###################################################################################
+// section to copy
+//###################################################################################
+uint16_t moduleDistance::getVersion() {
+	String SVN = "$Rev: 132 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
+	return v > vh ? v : vh;
+}
+
+void moduleDistance::changeSendRest() {
+	mb->changeSendRest();
+}
+void moduleDistance::changeDebug() {
+	mb->changeDebug();
+}
+bool moduleDistance::SendRest() {
+	return mb->sendRest;
+}
+bool moduleDistance::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
+}
+bool moduleDistance::Debug() {
+	return mb->debug;
+}
+bool moduleDistance::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
+}
+uint8_t moduleDistance::MaxCycle(){
+	return mb->maxCycle;
+}
+uint8_t moduleDistance::MaxCycle(uint8_t maxCycle){
+	mb->maxCycle = maxCycle;
+	return 0;
 }
