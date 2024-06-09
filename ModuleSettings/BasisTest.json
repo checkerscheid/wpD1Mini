@@ -1,0 +1,63 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "BasisTest",
+		"DeviceDescription": "BasisEmpty",
+		"Version": "V 3.0 Build 131",
+		"MAC": "08:F9:E0:6E:34:9C",
+		"miniMAC": "08f9e06e349c",
+		"UpdateMode": false,
+		"calcValues": true,
+		"DHT": {
+			"MaxCycleDHT": 50,
+			"TemperatureCorrection": -2.00,
+			"HumidityCorrection": 2.00
+		},
+		"BM": {},
+		"Relais": {
+			"Hand": false,
+			"HandValue": false,
+			"Moisture": {
+				"waterEmpty": false,
+				"pumpActive": 2,
+				"pumpPause": 300
+			}
+		},
+		"Moisture": {
+			"MaxCycleMoisture": 50,
+			"useMoistureAvg": 1,
+			"MoistureMin": 30,
+			"MoistureDry": 1023,
+			"MoistureWet": 316
+		},
+		"Oled096": {},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Rest": true,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT22": false,
+			"BM": true,
+			"Relais": true,
+			"Moisture": true,
+			"Oled096": false
+		},
+		"useModul": {
+			"DHT11": false,
+			"DHT22": true,
+			"LDR": false,
+			"Light": false,
+			"BM": true,
+			"Relais": true,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": true,
+			"Distance": false,
+			"Oled096": true
+		}
+	}
+}
