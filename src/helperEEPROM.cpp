@@ -181,10 +181,10 @@ void helperEEPROM::readVars() {
 //###################################################################################
 
 	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
-	wpDHT.sendRest = bitRead(bitsSendRestModules0, bitSendRestDHT);
+	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
 	wpLDR.sendRest = bitRead(bitsSendRestModules0, bitSendRestLDR);
 	wpLight.sendRest = bitRead(bitsSendRestModules0, bitSendRestLight);
-	wpBM.sendRest = bitRead(bitsSendRestModules0, bitSendRestBM);
+	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
 	wpRelais.sendRest = bitRead(bitsSendRestModules0, bitSendRestRelais);
 	wpRain.sendRest = bitRead(bitsSendRestModules0, bitSendRestRain);
 	wpMoisture.sendRest = bitRead(bitsSendRestModules0, bitSendRestMoisture);
@@ -193,10 +193,10 @@ void helperEEPROM::readVars() {
 //###################################################################################
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
-	wpDHT.Debug = bitRead(bitsDebugModules0, bitDebugDHT);
+	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
 	wpLDR.Debug = bitRead(bitsDebugModules0, bitDebugLDR);
 	wpLight.Debug = bitRead(bitsDebugModules0, bitDebugLight);
-	wpBM.Debug = bitRead(bitsDebugModules0, bitDebugBM);
+	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
 	wpRelais.Debug = bitRead(bitsDebugModules0, bitDebugRelais);
 	wpRain.Debug = bitRead(bitsDebugModules0, bitDebugRain);
 	wpMoisture.Debug = bitRead(bitsDebugModules0, bitDebugMoisture);
@@ -215,7 +215,7 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: byte 20 - 49
-	wpDHT.maxCycle = EEPROM.read(byteMaxCycleDHT);
+	wpDHT.MaxCycle(EEPROM.read(byteMaxCycleDHT));
 	wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 	wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
 	wpLDR.maxCycle = EEPROM.read(byteMaxCycleLDR);

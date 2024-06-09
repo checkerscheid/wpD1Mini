@@ -205,6 +205,8 @@ function onMessage(event) {
 	const d = JSON.parse(event.data);
 	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
 		document.getElementById(d.msg.id).checked = d.msg.value;
+	} else if(typeof d.cmd != undefined && d.cmd == 'setSendRest') {
+		document.getElementById(d.msg.id).checked = d.msg.value;
 	} else if(typeof d.cmd != undefined && d.cmd == 'setModule') {
 		document.getElementById(d.msg.id).checked = d.msg.value;
 	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
