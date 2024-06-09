@@ -17,17 +17,12 @@
 
 moduleRain wpRain;
 
-moduleRain::moduleRain() {}
-void moduleRain::init() {
+moduleRain::moduleRain() {
 	// section to config and copy
 	ModuleName = "Rain";
-	addrMaxCycle = wpEEPROM.byteMaxCycleRain;
-	addrSendRest = wpEEPROM.addrBitsSendRestModules0;
-	byteSendRest = wpEEPROM.bitsSendRestModules0;
-	bitSendRest = wpEEPROM.bitSendRestRain;
-	addrDebug = wpEEPROM.addrBitsDebugModules0;
-	byteDebug = wpEEPROM.bitsDebugModules0;
-	bitDebug = wpEEPROM.bitDebugRain;
+	mb = new moduleBase(ModuleName);
+}
+void moduleRain::init() {
 
 	// section for define
 	RainPin = A0;
@@ -36,33 +31,24 @@ void moduleRain::init() {
 	mqttTopicRain = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + ModuleName + "/useAvg";
 
 	rainLast = 0;
 	publishCountRain = 0;
 
 	// section to copy
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
-	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + ModuleName;
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/" + ModuleName;
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + ModuleName;
-
-	cycleCounter = 0;
-	sendRestLast = false;
-	publishCountSendRest = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
-	errorLast = false;
-	publishCountError = 0;
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestRain);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain);
+	mb->initError();
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleRain);
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleRain::cycle() {
-	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
-		cycleCounter = 0;
+		mb->cycleCounter = 0;
 	}
 	publishValues();
 }
@@ -72,8 +58,7 @@ void moduleRain::publishSettings() {
 }
 void moduleRain::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
-	publishDefaultSettings(force);
+	mb->publishSettings(force);
 }
 
 void moduleRain::publishValues() {
@@ -86,13 +71,12 @@ void moduleRain::publishValues(bool force) {
 	if(rainLast != rain || ++publishCountRain > wpFZ.publishQoS) {
 		publishValue();
 	}
-	publishDefaultValues(force);
+	mb->publishValues(force);
 }
 
 void moduleRain::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
-	setDefaultSubscribes();
+	mb->setSubscribes();
 }
 
 void moduleRain::checkSubscribes(char* topic, String msg) {
@@ -105,17 +89,7 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
-	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
-		bool readAvg = msg.toInt();
-		if(useAvg != readAvg) {
-			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseRainAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
-		}
-	}
-	checkDefaultSubscribes(topic, msg);
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -123,7 +97,7 @@ void moduleRain::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleRain::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicRain.c_str(), String(rain).c_str());
-	if(sendRest) {
+	if(mb->sendRest) {
 		wpRest.error = wpRest.error | !wpRest.sendRest("rain", String(rain));
 		wpRest.trySend = true;
 	}
@@ -140,20 +114,20 @@ void moduleRain::calc() {
 		if(newRain > 1023) newRain = 1023;
 		if(newRain < 0) newRain = 0;
 		int calcedRain = newRain;
-		if(useAvg) {
+		if(mb->useAvg) {
 			calcedRain = calcAvg(newRain);
 		}
 		calcedRain = map(newRain, 1023, 0, 0, 500);
 		if(calcedRain > 500) calcedRain = 500;
 		if(calcedRain < 0) calcedRain = 0;
 		rain = (float)(calcedRain / 10.0) + correction;
-		error = false;
-		if(Debug) {
+		mb->error = false;
+		if(mb->debug) {
 			String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", logmessage);
 		}
 	} else {
-		error = true;
+		mb->error = true;
 		String logmessage = "Sensor Failure";
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 	}
@@ -187,85 +161,38 @@ uint16_t moduleRain::getVersion() {
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
+
 void moduleRain::changeSendRest() {
-	sendRest = !sendRest;
-	bitWrite(byteSendRest, bitSendRest, sendRest);
-	EEPROM.write(addrSendRest, byteSendRest);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeSendRest();
 }
 void moduleRain::changeDebug() {
-	Debug = !Debug;
-	bitWrite(byteDebug, bitDebug, Debug);
-	EEPROM.write(addrDebug, byteDebug);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeDebug();
 }
-void moduleRain::publishDefaultSettings(bool force) {
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-	}
+bool moduleRain::SendRest() {
+	return mb->sendRest;
 }
-void moduleRain::publishDefaultValues(bool force) {
-	if(force) {
-		publishCountSendRest = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
-	}
-	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
-		sendRestLast = sendRest;
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpFZ.SendWSSendRest("sendRest" + ModuleName, sendRest);
-		publishCountSendRest = 0;
-	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpFZ.SendWSDebug("Debug" + ModuleName, Debug);
-		publishCountDebug = 0;
-	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
-	}
+bool moduleRain::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
 }
-void moduleRain::setDefaultSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+bool moduleRain::UseAvg() {
+	return mb->useAvg;
 }
-void moduleRain::checkDefaultSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		uint8_t readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(addrMaxCycle, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
-	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
-		bool readSendRest = msg.toInt();
-		if(sendRest != readSendRest) {
-			sendRest = readSendRest;
-			bitWrite(byteSendRest, bitSendRest, sendRest);
-			EEPROM.write(addrSendRest, byteSendRest);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
-		}
-	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(byteDebug, bitDebug, Debug);
-			EEPROM.write(addrDebug, byteDebug);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-		}
-	}
+bool moduleRain::UseAvg(bool useAvg) {
+	mb->useAvg = useAvg;
+	return true;
+}
+bool moduleRain::Debug() {
+	return mb->debug;
+}
+bool moduleRain::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
+}
+uint8_t moduleRain::MaxCycle(){
+	return mb->maxCycle;
+}
+uint8_t moduleRain::MaxCycle(uint8_t maxCycle){
+	mb->maxCycle = maxCycle;
+	return 0;
 }

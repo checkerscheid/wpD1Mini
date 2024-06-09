@@ -17,12 +17,13 @@
 #define moduleMoisture_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
+#include <moduleBase.h>
 
 class moduleMoisture {
 	public:
 		moduleMoisture();
+		moduleBase* mb;
 		int16_t moisture;
-		bool useAvg = false;
 		byte minValue = 30;
 		uint16_t dry = 1023; // high value
 		uint16_t wet = 0; // low value
@@ -32,32 +33,32 @@ class moduleMoisture {
 		String mqttTopicMoisture;
 		String mqttTopicErrorMin;
 		// settings
-		String mqttTopicUseAvg;
 		String mqttTopicMin;
 		String mqttTopicDry;
 		String mqttTopicWet;
 
 		// section to copy
-		bool sendRest = false;
-		bool Debug = false;
-		bool error = false;
-		uint8_t maxCycle = 5;
-		String mqttTopicMaxCycle;
-		String mqttTopicSendRest;
-		String mqttTopicDebug;
-		String mqttTopicError;
 		void init();
 		void cycle();
 		uint16_t getVersion();
 
-		void changeSendRest();
-		void changeDebug();
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool UseAvg();
+		bool UseAvg(bool useAvg);
+		bool Debug();
+		bool Debug(bool debug);
+		uint8_t MaxCycle();
+		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
 		uint8_t moisturePin;
 		int16_t moistureLast;
@@ -74,25 +75,7 @@ class moduleMoisture {
 
 		// section to config and copy
 		String ModuleName;
-		uint16_t addrMaxCycle;
-		uint16_t addrSendRest;
-		byte byteSendRest;
-		uint8_t bitSendRest;
-		uint16_t addrDebug;
-		byte byteDebug;
-		uint8_t bitDebug;
 		String SVNh = "$Rev: 128 $";
-		uint8_t cycleCounter;
-		bool sendRestLast;
-		uint16_t publishCountSendRest;
-		bool DebugLast;
-		uint16_t publishCountDebug;
-		bool errorLast;
-		uint16_t publishCountError;
-		void publishDefaultSettings(bool force);
-		void publishDefaultValues(bool force);
-		void setDefaultSubscribes();
-		void checkDefaultSubscribes(char* topic, String msg);
 };
 extern moduleMoisture wpMoisture;
 

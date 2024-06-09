@@ -17,17 +17,12 @@
 
 moduleLDR wpLDR;
 
-moduleLDR::moduleLDR() {}
-void moduleLDR::init() {
+moduleLDR::moduleLDR() {
 	// section to config and copy
 	ModuleName = "LDR";
-	addrMaxCycle = wpEEPROM.byteMaxCycleLDR;
-	addrSendRest = wpEEPROM.addrBitsSendRestModules0;
-	byteSendRest = wpEEPROM.bitsSendRestModules0;
-	bitSendRest = wpEEPROM.bitSendRestLDR;
-	addrDebug = wpEEPROM.addrBitsDebugModules0;
-	byteDebug = wpEEPROM.bitsDebugModules0;
-	bitDebug = wpEEPROM.bitDebugLDR;
+	mb = new moduleBase(ModuleName);
+}
+void moduleLDR::init() {
 
 	// section for define
 	LDRPin = A0;
@@ -36,33 +31,24 @@ void moduleLDR::init() {
 	mqttTopicLDR = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + ModuleName + "/useAvg";
 
 	LDRLast = 0;
 	publishCountLDR = 0;
 
 	// section to copy
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
-	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + ModuleName;
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/" + ModuleName;
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + ModuleName;
-
-	cycleCounter = 0;
-	sendRestLast = false;
-	publishCountSendRest = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
-	errorLast = false;
-	publishCountError = 0;
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
+	mb->initError();
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleLDR);
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleLDR::cycle() {
-	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
-		cycleCounter = 0;
+		mb->cycleCounter = 0;
 	}
 	publishValues();
 }
@@ -72,8 +58,7 @@ void moduleLDR::publishSettings() {
 }
 void moduleLDR::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
-	publishDefaultSettings(force);
+	mb->publishSettings(force);
 }
 
 void moduleLDR::publishValues() {
@@ -86,13 +71,12 @@ void moduleLDR::publishValues(bool force) {
 	if(LDRLast != LDR || ++publishCountLDR > wpFZ.publishQoS) {
 		publishValue();
 	}
-	publishDefaultValues(force);
+	mb->publishValues(force);
 }
 
 void moduleLDR::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
-	setDefaultSubscribes();
+	mb->setSubscribes();
 }
 
 void moduleLDR::checkSubscribes(char* topic, String msg) {
@@ -105,17 +89,7 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
-	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
-		bool readAvg = msg.toInt();
-		if(useAvg != readAvg) {
-			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLdrAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
-		}
-	}
-	checkDefaultSubscribes(topic, msg);
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -123,7 +97,7 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleLDR::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicLDR.c_str(), String(LDR).c_str());
-	if(sendRest) {
+	if(mb->sendRest) {
 		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(LDR));
 		wpRest.trySend = true;
 	}
@@ -139,17 +113,17 @@ void moduleLDR::calc() {
 	if(!isnan(newLDR)) {
 		if(newLDR > 1023) newLDR = 1023;
 		if(newLDR < 0) newLDR = 0;
-		if(useAvg) {
+		if(mb->useAvg) {
 			newLDR = calcAvg(newLDR);
 		}
 		LDR = (1023 - newLDR) + correction;
-		error = false;
-		if(Debug) {
+		mb->error = false;
+		if(mb->debug) {
 			String logmessage = "LDR: " + String(LDR) + " (" + String(newLDR) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcLDR", logmessage);
 		}
 	} else {
-		error = true;
+		mb->error = true;
 		String logmessage = "Sensor Failure";
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 	}
@@ -183,85 +157,38 @@ uint16_t moduleLDR::getVersion() {
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
+
 void moduleLDR::changeSendRest() {
-	sendRest = !sendRest;
-	bitWrite(byteSendRest, bitSendRest, sendRest);
-	EEPROM.write(addrSendRest, byteSendRest);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeSendRest();
 }
 void moduleLDR::changeDebug() {
-	Debug = !Debug;
-	bitWrite(byteDebug, bitDebug, Debug);
-	EEPROM.write(addrDebug, byteDebug);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeDebug();
 }
-void moduleLDR::publishDefaultSettings(bool force) {
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-	}
+bool moduleLDR::SendRest() {
+	return mb->sendRest;
 }
-void moduleLDR::publishDefaultValues(bool force) {
-	if(force) {
-		publishCountSendRest = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
-	}
-	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
-		sendRestLast = sendRest;
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpFZ.SendWSSendRest("sendRest" + ModuleName, sendRest);
-		publishCountSendRest = 0;
-	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpFZ.SendWSDebug("Debug" + ModuleName, Debug);
-		publishCountDebug = 0;
-	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
-	}
+bool moduleLDR::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
 }
-void moduleLDR::setDefaultSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+bool moduleLDR::UseAvg() {
+	return mb->useAvg;
 }
-void moduleLDR::checkDefaultSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		uint8_t readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(addrMaxCycle, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
-	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
-		bool readSendRest = msg.toInt();
-		if(sendRest != readSendRest) {
-			sendRest = readSendRest;
-			bitWrite(byteSendRest, bitSendRest, sendRest);
-			EEPROM.write(addrSendRest, byteSendRest);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
-		}
-	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(byteDebug, bitDebug, Debug);
-			EEPROM.write(addrDebug, byteDebug);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-		}
-	}
+bool moduleLDR::UseAvg(bool useAvg) {
+	mb->useAvg = useAvg;
+	return true;
+}
+bool moduleLDR::Debug() {
+	return mb->debug;
+}
+bool moduleLDR::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
+}
+uint8_t moduleLDR::MaxCycle(){
+	return mb->maxCycle;
+}
+uint8_t moduleLDR::MaxCycle(uint8_t maxCycle){
+	mb->maxCycle = maxCycle;
+	return 0;
 }

@@ -27,6 +27,7 @@
 #include <helperUpdate.h>
 #include <helperWebServer.h>
 #include <helperWiFi.h>
+#include <moduleBase.h>
 #include <moduleDHT.h>
 #include <moduleLDR.h>
 #include <moduleLight.h>
