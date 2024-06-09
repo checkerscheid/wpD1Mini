@@ -182,51 +182,51 @@ void helperEEPROM::readVars() {
 
 	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
 	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
-	wpLDR.sendRest = bitRead(bitsSendRestModules0, bitSendRestLDR);
-	wpLight.sendRest = bitRead(bitsSendRestModules0, bitSendRestLight);
+	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
+	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
 	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
-	wpRelais.sendRest = bitRead(bitsSendRestModules0, bitSendRestRelais);
-	wpRain.sendRest = bitRead(bitsSendRestModules0, bitSendRestRain);
-	wpMoisture.sendRest = bitRead(bitsSendRestModules0, bitSendRestMoisture);
-	wpDistance.sendRest = bitRead(bitsSendRestModules0, bitSendRestDistance);
+	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
+	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
+	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
+	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
 
 //###################################################################################
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
 	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
-	wpLDR.Debug = bitRead(bitsDebugModules0, bitDebugLDR);
-	wpLight.Debug = bitRead(bitsDebugModules0, bitDebugLight);
+	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
+	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
-	wpRelais.Debug = bitRead(bitsDebugModules0, bitDebugRelais);
-	wpRain.Debug = bitRead(bitsDebugModules0, bitDebugRain);
-	wpMoisture.Debug = bitRead(bitsDebugModules0, bitDebugMoisture);
-	wpDistance.Debug = bitRead(bitsDebugModules0, bitDebugDistance);
+	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
+	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
+	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
+	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
 
 //###################################################################################
 
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
-	wpLDR.useAvg = bitRead(bitsSettingsModules0, bitUseLdrAvg);
-	wpLight.useAvg = bitRead(bitsSettingsModules0, bitUseLightAvg);
+	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
+	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
 	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
 	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue);
 	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
-	wpRain.useAvg = bitRead(bitsSettingsModules0, bitUseRainAvg);
-	wpMoisture.useAvg = bitRead(bitsSettingsModules0, bitUseMoistureAvg);
+	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg));
+	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 
 //###################################################################################
 /// byte values: byte 20 - 49
 	wpDHT.MaxCycle(EEPROM.read(byteMaxCycleDHT));
 	wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 	wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
-	wpLDR.maxCycle = EEPROM.read(byteMaxCycleLDR);
+	wpLDR.MaxCycle(EEPROM.read(byteMaxCycleLDR));
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
-	wpLight.maxCycle = EEPROM.read(byteMaxCycleLight);
+	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
-	wpRain.maxCycle = EEPROM.read(byteMaxCycleRain);
+	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));
 	wpRain.correction = EEPROM.read(byteRainCorrection);
-	wpMoisture.maxCycle = EEPROM.read(byteMaxCycleMoisture);
+	wpMoisture.MaxCycle(EEPROM.read(byteMaxCycleMoisture));
 	wpMoisture.minValue = EEPROM.read(byteMoistureMin);
-	wpDistance.maxCycle = EEPROM.read(byteMaxCycleDistance);
+	wpDistance.MaxCycle(EEPROM.read(byteMaxCycleDistance));
 	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
 	wpDistance.height = EEPROM.read(byteHeight);
 

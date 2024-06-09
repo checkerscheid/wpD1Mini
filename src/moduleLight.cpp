@@ -18,17 +18,12 @@
 // uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
 moduleLight wpLight;
 
-moduleLight::moduleLight() {}
-void moduleLight::init() {
+moduleLight::moduleLight() {
 	// section to config and copy
 	ModuleName = "Light";
-	addrMaxCycle = wpEEPROM.byteMaxCycleLight;
-	addrSendRest = wpEEPROM.addrBitsSendRestModules0;
-	byteSendRest = wpEEPROM.bitsSendRestModules0;
-	bitSendRest = wpEEPROM.bitSendRestLight;
-	addrDebug = wpEEPROM.addrBitsDebugModules0;
-	byteDebug = wpEEPROM.bitsDebugModules0;
-	bitDebug = wpEEPROM.bitDebugLight;
+	mb = new moduleBase(ModuleName);
+}
+void moduleLight::init() {
 
 	// section for define
 	light = 0;
@@ -36,7 +31,6 @@ void moduleLight::init() {
 	mqttTopicLight = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
-	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + ModuleName + "/useAvg";
 
 	lightMeter = new AS_BH1750();
 	lightMeter->begin();
@@ -45,27 +39,19 @@ void moduleLight::init() {
 	publishCountLight = 0;
 
 	// section to copy
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
-	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + ModuleName;
-	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/" + ModuleName;
-	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + ModuleName;
-
-	cycleCounter = 0;
-	sendRestLast = false;
-	publishCountSendRest = 0;
-	DebugLast = false;
-	publishCountDebug = 0;
-	errorLast = false;
-	publishCountError = 0;
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLight);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight);
+	mb->initError();
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleLight);
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleLight::cycle() {
-	if(wpFZ.calcValues && ++cycleCounter >= maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
-		cycleCounter = 0;
+		mb->cycleCounter = 0;
 	}
 	publishValues();
 }
@@ -75,8 +61,7 @@ void moduleLight::publishSettings() {
 }
 void moduleLight::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
-	publishDefaultSettings(force);
+	mb->publishSettings(force);
 }
 
 void moduleLight::publishValues() {
@@ -89,13 +74,12 @@ void moduleLight::publishValues(bool force) {
 	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
 		publishValue();
 	}
-	publishDefaultValues(force);
+	mb->publishValues(force);
 }
 
 void moduleLight::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
-	setDefaultSubscribes();
+	mb->setSubscribes();
 }
 
 void moduleLight::checkSubscribes(char* topic, String msg) {
@@ -108,17 +92,7 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
-	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
-		bool readAvg = msg.toInt();
-		if(useAvg != readAvg) {
-			useAvg = readAvg;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLightAvg, useAvg);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
-		}
-	}
-	checkDefaultSubscribes(topic, msg);
+	mb->checkSubscribes(topic, msg);
 }
 
 //###################################################################################
@@ -126,7 +100,7 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleLight::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-	if(sendRest) {
+	if(mb->sendRest) {
 		wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
 		wpRest.trySend = true;
 	}
@@ -141,17 +115,17 @@ void moduleLight::calc() {
 	float ar = lightMeter->readLightLevel();
 	uint16_t newLight = (uint16_t)ar;
 	if(ar >= 0) {
-		if(useAvg) {
+		if(mb->useAvg) {
 			newLight = calcAvg(newLight);
 		}
 		light = newLight + correction;
-		error = false;
-		if(Debug) {
+		mb->error = false;
+		if(mb->debug) {
 			String logmessage = "Light: " + String(light) + " (" + String(newLight) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "wpLight::calc", logmessage);
 		}
 	} else {
-		error = true;
+		mb->error = true;
 		String logmessage = "Sensor Failure";
 		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
 	}
@@ -185,85 +159,38 @@ uint16_t moduleLight::getVersion() {
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
+
 void moduleLight::changeSendRest() {
-	sendRest = !sendRest;
-	bitWrite(byteSendRest, bitSendRest, sendRest);
-	EEPROM.write(addrSendRest, byteSendRest);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeSendRest();
 }
 void moduleLight::changeDebug() {
-	Debug = !Debug;
-	bitWrite(byteDebug, bitDebug, Debug);
-	EEPROM.write(addrDebug, byteDebug);
-	EEPROM.commit();
-	wpFZ.blink();
+	mb->changeDebug();
 }
-void moduleLight::publishDefaultSettings(bool force) {
-	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-	}
+bool moduleLight::SendRest() {
+	return mb->sendRest;
 }
-void moduleLight::publishDefaultValues(bool force) {
-	if(force) {
-		publishCountSendRest = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
-	}
-	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
-		sendRestLast = sendRest;
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpFZ.SendWSSendRest("sendRest" + ModuleName, sendRest);
-		publishCountSendRest = 0;
-	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
-		DebugLast = Debug;
-		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpFZ.SendWSDebug("Debug" + ModuleName, Debug);
-		publishCountDebug = 0;
-	}
-	if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
-		errorLast = error;
-		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-		publishCountError = 0;
-	}
+bool moduleLight::SendRest(bool sendRest) {
+	mb->sendRest = sendRest;
+	return true;
 }
-void moduleLight::setDefaultSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
+bool moduleLight::UseAvg() {
+	return mb->useAvg;
 }
-void moduleLight::checkDefaultSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		uint8_t readMaxCycle = msg.toInt();
-		if(readMaxCycle <= 0) readMaxCycle = 1;
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			EEPROM.write(addrMaxCycle, maxCycle);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
-		}
-	}
-	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
-		bool readSendRest = msg.toInt();
-		if(sendRest != readSendRest) {
-			sendRest = readSendRest;
-			bitWrite(byteSendRest, bitSendRest, sendRest);
-			EEPROM.write(addrSendRest, byteSendRest);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
-		}
-	}
-	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
-			bitWrite(byteDebug, bitDebug, Debug);
-			EEPROM.write(addrDebug, byteDebug);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
-		}
-	}
+bool moduleLight::UseAvg(bool useAvg) {
+	mb->useAvg = useAvg;
+	return true;
+}
+bool moduleLight::Debug() {
+	return mb->debug;
+}
+bool moduleLight::Debug(bool debug) {
+	mb->debug = debug;
+	return true;
+}
+uint8_t moduleLight::MaxCycle(){
+	return mb->maxCycle;
+}
+uint8_t moduleLight::MaxCycle(uint8_t maxCycle){
+	mb->maxCycle = maxCycle;
+	return 0;
 }

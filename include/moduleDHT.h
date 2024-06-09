@@ -74,7 +74,6 @@ class moduleDHT {
 		void printCalcDebug(String name, int16_t value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
-
 		// section to config and copy
 		String ModuleName;
 		String SVNh = "$Rev: 128 $";

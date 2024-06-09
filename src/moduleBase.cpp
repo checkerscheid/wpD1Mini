@@ -26,6 +26,7 @@ moduleBase::moduleBase(String moduleName) {
 	errorLast = false;
 	publishCountError = 0;
 	cycleCounter = 0;
+	_useUseAvg = false;
 	_useMaxCycle = false;
 	_useError = false;
 }
@@ -34,6 +35,13 @@ void moduleBase::initRest(uint16_t addrSendRest, byte byteSendRest, uint8_t bitS
 	_byteSendRest = byteSendRest;
 	_bitSendRest = bitSendRest;
 	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + _name;
+}
+void moduleBase::initUseAvg(uint16_t addrUseAvg, byte byteUseAvg, uint8_t bitUseAvg) {
+	_useUseAvg = true;
+	_addrUseAvg = addrUseAvg;
+	_byteUseAvg = byteUseAvg;
+	_bitUseAvg = bitUseAvg;
+	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + _name + "/useAvg";
 }
 void moduleBase::initDebug(uint16_t addrDebug, byte byteDebug, uint8_t bitDebug) {
 	_addrDebug = addrDebug;
@@ -66,6 +74,9 @@ void moduleBase::changeDebug() {
 void moduleBase::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		if(_useUseAvg) {
+			wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
+		}
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(debug).c_str());
 		if(_useError) {
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
@@ -103,6 +114,9 @@ void moduleBase::publishValues(bool force) {
 }
 void moduleBase::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
+	if(_useUseAvg) {
+		wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
+	}
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 	if(_useMaxCycle) {
 		wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
@@ -115,6 +129,14 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 			sendRest = readSendRest;
 			writeEEPROMsendRest();
 			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
+		}
+	}
+	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
+		bool readUseAvg = msg.toInt();
+		if(useAvg != readUseAvg) {
+			useAvg = readUseAvg;
+			writeEEPROMuseAvg();
+			wpFZ.DebugcheckSubscribes(mqttTopicUseAvg, String(useAvg));
 		}
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -137,6 +159,11 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 void moduleBase::writeEEPROMsendRest() {
 	bitWrite(_byteSendRest, _bitSendRest, sendRest);
 	EEPROM.write(_addrSendRest, _byteSendRest);
+	EEPROM.commit();
+}
+void moduleBase::writeEEPROMuseAvg() {
+	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
+	EEPROM.write(_addrUseAvg, _byteUseAvg);
 	EEPROM.commit();
 }
 void moduleBase::writeEEPROMdebug() {

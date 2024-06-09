@@ -43,12 +43,11 @@ void moduleDHT::init() {
 	dht->begin();
 
 	// section to copy
-
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDHT);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDHT);
 	mb->initError();
 	mb->initMaxCycle(wpEEPROM.byteMaxCycleDHT);
-	
+
 }
 
 //###################################################################################
