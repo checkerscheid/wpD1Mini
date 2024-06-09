@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 135                                                     $ #
+//# Revision     : $Rev:: 136                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 135 2024-06-06 14:04:54Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 136 2024-06-09 15:37:41Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -51,7 +51,7 @@ void helperModules::cycle() {
 }
 
 uint16_t helperModules::getVersion() {
-	String SVN = "$Rev: 135 $";
+	String SVN = "$Rev: 136 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
