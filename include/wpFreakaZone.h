@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 138                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 136 2024-06-09 15:37:41Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 138 2024-06-10 05:26:18Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -62,7 +62,7 @@ class wpFreakaZone {
 		const uint16_t publishQoS = minute10; // 5 because loopTime = 200
 
 		uint16_t MajorVersion = 3;
-		uint16_t MinorVersion = 0;
+		uint16_t MinorVersion = 1;
 		uint16_t Build;
 		String Version;
 
@@ -128,7 +128,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 136 $";
+		String SVNh = "$Rev: 138 $";
 		uint16_t publishCountOnDuration;
 		bool calcValuesLast;
 		uint16_t publishCountCalcValues;

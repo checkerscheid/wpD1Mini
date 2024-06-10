@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 138                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 136 2024-06-09 15:37:41Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 138 2024-06-10 05:26:18Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -45,6 +45,7 @@ void moduleMoisture::init() {
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestMoisture);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture);
+	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseMoistureAvg);
 	mb->initError();
 	mb->initMaxCycle(wpEEPROM.byteMaxCycleMoisture);
 }
@@ -206,7 +207,7 @@ void moduleMoisture::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16_t moduleMoisture::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 138 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
