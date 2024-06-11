@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 136 2024-06-09 15:37:41Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 139 2024-06-11 10:08:54Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -220,8 +220,7 @@ void helperWebServer::setupWebServer() {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			String Shield = (wpModules.useModuleRelaisShield ? "RelaisShield" : "Relais");
-			message += "," + wpFZ.JsonKeyValue(Shield, wpRelais.Debug() ? "true" : "false");
+			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleRain) {
 			message += "," + wpFZ.JsonKeyValue("Rain", wpRain.Debug() ? "true" : "false");
@@ -250,8 +249,7 @@ void helperWebServer::setupWebServer() {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			String Shield = (wpModules.useModuleRelaisShield ? "RelaisShield" : "Relais");
-			message += "," + wpFZ.JsonKeyValue(Shield, wpRelais.SendRest() ? "true" : "false");
+			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleRain) {
 			message += "," + wpFZ.JsonKeyValue("Rain", wpRain.SendRest() ? "true" : "false");
@@ -656,7 +654,7 @@ String processor(const String& var) {
 		returns = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>"
 			"<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") +
 			" onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";
-		if(wpModules.useModuleRelais && wpModules.useModuleMoisture) {
+		if((wpModules.useModuleRelais || wpModules.useModuleRelaisShield) && wpModules.useModuleMoisture) {
 			returns += "<li><input id='waterEmpty' type='checkbox'" + String(wpRelais.waterEmptySet ? " checked" : "") +
 				" onchange='cmdHandle(event)' /><label for='waterEmpty'>waterEmpty</label></li>";
 		}

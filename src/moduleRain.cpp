@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 138                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 138 2024-06-10 05:26:18Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 139 2024-06-11 10:08:54Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -110,21 +110,29 @@ void moduleRain::publishValue() {
 }
 
 void moduleRain::calc() {
-	int newRain = analogRead(RainPin);
-	if(!isnan(newRain)) {
-		if(newRain > 1023) newRain = 1023;
-		if(newRain < 0) newRain = 0;
-		int calcedRain = newRain;
+	int read = analogRead(RainPin);
+	int minMax, avg, correct, raw;
+	if(!isnan(read)) {
+		minMax = read;
+		if(minMax > 1023) minMax = 1023;
+		if(minMax < 0) minMax = 0;
+		avg = minMax;
 		if(mb->useAvg) {
-			calcedRain = calcAvg(newRain);
+			avg = calcAvg(avg);
 		}
-		calcedRain = map(newRain, 1023, 0, 0, 500);
-		if(calcedRain > 500) calcedRain = 500;
-		if(calcedRain < 0) calcedRain = 0;
-		rain = (float)(calcedRain / 10.0) + correction;
+		correct = avg;
+		raw = map(correct, 1023, 0, 0, 500);
+		/// 0 - 50 l/m²
+		if(raw > 500) raw = 500;
+		if(raw < 0) raw = 0;
+		rain = (float)(raw / 10.0) + correction;
 		mb->error = false;
 		if(mb->debug) {
-			String logmessage = "Rain: " + String(rain) + " (" + String(newRain) + ")";
+			String logmessage = "Rain: " + String(rain) + " ("
+				"Read: " + String(read) + ", "
+				"MinMax: " + String(minMax) + ", "
+				"Avg: " + String(correct) + ", "
+				"Raw: " + String(raw) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcRain", logmessage);
 		}
 	} else {
@@ -157,7 +165,7 @@ void moduleRain::printPublishValueDebug(String name, String value, String publis
 // section to copy
 //###################################################################################
 uint16_t moduleRain::getVersion() {
-	String SVN = "$Rev: 138 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

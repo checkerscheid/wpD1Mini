@@ -2,15 +2,14 @@
 	"FreakaZoneDevice": {
 		"DeviceName": "KU_RU",
 		"DeviceDescription": "Kueche Raumueberwachung",
-		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
-		"Version": "Build 118.118",
+		"Version": "V 3.0 Build 134",
 		"MAC": "08:F9:E0:6E:5E:8A",
 		"miniMAC": "08f9e06e5e8a",
 		"UpdateMode": false,
 		"calcValues": true,
-		"HT": {
-			"MaxCycleHT": 50,
-			"TemperatureCorrection": -3.90,
+		"DHT": {
+			"MaxCycleDHT": 50,
+			"TemperatureCorrection": 0.00,
 			"HumidityCorrection": 0.00
 		},
 		"LDR": {
@@ -26,13 +25,29 @@
 		},
 		"Debug": {
 			"EEPROM": false,
-			"WiFi": false,
+			"Finder": false,
+			"Modules": false,
 			"MQTT": false,
-			"Search": false,
+			"OnlineToggler": false,
 			"Rest": false,
-			"HT11": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT11": false,
+			"LDR": false,
+			"BM": false
+		},
+		"useModul": {
+			"DHT11": true,
+			"DHT22": false,
 			"LDR": true,
-			"BM": true
+			"Light": false,
+			"BM": true,
+			"Relais": false,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": false,
+			"Distance": false
 		}
 	}
 }

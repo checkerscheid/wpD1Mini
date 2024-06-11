@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 138                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 138 2024-06-10 05:26:18Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 139 2024-06-11 10:08:54Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -151,13 +151,17 @@ void moduleMoisture::publishValue() {
 }
 
 void moduleMoisture::calc() {
-	int newMoisture = analogRead(moisturePin);
-	if(!isnan(newMoisture)) {
-		if(newMoisture > 1023) newMoisture = 1023;
-		if(newMoisture < 0) newMoisture = 0;
+	int read = analogRead(moisturePin);
+	int minMax, avg, correct;
+	if(!isnan(read)) {
+		minMax = read;
+		if(minMax > 1023) minMax = 1023;
+		if(minMax < 0) minMax = 0;
+		avg = minMax;
 		if(mb->useAvg) {
-			newMoisture = calcAvg(newMoisture);
+			avg = calcAvg(avg);
 		}
+		correct = avg;
 		//Divission 0
 		if((wet - dry) == 0) {
 			wpFZ.DebugWS(wpFZ.strERRROR, "Moisture::calc", "risky math operation: '" + String(wet) + " (wet) - " + String(dry) + " (dry)'");
@@ -166,14 +170,17 @@ void moduleMoisture::calc() {
 				wet = ++i;
 			} while((wet - dry) > 0);
 		}
-		moisture = map(newMoisture, dry, wet, 0, 100);
+		moisture = map(correct, dry, wet, 0, 100);
 		if(moisture > 100) moisture = 100;
 		if(moisture < 0) moisture = 0;
 		if(moisture < minValue) errorMin = true;
 		if(moisture > minValue) errorMin = false;
 		mb->error = false;
 		if(mb->debug) {
-			String logmessage = "Moisture: " + String(moisture) + " (" + String(newMoisture) + ")";
+			String logmessage = "Moisture: " + String(moisture) + " ("
+				"Read: " + String(read) + ", "
+				"MinMax: " + String(minMax) + ", "
+				"Avg: " + String(avg) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcMoisture", logmessage);
 		}
 	} else {
@@ -207,7 +214,7 @@ void moduleMoisture::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16_t moduleMoisture::getVersion() {
-	String SVN = "$Rev: 138 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

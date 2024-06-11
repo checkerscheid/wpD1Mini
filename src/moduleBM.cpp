@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 136 2024-06-09 15:37:41Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 139 2024-06-11 10:08:54Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -107,8 +107,8 @@ void moduleBM::publishValue() {
 	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.LDR <= threshold) {
-			String lm = "MQTT Set Light (" + String(wpLDR.LDR) + " <= " + String(threshold) + ")";
+		if(bm && wpLDR.ldr <= threshold) {
+			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
 					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
@@ -150,7 +150,7 @@ void moduleBM::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

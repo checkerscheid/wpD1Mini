@@ -1,1 +1,53 @@
-{"FreakaZoneDevice":{"DeviceName":"WZ_PF_TE","DeviceDescription":"Wohnzimmer Pflanze Terrasse","Version":"V 3.0 Build 130","MAC":"08:F9:E0:6C:1F:5F","miniMAC":"08f9e06c1f5f","UpdateMode":false,"calcValues":true,"Relais":{"Hand":false,"HandValue":false,"Moisture":{"waterEmpty":false,"pumpActive":2,"pumpPause":300}},"Moisture":{"MaxCycleMoisture":50,"useMoistureAvg":1,"MoistureMin":30,"MoistureDry":1023,"MoistureWet":502},"Debug":{"EEPROM":false,"Finder":false,"Modules":false,"MQTT":false,"OnlineToggler":false,"Rest":false,"Update":false,"WebServer":false,"WiFi":false,"DHT":true,"Relais":true,"Moisture":true},"useModul":{"DHT11":false,"DHT22":false,"LDR":false,"Light":false,"BM":false,"Relais":true,"RelaisShield":false,"Rain":false,"Moisture":true,"Distance":false}}}
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "WZ_PF_TE",
+		"DeviceDescription": "Wohnzimmer Pflanze Terrasse",
+		"Version": "V 3.0 Build 130",
+		"MAC": "08:F9:E0:6C:1F:5F",
+		"miniMAC": "08f9e06c1f5f",
+		"UpdateMode": false,
+		"calcValues": true,
+		"Relais": {
+			"Hand": false,
+			"HandValue": false,
+			"Moisture": {
+				"waterEmpty": false,
+				"pumpActive": 2,
+				"pumpPause": 300
+			}
+		},
+		"Moisture": {
+			"MaxCycleMoisture": 50,
+			"useMoistureAvg": 1,
+			"MoistureMin": 30,
+			"MoistureDry": 1023,
+			"MoistureWet": 502
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Rest": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT": true,
+			"Relais": true,
+			"Moisture": true
+		},
+		"useModul": {
+			"DHT11": false,
+			"DHT22": false,
+			"LDR": false,
+			"Light": false,
+			"BM": false,
+			"Relais": true,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": true,
+			"Distance": false
+		}
+	}
+}
