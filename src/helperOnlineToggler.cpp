@@ -19,6 +19,7 @@ helperOnlineToggler wpOnlineToggler;
 
 helperOnlineToggler::helperOnlineToggler() {}
 void helperOnlineToggler::init() {
+	lastContact = millis();
 	// settings
 	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// commands
@@ -32,6 +33,10 @@ void helperOnlineToggler::init() {
 //###################################################################################
 void helperOnlineToggler::cycle() {
 	publishValues();
+	if(millis() > lastContact + Minutes10) {
+		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, renew Subscribes");
+		wpModules.setAllSubscribes();
+	}
 }
 
 uint16_t helperOnlineToggler::getVersion() {
@@ -84,6 +89,10 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 		if(readOnline != 1) {
 			//reset
 			wpMqtt.mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
+		}
+		lastContact = millis();
+		if(Debug) {
+			wpFZ.DebugWS(wpFZ.strDEBUG, "TopicOnlineToggler", "get Message From Server, reset counter");
 		}
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {

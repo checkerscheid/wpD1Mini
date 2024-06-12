@@ -44,6 +44,8 @@ class helperOnlineToggler {
 		String SVNh = "$Rev: 123 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
+		unsigned long lastContact;
+		const unsigned long Minutes10 = 1000 * 60 * 60;
 };
 extern helperOnlineToggler wpOnlineToggler;
 #endif
