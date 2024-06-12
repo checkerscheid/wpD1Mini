@@ -92,7 +92,7 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 		}
 		lastContact = millis();
 		if(Debug) {
-			wpFZ.DebugWS(wpFZ.strDEBUG, "TopicOnlineToggler", "get Message From Server, reset counter");
+			wpFZ.DebugWS(wpFZ.strDEBUG, "TopicOnlineToggler", "get 'Online question' Message From Server, reset counter");
 		}
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
