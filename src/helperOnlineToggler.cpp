@@ -34,8 +34,10 @@ void helperOnlineToggler::init() {
 void helperOnlineToggler::cycle() {
 	publishValues();
 	if(millis() > lastContact + Minutes10) {
-		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, renew Subscribes");
+		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, reconnect and renew Subscribes");
+		wpMqtt.connectMqtt();
 		wpModules.setAllSubscribes();
+		lastContact = millis();
 	}
 }
 

@@ -47,11 +47,11 @@ class helperMqtt {
 		void publishValues();
 		void publishValues(bool force);
 		void setSubscribes();
+		void connectMqtt();
 	private:
 		String SVNh = "$Rev: 125 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
-		void connectMqtt();
 		static void callbackMqtt(char*, byte*, unsigned int);
 		unsigned long lastConnectTry;
 };
