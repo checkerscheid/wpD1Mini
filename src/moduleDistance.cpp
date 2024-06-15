@@ -28,7 +28,7 @@ void moduleDistance::init() {
 	trigPin = D1;
 	echoPin = D2;
 	pinMode(trigPin, OUTPUT);
-	pinMode(echoPin, INPUT_PULLUP);
+	pinMode(echoPin, INPUT);
 	volume = 0;
 	distanceRaw = 0;
 	distanceAvg = 0;

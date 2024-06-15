@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 142                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 132 2024-06-06 11:07:48Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 142 2024-06-14 07:49:48Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -54,7 +54,7 @@ void helperMqtt::cycle() {
 }
 
 uint16_t helperMqtt::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 142 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -106,6 +106,7 @@ void helperMqtt::setSubscribes() {
 void helperMqtt::connectMqtt() {
 	String logmessage = "Connecting MQTT Server: " + String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort) + " as " + wpFZ.DeviceName;
 	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
+	mqttClient.disconnect();
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
 			wpModules.publishAllValues();
