@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 143                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 136 2024-06-09 15:37:41Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 143 2024-06-15 00:57:05Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -224,7 +224,7 @@ void moduleDistance::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16_t moduleDistance::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 143 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
