@@ -1,0 +1,53 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "BA_RU",
+		"DeviceDescription": "Bad Raumueberwachung",
+		"Version": "V 3.0 Build 134",
+		"MAC": "08:F9:E0:6C:09:F9",
+		"miniMAC": "08f9e06c09f9",
+		"UpdateMode": false,
+		"calcValues": true,
+		"DHT": {
+			"MaxCycleDHT": 50,
+			"TemperatureCorrection": 0.00,
+			"HumidityCorrection": 0.00
+		},
+		"LDR": {
+			"MaxCycleLDR": 50,
+			"useLDRAvg": 1,
+			"LDRCorrection": 0
+		},
+		"BM": {
+			"LDR": {
+				"Threshold": 200,
+				"LightToTurnOn": "BA_SP/command/switch:0"
+			}
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Rest": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT11": false,
+			"LDR": false,
+			"BM": false
+		},
+		"useModul": {
+			"DHT11": true,
+			"DHT22": false,
+			"LDR": true,
+			"Light": false,
+			"BM": true,
+			"Relais": false,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": false,
+			"Distance": false
+		}
+	}
+}

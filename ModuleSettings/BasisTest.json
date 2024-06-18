@@ -1,0 +1,67 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "BasisTest",
+		"DeviceDescription": "BasisEmpty",
+		"Version": "V 3.1 Build 138",
+		"MAC": "08:F9:E0:6E:34:9C",
+		"miniMAC": "08f9e06e349c",
+		"UpdateMode": false,
+		"calcValues": true,
+		"DHT": {
+			"MaxCycleDHT": 50,
+			"TemperatureCorrection": -1.50,
+			"HumidityCorrection": 0.00
+		},
+		"BM": {},
+		"Relais": {
+			"Hand": false,
+			"HandValue": false,
+			"Moisture": {
+				"waterEmpty": false,
+				"pumpActive": 2,
+				"pumpPause": 600
+			}
+		},
+		"Moisture": {
+			"MaxCycleMoisture": 50,
+			"useMoistureAvg": 1,
+			"MoistureMin": 30,
+			"MoistureDry": 1023,
+			"MoistureWet": 316
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Rest": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT22": true,
+			"BM": false,
+			"Relais": false,
+			"Moisture": false
+		},
+		"SendRest": {
+			"WiFi": false,
+			"DHT22": false,
+			"BM": false,
+			"Relais": false,
+			"Moisture": false
+		},
+		"useModul": {
+			"DHT11": false,
+			"DHT22": true,
+			"LDR": false,
+			"Light": false,
+			"BM": true,
+			"Relais": true,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": true,
+			"Distance": false
+		}
+	}
+}

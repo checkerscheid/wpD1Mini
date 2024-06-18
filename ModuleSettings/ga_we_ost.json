@@ -1,0 +1,37 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "GA_WE_Ost",
+		"DeviceDescription": "Wetterstation Ost",
+		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
+		"Version": "Build 118.118",
+		"MAC": "08:F9:E0:6E:58:EC",
+		"miniMAC": "08f9e06e58ec",
+		"UpdateMode": false,
+		"calcValues": true,
+		"HT": {
+			"MaxCycleHT": 50,
+			"TemperatureCorrection": 0.00,
+			"HumidityCorrection": 0.00
+		},
+		"Light": {
+			"MaxCycleLight": 50,
+			"useLightAvg": 0,
+			"LightCorrection": 0
+		},
+		"Rain": {
+			"MaxCycleRain": 50,
+			"useRainAvg": 0,
+			"RainCorrection": -26.00
+		},
+		"Debug": {
+			"EEPROM": false,
+			"WiFi": false,
+			"MQTT": false,
+			"Search": false,
+			"Rest": false,
+			"HT22": false,
+			"Light": false,
+			"Rain": true
+		}
+	}
+}

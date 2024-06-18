@@ -8,48 +8,52 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 142                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 136 2024-06-09 15:37:41Z                          $ #
+//# File-ID      : $Id:: helperMqtt.h 142 2024-06-14 07:49:48Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef BasisEmpty_h
-#define BasisEmpty_h
+#ifndef helperMqtt_h
+#define helperMqtt_h
 #include <Arduino.h>
-#include <helperEEPROM.h>
-#include <helperFinder.h>
-#include <helperModules.h>
-#include <helperMqtt.h>
-#include <helperOnlineToggler.h>
-#include <helperRest.h>
-#include <helperUpdate.h>
-#include <helperWebServer.h>
-#include <helperWiFi.h>
-#include <moduleBase.h>
-#include <moduleDHT.h>
-#include <moduleLDR.h>
-#include <moduleLight.h>
-#include <moduleBM.h>
-#include <moduleBM2.h>
-#include <moduleRelais.h>
-#include <moduleRain.h>
-#include <moduleMoisture.h>
-#include <moduleDistance.h>
 #include <wpFreakaZone.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+class helperMqtt {
+	public:
+		bool Debug = false;
+		// values
+		String mqttTopicMqttSince;
+		// settings
+		String mqttTopicMqttServer;
+		// commands
+		String mqttTopicForceMqttUpdate;
+		String mqttTopicForceRenewValue;
+		String mqttTopicDebug;
 
-uint16_t getVersion();
-void buildChecker(uint16_t &v, uint16 moduleBuild);
-uint16_t getBuild();
-String getStringVersion();
-uint16_t getGlobalBuild();
-void BuildChecker(uint16_t &v, uint16 moduleBuild);
+		String MqttSince;
 
-//void publishValuesSystem();
+		static WiFiClient wifiClient;
+		static PubSubClient mqttClient;
 
-String SVNh = "$Rev: 136 $";
-// counter
-uint16_t publishCountRssi = 0;
+		helperMqtt();
+		void init();
+		void cycle();
+		uint16_t getVersion();
+		void changeDebug();
 
-// value stores for Com
-int rssi = 0;
+		void publishSettings();
+		void publishSettings(bool force);
+		void publishValues();
+		void publishValues(bool force);
+		void setSubscribes();
+		void connectMqtt();
+	private:
+		String SVNh = "$Rev: 142 $";
+		bool DebugLast = false;
+		uint16_t publishCountDebug = 0;
+		static void callbackMqtt(char*, byte*, unsigned int);
+		unsigned long lastConnectTry;
+};
+extern helperMqtt wpMqtt;
 #endif

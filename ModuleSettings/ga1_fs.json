@@ -1,0 +1,32 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "GA1_FS",
+		"DeviceDescription": "Fuellstand im Gartenhaus",
+		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
+		"Version": "Build 118.118",
+		"MAC": "C8:C9:A3:1C:35:80",
+		"miniMAC": "c8c9a31c3580",
+		"UpdateMode": true,
+		"calcValues": true,
+		"HT": {
+			"MaxCycleHT": 50,
+			"TemperatureCorrection": 0.00,
+			"HumidityCorrection": 0.00
+		},
+		"Distance": {
+			"MaxCycleDistance": 50,
+			"distanceCorrection": 0,
+			"maxVolume": 6000,
+			"height": 120
+		},
+		"Debug": {
+			"EEPROM": false,
+			"WiFi": false,
+			"MQTT": true,
+			"Search": false,
+			"Rest": false,
+			"HT22": false,
+			"Distance": true
+		}
+	}
+}
