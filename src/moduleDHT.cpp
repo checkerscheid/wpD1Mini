@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 138                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 138 2024-06-10 05:26:18Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 144 2024-06-18 17:20:09Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -23,8 +23,8 @@ moduleDHT::moduleDHT() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleDHT::init() {
-
 	// section for define
+	DHTPin = D7;
 	temperature = 0;
 	humidity = 0;
 	// values
@@ -194,7 +194,7 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 138 $";
+	String SVN = "$Rev: 144 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -6,40 +6,36 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 29.05.2024                                                       #
+//# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 145                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 144 2024-06-18 17:20:09Z                     $ #
+//# File-ID      : $Id:: moduleBM2.h 145 2024-06-18 17:20:41Z                     $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleDHT_h
-#define moduleDHT_h
+#ifndef moduleBM2_h
+#define moduleBM2_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
-#include <DHT.h>
 
-class moduleDHT {
+class moduleBM2 {
 	public:
-		moduleDHT();
+		moduleBM2();
 		moduleBase* mb;
-		DHT* dht;
 
 		// section for define
-		int16_t temperature;
-		int16_t humidity;
-		int8_t temperatureCorrection = 0;
-		int8_t humidityCorrection = 0;
-
-		String mqttTopicTemperature;
-		String mqttTopicHumidity;
-
-		String mqttTopicTemperatureCorrection;
-		String mqttTopicHumidityCorrection;
-		
+		bool bm;
+		uint16_t threshold = 500;
+		String lightToTurnOn = "_";
+		String mqttTopicBM;
+		String mqttTopicThreshold;
+		String mqttTopicLightToTurnOn;
 
 		// section to copy
+		uint8_t maxCycle = 5;
+		uint8_t cycleCounter = 0;
+		String mqttTopicMaxCycle;
 		void init();
 		void cycle();
 		uint16_t getVersion();
@@ -57,26 +53,19 @@ class moduleDHT {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
-		uint8_t DHTPin;
-		int16_t temperatureLast;
-		uint16_t publishCountTemperature;
-		int16_t humidityLast;
-		uint16_t publishCountHumidity;
-
-		void publishValueTemp();
-		void publishValueHum();
-		void calc();
-		void printCalcError(String name);
-		void printCalcDebug(String name, int16_t value, float raw);
+		uint8_t BMPin;
+		int16_t bmLast;
+		uint16_t publishCountBM;
+		void publishValue();
 		void printPublishValueDebug(String name, String value, String publishCount);
+		void calc();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 145 $";
+
 };
-extern moduleDHT wpDHT;
+extern moduleBM2 wpBM2;
 
 #endif

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 143                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 143 2024-06-15 00:57:05Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 144 2024-06-18 17:20:09Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 143 $";
+	String SVN = "$Rev: 144 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -157,6 +157,16 @@ void helperWebServer::setupWebServer() {
 			}
 			message += "},";
 		}
+		if(wpModules.useModuleBM2) {
+			message += "\"BM2\":{";
+			if(wpModules.useModuleLDR) {
+				message += "\"LDR\":{";
+				message += wpFZ.JsonKeyValue("Threshold", String(wpBM2.threshold)) + ",";
+				message += wpFZ.JsonKeyString("LightToTurnOn", wpBM2.lightToTurnOn);
+				message += "}";
+			}
+			message += "},";
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "\"Relais\":{";
 			message += wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + ",";
@@ -216,6 +226,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleBM) {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleBM2) {
+			message += "," + wpFZ.JsonKeyValue("BM2", wpBM2.Debug() ? "true" : "false");
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.Debug() ? "true" : "false");
 		}
@@ -242,6 +255,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleBM) {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.SendRest() ? "true" : "false");
 		}
+		if(wpModules.useModuleBM2) {
+			message += "," + wpFZ.JsonKeyValue("BM2", wpBM2.SendRest() ? "true" : "false");
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.SendRest() ? "true" : "false");
 		}
@@ -260,6 +276,7 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("BM2", wpModules.useModuleBM2 ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + ",";
@@ -293,6 +310,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Module")->value() == "useBM") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useBM");
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleBM);
+			}
+			if(request->getParam("Module")->value() == "useBM2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useBM2");
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleBM2);
 			}
 			if(request->getParam("Module")->value() == "useRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRelais");
@@ -341,6 +362,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("sendRest")->value() == "sendRestBM") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestBM");
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestBM);
+			}
+			if(request->getParam("sendRest")->value() == "sendRestBM2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestBM2");
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestBM2);
 			}
 			if(request->getParam("sendRest")->value() == "sendRestRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRelais");
@@ -417,6 +442,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Debug")->value() == "DebugBM") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugBM");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugBM);
+			}
+			if(request->getParam("Debug")->value() == "DebugBM2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugBM2");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugBM2);
 			}
 			if(request->getParam("Debug")->value() == "DebugRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRelais");
@@ -549,6 +578,7 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleLDR) wpModules.changeModuleLDR(!wpModules.useModuleLDR);
 		if(doModuleChange == cmdModuleLight) wpModules.changeModuleLight(!wpModules.useModuleLight);
 		if(doModuleChange == cmdModuleBM) wpModules.changeModuleBM(!wpModules.useModuleBM);
+		if(doModuleChange == cmdModuleBM2) wpModules.changeModuleBM2(!wpModules.useModuleBM2);
 		if(doModuleChange == cmdModuleRelais) wpModules.changeModuleRelais(!wpModules.useModuleRelais);
 		if(doModuleChange == cmdModuleRelaisShield) wpModules.changeModuleRelaisShield(!wpModules.useModuleRelaisShield);
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
@@ -565,6 +595,7 @@ void helperWebServer::doTheSendRestChange() {
 		if(doSendRestChange == cmdSendRestLDR) wpLDR.changeSendRest();
 		if(doSendRestChange == cmdSendRestLight) wpLight.changeSendRest();
 		if(doSendRestChange == cmdSendRestBM) wpBM.changeSendRest();
+		if(doSendRestChange == cmdSendRestBM2) wpBM2.changeSendRest();
 		if(doSendRestChange == cmdSendRestRelais) wpRelais.changeSendRest();
 		if(doSendRestChange == cmdSendRestRain) wpRain.changeSendRest();
 		if(doSendRestChange == cmdSendRestMoisture) wpMoisture.changeSendRest();
@@ -588,6 +619,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugLDR) wpLDR.changeDebug();
 		if(doDebugChange == cmdDebugLight) wpLight.changeDebug();
 		if(doDebugChange == cmdDebugBM) wpBM.changeDebug();
+		if(doDebugChange == cmdDebugBM2) wpBM2.changeDebug();
 		if(doDebugChange == cmdDebugRelais) wpRelais.changeDebug();
 		if(doDebugChange == cmdDebugRain) wpRain.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
@@ -619,6 +651,9 @@ String processor(const String& var) {
 	if(var == "DeviceDescription")
 		return wpFZ.DeviceDescription;
 //###################################################################################
+	if(var == "Version")
+		return wpFZ.Version;
+//###################################################################################
 	if(var == "CompiledWith") {
 		returns = "<ul><li><span class='bold'>Modules:</span></li><li><hr /></li>"
 		"<li><input id='useDHT11' type='checkbox'" + String(wpModules.useModuleDHT11 ? " checked" : "") +
@@ -631,6 +666,8 @@ String processor(const String& var) {
 			" onchange='changeModule(event)' /><label for='useLight'>wpLight</label></li>" +
 		"<li><input id='useBM' type='checkbox'" + String(wpModules.useModuleBM ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useBM'>wpBM</label></li>" +
+		"<li><input id='useBM2' type='checkbox'" + String(wpModules.useModuleBM2 ? " checked" : "") +
+			" onchange='changeModule(event)' /><label for='useBM2'>wpBM2</label></li>" +
 		"<li><input id='useRelais' type='checkbox'" + String(wpModules.useModuleRelais ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useRelais'>wpRelais</label></li>" +
 		"<li><input id='useRelaisShield' type='checkbox'" + String(wpModules.useModuleRelaisShield ? " checked" : "") +
@@ -688,6 +725,10 @@ String processor(const String& var) {
 			returns += "<li><input id='DebugBM' type='checkbox'" + String(wpBM.Debug() ? " checked" : "") +
 				" onchange='changeDebug(event)' /><label for='DebugBM'>BM</label></li>";
 		}
+		if(wpModules.useModuleBM2) {
+			returns += "<li><input id='DebugBM2' type='checkbox'" + String(wpBM2.Debug() ? " checked" : "") +
+				" onchange='changeDebug(event)' /><label for='DebugBM2'>BM2</label></li>";
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += "<li><input id='DebugRelais' type='checkbox'" + String(wpRelais.Debug() ? " checked" : "") +
 				" onchange='changeDebug(event)' /><label for='DebugRelais'>Relais</label></li>";
@@ -727,6 +768,10 @@ String processor(const String& var) {
 		if(wpModules.useModuleBM) {
 			returns += "<li><input id='sendRestBM' type='checkbox'" + String(wpBM.SendRest() ? " checked" : "") +
 				" onchange='changeSendRest(event)' /><label for='sendRestBM'>BM</label></li>";
+		}
+		if(wpModules.useModuleBM2) {
+			returns += "<li><input id='sendRestBM2' type='checkbox'" + String(wpBM2.SendRest() ? " checked" : "") +
+				" onchange='changeSendRest(event)' /><label for='sendRestBM2'>BM2</label></li>";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += "<li><input id='sendRestRelais' type='checkbox'" + String(wpRelais.SendRest() ? " checked" : "") +

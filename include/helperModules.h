@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 135                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 135 2024-06-06 14:04:54Z                 $ #
+//# File-ID      : $Id:: helperModules.h 144 2024-06-18 17:20:09Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -27,6 +27,7 @@ class helperModules {
 		bool useModuleLDR = false;
 		bool useModuleLight = false;
 		bool useModuleBM = false;
+		bool useModuleBM2 = false;
 		bool useModuleRelais = false;
 		bool useModuleRelaisShield = false;
 		bool useModuleRain = false;
@@ -41,6 +42,7 @@ class helperModules {
 		String mqttTopicUseLDR;
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
+		String mqttTopicUseBM2;
 		String mqttTopicUseRelais;
 		String mqttTopicUseRelaisShield;
 		String mqttTopicUseRain;
@@ -66,6 +68,7 @@ class helperModules {
 		void changeModuleLDR(bool newValue);
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
+		void changeModuleBM2(bool newValue);
 		void changeModuleRelais(bool newValue);
 		void changeModuleRelaisShield(bool newValue);
 		void changeModuleRain(bool newValue);
@@ -79,7 +82,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 135 $";
+		String SVNh = "$Rev: 144 $";
 		bool useDHT11Last = false;
 		uint16 publishCountUseDHT11 = 0;
 		bool useDHT22Last = false;
@@ -90,6 +93,8 @@ class helperModules {
 		uint16 publishCountUseLight = 0;
 		bool useBMLast = false;
 		uint16 publishCountUseBM = 0;
+		bool useBM2Last = false;
+		uint16 publishCountUseBM2 = 0;
 		bool useRelaisLast = false;
 		uint16 publishCountUseRelais = 0;
 		bool useRelaisShieldLast = false;
