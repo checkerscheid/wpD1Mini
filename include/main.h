@@ -16,6 +16,29 @@
 #ifndef BasisEmpty_h
 #define BasisEmpty_h
 #include <Arduino.h>
+<<<<<<< Updated upstream
+=======
+#include <helperEEPROM.h>
+#include <helperFinder.h>
+#include <helperModules.h>
+#include <helperMqtt.h>
+#include <helperOnlineToggler.h>
+#include <helperRest.h>
+#include <helperUpdate.h>
+#include <helperWebServer.h>
+#include <helperWiFi.h>
+#include <moduleBase.h>
+#include <moduleDHT.h>
+#include <moduleLDR.h>
+#include <moduleLight.h>
+#include <moduleBM.h>
+#include <moduleBM2.h>
+#include <moduleRelais.h>
+#include <moduleRain.h>
+#include <moduleMoisture.h>
+#include <moduleDistance.h>
+#include <wpFreakaZone.h>
+>>>>>>> Stashed changes
 
 // values
 String mqttTopicUpdateMode;
