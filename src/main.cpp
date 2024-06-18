@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 133                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 133 2024-06-06 12:40:21Z                        $ #
+//# File-ID      : $Id:: main.cpp 144 2024-06-18 17:20:09Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -120,7 +120,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 133 $";
+	String SVN = "$Rev: 144 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
