@@ -6,25 +6,25 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 02.06.2024                                                       #
+//# Date         : 18.06.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: moduleBM.cpp 139 2024-06-11 10:08:54Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleBM.h>
+#include <moduleBM2.h>
 
-moduleBM wpBM;
+moduleBM2 wpBM2;
 
-moduleBM::moduleBM() {
+moduleBM2::moduleBM2() {
 	// section to config and copy
-	ModuleName = "BM";
+	ModuleName = "BM2";
 	mb = new moduleBase(ModuleName);
 }
-void moduleBM::init() {
+void moduleBM2::init() {
 	// section for define
-	BMPin = D5;
+	BMPin = D6;
 	pinMode(BMPin, INPUT_PULLUP);
 	bm = 0;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
@@ -37,32 +37,32 @@ void moduleBM::init() {
 	// section to copy
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestBM);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestBM2);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugBM2);
 
 }
 
 //###################################################################################
-void moduleBM::cycle() {
+void moduleBM2::cycle() {
 	if(wpFZ.calcValues) {
 		calc();
 	}
 	publishValues();
 }
-void moduleBM::publishSettings() {
+void moduleBM2::publishSettings() {
 	publishSettings(false);
 }
-void moduleBM::publishSettings(bool force) {
+void moduleBM2::publishSettings(bool force) {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
 	}
 	mb->publishSettings(force);
 }
-void moduleBM::publishValues() {
+void moduleBM2::publishValues() {
 	publishValues(false);
 }
-void moduleBM::publishValues(bool force) {
+void moduleBM2::publishValues(bool force) {
 	if(force) {
 		publishCountBM = wpFZ.publishQoS;
 	}
@@ -71,20 +71,20 @@ void moduleBM::publishValues(bool force) {
 	}
 	mb->publishValues(force);
 }
-void moduleBM::setSubscribes() {
+void moduleBM2::setSubscribes() {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 	}
 	mb->setSubscribes();
 }
-void moduleBM::checkSubscribes(char* topic, String msg) {
+void moduleBM2::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
 			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteBMThreshold, threshold);
+				EEPROM.put(wpEEPROM.byteBM2Threshold, threshold);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
@@ -99,10 +99,10 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleBM::publishValue() {
+void moduleBM2::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("bm", String(bm));
+		wpRest.error = wpRest.error | !wpRest.sendRest("bm2", String(bm));
 		wpRest.trySend = true;
 	}
 	bmLast = bm;
@@ -123,15 +123,15 @@ void moduleBM::publishValue() {
 		}
 	}
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("BM", String(bm), String(publishCountBM));
+		printPublishValueDebug("BM2", String(bm), String(publishCountBM));
 	}
 	publishCountBM = 0;
 }
-void moduleBM::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleBM2::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
-void moduleBM::calc() {
+void moduleBM2::calc() {
 	if(digitalRead(BMPin) == LOW) {
 		bm = false;
 	} else {
@@ -139,7 +139,7 @@ void moduleBM::calc() {
 			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", "Bewegung erkannt");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM2", "Bewegung erkannt");
 			}
 		}
 	}
@@ -149,30 +149,30 @@ void moduleBM::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleBM::getVersion() {
+uint16_t moduleBM2::getVersion() {
 	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleBM::SendRest() {
+bool moduleBM2::SendRest() {
 	return mb->sendRest;
 }
-bool moduleBM::SendRest(bool sendRest) {
+bool moduleBM2::SendRest(bool sendRest) {
 	mb->sendRest = sendRest;
 	return true;
 }
-bool moduleBM::Debug() {
+bool moduleBM2::Debug() {
 	return mb->debug;
 }
-bool moduleBM::Debug(bool debug) {
+bool moduleBM2::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-void moduleBM::changeSendRest() {
+void moduleBM2::changeSendRest() {
 	mb->changeSendRest();
 }
-void moduleBM::changeDebug() {
+void moduleBM2::changeDebug() {
 	mb->changeDebug();
 }

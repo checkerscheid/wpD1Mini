@@ -6,22 +6,22 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 02.06.2024                                                       #
+//# Date         : 18.06.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 136                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: moduleBM.h 136 2024-06-09 15:37:41Z                      $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleBM_h
-#define moduleBM_h
+#ifndef moduleBM2_h
+#define moduleBM2_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleBM {
+class moduleBM2 {
 	public:
-		moduleBM();
+		moduleBM2();
 		moduleBase* mb;
 
 		// section for define
@@ -66,6 +66,6 @@ class moduleBM {
 		String SVNh = "$Rev: 136 $";
 
 };
-extern moduleBM wpBM;
+extern moduleBM2 wpBM2;
 
 #endif

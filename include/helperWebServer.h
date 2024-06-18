@@ -29,10 +29,10 @@ class helperWebServer {
 		const int8_t cmdForceMqttUpdate = 2;
 		const int8_t cmdForceRenewValue = 3;
 		const int8_t cmdUpdateFW = 4;
-		const int8_t cmdUpdateCheck = 6;
-		const int8_t cmdUpdateHTTP = 7;
-		const int8_t cmdRestartESP = 8;
-		const int8_t cmdScanWiFi = 9;
+		const int8_t cmdUpdateCheck = 5;
+		const int8_t cmdUpdateHTTP = 6;
+		const int8_t cmdRestartESP = 7;
+		const int8_t cmdScanWiFi = 8;
 		int8_t doCommand;
 
 		const int8_t cmdSendRestWiFi = 1;
@@ -40,10 +40,11 @@ class helperWebServer {
 		const int8_t cmdSendRestLDR = 3;
 		const int8_t cmdSendRestLight = 4;
 		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestRelais = 6;
-		const int8_t cmdSendRestRain = 7;
-		const int8_t cmdSendRestMoisture = 8;
-		const int8_t cmdSendRestDistance = 9;
+		const int8_t cmdSendRestBM2 = 6;
+		const int8_t cmdSendRestRelais = 7;
+		const int8_t cmdSendRestRain = 8;
+		const int8_t cmdSendRestMoisture = 9;
+		const int8_t cmdSendRestDistance = 10;
 		int8_t doSendRestChange;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -60,10 +61,11 @@ class helperWebServer {
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
 		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugRelais = 24;
-		const int8_t cmdDebugRain = 25;
-		const int8_t cmdDebugMoisture = 26;
-		const int8_t cmdDebugDistance = 27;
+		const int8_t cmdDebugBM2 = 24;
+		const int8_t cmdDebugRelais = 25;
+		const int8_t cmdDebugRain = 26;
+		const int8_t cmdDebugMoisture = 27;
+		const int8_t cmdDebugDistance = 28;
 		int8_t doDebugChange;
 
 		const int8_t cmdModuleDHT11 = 1;
@@ -71,12 +73,12 @@ class helperWebServer {
 		const int8_t cmdModuleLDR = 3;
 		const int8_t cmdModuleLight = 4;
 		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleBM2 = 11;
-		const int8_t cmdModuleRelais = 6;
-		const int8_t cmdModuleRelaisShield = 7;
-		const int8_t cmdModuleRain = 8;
-		const int8_t cmdModuleMoisture = 9;
-		const int8_t cmdModuleDistance = 10;
+		const int8_t cmdModuleBM2 = 6;
+		const int8_t cmdModuleRelais = 7;
+		const int8_t cmdModuleRelaisShield = 8;
+		const int8_t cmdModuleRain = 9;
+		const int8_t cmdModuleMoisture = 10;
+		const int8_t cmdModuleDistance = 11;
 		int8_t doModuleChange;
 
 		int8_t doBlink;
@@ -155,7 +157,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<div id="FreakaZoneWebSerial">
 		<div id="restartRequired"></div>
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
-		<h2>%DeviceDescription%</h2>
+		<h2>%DeviceDescription% (%Version%)</h2>
 		<div class="ul">
 			%Debug%
 			%SendRest%

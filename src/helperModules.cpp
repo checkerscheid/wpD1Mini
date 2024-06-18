@@ -28,6 +28,7 @@ void helperModules::init() {
 	mqttTopicUseLDR = wpFZ.DeviceName + "/settings/useModule/LDR";
 	mqttTopicUseLight = wpFZ.DeviceName + "/settings/useModule/Light";
 	mqttTopicUseBM = wpFZ.DeviceName + "/settings/useModule/BM";
+	mqttTopicUseBM2 = wpFZ.DeviceName + "/settings/useModule/BM2";
 	mqttTopicUseRelais = wpFZ.DeviceName + "/settings/useModule/Relais";
 	mqttTopicUseRelaisShield = wpFZ.DeviceName + "/settings/useModule/RelaisShield";
 	mqttTopicUseRain = wpFZ.DeviceName + "/settings/useModule/Rain";
@@ -79,61 +80,80 @@ void helperModules::publishValues() {
 	publishValues(false);
 }
 void helperModules::publishValues(bool force) {
-	if(useDHT11Last != useModuleDHT11 || publishCountUseDHT11 > wpFZ.publishQoS) {
+	if(force) {
+		publishCountUseDHT11 = wpFZ.publishQoS;
+		publishCountUseDHT22 = wpFZ.publishQoS;
+		publishCountUseLDR = wpFZ.publishQoS;
+		publishCountUseLight = wpFZ.publishQoS;
+		publishCountUseBM = wpFZ.publishQoS;
+		publishCountUseBM2 = wpFZ.publishQoS;
+		publishCountUseRelais = wpFZ.publishQoS;
+		publishCountUseRelaisShield = wpFZ.publishQoS;
+		publishCountUseRain = wpFZ.publishQoS;
+		publishCountUseMoisture = wpFZ.publishQoS;
+		publishCountUseDistance = wpFZ.publishQoS;
+	}
+	if(useDHT11Last != useModuleDHT11 || ++publishCountUseDHT11 > wpFZ.publishQoS) {
 		useDHT11Last = useModuleDHT11;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT11.c_str(), String(useModuleDHT11).c_str());
 		wpFZ.SendWSModule("useDHT11", useModuleDHT11);
 		publishCountUseDHT11 = 0;
 	}
-	if(useDHT22Last != useModuleDHT22 || publishCountUseDHT22 > wpFZ.publishQoS) {
+	if(useDHT22Last != useModuleDHT22 || ++publishCountUseDHT22 > wpFZ.publishQoS) {
 		useDHT22Last = useModuleDHT22;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT22.c_str(), String(useModuleDHT22).c_str());
 		wpFZ.SendWSModule("useDHT22", useModuleDHT22);
 		publishCountUseDHT22 = 0;
 	}
-	if(useLDRLast != useModuleLDR || publishCountUseLDR > wpFZ.publishQoS) {
+	if(useLDRLast != useModuleLDR || ++publishCountUseLDR > wpFZ.publishQoS) {
 		useLDRLast = useModuleLDR;
 		wpMqtt.mqttClient.publish(mqttTopicUseLDR.c_str(), String(useModuleLDR).c_str());
 		wpFZ.SendWSModule("useLDR", useModuleLDR);
 		publishCountUseLDR = 0;
 	}
-	if(useLightLast != useModuleLight || publishCountUseLight > wpFZ.publishQoS) {
+	if(useLightLast != useModuleLight || ++publishCountUseLight > wpFZ.publishQoS) {
 		useLightLast = useModuleLight;
 		wpMqtt.mqttClient.publish(mqttTopicUseLight.c_str(), String(useModuleLight).c_str());
 		wpFZ.SendWSModule("useLight", useModuleLight);
 		publishCountUseLight = 0;
 	}
-	if(useBMLast != useModuleBM || publishCountUseBM > wpFZ.publishQoS) {
+	if(useBMLast != useModuleBM || ++publishCountUseBM > wpFZ.publishQoS) {
 		useBMLast = useModuleBM;
 		wpMqtt.mqttClient.publish(mqttTopicUseBM.c_str(), String(useModuleBM).c_str());
 		wpFZ.SendWSModule("useBM", useModuleBM);
 		publishCountUseBM = 0;
 	}
-	if(useRelaisLast != useModuleRelais || publishCountUseRelais > wpFZ.publishQoS) {
+	if(useBM2Last != useModuleBM2 || ++publishCountUseBM2 > wpFZ.publishQoS) {
+		useBM2Last = useModuleBM2;
+		wpMqtt.mqttClient.publish(mqttTopicUseBM2.c_str(), String(useModuleBM2).c_str());
+		wpFZ.SendWSModule("useBM2", useModuleBM2);
+		publishCountUseBM2 = 0;
+	}
+	if(useRelaisLast != useModuleRelais || ++publishCountUseRelais > wpFZ.publishQoS) {
 		useRelaisLast = useModuleRelais;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelais.c_str(), String(useModuleRelais).c_str());
 		wpFZ.SendWSModule("useRelais", useModuleRelais);
 		publishCountUseRelais = 0;
 	}
-	if(useRelaisShieldLast != useModuleRelaisShield || publishCountUseRelaisShield > wpFZ.publishQoS) {
+	if(useRelaisShieldLast != useModuleRelaisShield || ++publishCountUseRelaisShield > wpFZ.publishQoS) {
 		useRelaisShieldLast = useModuleRelaisShield;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelaisShield.c_str(), String(useModuleRelaisShield).c_str());
 		wpFZ.SendWSModule("useRelaisShield", useModuleRelaisShield);
 		publishCountUseRelaisShield = 0;
 	}
-	if(useRainLast != useModuleRain || publishCountUseRain > wpFZ.publishQoS) {
+	if(useRainLast != useModuleRain || ++publishCountUseRain > wpFZ.publishQoS) {
 		useRainLast = useModuleRain;
 		wpMqtt.mqttClient.publish(mqttTopicUseRain.c_str(), String(useModuleRain).c_str());
 		wpFZ.SendWSModule("useRain", useModuleRain);
 		publishCountUseRain = 0;
 	}
-	if(useMoistureLast != useModuleMoisture || publishCountUseMoisture > wpFZ.publishQoS) {
+	if(useMoistureLast != useModuleMoisture || ++publishCountUseMoisture > wpFZ.publishQoS) {
 		useMoistureLast = useModuleMoisture;
 		wpMqtt.mqttClient.publish(mqttTopicUseMoisture.c_str(), String(useModuleMoisture).c_str());
 		wpFZ.SendWSModule("useMoisture", useModuleMoisture);
 		publishCountUseMoisture = 0;
 	}
-	if(useDistanceLast != useModuleDistance || publishCountUseDistance > wpFZ.publishQoS) {
+	if(useDistanceLast != useModuleDistance || ++publishCountUseDistance > wpFZ.publishQoS) {
 		useDistanceLast = useModuleDistance;
 		wpMqtt.mqttClient.publish(mqttTopicUseDistance.c_str(), String(useModuleDistance).c_str());
 		wpFZ.SendWSModule("useDistance", useModuleDistance);
@@ -153,6 +173,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseLDR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseBM2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRelais.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRelaisShield.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
@@ -161,50 +182,43 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperModules::checkSubscribes(char* topic, String msg) {
+	bool readUseModule = msg.toInt();
 	if(strcmp(topic, mqttTopicUseDHT11.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleDHT11(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseDHT22.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleDHT22(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseLDR.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleLDR(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseLight.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleLight(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseMoisture.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleMoisture(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseRelais.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleRelais(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseRelaisShield.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleRelaisShield(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseBM.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleBM(readUseModule);
 	}
+	if(strcmp(topic, mqttTopicUseBM2.c_str()) == 0) {
+		changeModuleBM2(readUseModule);
+	}
 	if(strcmp(topic, mqttTopicUseRain.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleRain(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseDistance.c_str()) == 0) {
-		bool readUseModule = msg.toInt();
 		changeModuleDistance(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
-		bool readDebug = msg.toInt();
-		if(Debug != readDebug) {
-			Debug = readDebug;
+		if(Debug != readUseModule) {
+			Debug = readUseModule;
 			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 			EEPROM.commit();
@@ -266,6 +280,17 @@ void helperModules::changeModuleBM(bool newValue) {
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleBM", useModuleBM);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
+	}
+}
+void helperModules::changeModuleBM2(bool newValue) {
+	if(useModuleBM2 != newValue) {
+		useModuleBM2 = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseBM2, useModuleBM2);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleBM2", useModuleBM2);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseBM2, String(useModuleBM2));
 	}
 }
 void helperModules::changeModuleRelais(bool newValue) {
@@ -352,6 +377,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleBM) {
 		wpBM.publishSettings(force);
 	}
+	if(wpModules.useModuleBM2) {
+		wpBM2.publishSettings(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishSettings(force);
 	}
@@ -393,6 +421,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleBM) {
 		wpBM.publishValues(force);
 	}
+	if(wpModules.useModuleBM2) {
+		wpBM2.publishValues(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishValues(force);
 	}
@@ -431,6 +462,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleBM) {
 		wpBM.setSubscribes();
 	}
+	if(wpModules.useModuleBM2) {
+		wpBM2.setSubscribes();
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.setSubscribes();
 	}
@@ -466,6 +500,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleBM) {
 		wpBM.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleBM2) {
+		wpBM2.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.checkSubscribes(topic, msg);

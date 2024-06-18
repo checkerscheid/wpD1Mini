@@ -80,6 +80,7 @@ class helperEEPROM {
 		
 		const uint16_t addrBitsSendRestModules1 = 7;
 		byte bitsSendRestModules1;
+		const uint8_t bitSendRestBM2 = 0; // include in bitsSendRestModules1
 		
 		const uint16_t addrBitsSendRestModules2 = 8;
 		byte bitsSendRestModules2;
@@ -99,6 +100,7 @@ class helperEEPROM {
 		
 		const uint16_t addrBitsDebugModules1 = 10;
 		byte bitsDebugModules1;
+		const uint8_t bitDebugBM2 = 0; // include in bitsDebugModules1
 		
 		const uint16_t addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
@@ -141,11 +143,12 @@ class helperEEPROM {
 //###################################################################################
 /// byte values: 2byte 50 - 79
 		const uint16_t byteLightCorrection = 50; // int16_t
-		const uint16_t byteThreshold = 52;
+		const uint16_t byteBMThreshold = 52;
 		const uint16_t bytePumpPause = 54;
 		const uint16_t byteMoistureDry = 56;
 		const uint16_t byteMoistureWet = 58;
 		const uint16_t byteMaxVolume = 60;
+		const uint16_t byteBM2Threshold = 62;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99

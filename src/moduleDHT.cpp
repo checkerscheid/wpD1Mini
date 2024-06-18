@@ -23,8 +23,8 @@ moduleDHT::moduleDHT() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleDHT::init() {
-
 	// section for define
+	DHTPin = D7;
 	temperature = 0;
 	humidity = 0;
 	// values

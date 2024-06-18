@@ -20,8 +20,6 @@
 #include <moduleBase.h>
 #include <DHT.h>
 
-#define DHTPin D7
-
 class moduleDHT {
 	public:
 		moduleDHT();
@@ -62,6 +60,7 @@ class moduleDHT {
 		uint8_t MaxCycle();
 		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
+		uint8_t DHTPin;
 		int16_t temperatureLast;
 		uint16_t publishCountTemperature;
 		int16_t humidityLast;
