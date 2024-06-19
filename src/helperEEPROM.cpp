@@ -169,7 +169,10 @@ void helperEEPROM::readVars() {
 	bitsSendRestBasis0 = EEPROM.read(addrBitsSendRestBasis0);
 	wpWiFi.sendRest = bitRead(bitSendRestRssi, bitsSendRestBasis0);
 
+//###################################################################################
+
 	bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
+	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
 	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
 	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder);
 	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
@@ -178,13 +181,12 @@ void helperEEPROM::readVars() {
 	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
 	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate);
 	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
-
-	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
 	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
 
 //###################################################################################
 
 	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
+	bitsSendRestModules1 = EEPROM.read(addrBitsSendRestModules1);
 	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
 	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
 	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
@@ -198,6 +200,7 @@ void helperEEPROM::readVars() {
 //###################################################################################
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
+	bitsDebugModules1 = EEPROM.read(addrBitsDebugModules1);
 	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
 	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
