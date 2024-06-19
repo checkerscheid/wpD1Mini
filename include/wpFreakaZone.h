@@ -52,7 +52,7 @@ class wpFreakaZone {
 		const uint16_t mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
-		const char* updateServer = "http://d1miniupdate.freakazone.com";
+		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16_t finderListenPort = 51346;
 		const uint16_t loopTime = 200; // ms
 		const uint16_t minute10  = 5 * 60 * 10;

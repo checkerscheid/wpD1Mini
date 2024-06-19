@@ -50,6 +50,7 @@ class helperWiFi {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void checkDns();
 	private:
 		String SVNh = "$Rev: 136 $";
 		bool DebugLast = false;

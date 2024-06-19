@@ -33,6 +33,7 @@ class helperWebServer {
 		const int8_t cmdUpdateHTTP = 6;
 		const int8_t cmdRestartESP = 7;
 		const int8_t cmdScanWiFi = 8;
+		const int8_t cmdCheckDns = 9;
 		int8_t doCommand;
 
 		const int8_t cmdSendRestWiFi = 1;
@@ -173,6 +174,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
 				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
+				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
 		</div>

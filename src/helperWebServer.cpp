@@ -499,6 +499,10 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ScanWiFi");
 				wpWebServer.setCommand(wpWebServer.cmdScanWiFi);
 			}
+			if(request->getParam("cmd")->value() == "CheckDns") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found CheckDns");
+				wpWebServer.setCommand(wpWebServer.cmdCheckDns);
+			}
 			if(request->getParam("cmd")->value() == "calcValues") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
 				wpFZ.calcValues = !wpFZ.calcValues;
@@ -566,6 +570,9 @@ void helperWebServer::doTheCommand() {
 		}
 		if(doCommand == cmdScanWiFi) {
 			wpWiFi.scanWiFi();
+		}
+		if(doCommand == cmdCheckDns) {
+			wpWiFi.checkDns();
 		}
 		doCommand = cmdDoNothing;
 	}

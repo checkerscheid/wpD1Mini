@@ -126,6 +126,13 @@ void helperWiFi::scanWiFi() {
 				"Signal: " + String(WiFi.RSSI(thisNet)) + " dBm, " +
 				"Encryption: " + printEncryptionType(WiFi.encryptionType(thisNet)));
 		}
+
+		wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi", "own WiFi network");
+		wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi",
+			WiFi.SSID() + ", "
+			"Channel: " + String(WiFi.channel()) + ", "
+			"BSSID: " + WiFi.BSSIDstr() + ", "
+			"Signal: " + String(WiFi.RSSI()) + " dBm");
 	}
 	wpFZ.DebugWS(wpFZ.strWARN, "scanWiFi", "finished scan WiFi networks");
 }
@@ -197,6 +204,29 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 			wpFZ.SendWSDebug("DebugWiFi", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
+	}
+}
+
+void helperWiFi::checkDns() {
+	int returns = 0;
+	IPAddress r;
+	returns = WiFi.hostByName(wpFZ.mqttServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + ": " + String(returns));
+	}
+	returns = WiFi.hostByName(wpFZ.restServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.restServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.restServer) + ": " + String(returns));
+	}
+	returns = WiFi.hostByName(wpFZ.updateServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.updateServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.updateServer) + ": " + String(returns));
 	}
 }
 
