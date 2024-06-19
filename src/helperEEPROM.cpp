@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 144 2024-06-18 17:20:09Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 146 2024-06-19 18:57:43Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 144 $";
+	String SVN = "$Rev: 146 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

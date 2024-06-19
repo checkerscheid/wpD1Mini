@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 136 2024-06-09 15:37:41Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 146 2024-06-19 18:57:43Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -54,7 +54,7 @@ void helperWiFi::cycle() {
 }
 
 uint16_t helperWiFi::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 146 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
