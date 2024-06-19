@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.h 136 2024-06-09 15:37:41Z                    $ #
+//# File-ID      : $Id:: helperWiFi.h 146 2024-06-19 18:57:43Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWiFi_h
@@ -50,8 +50,9 @@ class helperWiFi {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void checkDns();
 	private:
-		String SVNh = "$Rev: 136 $";
+		String SVNh = "$Rev: 146 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		uint16_t publishCountRssi = 0;

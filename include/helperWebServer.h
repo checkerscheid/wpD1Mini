@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 144 2024-06-18 17:20:09Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 146 2024-06-19 18:57:43Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -33,6 +33,7 @@ class helperWebServer {
 		const int8_t cmdUpdateHTTP = 6;
 		const int8_t cmdRestartESP = 7;
 		const int8_t cmdScanWiFi = 8;
+		const int8_t cmdCheckDns = 9;
 		int8_t doCommand;
 
 		const int8_t cmdSendRestWiFi = 1;
@@ -40,7 +41,7 @@ class helperWebServer {
 		const int8_t cmdSendRestLDR = 3;
 		const int8_t cmdSendRestLight = 4;
 		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestBM2 = 6;
+		const int8_t cmdSendRestFK = 6;
 		const int8_t cmdSendRestRelais = 7;
 		const int8_t cmdSendRestRain = 8;
 		const int8_t cmdSendRestMoisture = 9;
@@ -61,7 +62,7 @@ class helperWebServer {
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
 		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugBM2 = 24;
+		const int8_t cmdDebugFK = 24;
 		const int8_t cmdDebugRelais = 25;
 		const int8_t cmdDebugRain = 26;
 		const int8_t cmdDebugMoisture = 27;
@@ -73,7 +74,7 @@ class helperWebServer {
 		const int8_t cmdModuleLDR = 3;
 		const int8_t cmdModuleLight = 4;
 		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleBM2 = 6;
+		const int8_t cmdModuleFK = 6;
 		const int8_t cmdModuleRelais = 7;
 		const int8_t cmdModuleRelaisShield = 8;
 		const int8_t cmdModuleRain = 9;
@@ -111,7 +112,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 146 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -173,6 +174,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
 				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
+				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
 		</div>

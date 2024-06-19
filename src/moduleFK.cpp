@@ -10,19 +10,19 @@
 //#                                                                                 #
 //# Revision     : $Rev:: 145                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM2.cpp 145 2024-06-18 17:20:41Z                   $ #
+//# File-ID      : $Id:: moduleFK.cpp 145 2024-06-18 17:20:41Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleBM2.h>
+#include <moduleFK.h>
 
-moduleBM2 wpBM2;
+moduleFK wpFK;
 
-moduleBM2::moduleBM2() {
+moduleFK::moduleFK() {
 	// section to config and copy
-	ModuleName = "BM2";
+	ModuleName = "FK";
 	mb = new moduleBase(ModuleName);
 }
-void moduleBM2::init() {
+void moduleFK::init() {
 	// section for define
 	BMPin = D6;
 	pinMode(BMPin, INPUT_PULLUP);
@@ -37,32 +37,32 @@ void moduleBM2::init() {
 	// section to copy
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestBM2);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugBM2);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestFK);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugFK);
 
 }
 
 //###################################################################################
-void moduleBM2::cycle() {
+void moduleFK::cycle() {
 	if(wpFZ.calcValues) {
 		calc();
 	}
 	publishValues();
 }
-void moduleBM2::publishSettings() {
+void moduleFK::publishSettings() {
 	publishSettings(false);
 }
-void moduleBM2::publishSettings(bool force) {
+void moduleFK::publishSettings(bool force) {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
 	}
 	mb->publishSettings(force);
 }
-void moduleBM2::publishValues() {
+void moduleFK::publishValues() {
 	publishValues(false);
 }
-void moduleBM2::publishValues(bool force) {
+void moduleFK::publishValues(bool force) {
 	if(force) {
 		publishCountBM = wpFZ.publishQoS;
 	}
@@ -71,20 +71,20 @@ void moduleBM2::publishValues(bool force) {
 	}
 	mb->publishValues(force);
 }
-void moduleBM2::setSubscribes() {
+void moduleFK::setSubscribes() {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 	}
 	mb->setSubscribes();
 }
-void moduleBM2::checkSubscribes(char* topic, String msg) {
+void moduleFK::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
 			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteBM2Threshold, threshold);
+				EEPROM.put(wpEEPROM.byteFKThreshold, threshold);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
@@ -99,10 +99,10 @@ void moduleBM2::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleBM2::publishValue() {
+void moduleFK::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("bm2", String(bm));
+		wpRest.error = wpRest.error | !wpRest.sendRest("FK", String(bm));
 		wpRest.trySend = true;
 	}
 	bmLast = bm;
@@ -123,15 +123,15 @@ void moduleBM2::publishValue() {
 		}
 	}
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("BM2", String(bm), String(publishCountBM));
+		printPublishValueDebug("FK", String(bm), String(publishCountBM));
 	}
 	publishCountBM = 0;
 }
-void moduleBM2::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleFK::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
-void moduleBM2::calc() {
+void moduleFK::calc() {
 	if(digitalRead(BMPin) == LOW) {
 		bm = false;
 	} else {
@@ -139,7 +139,7 @@ void moduleBM2::calc() {
 			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM2", "Bewegung erkannt");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcFK", "Bewegung erkannt");
 			}
 		}
 	}
@@ -149,30 +149,30 @@ void moduleBM2::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleBM2::getVersion() {
+uint16_t moduleFK::getVersion() {
 	String SVN = "$Rev: 145 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleBM2::SendRest() {
+bool moduleFK::SendRest() {
 	return mb->sendRest;
 }
-bool moduleBM2::SendRest(bool sendRest) {
+bool moduleFK::SendRest(bool sendRest) {
 	mb->sendRest = sendRest;
 	return true;
 }
-bool moduleBM2::Debug() {
+bool moduleFK::Debug() {
 	return mb->debug;
 }
-bool moduleBM2::Debug(bool debug) {
+bool moduleFK::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-void moduleBM2::changeSendRest() {
+void moduleFK::changeSendRest() {
 	mb->changeSendRest();
 }
-void moduleBM2::changeDebug() {
+void moduleFK::changeDebug() {
 	mb->changeDebug();
 }

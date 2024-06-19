@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 144 2024-06-18 17:20:09Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 146 2024-06-19 18:57:43Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -32,7 +32,7 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
-#include <moduleBM2.h>
+#include <moduleFK.h>
 #include <moduleRelais.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
@@ -52,7 +52,7 @@ class wpFreakaZone {
 		const uint16_t mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
-		const char* updateServer = "http://d1miniupdate.freakazone.com";
+		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16_t finderListenPort = 51346;
 		const uint16_t loopTime = 200; // ms
 		const uint16_t minute10  = 5 * 60 * 10;
@@ -129,7 +129,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 146 $";
 		uint16_t publishCountOnDuration;
 		bool calcValuesLast;
 		uint16_t publishCountCalcValues;
