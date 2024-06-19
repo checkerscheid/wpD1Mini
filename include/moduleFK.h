@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 145                                                     $ #
+//# Revision     : $Rev:: 147                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleFK.h 145 2024-06-18 17:20:41Z                      $ #
+//# File-ID      : $Id:: moduleFK.h 147 2024-06-19 19:13:41Z                      $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleFK_h
@@ -63,7 +63,7 @@ class moduleFK {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 145 $";
+		String SVNh = "$Rev: 147 $";
 
 };
 extern moduleFK wpFK;

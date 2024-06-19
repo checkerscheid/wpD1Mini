@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 145                                                     $ #
+//# Revision     : $Rev:: 147                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleFK.cpp 145 2024-06-18 17:20:41Z                    $ #
+//# File-ID      : $Id:: moduleFK.cpp 147 2024-06-19 19:13:41Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleFK.h>
@@ -150,7 +150,7 @@ void moduleFK::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleFK::getVersion() {
-	String SVN = "$Rev: 145 $";
+	String SVN = "$Rev: 147 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
