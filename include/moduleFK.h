@@ -10,18 +10,18 @@
 //#                                                                                 #
 //# Revision     : $Rev:: 145                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM2.h 145 2024-06-18 17:20:41Z                     $ #
+//# File-ID      : $Id:: moduleFK.h 145 2024-06-18 17:20:41Z                      $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleBM2_h
-#define moduleBM2_h
+#ifndef moduleFK_h
+#define moduleFK_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleBM2 {
+class moduleFK {
 	public:
-		moduleBM2();
+		moduleFK();
 		moduleBase* mb;
 
 		// section for define
@@ -66,6 +66,6 @@ class moduleBM2 {
 		String SVNh = "$Rev: 145 $";
 
 };
-extern moduleBM2 wpBM2;
+extern moduleFK wpFK;
 
 #endif

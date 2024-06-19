@@ -55,7 +55,7 @@ void helperEEPROM::readStringsFromEEPROM() {
 	byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
 	wpBM.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = byteStartForString + 1 + wpBM.lightToTurnOn.length();
-	wpBM2.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM2.lightToTurnOn);
+	wpFK.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpFK.lightToTurnOn);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
@@ -63,7 +63,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM2.lightToTurnOn);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpFK.lightToTurnOn);
 }
 
 void helperEEPROM::saveBool(uint16_t &addr, byte &by, uint8_t &bi, bool v) {
@@ -157,7 +157,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
 	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
 	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
-	wpModules.useModuleBM2 = bitRead(bitsModules1, bitUseBM2);
+	wpModules.useModuleFK = bitRead(bitsModules1, bitUseFK);
 	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
 	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
@@ -191,7 +191,7 @@ void helperEEPROM::readVars() {
 	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
 	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
 	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
-	wpBM2.SendRest(bitRead(bitsSendRestModules1, bitSendRestBM2));
+	wpFK.SendRest(bitRead(bitsSendRestModules1, bitSendRestFK));
 	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
 	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
 	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
@@ -205,7 +205,7 @@ void helperEEPROM::readVars() {
 	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
-	wpBM2.Debug(bitRead(bitsDebugModules1, bitDebugBM2));
+	wpFK.Debug(bitRead(bitsDebugModules1, bitDebugFK));
 	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
@@ -243,7 +243,7 @@ void helperEEPROM::readVars() {
 /// byte values: 2byte 50 - 79
 	EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
 	EEPROM.get(byteBMThreshold, wpBM.threshold);
-	EEPROM.get(byteBM2Threshold, wpBM2.threshold);
+	EEPROM.get(byteFKThreshold, wpFK.threshold);
 	EEPROM.get(bytePumpPause, wpRelais.pumpPause);
 	EEPROM.get(byteMoistureDry, wpMoisture.dry);
 	EEPROM.get(byteMoistureWet, wpMoisture.wet);

@@ -30,7 +30,7 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
-#include <moduleBM2.h>
+#include <moduleFK.h>
 #include <moduleRelais.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>

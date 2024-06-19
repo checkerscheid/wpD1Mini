@@ -40,7 +40,7 @@ class helperWebServer {
 		const int8_t cmdSendRestLDR = 3;
 		const int8_t cmdSendRestLight = 4;
 		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestBM2 = 6;
+		const int8_t cmdSendRestFK = 6;
 		const int8_t cmdSendRestRelais = 7;
 		const int8_t cmdSendRestRain = 8;
 		const int8_t cmdSendRestMoisture = 9;
@@ -61,7 +61,7 @@ class helperWebServer {
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
 		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugBM2 = 24;
+		const int8_t cmdDebugFK = 24;
 		const int8_t cmdDebugRelais = 25;
 		const int8_t cmdDebugRain = 26;
 		const int8_t cmdDebugMoisture = 27;
@@ -73,7 +73,7 @@ class helperWebServer {
 		const int8_t cmdModuleLDR = 3;
 		const int8_t cmdModuleLight = 4;
 		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleBM2 = 6;
+		const int8_t cmdModuleFK = 6;
 		const int8_t cmdModuleRelais = 7;
 		const int8_t cmdModuleRelaisShield = 8;
 		const int8_t cmdModuleRain = 9;
