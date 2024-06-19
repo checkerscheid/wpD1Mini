@@ -562,10 +562,12 @@ void helperWebServer::doTheCommand() {
 			wpUpdate.check();
 		}
 		if(doCommand == cmdUpdateHTTP) {
+			delay(10);
 			wpUpdate.start();
 		}
 		if(doCommand == cmdRestartESP) {
 			wpOnlineToggler.setMqttOffline();
+			delay(10);
 			ESP.restart();
 		}
 		if(doCommand == cmdScanWiFi) {
