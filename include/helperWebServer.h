@@ -130,7 +130,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<style>
 		body { background-color:#606060; color:#ececfb; }
 		* { margin:0; padding:0; }
-		#FreakaZoneWebSerial { margin:20px 50px; font-family:Consolas, Verdana, Arial, sans-serif; font-size:15px; }
+		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
+		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
 		h1 { font-size:25px; }
 		h2 { font-size:20px; }
 		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
@@ -142,7 +143,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.ul input { margin-right:5px; }
 		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
-			line-height:16px; font-size:13px; font-weight:bold; text-align:center;
+			line-height:16px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
 			background-color:#555; background-image:linear-gradient(#606060 .25em, #222 1.75em); box-shadow:0px 0px 2px 0px #888; }
 		.wpButton:hover { border-color:#AAA; }
