@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 149                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 146 2024-06-19 18:57:43Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 149 2024-06-20 23:26:18Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -112,7 +112,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 146 $";
+		String SVNh = "$Rev: 149 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
