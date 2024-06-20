@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 148                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 146 2024-06-19 18:57:43Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 148 2024-06-19 23:04:26Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 146 $";
+	String SVN = "$Rev: 148 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -336,7 +336,7 @@ void helperWebServer::setupWebServer() {
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDistance);
 			}
 		}
-		request->send(200);
+		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
 
@@ -384,7 +384,7 @@ void helperWebServer::setupWebServer() {
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestDistance);
 			}
 		}
-		request->send(200);
+		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
 
@@ -464,7 +464,7 @@ void helperWebServer::setupWebServer() {
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugDistance);
 			}
 		}
-		request->send(200);
+		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
 
@@ -515,7 +515,7 @@ void helperWebServer::setupWebServer() {
 				wpRelais.waterEmptySet = !wpRelais.waterEmptySet;
 			}
 		}
-		request->send(200);
+		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
 	webServer.begin();
@@ -562,12 +562,10 @@ void helperWebServer::doTheCommand() {
 			wpUpdate.check();
 		}
 		if(doCommand == cmdUpdateHTTP) {
-			delay(10);
 			wpUpdate.start();
 		}
 		if(doCommand == cmdRestartESP) {
 			wpOnlineToggler.setMqttOffline();
-			delay(10);
 			ESP.restart();
 		}
 		if(doCommand == cmdScanWiFi) {
