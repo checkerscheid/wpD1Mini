@@ -61,13 +61,13 @@ void moduleBase::initMaxCycle(uint16_t addrMaxCycle) {
 void moduleBase::changeSendRest() {
 	sendRest = !sendRest;
 	writeEEPROMsendRest();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value: sendRest = " + String(sendRest));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value " + _name + ": sendRest = " + String(sendRest));
 	wpFZ.blink();
 }
 void moduleBase::changeDebug() {
 	debug = !debug;
 	writeEEPROMdebug();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value: debug = " + String(debug));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value" + _name + ": debug = " + String(debug));
 	wpFZ.blink();
 }
 
