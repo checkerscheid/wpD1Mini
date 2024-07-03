@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 132 2024-06-06 11:07:48Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 144 2024-06-18 17:20:09Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -23,8 +23,8 @@ moduleDHT::moduleDHT() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleDHT::init() {
-
 	// section for define
+	DHTPin = D7;
 	temperature = 0;
 	humidity = 0;
 	// values
@@ -65,8 +65,8 @@ void moduleDHT::publishSettings() {
 	publishSettings(false);
 }
 void moduleDHT::publishSettings(bool force) {
-	wpMqtt.mqttClient.publish(mqttTopicTemperatureCorrection.c_str(), String(float(temperatureCorrection / 10)).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicHumidityCorrection.c_str(), String(float(humidityCorrection / 10)).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicTemperatureCorrection.c_str(), String(float(temperatureCorrection / 10.0)).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicHumidityCorrection.c_str(), String(float(humidityCorrection / 10.0)).c_str());
 	mb->publishSettings(force);
 }
 
@@ -95,7 +95,7 @@ void moduleDHT::setSubscribes() {
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
-		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10);
+		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
 			EEPROM.put(wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
@@ -151,7 +151,7 @@ void moduleDHT::calc() {
 	float newT = dht->readTemperature();
 	float newH = dht->readHumidity();
 	if(!isnan(newT)) {
-		temperature = int16_t(newT * 100) + temperatureCorrection;
+		temperature = int16_t(newT * 100) + (temperatureCorrection * 10);
 		e = e | false;
 		if(mb->debug) {
 			printCalcDebug("Temperature", temperature, newT);
@@ -161,7 +161,7 @@ void moduleDHT::calc() {
 		printCalcError("Temperature");
 	}
 	if(!isnan(newH)) {
-		humidity = int16_t(newH * 100) + humidityCorrection;
+		humidity = int16_t(newH * 100) + (humidityCorrection * 10);
 		e = e | false;
 		if(mb->debug) {
 			printCalcDebug("Humidity", humidity, newH);
@@ -194,7 +194,7 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 144 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

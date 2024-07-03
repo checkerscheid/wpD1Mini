@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 132 2024-06-06 11:07:48Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 144 2024-06-18 17:20:09Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -84,7 +84,7 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteThreshold, threshold);
+				EEPROM.put(wpEEPROM.byteBMThreshold, threshold);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
@@ -107,8 +107,8 @@ void moduleBM::publishValue() {
 	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.LDR <= threshold) {
-			String lm = "MQTT Set Light (" + String(wpLDR.LDR) + " <= " + String(threshold) + ")";
+		if(bm && wpLDR.ldr <= threshold) {
+			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
 					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
@@ -150,7 +150,7 @@ void moduleBM::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 144 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -2,15 +2,14 @@
 	"FreakaZoneDevice": {
 		"DeviceName": "SZ_RU",
 		"DeviceDescription": "Schlafzimmer Raumueberwachung",
-		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
-		"Version": "Build 118.118",
+		"Version": "V 3.1 Build 136",
 		"MAC": "08:F9:E0:6E:55:90",
 		"miniMAC": "08f9e06e5590",
 		"UpdateMode": false,
 		"calcValues": true,
-		"HT": {
-			"MaxCycleHT": 50,
-			"TemperatureCorrection": -3.50,
+		"DHT": {
+			"MaxCycleDHT": 50,
+			"TemperatureCorrection": -2.50,
 			"HumidityCorrection": 0.00
 		},
 		"LDR": {
@@ -19,13 +18,34 @@
 			"LDRCorrection": 0
 		},
 		"Debug": {
-			"EEPROM": false,
-			"WiFi": false,
+			"EEPROM": true,
+			"Finder": false,
+			"Modules": false,
 			"MQTT": false,
-			"Search": false,
-			"Rest": false,
-			"HT11": true,
+			"OnlineToggler": true,
+			"Rest": true,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT11": true,
 			"LDR": true
+		},
+		"SendRest": {
+			"WiFi": false,
+			"DHT11": true,
+			"LDR": true
+		},
+		"useModul": {
+			"DHT11": true,
+			"DHT22": false,
+			"LDR": true,
+			"Light": false,
+			"BM": false,
+			"Relais": false,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": false,
+			"Distance": false
 		}
 	}
 }

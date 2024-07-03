@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 132 2024-06-06 11:07:48Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 139 2024-06-11 10:08:54Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -41,6 +41,7 @@ void moduleLight::init() {
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLight);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight);
+	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLightAvg);
 	mb->initError();
 	mb->initMaxCycle(wpEEPROM.byteMaxCycleLight);
 }
@@ -113,15 +114,20 @@ void moduleLight::publishValue() {
 
 void moduleLight::calc() {
 	float ar = lightMeter->readLightLevel();
-	uint16_t newLight = (uint16_t)ar;
-	if(ar >= 0) {
+	uint32_t read = (uint32_t)ar;
+	uint32_t avg;
+	if(!isnan(ar) || ar < 0) {
+		avg = read;
 		if(mb->useAvg) {
-			newLight = calcAvg(newLight);
+			avg = calcAvg(avg);
 		}
-		light = newLight + correction;
+		light = avg + correction;
 		mb->error = false;
 		if(mb->debug) {
-			String logmessage = "Light: " + String(light) + " (" + String(newLight) + ")";
+			String logmessage = "Light: " + String(light) + " ("
+				"AnalogRead: " + String(ar) + ", "
+				"Read: " + String(read) + ", "
+				"Avg: " + String(avg) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "wpLight::calc", logmessage);
 		}
 	} else {
@@ -130,7 +136,7 @@ void moduleLight::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
 	}
 }
-uint16_t moduleLight::calcAvg(uint16_t raw) {
+uint32_t moduleLight::calcAvg(uint32_t raw) {
 	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -154,7 +160,7 @@ void moduleLight::printPublishValueDebug(String name, String value, String publi
 // section to copy
 //###################################################################################
 uint16_t moduleLight::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

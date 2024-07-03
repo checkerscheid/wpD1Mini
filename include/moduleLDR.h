@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 128                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.h 128 2024-06-03 11:49:32Z                     $ #
+//# File-ID      : $Id:: moduleLDR.h 139 2024-06-11 10:08:54Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLDR_h
@@ -23,11 +23,11 @@ class moduleLDR {
 	public:
 		moduleLDR();
 		moduleBase* mb;
-		int16_t LDR;
+		int16_t ldr;
 		int8_t correction = 0;
 
 		// values
-		String mqttTopicLDR;
+		String mqttTopicLdr;
 		// settings
 		String mqttTopicCorrection;
 
@@ -55,8 +55,8 @@ class moduleLDR {
 		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
 		uint8_t LDRPin;
-		int16_t LDRLast;
-		uint16_t publishCountLDR;
+		int16_t ldrLast;
+		uint16_t publishCountLdr;
 		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
@@ -68,7 +68,7 @@ class moduleLDR {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 128 $";
+		String SVNh = "$Rev: 139 $";
 };
 extern moduleLDR wpLDR;
 

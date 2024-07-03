@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 135                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 135 2024-06-06 14:04:54Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 152 2024-07-03 18:00:06Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -29,10 +29,11 @@ class helperWebServer {
 		const int8_t cmdForceMqttUpdate = 2;
 		const int8_t cmdForceRenewValue = 3;
 		const int8_t cmdUpdateFW = 4;
-		const int8_t cmdUpdateCheck = 6;
-		const int8_t cmdUpdateHTTP = 7;
-		const int8_t cmdRestartESP = 8;
-		const int8_t cmdScanWiFi = 9;
+		const int8_t cmdUpdateCheck = 5;
+		const int8_t cmdUpdateHTTP = 6;
+		const int8_t cmdRestartESP = 7;
+		const int8_t cmdScanWiFi = 8;
+		const int8_t cmdCheckDns = 9;
 		int8_t doCommand;
 
 		const int8_t cmdSendRestWiFi = 1;
@@ -40,10 +41,11 @@ class helperWebServer {
 		const int8_t cmdSendRestLDR = 3;
 		const int8_t cmdSendRestLight = 4;
 		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestRelais = 6;
-		const int8_t cmdSendRestRain = 7;
-		const int8_t cmdSendRestMoisture = 8;
-		const int8_t cmdSendRestDistance = 9;
+		const int8_t cmdSendRestWindow = 6;
+		const int8_t cmdSendRestRelais = 7;
+		const int8_t cmdSendRestRain = 8;
+		const int8_t cmdSendRestMoisture = 9;
+		const int8_t cmdSendRestDistance = 10;
 		int8_t doSendRestChange;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -60,10 +62,11 @@ class helperWebServer {
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
 		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugRelais = 24;
-		const int8_t cmdDebugRain = 25;
-		const int8_t cmdDebugMoisture = 26;
-		const int8_t cmdDebugDistance = 27;
+		const int8_t cmdDebugWindow = 24;
+		const int8_t cmdDebugRelais = 25;
+		const int8_t cmdDebugRain = 26;
+		const int8_t cmdDebugMoisture = 27;
+		const int8_t cmdDebugDistance = 28;
 		int8_t doDebugChange;
 
 		const int8_t cmdModuleDHT11 = 1;
@@ -71,11 +74,12 @@ class helperWebServer {
 		const int8_t cmdModuleLDR = 3;
 		const int8_t cmdModuleLight = 4;
 		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleRelais = 6;
-		const int8_t cmdModuleRelaisShield = 7;
-		const int8_t cmdModuleRain = 8;
-		const int8_t cmdModuleMoisture = 9;
-		const int8_t cmdModuleDistance = 10;
+		const int8_t cmdModuleWindow = 6;
+		const int8_t cmdModuleRelais = 7;
+		const int8_t cmdModuleRelaisShield = 8;
+		const int8_t cmdModuleRain = 9;
+		const int8_t cmdModuleMoisture = 10;
+		const int8_t cmdModuleDistance = 11;
 		int8_t doModuleChange;
 
 		int8_t doBlink;
@@ -108,7 +112,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 135 $";
+		String SVNh = "$Rev: 152 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -126,7 +130,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<style>
 		body { background-color:#606060; color:#ececfb; }
 		* { margin:0; padding:0; }
-		#FreakaZoneWebSerial { margin:20px 50px; font-family:Consolas, Verdana, Arial, sans-serif; font-size:15px; }
+		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
+		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
 		h1 { font-size:25px; }
 		h2 { font-size:20px; }
 		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
@@ -138,7 +143,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.ul input { margin-right:5px; }
 		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
-			line-height:16px; font-size:13px; font-weight:bold; text-align:center;
+			line-height:16px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
 			background-color:#555; background-image:linear-gradient(#606060 .25em, #222 1.75em); box-shadow:0px 0px 2px 0px #888; }
 		.wpButton:hover { border-color:#AAA; }
@@ -154,7 +159,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<div id="FreakaZoneWebSerial">
 		<div id="restartRequired"></div>
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
-		<h2>%DeviceDescription%</h2>
+		<h2>%DeviceDescription% (%Version%)</h2>
 		<div class="ul">
 			%Debug%
 			%SendRest%
@@ -170,6 +175,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
 				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
+				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
 		</div>

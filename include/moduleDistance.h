@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 136                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 132 2024-06-06 11:07:48Z                $ #
+//# File-ID      : $Id:: moduleDistance.h 136 2024-06-09 15:37:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDistance_h
@@ -84,7 +84,7 @@ class moduleDistance {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 128 $";
+		String SVNh = "$Rev: 136 $";
 };
 extern moduleDistance wpDistance;
 

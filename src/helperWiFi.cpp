@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 132 2024-06-06 11:07:48Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 146 2024-06-19 18:57:43Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -54,7 +54,7 @@ void helperWiFi::cycle() {
 }
 
 uint16_t helperWiFi::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 146 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -126,6 +126,13 @@ void helperWiFi::scanWiFi() {
 				"Signal: " + String(WiFi.RSSI(thisNet)) + " dBm, " +
 				"Encryption: " + printEncryptionType(WiFi.encryptionType(thisNet)));
 		}
+
+		wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi", "own WiFi network");
+		wpFZ.DebugWS(wpFZ.strINFO, "scanWiFi",
+			WiFi.SSID() + ", "
+			"Channel: " + String(WiFi.channel()) + ", "
+			"BSSID: " + WiFi.BSSIDstr() + ", "
+			"Signal: " + String(WiFi.RSSI()) + " dBm");
 	}
 	wpFZ.DebugWS(wpFZ.strWARN, "scanWiFi", "finished scan WiFi networks");
 }
@@ -197,6 +204,29 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 			wpFZ.SendWSDebug("DebugWiFi", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
+	}
+}
+
+void helperWiFi::checkDns() {
+	int returns = 0;
+	IPAddress r;
+	returns = WiFi.hostByName(wpFZ.mqttServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + ": " + String(returns));
+	}
+	returns = WiFi.hostByName(wpFZ.restServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.restServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.restServer) + ": " + String(returns));
+	}
+	returns = WiFi.hostByName(wpFZ.updateServer, r);
+	if(returns == 1) {
+		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.updateServer) + " is " + r.toString());
+	} else {
+		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.updateServer) + ": " + String(returns));
 	}
 }
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 139                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 132 2024-06-06 11:07:48Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 139 2024-06-11 10:08:54Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -26,18 +26,19 @@ void moduleLDR::init() {
 
 	// section for define
 	LDRPin = A0;
-	LDR = 0;
+	ldr = 0;
 	// values
-	mqttTopicLDR = wpFZ.DeviceName + "/" + ModuleName;
+	mqttTopicLdr = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
 
-	LDRLast = 0;
-	publishCountLDR = 0;
+	ldrLast = 0;
+	publishCountLdr = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
+	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLdrAvg);
 	mb->initError();
 	mb->initMaxCycle(wpEEPROM.byteMaxCycleLDR);
 }
@@ -66,9 +67,9 @@ void moduleLDR::publishValues() {
 }
 void moduleLDR::publishValues(bool force) {
 	if(force) {
-		publishCountLDR = wpFZ.publishQoS;
+		publishCountLdr = wpFZ.publishQoS;
 	}
-	if(LDRLast != LDR || ++publishCountLDR > wpFZ.publishQoS) {
+	if(ldrLast != ldr || ++publishCountLdr > wpFZ.publishQoS) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -96,30 +97,37 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLDR::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLDR.c_str(), String(LDR).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(LDR));
+		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
 		wpRest.trySend = true;
 	}
-	LDRLast = LDR;
+	ldrLast = ldr;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("LDR", String(LDR), String(publishCountLDR));
+		printPublishValueDebug("LDR", String(ldr), String(publishCountLdr));
 	}
-	publishCountLDR = 0;
+	publishCountLdr = 0;
 }
 
 void moduleLDR::calc() {
-	int newLDR = analogRead(LDRPin);
-	if(!isnan(newLDR)) {
-		if(newLDR > 1023) newLDR = 1023;
-		if(newLDR < 0) newLDR = 0;
+	int read = analogRead(LDRPin);
+	int minMax, avg, correct;
+	if(!isnan(read)) {
+		minMax = read;
+		if(minMax > 1023) minMax = 1023;
+		if(minMax < 0) minMax = 0;
+		avg = minMax;
 		if(mb->useAvg) {
-			newLDR = calcAvg(newLDR);
+			avg = calcAvg(avg);
 		}
-		LDR = (1023 - newLDR) + correction;
+		correct = avg;
+		ldr = (1023 - correct) + correction;
 		mb->error = false;
 		if(mb->debug) {
-			String logmessage = "LDR: " + String(LDR) + " (" + String(newLDR) + ")";
+			String logmessage = "LDR: " + String(ldr) + " ("
+				"Read: " + String(read) + ", "
+				"MinMax: " + String(minMax) + ", "
+				"Avg: " + String(avg) + ")";;
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcLDR", logmessage);
 		}
 	} else {
@@ -152,7 +160,7 @@ void moduleLDR::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16_t moduleLDR::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 139 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

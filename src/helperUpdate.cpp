@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 146                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 132 2024-06-06 11:07:48Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 146 2024-06-19 18:57:43Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -38,7 +38,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 132 $";
+	String SVN = "$Rev: 146 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -88,7 +88,8 @@ void helperUpdate::check() {
 	WiFiClient wifi;
 	HTTPClient http;
 	JsonDocument doc;
-	http.begin(wifi, String(wpFZ.updateServer));
+	const String url = "http://" + String(wpFZ.updateServer);
+	http.begin(wifi, url);
 	int httpCode = http.GET();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
 	String payload = http.getString();
@@ -117,8 +118,13 @@ void helperUpdate::start(String file) {
 
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
 	// Or:
+	// 
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, server, 80, file);
-	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer) + "/" + file);
+	
+	//const String urlfile = "http://" + String(wpFZ.updateServer) + "/" + file;
+	//t_httpUpdate_return ret = ESPhttpUpdate.update(client, urlfile);
+	
+	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer), 80, "/" + file);
 
 	switch (ret) {
 		case HTTP_UPDATE_FAILED:

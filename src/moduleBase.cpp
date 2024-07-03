@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 149                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 132 2024-06-06 11:07:48Z                    $ #
+//# File-ID      : $Id:: moduleBase.cpp 149 2024-06-20 23:26:18Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -61,13 +61,13 @@ void moduleBase::initMaxCycle(uint16_t addrMaxCycle) {
 void moduleBase::changeSendRest() {
 	sendRest = !sendRest;
 	writeEEPROMsendRest();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value: sendRest = " + String(sendRest));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value " + _name + ": sendRest = " + String(sendRest));
 	wpFZ.blink();
 }
 void moduleBase::changeDebug() {
 	debug = !debug;
 	writeEEPROMdebug();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value: debug = " + String(debug));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value" + _name + ": debug = " + String(debug));
 	wpFZ.blink();
 }
 

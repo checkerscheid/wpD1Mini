@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 133                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 133 2024-06-06 12:40:21Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 152 2024-07-03 18:00:06Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -32,6 +32,7 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
+#include <moduleWindow.h>
 #include <moduleRelais.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
@@ -51,7 +52,7 @@ class wpFreakaZone {
 		const uint16_t mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
 		const uint16_t restServerPort = 255;
-		const char* updateServer = "http://d1miniupdate.freakazone.com";
+		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16_t finderListenPort = 51346;
 		const uint16_t loopTime = 200; // ms
 		const uint16_t minute10  = 5 * 60 * 10;
@@ -62,7 +63,7 @@ class wpFreakaZone {
 		const uint16_t publishQoS = minute10; // 5 because loopTime = 200
 
 		uint16_t MajorVersion = 3;
-		uint16_t MinorVersion = 0;
+		uint16_t MinorVersion = 1;
 		uint16_t Build;
 		String Version;
 
@@ -128,7 +129,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 133 $";
+		String SVNh = "$Rev: 152 $";
 		uint16_t publishCountOnDuration;
 		bool calcValuesLast;
 		uint16_t publishCountCalcValues;

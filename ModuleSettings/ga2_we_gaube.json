@@ -1,1 +1,31 @@
-{"FreakaZoneDevice":{"DeviceName":"GA2_WE_Gaube","DeviceDescription":"Wetterstation Gaube","wpFreakaZoneVersion":"V 2.5 Build 117.117","Version":"Build 118.118","MAC":"08:F9:E0:6C:1E:58","miniMAC":"08f9e06c1e58","UpdateMode":false,"calcValues":true,"HT":{"MaxCycleHT":50,"TemperatureCorrection":0.00,"HumidityCorrection":0.00},"Rain":{"MaxCycleRain":50,"useRainAvg":0,"RainCorrection":0.00},"Debug":{"EEPROM":false,"WiFi":false,"MQTT":false,"Search":false,"Rest":false,"HT22":false,"Rain":false}}}
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "GA2_WE_Gaube",
+		"DeviceDescription": "Wetterstation Gaube",
+		"wpFreakaZoneVersion": "V 2.5 Build 117.117",
+		"Version": "Build 118.118",
+		"MAC": "08:F9:E0:6C:1E:58",
+		"miniMAC": "08f9e06c1e58",
+		"UpdateMode": false,
+		"calcValues": true,
+		"HT": {
+			"MaxCycleHT": 50,
+			"TemperatureCorrection": 0.00,
+			"HumidityCorrection": 0.00
+		},
+		"Rain": {
+			"MaxCycleRain": 50,
+			"useRainAvg": 0,
+			"RainCorrection": 0.00
+		},
+		"Debug": {
+			"EEPROM": false,
+			"WiFi": false,
+			"MQTT": false,
+			"Search": false,
+			"Rest": false,
+			"HT22": false,
+			"Rain": false
+		}
+	}
+}

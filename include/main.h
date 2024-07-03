@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 125 2024-06-03 03:11:11Z                          $ #
+//# File-ID      : $Id:: main.h 152 2024-07-03 18:00:06Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -30,6 +30,7 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
+#include <moduleWindow.h>
 #include <moduleRelais.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
@@ -45,7 +46,7 @@ void BuildChecker(uint16_t &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 125 $";
+String SVNh = "$Rev: 152 $";
 // counter
 uint16_t publishCountRssi = 0;
 

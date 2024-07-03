@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 126                                                     $ #
+//# Revision     : $Rev:: 136                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.h 126 2024-06-03 03:11:41Z                $ #
+//# File-ID      : $Id:: moduleMoisture.h 136 2024-06-09 15:37:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleMoisture_h
@@ -75,7 +75,7 @@ class moduleMoisture {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 128 $";
+		String SVNh = "$Rev: 136 $";
 };
 extern moduleMoisture wpMoisture;
 

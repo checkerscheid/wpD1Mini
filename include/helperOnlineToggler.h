@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 123                                                     $ #
+//# Revision     : $Rev:: 141                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.h 123 2024-06-02 04:37:07Z           $ #
+//# File-ID      : $Id:: helperOnlineToggler.h 141 2024-06-12 06:33:28Z           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperOnlineToggler_h
@@ -41,9 +41,11 @@ class helperOnlineToggler {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 123 $";
+		String SVNh = "$Rev: 141 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
+		unsigned long lastContact;
+		const unsigned long Minutes10 = 1000 * 60 * 60;
 };
 extern helperOnlineToggler wpOnlineToggler;
 #endif

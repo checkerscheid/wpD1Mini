@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 125                                                     $ #
+//# Revision     : $Rev:: 144                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 125 2024-06-03 03:11:11Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 144 2024-06-18 17:20:09Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -19,8 +19,6 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 #include <DHT.h>
-
-#define DHTPin D7
 
 class moduleDHT {
 	public:
@@ -62,6 +60,7 @@ class moduleDHT {
 		uint8_t MaxCycle();
 		uint8_t MaxCycle(uint8_t maxCycle);
 	private:
+		uint8_t DHTPin;
 		int16_t temperatureLast;
 		uint16_t publishCountTemperature;
 		int16_t humidityLast;
@@ -76,7 +75,7 @@ class moduleDHT {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 128 $";
+		String SVNh = "$Rev: 144 $";
 };
 extern moduleDHT wpDHT;
 

@@ -6,62 +6,66 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 29.05.2024                                                       #
+//# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 153                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.h 146 2024-06-19 18:57:43Z                    $ #
+//# File-ID      : $Id:: moduleWindow.h 153 2024-07-03 18:00:38Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef helperWiFi_h
-#define helperWiFi_h
+#ifndef moduleWindow_h
+#define moduleWindow_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <ESP8266WiFi.h>
-class helperWiFi {
+#include <moduleBase.h>
+
+class moduleWindow {
 	public:
-		bool Debug = false;
-		bool sendRest = false;
-		// values
-		String mqttTopicRssi;
-		String mqttTopicWiFiSince;
-		// settings
-		String mqttTopicSsid;
-		String mqttTopicIp;
-		String mqttTopicMac;
-		// commands
-		String mqttTopicDebug;
-		String mqttTopicSendRest;
+		moduleWindow();
+		moduleBase* mb;
 
-		String WiFiSince;
+		// section for define
+		bool bm;
+		uint16_t threshold = 500;
+		String lightToTurnOn = "_";
+		String mqttTopicBM;
+		String mqttTopicThreshold;
+		String mqttTopicLightToTurnOn;
 
-		helperWiFi();
+		// section to copy
+		uint8_t maxCycle = 5;
+		uint8_t cycleCounter = 0;
+		String mqttTopicMaxCycle;
 		void init();
 		void cycle();
 		uint16_t getVersion();
-		void changeDebug();
-		void changeSendRest();
-		void setupWiFi();
-		void scanWiFi();
-		
+
 		void publishSettings();
 		void publishSettings(bool force);
 		void publishValues();
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void checkDns();
+		void changeSendRest();
+		void changeDebug();
+		// getter / setter
+		bool SendRest();
+		bool SendRest(bool sendRest);
+		bool Debug();
+		bool Debug(bool debug);
 	private:
-		String SVNh = "$Rev: 146 $";
-		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
-		uint16_t publishCountRssi = 0;
-		String printEncryptionType(int thisType);
-		uint16_t addrSendRest;
-		byte byteSendRest;
-		uint8_t bitSendRest;
-		bool sendRestLast;
-		uint16_t publishCountSendRest;
+		uint8_t BMPin;
+		int16_t bmLast;
+		uint16_t publishCountBM;
+		void publishValue();
+		void printPublishValueDebug(String name, String value, String publishCount);
+		void calc();
+
+		// section to config and copy
+		String ModuleName;
+		String SVNh = "$Rev: 153 $";
+
 };
-extern helperWiFi wpWiFi;
+extern moduleWindow wpWindow;
+
 #endif

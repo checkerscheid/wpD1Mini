@@ -1,1 +1,58 @@
-{"FreakaZoneDevice":{"DeviceName":"WZ_PF_FE","DeviceDescription":"Wohnzimmer Pflanze am Fenster","Version":"V 3.0 Build 130","MAC":"4C:EB:D6:ED:AD:CA","miniMAC":"4cebd6edadca","UpdateMode":false,"calcValues":true,"Relais":{"Hand":false,"HandValue":false,"Moisture":{"waterEmpty":false,"pumpActive":2,"pumpPause":300}},"Moisture":{"MaxCycleMoisture":50,"useMoistureAvg":1,"MoistureMin":30,"MoistureDry":1023,"MoistureWet":525},"Debug":{"EEPROM":false,"Finder":false,"Modules":false,"MQTT":false,"OnlineToggler":false,"Rest":false,"Update":false,"WebServer":false,"WiFi":false,"DHT":false,"Relais":false,"Moisture":false},"useModul":{"DHT11":false,"DHT22":false,"LDR":false,"Light":false,"BM":false,"Relais":true,"RelaisShield":false,"Rain":false,"Moisture":true,"Distance":false}}}
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "WZ_PF_FE",
+		"DeviceDescription": "Wohnzimmer Pflanze am Fenster",
+		"Version": "V 3.0 Build 131",
+		"MAC": "4C:EB:D6:ED:AD:CA",
+		"miniMAC": "4cebd6edadca",
+		"UpdateMode": false,
+		"calcValues": true,
+		"DHT": {
+			"MaxCycleDHT": 56,
+			"TemperatureCorrection": 3.00,
+			"HumidityCorrection": 4.90
+		},
+		"Relais": {
+			"Hand": false,
+			"HandValue": false,
+			"Moisture": {
+				"waterEmpty": false,
+				"pumpActive": 2,
+				"pumpPause": 300
+			}
+		},
+		"Moisture": {
+			"MaxCycleMoisture": 50,
+			"useMoistureAvg": 1,
+			"MoistureMin": 30,
+			"MoistureDry": 1023,
+			"MoistureWet": 522
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Rest": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"DHT11": false,
+			"Relais": false,
+			"Moisture": false
+		},
+		"useModul": {
+			"DHT11": true,
+			"DHT22": false,
+			"LDR": false,
+			"Light": false,
+			"BM": false,
+			"Relais": true,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": true,
+			"Distance": false
+		}
+	}
+}
