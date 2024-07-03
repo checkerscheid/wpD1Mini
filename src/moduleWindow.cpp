@@ -6,25 +6,25 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 02.06.2024                                                       #
+//# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 153                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 132 2024-06-06 11:07:48Z                    $ #
+//# File-ID      : $Id:: moduleWindow.cpp 153 2024-07-03 18:00:38Z                $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleBM.h>
+#include <moduleWindow.h>
 
-moduleBM wpBM;
+moduleWindow wpWindow;
 
-moduleBM::moduleBM() {
+moduleWindow::moduleWindow() {
 	// section to config and copy
-	ModuleName = "BM";
+	ModuleName = "Window";
 	mb = new moduleBase(ModuleName);
 }
-void moduleBM::init() {
+void moduleWindow::init() {
 	// section for define
-	BMPin = D5;
+	BMPin = D6;
 	pinMode(BMPin, INPUT_PULLUP);
 	bm = 0;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
@@ -37,32 +37,32 @@ void moduleBM::init() {
 	// section to copy
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestBM);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestWindow);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugWindow);
 
 }
 
 //###################################################################################
-void moduleBM::cycle() {
+void moduleWindow::cycle() {
 	if(wpFZ.calcValues) {
 		calc();
 	}
 	publishValues();
 }
-void moduleBM::publishSettings() {
+void moduleWindow::publishSettings() {
 	publishSettings(false);
 }
-void moduleBM::publishSettings(bool force) {
+void moduleWindow::publishSettings(bool force) {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
 	}
 	mb->publishSettings(force);
 }
-void moduleBM::publishValues() {
+void moduleWindow::publishValues() {
 	publishValues(false);
 }
-void moduleBM::publishValues(bool force) {
+void moduleWindow::publishValues(bool force) {
 	if(force) {
 		publishCountBM = wpFZ.publishQoS;
 	}
@@ -71,20 +71,20 @@ void moduleBM::publishValues(bool force) {
 	}
 	mb->publishValues(force);
 }
-void moduleBM::setSubscribes() {
+void moduleWindow::setSubscribes() {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 	}
 	mb->setSubscribes();
 }
-void moduleBM::checkSubscribes(char* topic, String msg) {
+void moduleWindow::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
 			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteThreshold, threshold);
+				EEPROM.put(wpEEPROM.byteWindowThreshold, threshold);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
@@ -99,16 +99,16 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleBM::publishValue() {
+void moduleWindow::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("bm", bm ? "true" : "false");
+		wpRest.error = wpRest.error | !wpRest.sendRest("window", bm ? "true" : "false");
 		wpRest.trySend = true;
 	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.LDR <= threshold) {
-			String lm = "MQTT Set Light (" + String(wpLDR.LDR) + " <= " + String(threshold) + ")";
+		if(bm && wpLDR.ldr <= threshold) {
+			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
 					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
@@ -123,15 +123,15 @@ void moduleBM::publishValue() {
 		}
 	}
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("BM", String(bm), String(publishCountBM));
+		printPublishValueDebug("Window", String(bm), String(publishCountBM));
 	}
 	publishCountBM = 0;
 }
-void moduleBM::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleWindow::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
-void moduleBM::calc() {
+void moduleWindow::calc() {
 	if(digitalRead(BMPin) == LOW) {
 		bm = false;
 	} else {
@@ -139,7 +139,7 @@ void moduleBM::calc() {
 			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", "Bewegung erkannt");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Bewegung erkannt");
 			}
 		}
 	}
@@ -149,30 +149,30 @@ void moduleBM::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 132 $";
+uint16_t moduleWindow::getVersion() {
+	String SVN = "$Rev: 153 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleBM::SendRest() {
+bool moduleWindow::SendRest() {
 	return mb->sendRest;
 }
-bool moduleBM::SendRest(bool sendRest) {
+bool moduleWindow::SendRest(bool sendRest) {
 	mb->sendRest = sendRest;
 	return true;
 }
-bool moduleBM::Debug() {
+bool moduleWindow::Debug() {
 	return mb->debug;
 }
-bool moduleBM::Debug(bool debug) {
+bool moduleWindow::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-void moduleBM::changeSendRest() {
+void moduleWindow::changeSendRest() {
 	mb->changeSendRest();
 }
-void moduleBM::changeDebug() {
+void moduleWindow::changeDebug() {
 	mb->changeDebug();
 }
