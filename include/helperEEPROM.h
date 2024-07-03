@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 146 2024-06-19 18:57:43Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 152 2024-07-03 18:00:06Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -39,7 +39,7 @@ class helperEEPROM {
 		byte bitsModules1;
 		const uint8_t bitUseMoisture = 0; // include in bitsModules1
 		const uint8_t bitUseDistance = 1; // include in bitsModules1
-		const uint8_t bitUseFK = 2; // include in bitsModules1
+		const uint8_t bitUseWindow = 2; // include in bitsModules1
 		
 		const uint16_t addrBitsModules2 = 2;
 		byte bitsModules2;
@@ -80,7 +80,7 @@ class helperEEPROM {
 		
 		const uint16_t addrBitsSendRestModules1 = 7;
 		byte bitsSendRestModules1;
-		const uint8_t bitSendRestFK = 0; // include in bitsSendRestModules1
+		const uint8_t bitSendRestWindow = 0; // include in bitsSendRestModules1
 		
 		const uint16_t addrBitsSendRestModules2 = 8;
 		byte bitsSendRestModules2;
@@ -100,7 +100,7 @@ class helperEEPROM {
 		
 		const uint16_t addrBitsDebugModules1 = 10;
 		byte bitsDebugModules1;
-		const uint8_t bitDebugFK = 0; // include in bitsDebugModules1
+		const uint8_t bitDebugWindow = 0; // include in bitsDebugModules1
 		
 		const uint16_t addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
@@ -148,7 +148,7 @@ class helperEEPROM {
 		const uint16_t byteMoistureDry = 56;
 		const uint16_t byteMoistureWet = 58;
 		const uint16_t byteMaxVolume = 60;
-		const uint16_t byteFKThreshold = 62;
+		const uint16_t byteWindowThreshold = 62;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
@@ -173,7 +173,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 146 $";
+		String SVNh = "$Rev: 152 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		const uint16_t addrStartForString0 = 500;
