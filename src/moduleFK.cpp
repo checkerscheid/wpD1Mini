@@ -102,7 +102,7 @@ void moduleFK::checkSubscribes(char* topic, String msg) {
 void moduleFK::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("FK", String(bm));
+		wpRest.error = wpRest.error | !wpRest.sendRest("fk", String(bm));
 		wpRest.trySend = true;
 	}
 	bmLast = bm;
