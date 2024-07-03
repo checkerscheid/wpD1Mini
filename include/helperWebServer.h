@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 149                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 149 2024-06-20 23:26:18Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 152 2024-07-03 18:00:06Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -41,7 +41,7 @@ class helperWebServer {
 		const int8_t cmdSendRestLDR = 3;
 		const int8_t cmdSendRestLight = 4;
 		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestFK = 6;
+		const int8_t cmdSendRestWindow = 6;
 		const int8_t cmdSendRestRelais = 7;
 		const int8_t cmdSendRestRain = 8;
 		const int8_t cmdSendRestMoisture = 9;
@@ -62,7 +62,7 @@ class helperWebServer {
 		const int8_t cmdDebugLDR = 21;
 		const int8_t cmdDebugLight = 22;
 		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugFK = 24;
+		const int8_t cmdDebugWindow = 24;
 		const int8_t cmdDebugRelais = 25;
 		const int8_t cmdDebugRain = 26;
 		const int8_t cmdDebugMoisture = 27;
@@ -74,7 +74,7 @@ class helperWebServer {
 		const int8_t cmdModuleLDR = 3;
 		const int8_t cmdModuleLight = 4;
 		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleFK = 6;
+		const int8_t cmdModuleWindow = 6;
 		const int8_t cmdModuleRelais = 7;
 		const int8_t cmdModuleRelaisShield = 8;
 		const int8_t cmdModuleRain = 9;
@@ -112,7 +112,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 149 $";
+		String SVNh = "$Rev: 152 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };

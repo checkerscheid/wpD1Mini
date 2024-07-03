@@ -8,20 +8,20 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 147                                                     $ #
+//# Revision     : $Rev:: 153                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleFK.h 147 2024-06-19 19:13:41Z                      $ #
+//# File-ID      : $Id:: moduleWindow.h 153 2024-07-03 18:00:38Z                  $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleFK_h
-#define moduleFK_h
+#ifndef moduleWindow_h
+#define moduleWindow_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleFK {
+class moduleWindow {
 	public:
-		moduleFK();
+		moduleWindow();
 		moduleBase* mb;
 
 		// section for define
@@ -63,9 +63,9 @@ class moduleFK {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 147 $";
+		String SVNh = "$Rev: 153 $";
 
 };
-extern moduleFK wpFK;
+extern moduleWindow wpWindow;
 
 #endif

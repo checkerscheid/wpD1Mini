@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 146 2024-06-19 18:57:43Z                 $ #
+//# File-ID      : $Id:: helperModules.h 152 2024-07-03 18:00:06Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -27,7 +27,7 @@ class helperModules {
 		bool useModuleLDR = false;
 		bool useModuleLight = false;
 		bool useModuleBM = false;
-		bool useModuleFK = false;
+		bool useModuleWindow = false;
 		bool useModuleRelais = false;
 		bool useModuleRelaisShield = false;
 		bool useModuleRain = false;
@@ -42,7 +42,7 @@ class helperModules {
 		String mqttTopicUseLDR;
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
-		String mqttTopicUseFK;
+		String mqttTopicUseWindow;
 		String mqttTopicUseRelais;
 		String mqttTopicUseRelaisShield;
 		String mqttTopicUseRain;
@@ -68,7 +68,7 @@ class helperModules {
 		void changeModuleLDR(bool newValue);
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
-		void changeModuleFK(bool newValue);
+		void changeModuleWindow(bool newValue);
 		void changeModuleRelais(bool newValue);
 		void changeModuleRelaisShield(bool newValue);
 		void changeModuleRain(bool newValue);
@@ -82,7 +82,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 146 $";
+		String SVNh = "$Rev: 152 $";
 		bool useDHT11Last = false;
 		uint16 publishCountUseDHT11 = 0;
 		bool useDHT22Last = false;
@@ -93,8 +93,8 @@ class helperModules {
 		uint16 publishCountUseLight = 0;
 		bool useBMLast = false;
 		uint16 publishCountUseBM = 0;
-		bool useFKLast = false;
-		uint16 publishCountUseFK = 0;
+		bool useWindowLast = false;
+		uint16 publishCountUseWindow = 0;
 		bool useRelaisLast = false;
 		uint16 publishCountUseRelais = 0;
 		bool useRelaisShieldLast = false;
