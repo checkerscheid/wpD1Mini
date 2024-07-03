@@ -223,7 +223,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 void moduleRelais::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("relais", String(output));
+		wpRest.error = wpRest.error | !wpRest.sendRest("relais", output ? "true" : "false");
 		wpRest.trySend = true;
 	}
 	outputLast = output;
