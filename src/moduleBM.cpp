@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 154                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 144 2024-06-18 17:20:09Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 154 2024-07-04 15:16:36Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -150,7 +150,7 @@ void moduleBM::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 144 $";
+	String SVN = "$Rev: 154 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

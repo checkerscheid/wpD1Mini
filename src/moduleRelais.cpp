@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 149                                                     $ #
+//# Revision     : $Rev:: 154                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 149 2024-06-20 23:26:18Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 154 2024-07-04 15:16:36Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -315,7 +315,7 @@ void moduleRelais::printPublishValueDebug(String name, String value, String publ
 // section to copy
 //###################################################################################
 uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 149 $";
+	String SVN = "$Rev: 154 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
