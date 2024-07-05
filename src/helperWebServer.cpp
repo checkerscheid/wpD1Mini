@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 151                                                     $ #
+//# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 151 2024-07-01 20:25:07Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 152 2024-07-03 18:00:06Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 151 $";
+	String SVN = "$Rev: 152 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -157,12 +157,12 @@ void helperWebServer::setupWebServer() {
 			}
 			message += "},";
 		}
-		if(wpModules.useModuleFK) {
-			message += "\"FK\":{";
+		if(wpModules.useModuleWindow) {
+			message += "\"Window\":{";
 			if(wpModules.useModuleLDR) {
 				message += "\"LDR\":{";
-				message += wpFZ.JsonKeyValue("Threshold", String(wpFK.threshold)) + ",";
-				message += wpFZ.JsonKeyString("LightToTurnOn", wpFK.lightToTurnOn);
+				message += wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + ",";
+				message += wpFZ.JsonKeyString("LightToTurnOn", wpWindow.lightToTurnOn);
 				message += "}";
 			}
 			message += "},";
@@ -226,8 +226,8 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleBM) {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.Debug() ? "true" : "false");
 		}
-		if(wpModules.useModuleFK) {
-			message += "," + wpFZ.JsonKeyValue("FK", wpFK.Debug() ? "true" : "false");
+		if(wpModules.useModuleWindow) {
+			message += "," + wpFZ.JsonKeyValue("Window", wpWindow.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.Debug() ? "true" : "false");
@@ -255,8 +255,8 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleBM) {
 			message += "," + wpFZ.JsonKeyValue("BM", wpBM.SendRest() ? "true" : "false");
 		}
-		if(wpModules.useModuleFK) {
-			message += "," + wpFZ.JsonKeyValue("FK", wpFK.SendRest() ? "true" : "false");
+		if(wpModules.useModuleWindow) {
+			message += "," + wpFZ.JsonKeyValue("Window", wpWindow.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.SendRest() ? "true" : "false");
@@ -276,7 +276,7 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("FK", wpModules.useModuleFK ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("Window", wpModules.useModuleWindow ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + ",";
@@ -311,9 +311,9 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useBM");
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleBM);
 			}
-			if(request->getParam("Module")->value() == "useFK") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useFK");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleFK);
+			if(request->getParam("Module")->value() == "useWindow") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useWindow");
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleWindow);
 			}
 			if(request->getParam("Module")->value() == "useRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRelais");
@@ -363,9 +363,9 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestBM");
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestBM);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestFK") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestFK");
-				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestFK);
+			if(request->getParam("sendRest")->value() == "sendRestWindow") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestWindow");
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestWindow);
 			}
 			if(request->getParam("sendRest")->value() == "sendRestRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRelais");
@@ -443,9 +443,9 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugBM");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugBM);
 			}
-			if(request->getParam("Debug")->value() == "DebugFK") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugFK");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugFK);
+			if(request->getParam("Debug")->value() == "DebugWindow") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugWindow");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugWindow);
 			}
 			if(request->getParam("Debug")->value() == "DebugRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRelais");
@@ -585,7 +585,7 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleLDR) wpModules.changeModuleLDR(!wpModules.useModuleLDR);
 		if(doModuleChange == cmdModuleLight) wpModules.changeModuleLight(!wpModules.useModuleLight);
 		if(doModuleChange == cmdModuleBM) wpModules.changeModuleBM(!wpModules.useModuleBM);
-		if(doModuleChange == cmdModuleFK) wpModules.changeModuleFK(!wpModules.useModuleFK);
+		if(doModuleChange == cmdModuleWindow) wpModules.changeModuleWindow(!wpModules.useModuleWindow);
 		if(doModuleChange == cmdModuleRelais) wpModules.changeModuleRelais(!wpModules.useModuleRelais);
 		if(doModuleChange == cmdModuleRelaisShield) wpModules.changeModuleRelaisShield(!wpModules.useModuleRelaisShield);
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
@@ -602,7 +602,7 @@ void helperWebServer::doTheSendRestChange() {
 		if(doSendRestChange == cmdSendRestLDR) wpLDR.changeSendRest();
 		if(doSendRestChange == cmdSendRestLight) wpLight.changeSendRest();
 		if(doSendRestChange == cmdSendRestBM) wpBM.changeSendRest();
-		if(doSendRestChange == cmdSendRestFK) wpFK.changeSendRest();
+		if(doSendRestChange == cmdSendRestWindow) wpWindow.changeSendRest();
 		if(doSendRestChange == cmdSendRestRelais) wpRelais.changeSendRest();
 		if(doSendRestChange == cmdSendRestRain) wpRain.changeSendRest();
 		if(doSendRestChange == cmdSendRestMoisture) wpMoisture.changeSendRest();
@@ -626,7 +626,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugLDR) wpLDR.changeDebug();
 		if(doDebugChange == cmdDebugLight) wpLight.changeDebug();
 		if(doDebugChange == cmdDebugBM) wpBM.changeDebug();
-		if(doDebugChange == cmdDebugFK) wpFK.changeDebug();
+		if(doDebugChange == cmdDebugWindow) wpWindow.changeDebug();
 		if(doDebugChange == cmdDebugRelais) wpRelais.changeDebug();
 		if(doDebugChange == cmdDebugRain) wpRain.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
@@ -673,8 +673,8 @@ String processor(const String& var) {
 			" onchange='changeModule(event)' /><label for='useLight'>wpLight</label></li>" +
 		"<li><input id='useBM' type='checkbox'" + String(wpModules.useModuleBM ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useBM'>wpBM</label></li>" +
-		"<li><input id='useFK' type='checkbox'" + String(wpModules.useModuleFK ? " checked" : "") +
-			" onchange='changeModule(event)' /><label for='useFK'>wpFK</label></li>" +
+		"<li><input id='useWindow' type='checkbox'" + String(wpModules.useModuleWindow ? " checked" : "") +
+			" onchange='changeModule(event)' /><label for='useWindow'>wpWindow</label></li>" +
 		"<li><input id='useRelais' type='checkbox'" + String(wpModules.useModuleRelais ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useRelais'>wpRelais</label></li>" +
 		"<li><input id='useRelaisShield' type='checkbox'" + String(wpModules.useModuleRelaisShield ? " checked" : "") +
@@ -732,9 +732,9 @@ String processor(const String& var) {
 			returns += "<li><input id='DebugBM' type='checkbox'" + String(wpBM.Debug() ? " checked" : "") +
 				" onchange='changeDebug(event)' /><label for='DebugBM'>BM</label></li>";
 		}
-		if(wpModules.useModuleFK) {
-			returns += "<li><input id='DebugFK' type='checkbox'" + String(wpFK.Debug() ? " checked" : "") +
-				" onchange='changeDebug(event)' /><label for='DebugFK'>FK</label></li>";
+		if(wpModules.useModuleWindow) {
+			returns += "<li><input id='DebugWindow' type='checkbox'" + String(wpWindow.Debug() ? " checked" : "") +
+				" onchange='changeDebug(event)' /><label for='DebugWindow'>Window</label></li>";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += "<li><input id='DebugRelais' type='checkbox'" + String(wpRelais.Debug() ? " checked" : "") +
@@ -776,9 +776,9 @@ String processor(const String& var) {
 			returns += "<li><input id='sendRestBM' type='checkbox'" + String(wpBM.SendRest() ? " checked" : "") +
 				" onchange='changeSendRest(event)' /><label for='sendRestBM'>BM</label></li>";
 		}
-		if(wpModules.useModuleFK) {
-			returns += "<li><input id='sendRestFK' type='checkbox'" + String(wpFK.SendRest() ? " checked" : "") +
-				" onchange='changeSendRest(event)' /><label for='sendRestFK'>FK</label></li>";
+		if(wpModules.useModuleWindow) {
+			returns += "<li><input id='sendRestWindow' type='checkbox'" + String(wpWindow.SendRest() ? " checked" : "") +
+				" onchange='changeSendRest(event)' /><label for='sendRestWindow'>Window</label></li>";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += "<li><input id='sendRestRelais' type='checkbox'" + String(wpRelais.SendRest() ? " checked" : "") +

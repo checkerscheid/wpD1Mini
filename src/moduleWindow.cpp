@@ -8,21 +8,21 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 147                                                     $ #
+//# Revision     : $Rev:: 154                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleFK.cpp 147 2024-06-19 19:13:41Z                    $ #
+//# File-ID      : $Id:: moduleWindow.cpp 154 2024-07-04 15:16:36Z                $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleFK.h>
+#include <moduleWindow.h>
 
-moduleFK wpFK;
+moduleWindow wpWindow;
 
-moduleFK::moduleFK() {
+moduleWindow::moduleWindow() {
 	// section to config and copy
-	ModuleName = "FK";
+	ModuleName = "Window";
 	mb = new moduleBase(ModuleName);
 }
-void moduleFK::init() {
+void moduleWindow::init() {
 	// section for define
 	BMPin = D6;
 	pinMode(BMPin, INPUT_PULLUP);
@@ -37,32 +37,32 @@ void moduleFK::init() {
 	// section to copy
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestFK);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugFK);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestWindow);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugWindow);
 
 }
 
 //###################################################################################
-void moduleFK::cycle() {
+void moduleWindow::cycle() {
 	if(wpFZ.calcValues) {
 		calc();
 	}
 	publishValues();
 }
-void moduleFK::publishSettings() {
+void moduleWindow::publishSettings() {
 	publishSettings(false);
 }
-void moduleFK::publishSettings(bool force) {
+void moduleWindow::publishSettings(bool force) {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
 	}
 	mb->publishSettings(force);
 }
-void moduleFK::publishValues() {
+void moduleWindow::publishValues() {
 	publishValues(false);
 }
-void moduleFK::publishValues(bool force) {
+void moduleWindow::publishValues(bool force) {
 	if(force) {
 		publishCountBM = wpFZ.publishQoS;
 	}
@@ -71,20 +71,20 @@ void moduleFK::publishValues(bool force) {
 	}
 	mb->publishValues(force);
 }
-void moduleFK::setSubscribes() {
+void moduleWindow::setSubscribes() {
 	if(wpModules.useModuleLDR) {
 		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
 	}
 	mb->setSubscribes();
 }
-void moduleFK::checkSubscribes(char* topic, String msg) {
+void moduleWindow::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
 			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteFKThreshold, threshold);
+				EEPROM.put(wpEEPROM.byteWindowThreshold, threshold);
 				EEPROM.commit();
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
@@ -99,10 +99,10 @@ void moduleFK::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleFK::publishValue() {
+void moduleWindow::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("FK", String(bm));
+		wpRest.error = wpRest.error | !wpRest.sendRest("window", bm ? "true" : "false");
 		wpRest.trySend = true;
 	}
 	bmLast = bm;
@@ -123,15 +123,15 @@ void moduleFK::publishValue() {
 		}
 	}
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("FK", String(bm), String(publishCountBM));
+		printPublishValueDebug("Window", String(bm), String(publishCountBM));
 	}
 	publishCountBM = 0;
 }
-void moduleFK::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleWindow::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
-void moduleFK::calc() {
+void moduleWindow::calc() {
 	if(digitalRead(BMPin) == LOW) {
 		bm = false;
 	} else {
@@ -139,7 +139,7 @@ void moduleFK::calc() {
 			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcFK", "Bewegung erkannt");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Bewegung erkannt");
 			}
 		}
 	}
@@ -149,30 +149,30 @@ void moduleFK::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleFK::getVersion() {
-	String SVN = "$Rev: 147 $";
+uint16_t moduleWindow::getVersion() {
+	String SVN = "$Rev: 154 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleFK::SendRest() {
+bool moduleWindow::SendRest() {
 	return mb->sendRest;
 }
-bool moduleFK::SendRest(bool sendRest) {
+bool moduleWindow::SendRest(bool sendRest) {
 	mb->sendRest = sendRest;
 	return true;
 }
-bool moduleFK::Debug() {
+bool moduleWindow::Debug() {
 	return mb->debug;
 }
-bool moduleFK::Debug(bool debug) {
+bool moduleWindow::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-void moduleFK::changeSendRest() {
+void moduleWindow::changeSendRest() {
 	mb->changeSendRest();
 }
-void moduleFK::changeDebug() {
+void moduleWindow::changeDebug() {
 	mb->changeDebug();
 }
