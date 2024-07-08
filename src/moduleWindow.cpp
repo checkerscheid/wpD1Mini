@@ -139,7 +139,7 @@ void moduleWindow::calc() {
 			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Bewegung erkannt");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Fenster offen");
 			}
 		}
 	}
