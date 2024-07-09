@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 156                                                     $ #
+//# Revision     : $Rev:: 157                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 156 2024-07-09 00:17:06Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 157 2024-07-09 22:52:04Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 156 $";
+	String SVN = "$Rev: 157 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -114,6 +114,9 @@ void helperWebServer::setupWebServer() {
 		request->send_P(200, "text/html", index_html, processor);
 	});
 
+//###################################################################################
+// JSON Status
+//###################################################################################
 	webServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
 		message += wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
@@ -124,6 +127,7 @@ void helperWebServer::setupWebServer() {
 		minimac.toLowerCase();
 		message += wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + ",";
 		message += wpFZ.JsonKeyString("miniMAC", minimac) + ",";
+		message += wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + ",";
 		message += wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
