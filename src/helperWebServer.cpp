@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 152                                                     $ #
+//# Revision     : $Rev:: 156                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 152 2024-07-03 18:00:06Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 156 2024-07-09 00:17:06Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 152 $";
+	String SVN = "$Rev: 156 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -175,7 +175,7 @@ void helperWebServer::setupWebServer() {
 				message += ",\"Moisture\":{";
 				message += wpFZ.JsonKeyValue("waterEmpty", wpRelais.waterEmptySet ? "true" : "false") + ",";
 				message += wpFZ.JsonKeyValue("pumpActive", String(wpRelais.pumpActive)) + ",";
-				message += wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause));
+				message += wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause / 60));
 				message += "}";
 			}
 			message += "},";

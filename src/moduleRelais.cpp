@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 154                                                     $ #
+//# Revision     : $Rev:: 156                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 154 2024-07-04 15:16:36Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 156 2024-07-09 00:17:06Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -91,7 +91,7 @@ void moduleRelais::publishSettings() {
 void moduleRelais::publishSettings(bool force) {
 	if(wpModules.useModuleMoisture) {
 		wpMqtt.mqttClient.publish(mqttTopicPumpActive.c_str(), String(pumpActive).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicPumpPause.c_str(), String(pumpPause).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicPumpPause.c_str(), String(pumpPause / 60).c_str());
 	}
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
@@ -186,6 +186,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		}
 		if(strcmp(topic, mqttTopicPumpPause.c_str()) == 0) {
 			uint16_t readPumpPause = msg.toInt();
+			readPumpPause *= 60;
 			if(pumpPause != readPumpPause) {
 				pumpPause = readPumpPause;
 				EEPROM.put(wpEEPROM.bytePumpPause, pumpPause);
@@ -315,7 +316,7 @@ void moduleRelais::printPublishValueDebug(String name, String value, String publ
 // section to copy
 //###################################################################################
 uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 154 $";
+	String SVN = "$Rev: 156 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

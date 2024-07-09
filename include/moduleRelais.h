@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 151                                                     $ #
+//# Revision     : $Rev:: 156                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 151 2024-07-01 20:25:07Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 156 2024-07-09 00:17:06Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -32,8 +32,8 @@ class moduleRelais {
 		// wpModules.useModuleMoisture {
 		bool waterEmptySet = false;
 		bool waterEmptyError;
-		uint8_t pumpActive;
-		uint16_t pumpPause;
+		uint8_t pumpActive; // in seconds
+		uint16_t pumpPause; // show in minutes, save in seconds
 		// }
 
 		// values
@@ -99,7 +99,7 @@ class moduleRelais {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 151 $";
+		String SVNh = "$Rev: 156 $";
 };
 extern moduleRelais wpRelais;
 
