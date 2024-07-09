@@ -138,10 +138,12 @@ const char index_html[] PROGMEM = R"rawliteral(
 		div.ul { display:flex; }
 		ul { margin-left:20px; list-style:none; }
 		hr { height:1px; border:none; margin:5px 5%; background-color:#CCC; }
-		#restartRequired.active, #WebSerialBox, .ul ul { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
+		#restartRequired.active, #WebSerialBox, .ul ul, .wpInput { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
 		#restartRequired.active, .ul ul { box-shadow: 3px 3px 5px #222; }
 		.ul input { margin-right:5px; }
 		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		.wpHidden { display:none !important; }
+		.wpInput { padding:5px; text-align:center; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
 			line-height:16px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
@@ -151,6 +153,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.bold { font-weight:bold; }
 		.color-debug { color:#aaa; text-shadow:0 0 3px #313131; }
 		.color-info { color:#ececfb; text-shadow:0 0 3px #000; }
+		.color-ok { color:#38C133; text-shadow:0 0 3px #313131; }
 		.color-warn { color:#cebd2f; text-shadow:0 0 3px #12130c; }
 		.color-error { color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 	</style>
@@ -177,6 +180,16 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
 				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
+			</ul>
+			<ul id="LiPump" class="wpHidden">
+				<li><li><span class='bold'>Pump:</span></li><hr /></li>
+				<li>
+					Cycle: <span id="pumpCycleActive" class="color-info"></span><br />
+					Pump: <span id="pumpStarted" class="color-info"></span><br />
+					Pause: <span id="pumpInPause" class="color-info"></span>
+					<p>in Pause:</p>
+					<p id="remainPumpInPause" class="wpInput"></p>
+				</li>
 			</ul>
 		</div>
 		<pre id="WebSerialBox"></pre>
@@ -221,6 +234,20 @@ function onMessage(event) {
 			restartRequired.classList.add('active');
 			restartRequired.innerHTML = '!!! Restart Required !!!'
 		}
+	} else if(typeof d.cmd != undefined && d.cmd == 'remainPumpInPause') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.remove('wpHidden');
+		let remainPumpInPause = document.getElementById('remainPumpInPause');
+		remainPumpInPause.innerHTML = d.msg;
+	} else if(typeof d.cmd != undefined && d.cmd == 'pumpStatus') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.remove('wpHidden');
+		changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
+		changePumpState('pumpStarted', d.msg.pumpStarted != 0);
+		changePumpState('pumpInPause', d.msg.pumpInPause != 0);
+	} else if(typeof d.cmd != undefined && d.cmd == 'pumpCycleFinished') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.add('wpHidden');
 	} else {
 		if(!d.newline) {
 			if(WebSerialBox.hasChildNodes()) {
@@ -232,6 +259,16 @@ function onMessage(event) {
 				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
 				'<span>' + d.msgbody + '</span>' +
 			'</p>' + WebSerialBox.innerHTML;
+	}
+}
+function changePumpState(elem, state) {
+	let elemHTML = document.getElementById(elem);
+	if(state) {
+		elemHTML.classList.add('color-ok');
+		elemHTML.innerHTML = 'On';
+	} else {
+		elemHTML.classList.remove('color-ok');
+		elemHTML.innerHTML = 'Off';
 	}
 }
 function changeModule(e) {

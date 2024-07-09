@@ -117,6 +117,9 @@ class wpFreakaZone {
 		void SendWSSendRest(String htmlId, bool value);
 		void SendWSDebug(String htmlId, bool value);
 		void SendRestartRequired(String msg);
+		void SendRemainPumpInPause(String readableTime);
+		void SendPumpStatus(String pumpStatus);
+		void pumpCycleFinished();
 		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();

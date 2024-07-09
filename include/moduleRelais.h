@@ -87,6 +87,9 @@ class moduleRelais {
 		bool pumpInPause;
 		unsigned long pumpTimeStart;
 		unsigned long pumpTimePause;
+
+		uint8_t debugCalcPumpCounter;
+		unsigned long remainPumpTimePause;
 		// }
 
 		void publishValue();
@@ -96,6 +99,8 @@ class moduleRelais {
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
 		void printCalcDebug(String name, int16_t value, float raw);
+		void SendPumpStatus();
+		String getReadableTime(unsigned long time);
 
 		// section to config and copy
 		String ModuleName;

@@ -274,6 +274,15 @@ void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");
 }
+void wpFreakaZone::SendRemainPumpInPause(String readableTime) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"remainPumpInPause\",\"msg\":\"" + readableTime + "\"}");
+}
+void wpFreakaZone::SendPumpStatus(String pumpStatus) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpStatus\",\"msg\":{" + pumpStatus + "}}");
+}
+void wpFreakaZone::pumpCycleFinished() {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpCycleFinished\"}");
+}
 void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
 	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);

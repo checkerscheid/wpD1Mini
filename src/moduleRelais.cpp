@@ -21,6 +21,10 @@ moduleRelais::moduleRelais() {
 	// section to config and copy
 	ModuleName = "Relais";
 	mb = new moduleBase(ModuleName);
+
+	
+	debugCalcPumpCounter = 0;
+	remainPumpTimePause = 0;
 }
 void moduleRelais::init() {
 
@@ -268,6 +272,7 @@ void moduleRelais::calcPump() {
 				pumpCycleActive = true;
 				pumpStarted = false;
 				pumpInPause = false;
+				SendPumpStatus();
 				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "Detect 'toDry', start Pump Cycle");
 				}
@@ -277,6 +282,7 @@ void moduleRelais::calcPump() {
 				autoValue = true;
 				pumpStarted = true;
 				pumpTimeStart = m;
+				SendPumpStatus();
 				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "start 'pump' (" + String(pumpTimeStart) + ")");
 				}
@@ -287,6 +293,8 @@ void moduleRelais::calcPump() {
 					autoValue = false;
 					pumpInPause = true;
 					pumpTimePause = m;
+					remainPumpTimePause = pumpTimePause + (pumpPause * 1000);
+					SendPumpStatus();
 					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pump', start 'pumpPause' (" + String(pumpTimePause) + ")");
 					}
@@ -298,13 +306,40 @@ void moduleRelais::calcPump() {
 					pumpCycleActive = false;
 					pumpStarted = false;
 					pumpInPause = false;
+					wpFZ.pumpCycleFinished();
 					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pumpPause' and reset");
 					}
 				}
+				if(mb->debug) {
+					if(++debugCalcPumpCounter >= 4) {
+						unsigned long calced = remainPumpTimePause - m;
+						wpFZ.SendRemainPumpInPause(getReadableTime(calced));
+						debugCalcPumpCounter = 0;
+					}
+				}
 			}
+
 		}
 	}
+}
+void moduleRelais::SendPumpStatus() {
+	if(mb->debug) {
+		wpFZ.SendPumpStatus(
+			"\"pumpCycleActive\":" + String(pumpCycleActive) + ","
+			"\"pumpStarted\":" + String(pumpStarted) + ","
+			"\"pumpInPause\":" + String(pumpInPause)
+		);
+	}
+}
+String moduleRelais::getReadableTime(unsigned long time) {
+	unsigned long secall = (unsigned long) time / 1000;
+	unsigned long minohnesec = (unsigned long) round(secall / 60);
+	byte sec = secall % 60;
+	unsigned long h = (unsigned long) round(minohnesec / 60);
+	byte min = minohnesec % 60;
+	String msg = (h < 10 ? "0" + String(h) : String(h)) + ":" + (min < 10 ? "0" + String(min) : String(min)) + ":" + (sec < 10 ? "0" + String(sec) : String(sec));
+	return msg;
 }
 // }
 void moduleRelais::printPublishValueDebug(String name, String value, String publishCount) {

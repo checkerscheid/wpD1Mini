@@ -114,6 +114,9 @@ void helperWebServer::setupWebServer() {
 		request->send_P(200, "text/html", index_html, processor);
 	});
 
+//###################################################################################
+// JSON Status
+//###################################################################################
 	webServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
 		message += wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
@@ -124,6 +127,7 @@ void helperWebServer::setupWebServer() {
 		minimac.toLowerCase();
 		message += wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + ",";
 		message += wpFZ.JsonKeyString("miniMAC", minimac) + ",";
+		message += wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + ",";
 		message += wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
