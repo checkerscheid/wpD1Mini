@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 158                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 157 2024-07-09 22:52:04Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 158 2024-07-10 15:41:32Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 157 $";
+	String SVN = "$Rev: 158 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -666,7 +666,7 @@ String processor(const String& var) {
 		return wpFZ.Version;
 //###################################################################################
 	if(var == "CompiledWith") {
-		returns = "<ul><li><span class='bold'>Modules:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>Modules:</span></li><li><hr /></li>"
 		"<li><input id='useDHT11' type='checkbox'" + String(wpModules.useModuleDHT11 ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useDHT11'>wpDHT11</label></li>" +
 		"<li><input id='useDHT22' type='checkbox'" + String(wpModules.useModuleDHT22 ? " checked" : "") +
@@ -693,7 +693,7 @@ String processor(const String& var) {
 	}
 //###################################################################################
 	if(var == "Debug") {
-		returns = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>"
 			"<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") +
 			" onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";
 		if((wpModules.useModuleRelais || wpModules.useModuleRelaisShield) && wpModules.useModuleMoisture) {
@@ -760,7 +760,7 @@ String processor(const String& var) {
 	}
 //###################################################################################
 	if(var == "SendRest") {
-		returns = "<ul><li><span class='bold'>SendRest:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>SendRest:</span></li><li><hr /></li>"
 			"<li><input id='sendRestWiFi' type='checkbox'" + String(wpWiFi.sendRest ? " checked" : "") + 
 				" onchange='changeSendRest(event)' /><label for='sendRestWiFi'>WiFi</label></li>" +
 			"<li><hr /></li>";
