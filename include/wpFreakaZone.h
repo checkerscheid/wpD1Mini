@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 158                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 157 2024-07-09 22:52:04Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 158 2024-07-10 15:41:32Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -111,7 +111,6 @@ class wpFreakaZone {
 		static String JsonKeyString(String name, String value);
 
 		void DebugWS(String typ, String func, String msg);
-		void DebugWS(String typ, String func, String msg, bool newline);
 		//void SendWS(String msg);
 		void SendWSModule(String htmlId, bool value);
 		void SendWSSendRest(String htmlId, bool value);
@@ -120,6 +119,7 @@ class wpFreakaZone {
 		void SendRemainPumpInPause(String readableTime);
 		void SendPumpStatus(String pumpStatus);
 		void pumpCycleFinished();
+		void updateProgress(int percent);
 		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();
@@ -132,7 +132,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 157 $";
+		String SVNh = "$Rev: 158 $";
 		uint16_t publishCountOnDuration;
 		bool calcValuesLast;
 		uint16_t publishCountCalcValues;
