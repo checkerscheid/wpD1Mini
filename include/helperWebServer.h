@@ -136,12 +136,13 @@ const char index_html[] PROGMEM = R"rawliteral(
 		hr { height:1px; border:none; margin:5px 5%; background-color:#CCC; }
 		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
 		.ulContainer { display:flex; }
-		.wpContainer { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
+		.wpContainer { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset;
+			background-color:#444; }
 		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
 		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
 		#restartRequired, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
 		#restartRequired { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
-		#progressBg { border:1px solid #444; border-radius: 5px; box-shadow: 2px 2px 3px #444 inset; }
+		#progressBg { border:1px solid #555; border-radius: 5px; box-shadow: 2px 2px 3px #333 inset; }
 		#progress { background-color:#6060dd; height:25px; width:25%; text-align:left;
 			box-shadow: -1px -3px 5px #222 inset, 1px 1px 5px #ccc inset; border-radius: 5px; }
 		#progressVal { line-height:25px; padding-left: 10px; }
