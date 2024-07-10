@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 159                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 144 2024-06-18 17:20:09Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 159 2024-07-10 19:33:14Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -194,7 +194,7 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 144 $";
+	String SVN = "$Rev: 159 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -221,7 +221,7 @@ bool moduleDHT::Debug(bool debug) {
 	return true;
 }
 uint8_t moduleDHT::MaxCycle(){
-	return mb->maxCycle;
+	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
 uint8_t moduleDHT::MaxCycle(uint8_t maxCycle){
 	mb->maxCycle = maxCycle;
