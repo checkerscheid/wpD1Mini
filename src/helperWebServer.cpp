@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 158                                                     $ #
+//# Revision     : $Rev:: 160                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 158 2024-07-10 15:41:32Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 160 2024-07-12 02:31:44Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 158 $";
+	String SVN = "$Rev: 160 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -93,7 +93,6 @@ void helperWebServer::checkSubscribes(char* topic, String msg) {
 		}
 	}
 }
-
 void helperWebServer::setupWebServer() {
 	webServer.addHandler(&webSocket);
 	webServer.onNotFound([](AsyncWebServerRequest *request){ 
