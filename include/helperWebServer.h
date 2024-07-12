@@ -288,26 +288,6 @@ function onMessage(event) {
 			progress.style.width = d.percent.replace(/\s/g, '');
 			progressVal.innerHTML = d.percent;
 		}
-	} else if(typeof d.cmd != undefined && d.cmd == 'remainPumpInPause') {
-		let LiPump = document.getElementById('LiPump');
-		LiPump.classList.remove('wpHidden');
-		let remainPumpInPause = document.getElementById('remainPumpInPause');
-		remainPumpInPause.innerHTML = d.msg;
-	} else if(typeof d.cmd != undefined && d.cmd == 'pumpStatus') {
-		let LiPump = document.getElementById('LiPump');
-		LiPump.classList.remove('wpHidden');
-		changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
-		changePumpState('pumpStarted', d.msg.pumpStarted != 0);
-		changePumpState('pumpInPause', d.msg.pumpInPause != 0);
-	} else if(typeof d.cmd != undefined && d.cmd == 'pumpCycleFinished') {
-		let LiPump = document.getElementById('LiPump');
-		LiPump.classList.add('wpHidden');
-	} else if(typeof d.cmd != undefined && d.cmd == 'updateProgress') {
-		document.getElementById('progressContainer').classList.remove('wpHidden');
-		let progress = document.getElementById('progress');
-		let progressVal = document.getElementById('progressVal');
-		progress.style.width = d.percent.replace(/\s/g, '');
-		progressVal.innerHTML = d.percent;
 	} else {
 		WebSerialBox.innerHTML =
 			'<p>' +
