@@ -8,9 +8,15 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
+<<<<<<< Updated upstream
 //# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: helperWebServer.h 152 2024-07-03 18:00:06Z               $ #
+=======
+//# Revision     : $Rev:: 160                                                     $ #
+//# Author       : $Author::                                                      $ #
+//# File-ID      : $Id:: helperWebServer.h 160 2024-07-12 02:31:44Z               $ #
+>>>>>>> Stashed changes
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -92,7 +98,7 @@ class helperWebServer {
 
 		AsyncWebServer webServer = AsyncWebServer(80);
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
-		
+
 		void setupWebServer();
 		void setCommand(int8_t command);
 		void setModuleChange(int8_t modul);
@@ -112,7 +118,11 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
+<<<<<<< Updated upstream
 		String SVNh = "$Rev: 152 $";
+=======
+		String SVNh = "$Rev: 160 $";
+>>>>>>> Stashed changes
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -190,36 +200,81 @@ window.addEventListener('load', onLoad);
 function onLoad(event) {
 	initWebSocket();
 	xmlHttp = new XMLHttpRequest();
+	WebSerialBox = document.getElementById('WebSerialBox');
+	setInterval(checkConnection, 5000);
 }
 function initWebSocket() {
 	console.log('Trying to open a WebSocket connection...');
 	websocket = new WebSocket(gateway);
-	WebSerialBox = document.getElementById('WebSerialBox');
 	websocket.onopen = onOpen;
 	websocket.onclose = onClose;
 	websocket.onmessage = onMessage;
+	document.getElementById('restartRequired').classList.add('wpHidden');
+	document.getElementById('LiPump').classList.add('wpHidden');
+	document.getElementById('progressContainer').classList.add('wpHidden');
+}
+function checkConnection() {
+	websocket.send('PING');
+	if(websocket.readyState != WebSocket.OPEN) {
+		console.log('Connection Lost');
+		initWebSocket();
+	}
 }
 function onOpen(event) {
 	console.log('Connection opened');
+	pingpongmsg = 1;
 }
 function onClose(event) {
-	console.log('Connection closed');
-	setTimeout(initWebSocket, 2000);
+	console.log('Connection closed, waitForReconnect');
+	pingpong = null;
 }
 function onMessage(event) {
 	%debugWebServer%
 	const d = JSON.parse(event.data);
-	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'setSendRest') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'setModule') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
-		if(d.msg) {
+	if(typeof d.cmd != undefined) {
+		if(d.cmd == 'setDebug') {
+			console.log('setDebug:');
+			console.log(d);
+			document.getElementById(d.msg.id).checked = d.msg.value;
+		} else if(d.cmd == 'setSendRest') {
+			console.log('setSendRest:');
+			console.log(d);
+			document.getElementById(d.msg.id).checked = d.msg.value;
+		} else if(d.cmd == 'setModule') {
+			console.log('setModule:');
+			console.log(d);
+			document.getElementById(d.msg.id).checked = d.msg.value;
+		} else if(d.cmd == 'restartRequired') {
+			console.log('restartRequired:');
+			console.log(d);
 			let restartRequired = document.getElementById('restartRequired');
+<<<<<<< Updated upstream
 			restartRequired.classList.add('active');
 			restartRequired.innerHTML = '!!! Restart Required !!!'
+=======
+			restartRequired.classList.remove('wpHidden');
+			restartRequired.innerHTML = '!!! Restart Required !!!';
+		} else if(d.cmd == 'remainPumpInPause') {
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.remove('wpHidden');
+			let remainPumpInPause = document.getElementById('remainPumpInPause');
+			remainPumpInPause.innerHTML = d.msg;
+		} else if(d.cmd == 'pumpStatus') {
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.remove('wpHidden');
+			changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
+			changePumpState('pumpStarted', d.msg.pumpStarted != 0);
+			changePumpState('pumpInPause', d.msg.pumpInPause != 0);
+		} else if(d.cmd == 'pumpCycleFinished') {
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.add('wpHidden');
+		} else if(d.cmd == 'updateProgress') {
+			document.getElementById('progressContainer').classList.remove('wpHidden');
+			let progress = document.getElementById('progress');
+			let progressVal = document.getElementById('progressVal');
+			progress.style.width = d.percent.replace(/\s/g, '');
+			progressVal.innerHTML = d.percent;
+>>>>>>> Stashed changes
 		}
 	} else {
 		if(!d.newline) {

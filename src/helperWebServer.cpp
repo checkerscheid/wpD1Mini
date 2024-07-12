@@ -8,9 +8,15 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
+<<<<<<< Updated upstream
 //# Revision     : $Rev:: 152                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: helperWebServer.cpp 152 2024-07-03 18:00:06Z             $ #
+=======
+//# Revision     : $Rev:: 160                                                     $ #
+//# Author       : $Author::                                                      $ #
+//# File-ID      : $Id:: helperWebServer.cpp 160 2024-07-12 02:31:44Z             $ #
+>>>>>>> Stashed changes
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +47,11 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
+<<<<<<< Updated upstream
 	String SVN = "$Rev: 152 $";
+=======
+	String SVN = "$Rev: 160 $";
+>>>>>>> Stashed changes
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -93,7 +103,6 @@ void helperWebServer::checkSubscribes(char* topic, String msg) {
 		}
 	}
 }
-
 void helperWebServer::setupWebServer() {
 	webServer.addHandler(&webSocket);
 	webServer.onNotFound([](AsyncWebServerRequest *request){ 
