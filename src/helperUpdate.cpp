@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 146                                                     $ #
+//# Revision     : $Rev:: 158                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 146 2024-06-19 18:57:43Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 158 2024-07-10 15:41:32Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -38,7 +38,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 146 $";
+	String SVN = "$Rev: 158 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -66,7 +66,8 @@ bool helperUpdate::setupOta() {
 	});
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		String logmessage = "OTA Progress: " + String((progress / (total / 100))) + " %";
-		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
+		//wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
+		wpFZ.updateProgress((progress / (total / 100)));
 	});
 	ArduinoOTA.onError([](ota_error_t error) {
 		String logmessage = "Error (" + String(error) + ") ";
@@ -194,7 +195,8 @@ void helperUpdate::finished() {
 
 void helperUpdate::progress(int cur, int total) {
 	String logmessage = "HTTP update: " + String(cur) + " of " + String(total) + " bytes";
-	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
+	//wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
+	wpFZ.updateProgress((cur / (total / 100)));
 }
 
 void helperUpdate::error(int err) {

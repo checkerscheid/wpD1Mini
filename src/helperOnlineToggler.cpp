@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 142                                                     $ #
+//# Revision     : $Rev:: 155                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 142 2024-06-14 07:49:48Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 155 2024-07-08 18:56:29Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -42,7 +42,7 @@ void helperOnlineToggler::cycle() {
 }
 
 uint16_t helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 142 $";
+	String SVN = "$Rev: 155 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

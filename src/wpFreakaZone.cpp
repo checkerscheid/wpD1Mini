@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 158                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 136 2024-06-09 15:37:41Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 158 2024-07-10 15:41:32Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -52,7 +52,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16_t wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 136 $";
+	String SVN = "$Rev: 158 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -242,9 +242,6 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 
 void wpFreakaZone::DebugWS(String typ, String func, String msg) {
-	DebugWS(typ, func, msg, true);
-}
-void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 	String msgheader = getTime() + getOnlineTime() + typ + funcToString(func);
 	String cssClass = "color-debug";
 	if(typ == wpFZ.strINFO) cssClass = "color-info";
@@ -253,8 +250,7 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 	String toSend = msgheader + msg;
 	Serial.println(toSend);
 	wpWebServer.webSocket.textAll("{\"msgheader\":\"" + msgheader + "\"," +
-		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"," +
-		"\"newline\":" + (newline ? "true" : "false") + "}");
+		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"}");
 }
 // void wpFreakaZone::SendWS(String msg) {
 // 	wpWebServer.webSocket.textAll(msg);
@@ -273,6 +269,18 @@ void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::SendRemainPumpInPause(String readableTime) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"remainPumpInPause\",\"msg\":\"" + readableTime + "\"}");
+}
+void wpFreakaZone::SendPumpStatus(String pumpStatus) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpStatus\",\"msg\":{" + pumpStatus + "}}");
+}
+void wpFreakaZone::pumpCycleFinished() {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpCycleFinished\"}");
+}
+void wpFreakaZone::updateProgress(int percent) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"updateProgress\",\"percent\":\"" + String(percent) + " %\"}");
 }
 void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;

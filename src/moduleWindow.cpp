@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 154                                                     $ #
+//# Revision     : $Rev:: 155                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 154 2024-07-04 15:16:36Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 155 2024-07-08 18:56:29Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -150,7 +150,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleWindow::getVersion() {
-	String SVN = "$Rev: 154 $";
+	String SVN = "$Rev: 155 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

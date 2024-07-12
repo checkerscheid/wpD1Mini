@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 151                                                     $ #
+//# Revision     : $Rev:: 157                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 151 2024-07-01 20:25:07Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 157 2024-07-09 22:52:04Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -32,8 +32,8 @@ class moduleRelais {
 		// wpModules.useModuleMoisture {
 		bool waterEmptySet = false;
 		bool waterEmptyError;
-		uint8_t pumpActive;
-		uint16_t pumpPause;
+		uint8_t pumpActive; // in seconds
+		uint16_t pumpPause; // show in minutes, save in seconds
 		// }
 
 		// values
@@ -87,6 +87,9 @@ class moduleRelais {
 		bool pumpInPause;
 		unsigned long pumpTimeStart;
 		unsigned long pumpTimePause;
+
+		uint8_t debugCalcPumpCounter;
+		unsigned long remainPumpTimePause;
 		// }
 
 		void publishValue();
@@ -96,10 +99,12 @@ class moduleRelais {
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
 		void printCalcDebug(String name, int16_t value, float raw);
+		void SendPumpStatus();
+		String getReadableTime(unsigned long time);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 151 $";
+		String SVNh = "$Rev: 157 $";
 };
 extern moduleRelais wpRelais;
 

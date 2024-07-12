@@ -8,15 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-<<<<<<< Updated upstream
-//# Revision     : $Rev:: 152                                                     $ #
-//# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 152 2024-07-03 18:00:06Z             $ #
-=======
 //# Revision     : $Rev:: 160                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: helperWebServer.cpp 160 2024-07-12 02:31:44Z             $ #
->>>>>>> Stashed changes
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -47,11 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-<<<<<<< Updated upstream
-	String SVN = "$Rev: 152 $";
-=======
 	String SVN = "$Rev: 160 $";
->>>>>>> Stashed changes
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -123,6 +113,9 @@ void helperWebServer::setupWebServer() {
 		request->send_P(200, "text/html", index_html, processor);
 	});
 
+//###################################################################################
+// JSON Status
+//###################################################################################
 	webServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
 		message += wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
@@ -133,6 +126,7 @@ void helperWebServer::setupWebServer() {
 		minimac.toLowerCase();
 		message += wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + ",";
 		message += wpFZ.JsonKeyString("miniMAC", minimac) + ",";
+		message += wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + ",";
 		message += wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
@@ -184,7 +178,7 @@ void helperWebServer::setupWebServer() {
 				message += ",\"Moisture\":{";
 				message += wpFZ.JsonKeyValue("waterEmpty", wpRelais.waterEmptySet ? "true" : "false") + ",";
 				message += wpFZ.JsonKeyValue("pumpActive", String(wpRelais.pumpActive)) + ",";
-				message += wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause));
+				message += wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause / 60));
 				message += "}";
 			}
 			message += "},";
@@ -671,7 +665,7 @@ String processor(const String& var) {
 		return wpFZ.Version;
 //###################################################################################
 	if(var == "CompiledWith") {
-		returns = "<ul><li><span class='bold'>Modules:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>Modules:</span></li><li><hr /></li>"
 		"<li><input id='useDHT11' type='checkbox'" + String(wpModules.useModuleDHT11 ? " checked" : "") +
 			" onchange='changeModule(event)' /><label for='useDHT11'>wpDHT11</label></li>" +
 		"<li><input id='useDHT22' type='checkbox'" + String(wpModules.useModuleDHT22 ? " checked" : "") +
@@ -698,7 +692,7 @@ String processor(const String& var) {
 	}
 //###################################################################################
 	if(var == "Debug") {
-		returns = "<ul><li><span class='bold'>Cmds:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>"
 			"<li><input id='calcValues' type='checkbox'" + String(wpFZ.calcValues ? " checked" : "") +
 			" onchange='cmdHandle(event)' /><label for='calcValues'>calc Values</label></li>";
 		if((wpModules.useModuleRelais || wpModules.useModuleRelaisShield) && wpModules.useModuleMoisture) {
@@ -765,7 +759,7 @@ String processor(const String& var) {
 	}
 //###################################################################################
 	if(var == "SendRest") {
-		returns = "<ul><li><span class='bold'>SendRest:</span></li><li><hr /></li>"
+		returns = "<ul class='wpContainer'><li><span class='bold'>SendRest:</span></li><li><hr /></li>"
 			"<li><input id='sendRestWiFi' type='checkbox'" + String(wpWiFi.sendRest ? " checked" : "") + 
 				" onchange='changeSendRest(event)' /><label for='sendRestWiFi'>WiFi</label></li>" +
 			"<li><hr /></li>";

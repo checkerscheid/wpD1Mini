@@ -8,15 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-<<<<<<< Updated upstream
-//# Revision     : $Rev:: 152                                                     $ #
-//# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 152 2024-07-03 18:00:06Z               $ #
-=======
 //# Revision     : $Rev:: 160                                                     $ #
 //# Author       : $Author::                                                      $ #
 //# File-ID      : $Id:: helperWebServer.h 160 2024-07-12 02:31:44Z               $ #
->>>>>>> Stashed changes
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -118,11 +112,7 @@ class helperWebServer {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-<<<<<<< Updated upstream
-		String SVNh = "$Rev: 152 $";
-=======
 		String SVNh = "$Rev: 160 $";
->>>>>>> Stashed changes
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -140,18 +130,25 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<style>
 		body { background-color:#606060; color:#ececfb; }
 		* { margin:0; padding:0; }
-		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
-		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
 		h1 { font-size:25px; }
 		h2 { font-size:20px; }
-		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
-		div.ul { display:flex; }
 		ul { margin-left:20px; list-style:none; }
 		hr { height:1px; border:none; margin:5px 5%; background-color:#CCC; }
-		#restartRequired.active, #WebSerialBox, .ul ul { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
-		#restartRequired.active, .ul ul { box-shadow: 3px 3px 5px #222; }
-		.ul input { margin-right:5px; }
-		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
+		.ulContainer { display:flex; }
+		.wpContainer { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset;
+			background-color:#444; }
+		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
+		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
+		#restartRequired, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
+		#restartRequired { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		#progressBg { border:1px solid #555; border-radius: 5px; box-shadow: 2px 2px 3px #333 inset; }
+		#progress { background-color:#6060dd; height:25px; width:25%; text-align:left;
+			box-shadow: -1px -3px 5px #222 inset, 1px 1px 5px #ccc inset; border-radius: 5px; }
+		#progressVal { line-height:25px; padding-left: 10px; }
+		.ulContainer input { margin-right:5px; }
+		.wpHidden { display:none !important; }
+		.wpInput { padding:5px; text-align:center; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
 			line-height:16px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
@@ -161,20 +158,30 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.bold { font-weight:bold; }
 		.color-debug { color:#aaa; text-shadow:0 0 3px #313131; }
 		.color-info { color:#ececfb; text-shadow:0 0 3px #000; }
+		.color-ok { color:#38C133; text-shadow:0 0 3px #313131; }
 		.color-warn { color:#cebd2f; text-shadow:0 0 3px #12130c; }
 		.color-error { color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 	</style>
 </head>
 <body>
 	<div id="FreakaZoneWebSerial">
-		<div id="restartRequired"></div>
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
-		<div class="ul">
+		<div id="restartRequired" class="wpContainer wpHidden"></div>
+		<div id="progressContainer" class="wpHidden">
+			<div class="wpContainer">
+				<div id="progressBg">
+					<div id="progress">
+						<span id="progressVal">0</span>
+					</div>
+				</div>
+			</diV>
+		</div>
+		<div class="ulContainer">
 			%Debug%
 			%SendRest%
 			%CompiledWith%
-			<ul>
+			<ul class="wpContainer">
 				<li><li><span class='bold'>Device:</span></li><hr /></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
@@ -188,8 +195,18 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
+			<ul id="LiPump" class="wpContainer wpHidden">
+				<li><li><span class='bold'>Pump:</span></li><hr /></li>
+				<li>
+					Cycle: <span id="pumpCycleActive" class="color-info"></span><br />
+					Pump: <span id="pumpStarted" class="color-info"></span><br />
+					Pause: <span id="pumpInPause" class="color-info"></span>
+					<p>in Pause:</p>
+					<p id="remainPumpInPause" class="wpContainer wpInput"></p>
+				</li>
+			</ul>
 		</div>
-		<pre id="WebSerialBox"></pre>
+		<pre id="WebSerialBox" class="wpContainer"></pre>
 	</div>
 	<script>
 var gateway = 'ws://%IPADRESS%/ws';
@@ -248,10 +265,6 @@ function onMessage(event) {
 			console.log('restartRequired:');
 			console.log(d);
 			let restartRequired = document.getElementById('restartRequired');
-<<<<<<< Updated upstream
-			restartRequired.classList.add('active');
-			restartRequired.innerHTML = '!!! Restart Required !!!'
-=======
 			restartRequired.classList.remove('wpHidden');
 			restartRequired.innerHTML = '!!! Restart Required !!!';
 		} else if(d.cmd == 'remainPumpInPause') {
@@ -274,19 +287,43 @@ function onMessage(event) {
 			let progressVal = document.getElementById('progressVal');
 			progress.style.width = d.percent.replace(/\s/g, '');
 			progressVal.innerHTML = d.percent;
->>>>>>> Stashed changes
 		}
+	} else if(typeof d.cmd != undefined && d.cmd == 'remainPumpInPause') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.remove('wpHidden');
+		let remainPumpInPause = document.getElementById('remainPumpInPause');
+		remainPumpInPause.innerHTML = d.msg;
+	} else if(typeof d.cmd != undefined && d.cmd == 'pumpStatus') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.remove('wpHidden');
+		changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
+		changePumpState('pumpStarted', d.msg.pumpStarted != 0);
+		changePumpState('pumpInPause', d.msg.pumpInPause != 0);
+	} else if(typeof d.cmd != undefined && d.cmd == 'pumpCycleFinished') {
+		let LiPump = document.getElementById('LiPump');
+		LiPump.classList.add('wpHidden');
+	} else if(typeof d.cmd != undefined && d.cmd == 'updateProgress') {
+		document.getElementById('progressContainer').classList.remove('wpHidden');
+		let progress = document.getElementById('progress');
+		let progressVal = document.getElementById('progressVal');
+		progress.style.width = d.percent.replace(/\s/g, '');
+		progressVal.innerHTML = d.percent;
 	} else {
-		if(!d.newline) {
-			if(WebSerialBox.hasChildNodes()) {
-				WebSerialBox.removeChild(WebSerialBox.children[0]);
-			}
-		}
 		WebSerialBox.innerHTML =
 			'<p>' +
 				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
 				'<span>' + d.msgbody + '</span>' +
 			'</p>' + WebSerialBox.innerHTML;
+	}
+}
+function changePumpState(elem, state) {
+	let elemHTML = document.getElementById(elem);
+	if(state) {
+		elemHTML.classList.add('color-ok');
+		elemHTML.innerHTML = 'On';
+	} else {
+		elemHTML.classList.remove('color-ok');
+		elemHTML.innerHTML = 'Off';
 	}
 }
 function changeModule(e) {

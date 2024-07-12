@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 143                                                     $ #
+//# Revision     : $Rev:: 159                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 143 2024-06-15 00:57:05Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 159 2024-07-10 19:33:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -224,7 +224,7 @@ void moduleDistance::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16_t moduleDistance::getVersion() {
-	String SVN = "$Rev: 143 $";
+	String SVN = "$Rev: 159 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -251,7 +251,7 @@ bool moduleDistance::Debug(bool debug) {
 	return true;
 }
 uint8_t moduleDistance::MaxCycle(){
-	return mb->maxCycle;
+	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
 uint8_t moduleDistance::MaxCycle(uint8_t maxCycle){
 	mb->maxCycle = maxCycle;
