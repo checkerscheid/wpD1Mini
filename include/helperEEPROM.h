@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 152                                                     $ #
+//# Revision     : $Rev:: 161                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 152 2024-07-03 18:00:06Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 161 2024-07-13 23:51:36Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -40,6 +40,7 @@ class helperEEPROM {
 		const uint8_t bitUseMoisture = 0; // include in bitsModules1
 		const uint8_t bitUseDistance = 1; // include in bitsModules1
 		const uint8_t bitUseWindow = 2; // include in bitsModules1
+		const uint8_t bitUseAnalogOut = 3; // include in bitsModules1
 		
 		const uint16_t addrBitsModules2 = 2;
 		byte bitsModules2;
@@ -81,6 +82,7 @@ class helperEEPROM {
 		const uint16_t addrBitsSendRestModules1 = 7;
 		byte bitsSendRestModules1;
 		const uint8_t bitSendRestWindow = 0; // include in bitsSendRestModules1
+		const uint8_t bitSendRestAnalogOut = 1; // include in bitsSendRestModules1
 		
 		const uint16_t addrBitsSendRestModules2 = 8;
 		byte bitsSendRestModules2;
@@ -101,6 +103,7 @@ class helperEEPROM {
 		const uint16_t addrBitsDebugModules1 = 10;
 		byte bitsDebugModules1;
 		const uint8_t bitDebugWindow = 0; // include in bitsDebugModules1
+		const uint8_t bitDebugAnalogOut = 0; // include in bitsDebugModules1
 		
 		const uint16_t addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
@@ -116,6 +119,7 @@ class helperEEPROM {
 		const uint8_t bitRelaisWaterEmpty = 4; // include in bitsSettingsModules0
 		const uint8_t bitUseRainAvg = 5; // include in bitsSettingsModules0
 		const uint8_t bitUseMoistureAvg = 6; // include in bitsSettingsModules0
+		const uint8_t bitAnalogOutHand = 7; // include in bitsSettingsModules0
 
 		const uint16_t addrBitsSettingsModules1 = 13;
 		byte bitsSettingsModules1;
@@ -139,6 +143,8 @@ class helperEEPROM {
 		const uint16_t byteMaxCycleDistance = 31;
 		const uint16_t byteDistanceCorrection = 32; // int8_t
 		const uint16_t byteHeight = 33;
+		const uint16_t byteMaxCycleAnalogOut = 34;
+		const uint16_t byteAnalogOutHandValue = 35;
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
@@ -173,7 +179,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 152 $";
+		String SVNh = "$Rev: 161 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 		const uint16_t addrStartForString0 = 500;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 152                                                     $ #
+//# Revision     : $Rev:: 161                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 152 2024-07-03 18:00:06Z                        $ #
+//# File-ID      : $Id:: main.cpp 161 2024-07-13 23:51:36Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -50,6 +50,9 @@ void setup() {
 	}
 	if(wpModules.useModuleWindow) {
 		wpWindow.init();
+	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.init();
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
@@ -99,6 +102,9 @@ void loop() {
 		if(wpModules.useModuleWindow) {
 			wpWindow.cycle();
 		}
+		if(wpModules.useModuleAnalogOut) {
+			wpAnalogOut.cycle();
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
 		}
@@ -120,7 +126,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 152 $";
+	String SVN = "$Rev: 161 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -154,6 +160,7 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpLight.getVersion());
 	buildChecker(v, wpBM.getVersion());
 	buildChecker(v, wpWindow.getVersion());
+	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpRelais.getVersion());
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());

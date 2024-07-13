@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 160                                                     $ #
+//# Revision     : $Rev:: 161                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 160 2024-07-12 02:31:44Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 161 2024-07-13 23:51:36Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -46,6 +46,7 @@ class helperWebServer {
 		const int8_t cmdSendRestRain = 8;
 		const int8_t cmdSendRestMoisture = 9;
 		const int8_t cmdSendRestDistance = 10;
+		const int8_t cmdSendRestAnalogOut = 11;
 		int8_t doSendRestChange;
 
 		const int8_t cmdDebugEEPROM = 1;
@@ -67,6 +68,7 @@ class helperWebServer {
 		const int8_t cmdDebugRain = 26;
 		const int8_t cmdDebugMoisture = 27;
 		const int8_t cmdDebugDistance = 28;
+		const int8_t cmdDebugAnalogOut = 29;
 		int8_t doDebugChange;
 
 		const int8_t cmdModuleDHT11 = 1;
@@ -80,6 +82,7 @@ class helperWebServer {
 		const int8_t cmdModuleRain = 9;
 		const int8_t cmdModuleMoisture = 10;
 		const int8_t cmdModuleDistance = 11;
+		const int8_t cmdModuleAnalogOut = 12;
 		int8_t doModuleChange;
 
 		int8_t doBlink;
@@ -111,8 +114,11 @@ class helperWebServer {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		String getchangeModule(String id, String name, bool state);
+		String getChangeDebug(String id, String name, bool state);
+		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 160 $";
+		String SVNh = "$Rev: 161 $";
 		bool DebugLast = false;
 		uint16_t publishCountDebug = 0;
 };
@@ -138,6 +144,9 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.ulContainer { display:flex; }
 		.wpContainer { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset;
 			background-color:#444; }
+		.setChange { border: 1px solid transparent; padding: 3px 5px; border-radius: 5px; cursor: pointer; }
+		.setChange:hover { border-color:#ccc; }
+		.setChange span { white-space:nowrap; }
 		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
 		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
 		#restartRequired, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
@@ -145,7 +154,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		#progressBg { border:1px solid #555; border-radius: 5px; box-shadow: 2px 2px 3px #333 inset; }
 		#progress { background-color:#6060dd; height:25px; width:25%; text-align:left;
 			box-shadow: -1px -3px 5px #222 inset, 1px 1px 5px #ccc inset; border-radius: 5px; }
-		#progressVal { line-height:25px; padding-left: 10px; }
+		#progressVal { line-height:25px; padding-left: 10px; white-space:nowrap; }
 		.ulContainer input { margin-right:5px; }
 		.wpHidden { display:none !important; }
 		.wpInput { padding:5px; text-align:center; }
@@ -182,15 +191,15 @@ const char index_html[] PROGMEM = R"rawliteral(
 			%SendRest%
 			%CompiledWith%
 			<ul class="wpContainer">
-				<li><li><span class='bold'>Device:</span></li><hr /></li>
+				<li><span class='bold'>Device:</span></li><li><hr /></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
-				<li><li><span class='bold'>Updates:</span></li><hr /></li>
+				<li><span class='bold'>Updates:</span></li><li><hr /></li>
 				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li>
 				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
-				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
+				<li><span class='bold'>Stuff:</span></li><li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
 				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
@@ -248,19 +257,19 @@ function onClose(event) {
 function onMessage(event) {
 	%debugWebServer%
 	const d = JSON.parse(event.data);
-	if(typeof d.cmd != undefined) {
+	if(typeof d.cmd != 'undefined') {
 		if(d.cmd == 'setDebug') {
 			console.log('setDebug:');
 			console.log(d);
-			document.getElementById(d.msg.id).checked = d.msg.value;
+			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'setSendRest') {
 			console.log('setSendRest:');
 			console.log(d);
-			document.getElementById(d.msg.id).checked = d.msg.value;
+			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'setModule') {
 			console.log('setModule:');
 			console.log(d);
-			document.getElementById(d.msg.id).checked = d.msg.value;
+			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'restartRequired') {
 			console.log('restartRequired:');
 			console.log(d);
@@ -268,27 +277,40 @@ function onMessage(event) {
 			restartRequired.classList.remove('wpHidden');
 			restartRequired.innerHTML = '!!! Restart Required !!!';
 		} else if(d.cmd == 'remainPumpInPause') {
+			console.log('remainPumpInPause:');
+			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
 			let remainPumpInPause = document.getElementById('remainPumpInPause');
 			remainPumpInPause.innerHTML = d.msg;
 		} else if(d.cmd == 'pumpStatus') {
+			console.log('pumpStatus:');
+			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
 			changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
 			changePumpState('pumpStarted', d.msg.pumpStarted != 0);
 			changePumpState('pumpInPause', d.msg.pumpInPause != 0);
 		} else if(d.cmd == 'pumpCycleFinished') {
+			console.log('pumpCycleFinished:');
+			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.add('wpHidden');
 		} else if(d.cmd == 'updateProgress') {
+			console.log('updateProgress:');
+			console.log(d);
 			document.getElementById('progressContainer').classList.remove('wpHidden');
 			let progress = document.getElementById('progress');
 			let progressVal = document.getElementById('progressVal');
 			progress.style.width = d.percent.replace(/\s/g, '');
 			progressVal.innerHTML = d.percent;
+		} else {
+			console.log('unknown command:');
+			console.log(d);
 		}
 	} else {
+		console.log('[d.cmd = undefined]:');
+		console.log(d);
 		WebSerialBox.innerHTML =
 			'<p>' +
 				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
@@ -306,16 +328,24 @@ function changePumpState(elem, state) {
 		elemHTML.innerHTML = 'Off';
 	}
 }
+function changeBoolValue(elem, state) {
+	let elemHTML = document.getElementById(elem);
+	if(state) {
+		elemHTML.classList.add('color-ok');
+	} else {
+		elemHTML.classList.remove('color-ok');
+	}
+}
 function changeModule(e) {
 	xmlHttp.open("GET", "/setModule?Module=" + e.target.id, false);
 	xmlHttp.send(null);
 }
-function changeSendRest(e) {
-	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
-	xmlHttp.send(null);
-}
 function changeDebug(e) {
 	xmlHttp.open("GET", "/setDebug?Debug=" + e.target.id, false);
+	xmlHttp.send(null);
+}
+function changeSendRest(e) {
+	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
 	xmlHttp.send(null);
 }
 function cmdHandle(e) {
