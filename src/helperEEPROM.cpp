@@ -158,6 +158,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
 	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
 	wpModules.useModuleWindow = bitRead(bitsModules1, bitUseWindow);
+	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
 	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
 	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
@@ -192,6 +193,7 @@ void helperEEPROM::readVars() {
 	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
 	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
 	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
+	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
 	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
 	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
 	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
@@ -206,6 +208,7 @@ void helperEEPROM::readVars() {
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
 	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
+	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
 	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
@@ -216,6 +219,7 @@ void helperEEPROM::readVars() {
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
 	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
 	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
+	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
 	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
 	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue);
 	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
@@ -230,6 +234,8 @@ void helperEEPROM::readVars() {
 	wpLDR.MaxCycle(EEPROM.read(byteMaxCycleLDR));
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
 	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
+	wpAnalogOut.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut));
+	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));
 	wpRain.correction = EEPROM.read(byteRainCorrection);

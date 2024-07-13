@@ -31,6 +31,7 @@
 #include <moduleLight.h>
 #include <moduleBM.h>
 #include <moduleWindow.h>
+#include <moduleAnalogOut.h>
 #include <moduleRelais.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>

@@ -51,6 +51,9 @@ void setup() {
 	if(wpModules.useModuleWindow) {
 		wpWindow.init();
 	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.init();
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
 	}
@@ -98,6 +101,9 @@ void loop() {
 		}
 		if(wpModules.useModuleWindow) {
 			wpWindow.cycle();
+		}
+		if(wpModules.useModuleAnalogOut) {
+			wpAnalogOut.cycle();
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
@@ -154,6 +160,7 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpLight.getVersion());
 	buildChecker(v, wpBM.getVersion());
 	buildChecker(v, wpWindow.getVersion());
+	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpRelais.getVersion());
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());

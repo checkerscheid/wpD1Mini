@@ -29,6 +29,7 @@ void helperModules::init() {
 	mqttTopicUseLight = wpFZ.DeviceName + "/settings/useModule/Light";
 	mqttTopicUseBM = wpFZ.DeviceName + "/settings/useModule/BM";
 	mqttTopicUseWindow = wpFZ.DeviceName + "/settings/useModule/Window";
+	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
 	mqttTopicUseRelais = wpFZ.DeviceName + "/settings/useModule/Relais";
 	mqttTopicUseRelaisShield = wpFZ.DeviceName + "/settings/useModule/RelaisShield";
 	mqttTopicUseRain = wpFZ.DeviceName + "/settings/useModule/Rain";
@@ -87,6 +88,7 @@ void helperModules::publishValues(bool force) {
 		publishCountUseLight = wpFZ.publishQoS;
 		publishCountUseBM = wpFZ.publishQoS;
 		publishCountUseWindow = wpFZ.publishQoS;
+		publishCountUseAnalogOut = wpFZ.publishQoS;
 		publishCountUseRelais = wpFZ.publishQoS;
 		publishCountUseRelaisShield = wpFZ.publishQoS;
 		publishCountUseRain = wpFZ.publishQoS;
@@ -128,6 +130,12 @@ void helperModules::publishValues(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow.c_str(), String(useModuleWindow).c_str());
 		wpFZ.SendWSModule("useWindow", useModuleWindow);
 		publishCountUseWindow = 0;
+	}
+	if(useAnalogOutLast != useModuleAnalogOut || ++publishCountUseAnalogOut > wpFZ.publishQoS) {
+		useAnalogOutLast = useModuleAnalogOut;
+		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
+		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
+		publishCountUseAnalogOut = 0;
 	}
 	if(useRelaisLast != useModuleRelais || ++publishCountUseRelais > wpFZ.publishQoS) {
 		useRelaisLast = useModuleRelais;
@@ -174,6 +182,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseWindow.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRelais.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRelaisShield.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRain.c_str());
@@ -197,6 +206,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseMoisture.c_str()) == 0) {
 		changeModuleMoisture(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseAnalogOut.c_str()) == 0) {
+		changeModuleAnalogOut(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseRelais.c_str()) == 0) {
 		changeModuleRelais(readUseModule);
@@ -293,6 +305,17 @@ void helperModules::changeModuleWindow(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow, String(useModuleWindow));
 	}
 }
+void helperModules::changeModuleAnalogOut(bool newValue) {
+	if(useModuleAnalogOut != newValue) {
+		useModuleAnalogOut = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut, useModuleAnalogOut);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleAnalogOut", useModuleAnalogOut);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut, String(useModuleAnalogOut));
+	}
+}
 void helperModules::changeModuleRelais(bool newValue) {
 	if(useModuleRelais != newValue) {
 		useModuleRelais = newValue;
@@ -380,6 +403,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleWindow) {
 		wpWindow.publishSettings(force);
 	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.publishSettings(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishSettings(force);
 	}
@@ -424,6 +450,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleWindow) {
 		wpWindow.publishValues(force);
 	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.publishValues(force);
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.publishValues(force);
 	}
@@ -465,6 +494,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleWindow) {
 		wpWindow.setSubscribes();
 	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.setSubscribes();
+	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.setSubscribes();
 	}
@@ -503,6 +535,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleWindow) {
 		wpWindow.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.checkSubscribes(topic, msg);

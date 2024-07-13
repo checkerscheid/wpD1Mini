@@ -28,6 +28,7 @@ class helperModules {
 		bool useModuleLight = false;
 		bool useModuleBM = false;
 		bool useModuleWindow = false;
+		bool useModuleAnalogOut = false;
 		bool useModuleRelais = false;
 		bool useModuleRelaisShield = false;
 		bool useModuleRain = false;
@@ -43,6 +44,7 @@ class helperModules {
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
 		String mqttTopicUseWindow;
+		String mqttTopicUseAnalogOut;
 		String mqttTopicUseRelais;
 		String mqttTopicUseRelaisShield;
 		String mqttTopicUseRain;
@@ -69,6 +71,7 @@ class helperModules {
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
 		void changeModuleWindow(bool newValue);
+		void changeModuleAnalogOut(bool newValue);
 		void changeModuleRelais(bool newValue);
 		void changeModuleRelaisShield(bool newValue);
 		void changeModuleRain(bool newValue);
@@ -95,6 +98,8 @@ class helperModules {
 		uint16 publishCountUseBM = 0;
 		bool useWindowLast = false;
 		uint16 publishCountUseWindow = 0;
+		bool useAnalogOutLast = false;
+		uint16 publishCountUseAnalogOut = 0;
 		bool useRelaisLast = false;
 		uint16 publishCountUseRelais = 0;
 		bool useRelaisShieldLast = false;
