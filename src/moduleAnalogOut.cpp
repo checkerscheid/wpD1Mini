@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 162                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 157 2024-07-09 22:52:04Z                $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 162 2024-07-13 23:52:17Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -191,7 +191,7 @@ void moduleAnalogOut::printPublishValueDebug(String name, String value, String p
 // section to copy
 //###################################################################################
 uint16_t moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 157 $";
+	String SVN = "$Rev: 162 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

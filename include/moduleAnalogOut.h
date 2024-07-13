@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 162                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 157 2024-07-09 22:52:04Z                  $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 162 2024-07-13 23:52:17Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -77,7 +77,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 157 $";
+		String SVNh = "$Rev: 162 $";
 };
 extern moduleAnalogOut wpAnalogOut;
 
