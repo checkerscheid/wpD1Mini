@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 161                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 161 2024-07-13 23:51:36Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -126,6 +126,7 @@ class helperEEPROM {
 
 		const uint16 addrBitsSettingsModules1 = 13;
 		byte bitsSettingsModules1;
+		const uint8 bitUseRpmAvg = 1; // include in bitsSettingsModules0
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
@@ -136,23 +137,24 @@ class helperEEPROM {
 		const uint16 byteTemperatureCorrection = 21; // int8 * 10
 		const uint16 byteHumidityCorrection = 22; // int8 * 10
 		const uint16 byteMaxCycleLDR = 23;
-		const uint16 byteLDRCorrection = 24; // int8_t
+		const uint16 byteLDRCorrection = 24; // int8
 		const uint16 byteMaxCycleLight = 25;
 		const uint16 bytePumpActive = 26;
 		const uint16 byteMaxCycleRain = 27;
-		const uint16 byteRainCorrection = 28; // int8_t
+		const uint16 byteRainCorrection = 28; // int8
 		const uint16 byteMaxCycleMoisture = 29;
 		const uint16 byteMoistureMin = 30;
 		const uint16 byteMaxCycleDistance = 31;
-		const uint16 byteDistanceCorrection = 32; // int8_t
+		const uint16 byteDistanceCorrection = 32; // int8
 		const uint16 byteHeight = 33;
 		const uint16 byteMaxCycleAnalogOut = 34;
 		const uint16 byteAnalogOutHandValue = 35;
 		const uint16 byteMaxCycleRpm = 36;
+		const uint16 byteRpmCorrection = 37; // int8
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
-		const uint16 byteLightCorrection = 50; // int16_t
+		const uint16 byteLightCorrection = 50; // int
 		const uint16 byteBMThreshold = 52;
 		const uint16 bytePumpPause = 54;
 		const uint16 byteMoistureDry = 56;
@@ -183,7 +185,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 161 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 		const uint16 addrStartForString0 = 500;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 161                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 161 2024-07-13 23:51:36Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 163 2024-07-14 19:03:20Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -53,7 +53,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 161 $";
+	String SVN = "$Rev: 163 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -336,6 +336,17 @@ void helperModules::changeModuleRelaisShield(bool newValue) {
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRelaisShield", useModuleRelaisShield);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRelaisShield, String(useModuleRelaisShield));
+	}
+}
+void helperModules::changeModuleRpm(bool newValue) {
+	if(useModuleRpm != newValue) {
+		useModuleRpm = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseRpm, useModuleRpm);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleRpm", useModuleRpm);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseRpm, String(useModuleRpm));
 	}
 }
 void helperModules::changeModuleRain(bool newValue) {

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 161                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 161 2024-07-13 23:51:36Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 163 2024-07-14 19:03:20Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -47,6 +47,7 @@ class helperWebServer {
 		const int8 cmdSendRestMoisture = 9;
 		const int8 cmdSendRestDistance = 10;
 		const int8 cmdSendRestAnalogOut = 11;
+		const int8 cmdSendRestRpm = 12;
 		int8 doSendRestChange;
 
 		const int8 cmdDebugEEPROM = 1;
@@ -69,6 +70,7 @@ class helperWebServer {
 		const int8 cmdDebugMoisture = 27;
 		const int8 cmdDebugDistance = 28;
 		const int8 cmdDebugAnalogOut = 29;
+		const int8 cmdDebugRpm = 30;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -83,6 +85,7 @@ class helperWebServer {
 		const int8 cmdModuleMoisture = 10;
 		const int8 cmdModuleDistance = 11;
 		const int8 cmdModuleAnalogOut = 12;
+		const int8 cmdModuleRpm = 13;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -118,7 +121,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 161 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 };

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 153                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.h 153 2024-07-03 18:00:38Z                  $ #
+//# File-ID      : $Id:: moduleWindow.h 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWindow_h
@@ -55,7 +55,7 @@ class moduleWindow {
 		bool Debug(bool debug);
 	private:
 		uint8 BMPin;
-		int16 bmLast;
+		bool bmLast;
 		uint16 publishCountBM;
 		void publishValue();
 		void printPublishValueDebug(String name, String value, String publishCount);
@@ -63,7 +63,7 @@ class moduleWindow {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 153 $";
+		String SVNh = "$Rev: 163 $";
 
 };
 extern moduleWindow wpWindow;

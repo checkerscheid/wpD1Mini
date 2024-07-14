@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 157 2024-07-09 22:52:04Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -98,13 +98,13 @@ class moduleRelais {
 		void calcPump();
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
-		void printCalcDebug(String name, int16 value, float raw);
+		void printCalcDebug(String name, int value, float raw);
 		void SendPumpStatus();
 		String getReadableTime(unsigned long time);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 157 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleRelais wpRelais;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 139                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 139 2024-06-11 10:08:54Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 163 2024-07-14 19:03:20Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -26,7 +26,7 @@ class moduleLight {
 		moduleLight();
 		moduleBase* mb;
 		uint32 light;
-		int16 correction = 0;
+		int correction = 0;
 
 		// values
 		String mqttTopicLight;
@@ -72,7 +72,7 @@ class moduleLight {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 139 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleLight wpLight;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 158                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 158 2024-07-10 15:41:32Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -38,7 +38,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 158 $";
+	String SVN = "$Rev: 163 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -69,7 +69,7 @@ bool helperUpdate::setupOta() {
 		//wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
 		wpFZ.updateProgress((progress / (total / 100)));
 	});
-	ArduinoOTA.onError([](ota_error error) {
+	ArduinoOTA.onError([](ota_error_t error) {
 		String logmessage = "Error (" + String(error) + ") ";
 		if (error == OTA_AUTH_ERROR) logmessage += "Auth Failed";
 		else if (error == OTA_BEGIN_ERROR) logmessage += "Begin Failed";

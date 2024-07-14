@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 144 2024-06-18 17:20:09Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 163 2024-07-14 19:03:20Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -27,8 +27,8 @@ class moduleDHT {
 		DHT* dht;
 
 		// section for define
-		int16 temperature;
-		int16 humidity;
+		int temperature;
+		int humidity;
 		int8 temperatureCorrection = 0;
 		int8 humidityCorrection = 0;
 
@@ -61,21 +61,21 @@ class moduleDHT {
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
 		uint8 DHTPin;
-		int16 temperatureLast;
+		int temperatureLast;
 		uint16 publishCountTemperature;
-		int16 humidityLast;
+		int humidityLast;
 		uint16 publishCountHumidity;
 
 		void publishValueTemp();
 		void publishValueHum();
 		void calc();
 		void printCalcError(String name);
-		void printCalcDebug(String name, int16 value, float raw);
+		void printCalcDebug(String name, int value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleDHT wpDHT;
 

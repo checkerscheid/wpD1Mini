@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 158                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 158 2024-07-10 15:41:32Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -52,7 +52,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 158 $";
+	String SVN = "$Rev: 163 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -66,7 +66,7 @@ uint16 wpFreakaZone::getBuild(String Rev) {
 }
 
 String wpFreakaZone::getTime() {
-	time now;
+	time_t now;
 	tm tm;
 	time(&now);
 	localtime_r(&now, &tm);
@@ -78,7 +78,7 @@ String wpFreakaZone::getTime() {
 }
 
 String wpFreakaZone::getDateTime() {
-	time now;
+	time_t now;
 	tm tm;
 	time(&now);
 	localtime_r(&now, &tm);

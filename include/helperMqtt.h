@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 142                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.h 142 2024-06-14 07:49:48Z                    $ #
+//# File-ID      : $Id:: helperMqtt.h 163 2024-07-14 19:03:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperMqtt_h
@@ -49,7 +49,7 @@ class helperMqtt {
 		void setSubscribes();
 		void connectMqtt();
 	private:
-		String SVNh = "$Rev: 142 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 		static void callbackMqtt(char*, byte*, unsigned int);
