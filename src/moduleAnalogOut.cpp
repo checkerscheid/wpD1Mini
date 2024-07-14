@@ -26,7 +26,6 @@ void moduleAnalogOut::init() {
 
 	// section for define
 	analogOutPin = D8;
-	//analogOutPin = A0;
 
 	pinMode(analogOutPin, OUTPUT);
 	output = false;
@@ -63,9 +62,8 @@ void moduleAnalogOut::init() {
 // public
 //###################################################################################
 void moduleAnalogOut::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
+	if(wpFZ.calcValues) {
 		calc();
-		mb->cycleCounter = 0;
 	}
 	publishValues();
 }
@@ -156,13 +154,14 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 void moduleAnalogOut::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("analogout", output ? "true" : "false");
+		wpRest.error = wpRest.error | !wpRest.sendRest("analogout", String(output));
 		wpRest.trySend = true;
 	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("AnalogOut", String(output), String(publishCountOutput));
 	}
+	mb->cycleCounter = 0;
 	publishCountOutput = 0;
 }
 
@@ -178,9 +177,10 @@ void moduleAnalogOut::calc() {
 	} else {
 		output = autoValue;
 	}
-	uint16_t hardwareout = map(output, 0, 100, 0, 1023);
+	if(output > 100) output = 100;
+	if(output < 0) output = 0;
+	uint16_t hardwareout = map(output, 0, 100, 0, 255);
 	analogWrite(analogOutPin, hardwareout);
-	wpFZ.DebugWS(wpFZ.strDEBUG, "calc", "AnalogOut: " + String(hardwareout));
 }
 void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
