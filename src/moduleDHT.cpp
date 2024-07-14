@@ -95,7 +95,7 @@ void moduleDHT::setSubscribes() {
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
-		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
+		int8 readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
 			EEPROM.put(wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
@@ -104,7 +104,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicHumidityCorrection.c_str()) == 0) {
-		int8_t readHumidityCorrection = int8_t(msg.toFloat() * 10);
+		int8 readHumidityCorrection = int8_t(msg.toFloat() * 10);
 		if(humidityCorrection != readHumidityCorrection) {
 			humidityCorrection = readHumidityCorrection;
 			EEPROM.put(wpEEPROM.byteHumidityCorrection, humidityCorrection);
@@ -179,7 +179,7 @@ void moduleDHT::printCalcError(String name) {
 	wpFZ.DebugWS(wpFZ.strERRROR, "wpDHT::calc", logmessage);
 }
 
-void moduleDHT::printCalcDebug(String name, int16_t value, float raw) {
+void moduleDHT::printCalcDebug(String name, int16 value, float raw) {
 	String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "wpDHT::calc", logmessage);
 }
@@ -193,10 +193,10 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleDHT::getVersion() {
+uint16 moduleDHT::getVersion() {
 	String SVN = "$Rev: 159 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -220,10 +220,10 @@ bool moduleDHT::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleDHT::MaxCycle(){
+uint8 moduleDHT::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleDHT::MaxCycle(uint8_t maxCycle){
+uint8 moduleDHT::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

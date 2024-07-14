@@ -39,7 +39,7 @@ class helperMqtt {
 		helperMqtt();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 
 		void publishSettings();
@@ -51,7 +51,7 @@ class helperMqtt {
 	private:
 		String SVNh = "$Rev: 142 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 		static void callbackMqtt(char*, byte*, unsigned int);
 		unsigned long lastConnectTry;
 };

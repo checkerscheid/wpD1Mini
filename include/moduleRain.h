@@ -23,8 +23,8 @@ class moduleRain {
 	public:
 		moduleRain();
 		moduleBase* mb;
-		uint16_t rain;
-		int8_t correction = 0;
+		uint16 rain;
+		int8 correction = 0;
 
 		// values
 		String mqttTopicRain;
@@ -34,7 +34,7 @@ class moduleRain {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -51,18 +51,18 @@ class moduleRain {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t RainPin;
-		int16_t rainLast;
-		uint16_t publishCountRain;
-		static const uint8_t avgLength = 128;
+		uint8 RainPin;
+		int16 rainLast;
+		uint16 publishCountRain;
+		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint16_t calcAvg(uint16_t raw);
+		uint16 calcAvg(uint16 raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy

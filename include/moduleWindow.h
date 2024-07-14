@@ -26,19 +26,19 @@ class moduleWindow {
 
 		// section for define
 		bool bm;
-		uint16_t threshold = 500;
+		uint16 threshold = 500;
 		String lightToTurnOn = "_";
 		String mqttTopicBM;
 		String mqttTopicThreshold;
 		String mqttTopicLightToTurnOn;
 
 		// section to copy
-		uint8_t maxCycle = 5;
-		uint8_t cycleCounter = 0;
+		uint8 maxCycle = 5;
+		uint8 cycleCounter = 0;
 		String mqttTopicMaxCycle;
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -54,9 +54,9 @@ class moduleWindow {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
-		uint8_t BMPin;
-		int16_t bmLast;
-		uint16_t publishCountBM;
+		uint8 BMPin;
+		int16 bmLast;
+		uint16 publishCountBM;
 		void publishValue();
 		void printPublishValueDebug(String name, String value, String publishCount);
 		void calc();

@@ -23,8 +23,8 @@ class moduleLDR {
 	public:
 		moduleLDR();
 		moduleBase* mb;
-		int16_t ldr;
-		int8_t correction = 0;
+		int16 ldr;
+		int8 correction = 0;
 
 		// values
 		String mqttTopicLdr;
@@ -34,7 +34,7 @@ class moduleLDR {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -51,18 +51,18 @@ class moduleLDR {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t LDRPin;
-		int16_t ldrLast;
-		uint16_t publishCountLdr;
-		static const uint8_t avgLength = 128;
+		uint8 LDRPin;
+		int16 ldrLast;
+		uint16 publishCountLdr;
+		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint16_t calcAvg(uint16_t raw);
+		uint16 calcAvg(uint16 raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 	

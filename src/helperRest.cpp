@@ -40,10 +40,10 @@ void helperRest::cycle() {
 	publishValues();
 }
 
-uint16_t helperRest::getVersion() {
+uint16 helperRest::getVersion() {
 	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

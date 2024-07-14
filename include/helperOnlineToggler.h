@@ -30,7 +30,7 @@ class helperOnlineToggler {
 		helperOnlineToggler();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		void setMqttOffline();
 
@@ -43,7 +43,7 @@ class helperOnlineToggler {
 	private:
 		String SVNh = "$Rev: 141 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 		unsigned long lastContact;
 		const unsigned long Minutes10 = 1000 * 60 * 60;
 };

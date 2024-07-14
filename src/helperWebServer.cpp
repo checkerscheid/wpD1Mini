@@ -40,10 +40,10 @@ void helperWebServer::cycle() {
 	publishValues();
 }
 
-uint16_t helperWebServer::getVersion() {
+uint16 helperWebServer::getVersion() {
 	String SVN = "$Rev: 161 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -552,16 +552,16 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 // do the commands
 //###################################################################################
-void helperWebServer::setCommand(int8_t command) {
+void helperWebServer::setCommand(int8 command) {
 	doCommand = command;
 }
-void helperWebServer::setModuleChange(int8_t module) {
+void helperWebServer::setModuleChange(int8 module) {
 	doModuleChange = module;
 }
-void helperWebServer::setSendRestChange(int8_t sendRest) {
+void helperWebServer::setSendRestChange(int8 sendRest) {
 	doSendRestChange = sendRest;
 }
-void helperWebServer::setDebugChange(int8_t debug) {
+void helperWebServer::setDebugChange(int8 debug) {
 	doDebugChange = debug;
 }
 void helperWebServer::setBlink() {

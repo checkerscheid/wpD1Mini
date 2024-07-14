@@ -137,7 +137,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8_t readSetHandValue = msg.toInt();
+		uint8 readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
 			handValueSet = readSetHandValue;
 			EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
@@ -179,7 +179,7 @@ void moduleAnalogOut::calc() {
 	}
 	if(output > 100) output = 100;
 	if(output < 0) output = 0;
-	uint16_t hardwareout = map(output, 0, 100, 0, 255);
+	uint16 hardwareout = map(output, 0, 100, 0, 255);
 	analogWrite(analogOutPin, hardwareout);
 }
 void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
@@ -190,10 +190,10 @@ void moduleAnalogOut::printPublishValueDebug(String name, String value, String p
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleAnalogOut::getVersion() {
+uint16 moduleAnalogOut::getVersion() {
 	String SVN = "$Rev: 162 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -217,10 +217,10 @@ bool moduleAnalogOut::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleAnalogOut::MaxCycle(){
+uint8 moduleAnalogOut::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleAnalogOut::MaxCycle(uint8_t maxCycle){
+uint8 moduleAnalogOut::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

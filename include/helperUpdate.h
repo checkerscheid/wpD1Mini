@@ -38,7 +38,7 @@ class helperUpdate {
 		helperUpdate();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		bool setupOta();
 		void check();
@@ -54,7 +54,7 @@ class helperUpdate {
 	private:
 		String SVNh = "$Rev: 123 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);

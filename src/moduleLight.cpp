@@ -85,7 +85,7 @@ void moduleLight::setSubscribes() {
 
 void moduleLight::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8_t readCorrection = msg.toInt();
+		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			EEPROM.put(wpEEPROM.byteLightCorrection, correction);
@@ -114,8 +114,8 @@ void moduleLight::publishValue() {
 
 void moduleLight::calc() {
 	float ar = lightMeter->readLightLevel();
-	uint32_t read = (uint32_t)ar;
-	uint32_t avg;
+	uint32 read = (uint32_t)ar;
+	uint32 avg;
 	if(!isnan(ar) || ar < 0) {
 		avg = read;
 		if(mb->useAvg) {
@@ -136,7 +136,7 @@ void moduleLight::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
 	}
 }
-uint32_t moduleLight::calcAvg(uint32_t raw) {
+uint32 moduleLight::calcAvg(uint32 raw) {
 	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -159,10 +159,10 @@ void moduleLight::printPublishValueDebug(String name, String value, String publi
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleLight::getVersion() {
+uint16 moduleLight::getVersion() {
 	String SVN = "$Rev: 159 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -193,10 +193,10 @@ bool moduleLight::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleLight::MaxCycle(){
+uint8 moduleLight::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleLight::MaxCycle(uint8_t maxCycle){
+uint8 moduleLight::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

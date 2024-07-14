@@ -31,10 +31,10 @@ void helperEEPROM::cycle() {
 	publishValues();
 }
 
-uint16_t helperEEPROM::getVersion() {
+uint16 helperEEPROM::getVersion() {
 	String SVN = "$Rev: 161 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -66,7 +66,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
 }
 
-void helperEEPROM::saveBool(uint16_t &addr, byte &by, uint8_t &bi, bool v) {
+void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
 	bitWrite(by, bi, v);
 	EEPROM.write(addr, by);
 	EEPROM.commit();

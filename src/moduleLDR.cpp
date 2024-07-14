@@ -82,7 +82,7 @@ void moduleLDR::setSubscribes() {
 
 void moduleLDR::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8_t readCorrection = msg.toInt();
+		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			EEPROM.put(wpEEPROM.byteLDRCorrection, correction);
@@ -136,7 +136,7 @@ void moduleLDR::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 	}
 }
-uint16_t moduleLDR::calcAvg(uint16_t raw) {
+uint16 moduleLDR::calcAvg(uint16 raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -159,10 +159,10 @@ void moduleLDR::printPublishValueDebug(String name, String value, String publish
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleLDR::getVersion() {
+uint16 moduleLDR::getVersion() {
 	String SVN = "$Rev: 159 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -193,10 +193,10 @@ bool moduleLDR::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleLDR::MaxCycle(){
+uint8 moduleLDR::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleLDR::MaxCycle(uint8_t maxCycle){
+uint8 moduleLDR::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

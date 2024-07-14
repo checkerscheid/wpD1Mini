@@ -51,22 +51,22 @@ void wpFreakaZone::cycle() {
 	publishValues();
 }
 
-uint16_t wpFreakaZone::getVersion() {
+uint16 wpFreakaZone::getVersion() {
 	String SVN = "$Rev: 158 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-uint16_t wpFreakaZone::getBuild(String Rev) {
+uint16 wpFreakaZone::getBuild(String Rev) {
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
-	uint16_t returns = Rev.toInt();
+	uint16 returns = Rev.toInt();
 	return returns;
 }
 
 String wpFreakaZone::getTime() {
-	time_t now;
+	time now;
 	tm tm;
 	time(&now);
 	localtime_r(&now, &tm);
@@ -78,7 +78,7 @@ String wpFreakaZone::getTime() {
 }
 
 String wpFreakaZone::getDateTime() {
-	time_t now;
+	time now;
 	tm tm;
 	time(&now);
 	localtime_r(&now, &tm);

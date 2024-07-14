@@ -23,12 +23,12 @@ class moduleAnalogOut {
 	public:
 		moduleAnalogOut();
 		moduleBase* mb;
-		uint8_t output;
-		uint8_t autoValue;
-		uint8_t handValue;
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
 		bool handError;
 		bool handSet = false;
-		uint8_t handValueSet = false;
+		uint8 handValueSet = false;
 
 		// values
 		String mqttTopicOut;
@@ -43,7 +43,7 @@ class moduleAnalogOut {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -58,18 +58,18 @@ class moduleAnalogOut {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t analogOutPin;
-		uint8_t outputLast;
-		uint16_t publishCountOutput;
-		uint8_t autoValueLast;
-		uint16_t publishCountAutoValue;
-		uint8_t handValueLast;
-		uint16_t publishCountHandValue;
+		uint8 analogOutPin;
+		uint8 outputLast;
+		uint16 publishCountOutput;
+		uint8 autoValueLast;
+		uint16 publishCountAutoValue;
+		uint8 handValueLast;
+		uint16 publishCountHandValue;
 		bool handErrorLast;
-		uint16_t publishCountHandError;
+		uint16 publishCountHandError;
 
 		void publishValue();
 		void calc();

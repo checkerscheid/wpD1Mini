@@ -37,10 +37,10 @@ void helperUpdate::cycle() {
 	publishValues();
 }
 
-uint16_t helperUpdate::getVersion() {
+uint16 helperUpdate::getVersion() {
 	String SVN = "$Rev: 158 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -69,7 +69,7 @@ bool helperUpdate::setupOta() {
 		//wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
 		wpFZ.updateProgress((progress / (total / 100)));
 	});
-	ArduinoOTA.onError([](ota_error_t error) {
+	ArduinoOTA.onError([](ota_error error) {
 		String logmessage = "Error (" + String(error) + ") ";
 		if (error == OTA_AUTH_ERROR) logmessage += "Auth Failed";
 		else if (error == OTA_BEGIN_ERROR) logmessage += "Begin Failed";

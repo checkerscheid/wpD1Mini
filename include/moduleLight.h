@@ -25,8 +25,8 @@ class moduleLight {
 	public:
 		moduleLight();
 		moduleBase* mb;
-		uint32_t light;
-		int16_t correction = 0;
+		uint32 light;
+		int16 correction = 0;
 
 		// values
 		String mqttTopicLight;
@@ -38,7 +38,7 @@ class moduleLight {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -55,19 +55,19 @@ class moduleLight {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint32_t lightLast;
-		uint16_t publishCountLight;
-		static const uint8_t avgLength = 128;
-		uint32_t avgValues[avgLength];
+		uint32 lightLast;
+		uint16 publishCountLight;
+		static const uint8 avgLength = 128;
+		uint32 avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint32_t calcAvg(uint32_t raw);
+		uint32 calcAvg(uint32 raw);
 		void printCalcError(String name);
-		void printCalcDebug(String name, uint32_t value, float raw);
+		void printCalcDebug(String name, uint32 value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy

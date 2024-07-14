@@ -27,7 +27,7 @@ class helperFinder {
 		helperFinder();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		void setupFinder();
 
@@ -40,7 +40,7 @@ class helperFinder {
 	private:
 		String SVNh = "$Rev: 121 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 };
 extern helperFinder wpFinder;
 #endif

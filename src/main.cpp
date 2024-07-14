@@ -125,16 +125,16 @@ void loop() {
 //###################################################################################
 // Allgemein
 //###################################################################################
-uint16_t getVersion() {
+uint16 getVersion() {
 	String SVN = "$Rev: 161 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
 String getStringVersion() {
-	uint16_t globalBuild = getGlobalBuild();
-	uint16_t Build = getVersion();
+	uint16 globalBuild = getGlobalBuild();
+	uint16 Build = getVersion();
 
 	String returns = "V " +
 		String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) +
@@ -142,8 +142,8 @@ String getStringVersion() {
 	return returns;
 }
 
-uint16_t getGlobalBuild() {
- 	uint16_t v = 0;
+uint16 getGlobalBuild() {
+ 	uint16 v = 0;
 	buildChecker(v, wpEEPROM.getVersion());
 	buildChecker(v, wpFinder.getVersion());
 	buildChecker(v, wpModules.getVersion());
@@ -167,13 +167,13 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpDistance.getVersion());
 	return v;
 }
-void buildChecker(uint16_t &v, uint16 moduleBuild) {
+void buildChecker(uint16 &v, uint16 moduleBuild) {
 	v = v > moduleBuild ? v : moduleBuild;
 }
 
-uint16_t getBuild() {
-	uint16_t globalBuild = getGlobalBuild();
-	uint16_t Build = getVersion();
+uint16 getBuild() {
+	uint16 globalBuild = getGlobalBuild();
+	uint16 Build = getVersion();
 	return globalBuild > Build ? globalBuild : Build;
 }
 

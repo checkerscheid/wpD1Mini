@@ -35,7 +35,7 @@ class helperRest {
 		helperRest();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		bool sendRest(String name, String value);
 		bool sendRawRest(String target);
@@ -50,9 +50,9 @@ class helperRest {
 	private:
 		String SVNh = "$Rev: 132 $";
 		bool errorLast = false;
-		uint16_t publishCountError = 0;
+		uint16 publishCountError = 0;
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 		String macId;
 };
 extern helperRest wpRest;
