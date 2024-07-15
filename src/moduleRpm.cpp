@@ -111,9 +111,10 @@ void moduleRpm::publishValue() {
 }
 
 void moduleRpm::calc() {
-	uint32 duration = pulseIn(RpmPin, HIGH, 200) / 1000;
-	if(duration > 0) {
-		uint32 read = 1000 / duration * 60;
+	uint32 raw = pulseIn(RpmPin, HIGH, 200 * 1000);
+	if(raw > 0) {
+		uint32 duration = raw / 1000;
+		uint32 read = 1000 / duration / 4 * 60;
 		uint32 avg = read;
 		if(mb->useAvg) {
 			avg = calcAvg(avg);
@@ -125,12 +126,12 @@ void moduleRpm::calc() {
 			String logmessage = "Rpm: " + String(rpm) + " ("
 				"Read: " + String(duration) + " ms, "
 				"Avg: " + String(correct) + ", "
-				"Raw: " + String(duration) + ")";
+				"Raw: " + String(raw) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcRpm", logmessage);
 		}
 	} else {
 		mb->error = true;
-		String logmessage = "Sensor Failure";
+		String logmessage = "Sensor Failure: " + String(raw);
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRpm", logmessage);
 	}
 }
