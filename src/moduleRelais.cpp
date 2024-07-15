@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 157                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 157 2024-07-09 22:52:04Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -180,7 +180,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
-			uint8_t readPumpActive = msg.toInt();
+			uint8 readPumpActive = msg.toInt();
 			if(pumpActive != readPumpActive) {
 				pumpActive = readPumpActive;
 				EEPROM.write(wpEEPROM.bytePumpActive, pumpActive);
@@ -189,7 +189,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpPause.c_str()) == 0) {
-			uint16_t readPumpPause = msg.toInt();
+			uint16 readPumpPause = msg.toInt();
 			readPumpPause *= 60;
 			if(pumpPause != readPumpPause) {
 				pumpPause = readPumpPause;
@@ -350,10 +350,10 @@ void moduleRelais::printPublishValueDebug(String name, String value, String publ
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 157 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleRelais::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

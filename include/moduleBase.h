@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 137                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 137 2024-06-09 15:38:30Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 163 2024-07-14 19:03:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h
@@ -25,18 +25,18 @@ class moduleBase {
 		bool debug = false;
 		bool error = false;
 
-		uint8_t maxCycle = 5;
-		uint8_t cycleCounter;
+		uint8 maxCycle = 5;
+		uint8 cycleCounter;
 		String mqttTopicSendRest;
 		String mqttTopicUseAvg;
 		String mqttTopicDebug;
 		String mqttTopicError;
 		String mqttTopicMaxCycle;
-		void initRest(uint16_t addrSendRest, byte byteSendRest, uint8_t bitSendRest);
-		void initUseAvg(uint16_t addrUseAvg, byte byteUseAvg, uint8_t bitUseAvg);
-		void initDebug(uint16_t addrDebug, byte byteDebug, uint8_t bitDebug);
+		void initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest);
+		void initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg);
+		void initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug);
 		void initError();
-		void initMaxCycle(uint16_t addrMaxCycle);
+		void initMaxCycle(uint16 addrMaxCycle);
 		void changeSendRest();
 		void changeDebug();
 
@@ -47,26 +47,26 @@ class moduleBase {
 	private:
 		String _name;
 
-		uint16_t _addrSendRest;
+		uint16 _addrSendRest;
 		byte _byteSendRest;
-		uint8_t _bitSendRest;
-		uint16_t _addrUseAvg;
+		uint8 _bitSendRest;
+		uint16 _addrUseAvg;
 		byte _byteUseAvg;
-		uint8_t _bitUseAvg;
-		uint16_t _addrDebug;
+		uint8 _bitUseAvg;
+		uint16 _addrDebug;
 		byte _byteDebug;
-		uint8_t _bitDebug;
-		uint16_t _addrMaxCycle;
+		uint8 _bitDebug;
+		uint16 _addrMaxCycle;
 		bool _useUseAvg;
 		bool _useMaxCycle;
 		bool _useError;
 
 		bool sendRestLast;
-		uint16_t publishCountSendRest;
+		uint16 publishCountSendRest;
 		bool DebugLast;
-		uint16_t publishCountDebug;
+		uint16 publishCountDebug;
 		bool errorLast;
-		uint16_t publishCountError;
+		uint16 publishCountError;
 
 		void writeEEPROMsendRest();
 		void writeEEPROMuseAvg();

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 144 2024-06-18 17:20:09Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 163 2024-07-14 19:03:20Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -27,10 +27,10 @@ class moduleDHT {
 		DHT* dht;
 
 		// section for define
-		int16_t temperature;
-		int16_t humidity;
-		int8_t temperatureCorrection = 0;
-		int8_t humidityCorrection = 0;
+		int temperature;
+		int humidity;
+		int8 temperatureCorrection = 0;
+		int8 humidityCorrection = 0;
 
 		String mqttTopicTemperature;
 		String mqttTopicHumidity;
@@ -42,7 +42,7 @@ class moduleDHT {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -57,25 +57,25 @@ class moduleDHT {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t DHTPin;
-		int16_t temperatureLast;
-		uint16_t publishCountTemperature;
-		int16_t humidityLast;
-		uint16_t publishCountHumidity;
+		uint8 DHTPin;
+		int temperatureLast;
+		uint16 publishCountTemperature;
+		int humidityLast;
+		uint16 publishCountHumidity;
 
 		void publishValueTemp();
 		void publishValueHum();
 		void calc();
 		void printCalcError(String name);
-		void printCalcDebug(String name, int16_t value, float raw);
+		void printCalcDebug(String name, int value, float raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleDHT wpDHT;
 

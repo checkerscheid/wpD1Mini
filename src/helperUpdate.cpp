@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 158                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 158 2024-07-10 15:41:32Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -37,10 +37,10 @@ void helperUpdate::cycle() {
 	publishValues();
 }
 
-uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 158 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 helperUpdate::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

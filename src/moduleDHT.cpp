@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 159                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 159 2024-07-10 19:33:14Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 163 2024-07-14 19:03:20Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -95,7 +95,7 @@ void moduleDHT::setSubscribes() {
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
-		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
+		int8 readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
 			EEPROM.put(wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
@@ -104,7 +104,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicHumidityCorrection.c_str()) == 0) {
-		int8_t readHumidityCorrection = int8_t(msg.toFloat() * 10);
+		int8 readHumidityCorrection = int8_t(msg.toFloat() * 10);
 		if(humidityCorrection != readHumidityCorrection) {
 			humidityCorrection = readHumidityCorrection;
 			EEPROM.put(wpEEPROM.byteHumidityCorrection, humidityCorrection);
@@ -151,7 +151,7 @@ void moduleDHT::calc() {
 	float newT = dht->readTemperature();
 	float newH = dht->readHumidity();
 	if(!isnan(newT)) {
-		temperature = int16_t(newT * 100) + (temperatureCorrection * 10);
+		temperature = int(newT * 100) + (temperatureCorrection * 10);
 		e = e | false;
 		if(mb->debug) {
 			printCalcDebug("Temperature", temperature, newT);
@@ -161,7 +161,7 @@ void moduleDHT::calc() {
 		printCalcError("Temperature");
 	}
 	if(!isnan(newH)) {
-		humidity = int16_t(newH * 100) + (humidityCorrection * 10);
+		humidity = int(newH * 100) + (humidityCorrection * 10);
 		e = e | false;
 		if(mb->debug) {
 			printCalcDebug("Humidity", humidity, newH);
@@ -179,7 +179,7 @@ void moduleDHT::printCalcError(String name) {
 	wpFZ.DebugWS(wpFZ.strERRROR, "wpDHT::calc", logmessage);
 }
 
-void moduleDHT::printCalcDebug(String name, int16_t value, float raw) {
+void moduleDHT::printCalcDebug(String name, int value, float raw) {
 	String logmessage = name + ": " + String(value) + " (" + String(raw) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "wpDHT::calc", logmessage);
 }
@@ -193,10 +193,10 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 159 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleDHT::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -220,10 +220,10 @@ bool moduleDHT::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleDHT::MaxCycle(){
+uint8 moduleDHT::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleDHT::MaxCycle(uint8_t maxCycle){
+uint8 moduleDHT::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

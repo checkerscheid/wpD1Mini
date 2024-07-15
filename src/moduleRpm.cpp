@@ -6,50 +6,48 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 01.06.2024                                                       #
+//# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 165                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 163 2024-07-14 19:03:20Z                 $ #
+//# File-ID      : $Id:: moduleRpm.cpp 165 2024-07-15 11:28:43Z                   $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleLight.h>
+#include <moduleRpm.h>
 
-// uses PIN D1 (SCL) & D2 (SDA) for I2C Bus
-moduleLight wpLight;
+moduleRpm wpRpm;
 
-moduleLight::moduleLight() {
+moduleRpm::moduleRpm() {
 	// section to config and copy
-	ModuleName = "Light";
+	ModuleName = "Rpm";
 	mb = new moduleBase(ModuleName);
 }
-void moduleLight::init() {
+void moduleRpm::init() {
 
 	// section for define
-	light = 0;
+	RpmPin = D8;
+	pinMode(RpmPin, INPUT);
+	rpm = 0;
 	// values
-	mqttTopicLight = wpFZ.DeviceName + "/" + ModuleName;
+	mqttTopicRpm = wpFZ.DeviceName + "/" + ModuleName;
 	// settings
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
 
-	lightMeter = new AS_BH1750();
-	lightMeter->begin();
-
-	lightLast = 0;
-	publishCountLight = 0;
+	rpmLast = 0;
+	publishCountRpm = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLight);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight);
-	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLightAvg);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestRpm);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugRpm);
+	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitUseRpmAvg);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleLight);
+	mb->initMaxCycle(wpEEPROM.byteMaxCycleRpm);
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void moduleLight::cycle() {
+void moduleRpm::cycle() {
 	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
 		calc();
 		mb->cycleCounter = 0;
@@ -57,38 +55,38 @@ void moduleLight::cycle() {
 	publishValues();
 }
 
-void moduleLight::publishSettings() {
+void moduleRpm::publishSettings() {
 	publishSettings(false);
 }
-void moduleLight::publishSettings(bool force) {
+void moduleRpm::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
 	mb->publishSettings(force);
 }
 
-void moduleLight::publishValues() {
+void moduleRpm::publishValues() {
 	publishValues(false);
 }
-void moduleLight::publishValues(bool force) {
+void moduleRpm::publishValues(bool force) {
 	if(force) {
-		publishCountLight = wpFZ.publishQoS;
+		publishCountRpm = wpFZ.publishQoS;
 	}
-	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
+	if(rpmLast != rpm || ++publishCountRpm > wpFZ.publishQoS) {
 		publishValue();
 	}
 	mb->publishValues(force);
 }
 
-void moduleLight::setSubscribes() {
+void moduleRpm::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicCorrection.c_str());
 	mb->setSubscribes();
 }
 
-void moduleLight::checkSubscribes(char* topic, String msg) {
+void moduleRpm::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
 		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteLightCorrection, correction);
+			EEPROM.put(wpEEPROM.byteRpmCorrection, correction);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
@@ -99,45 +97,46 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 // private
 //###################################################################################
-void moduleLight::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
+void moduleRpm::publishValue() {
+	wpMqtt.mqttClient.publish(mqttTopicRpm.c_str(), String(rpm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
+		wpRest.error = wpRest.error | !wpRest.sendRest("rpm", String(rpm));
 		wpRest.trySend = true;
 	}
-	lightLast = light;
+	rpmLast = rpm;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Light", String(light), String(publishCountLight));
+		printPublishValueDebug("Rpm", String(rpm), String(publishCountRpm));
 	}
-	publishCountLight = 0;
+	publishCountRpm = 0;
 }
 
-void moduleLight::calc() {
-	float ar = lightMeter->readLightLevel();
-	uint32 read = (uint32_t)ar;
-	uint32 avg;
-	if(!isnan(ar) || ar < 0) {
-		avg = read;
+void moduleRpm::calc() {
+	uint32 raw = pulseIn(RpmPin, HIGH, 200 * 1000);
+	if(raw > 0) {
+		uint32 duration = raw / 1000;
+		uint32 read = 1000 / duration / 4 * 60;
+		uint32 avg = read;
 		if(mb->useAvg) {
 			avg = calcAvg(avg);
 		}
-		light = avg + correction;
+		uint32 correct = avg + correction;
+		rpm = correct;
 		mb->error = false;
 		if(mb->debug) {
-			String logmessage = "Light: " + String(light) + " ("
-				"AnalogRead: " + String(ar) + ", "
-				"Read: " + String(read) + ", "
-				"Avg: " + String(avg) + ")";
-			wpFZ.DebugWS(wpFZ.strDEBUG, "wpLight::calc", logmessage);
+			String logmessage = "Rpm: " + String(rpm) + " ("
+				"Read: " + String(duration) + " ms, "
+				"Avg: " + String(correct) + ", "
+				"Raw: " + String(raw) + ")";
+			wpFZ.DebugWS(wpFZ.strDEBUG, "calcRpm", logmessage);
 		}
 	} else {
 		mb->error = true;
-		String logmessage = "Sensor Failure";
-		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
+		String logmessage = "Sensor Failure: " + String(raw);
+		wpFZ.DebugWS(wpFZ.strERRROR, "calcRpm", logmessage);
 	}
 }
-uint32 moduleLight::calcAvg(uint32 raw) {
-	unsigned long avg = 0;
+uint16 moduleRpm::calcAvg(uint16 raw) {
+	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
 	for(int i = 0; i < avgLength - 1; i++) {
@@ -151,7 +150,7 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 	return round(avg / avgCount);
 }
 
-void moduleLight::printPublishValueDebug(String name, String value, String publishCount) {
+void moduleRpm::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
@@ -159,44 +158,44 @@ void moduleLight::printPublishValueDebug(String name, String value, String publi
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 163 $";
+uint16 moduleRpm::getVersion() {
+	String SVN = "$Rev: 165 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleLight::changeSendRest() {
+void moduleRpm::changeSendRest() {
 	mb->changeSendRest();
 }
-void moduleLight::changeDebug() {
+void moduleRpm::changeDebug() {
 	mb->changeDebug();
 }
-bool moduleLight::SendRest() {
+bool moduleRpm::SendRest() {
 	return mb->sendRest;
 }
-bool moduleLight::SendRest(bool sendRest) {
+bool moduleRpm::SendRest(bool sendRest) {
 	mb->sendRest = sendRest;
 	return true;
 }
-bool moduleLight::UseAvg() {
+bool moduleRpm::UseAvg() {
 	return mb->useAvg;
 }
-bool moduleLight::UseAvg(bool useAvg) {
+bool moduleRpm::UseAvg(bool useAvg) {
 	mb->useAvg = useAvg;
 	return true;
 }
-bool moduleLight::Debug() {
+bool moduleRpm::Debug() {
 	return mb->debug;
 }
-bool moduleLight::Debug(bool debug) {
+bool moduleRpm::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleLight::MaxCycle(){
+uint8 moduleRpm::MaxCycle(){
 	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8 moduleLight::MaxCycle(uint8 maxCycle){
+uint8 moduleRpm::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

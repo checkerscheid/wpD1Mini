@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 154                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 154 2024-07-04 15:16:36Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 163 2024-07-14 19:03:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -81,7 +81,7 @@ void moduleBM::setSubscribes() {
 void moduleBM::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
-			uint16_t readThreshold = msg.toInt();
+			uint16 readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
 				EEPROM.put(wpEEPROM.byteBMThreshold, threshold);
@@ -149,10 +149,10 @@ void moduleBM::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleBM::getVersion() {
-	String SVN = "$Rev: 154 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleBM::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

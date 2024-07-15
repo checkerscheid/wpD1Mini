@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 136 2024-06-09 15:37:41Z                $ #
+//# File-ID      : $Id:: moduleDistance.h 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDistance_h
@@ -23,13 +23,13 @@ class moduleDistance {
 	public:
 		moduleDistance();
 		moduleBase* mb;
-		uint16_t volume;
-		uint16_t distanceRaw;
-		uint16_t distanceAvg;
+		uint16 volume;
+		uint16 distanceRaw;
+		uint16 distanceAvg;
 
-		uint8_t height = 120;
-		uint16_t maxVolume = 6000;
-		int8_t correction = 0;
+		uint8 height = 120;
+		uint16 maxVolume = 6000;
+		int8 correction = 0;
 
 		// values
 		String mqttTopicVolume;
@@ -44,7 +44,7 @@ class moduleDistance {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -59,32 +59,32 @@ class moduleDistance {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t trigPin;
-		uint8_t echoPin;
-		uint16_t volumeLast;
-		uint16_t publishCountVolume;
-		uint16_t distanceRawLast;
-		uint16_t publishCountDistanceRaw;
-		uint16_t distanceAvgLast;
-		uint16_t publishCountDistanceAvg;
+		uint8 trigPin;
+		uint8 echoPin;
+		uint16 volumeLast;
+		uint16 publishCountVolume;
+		uint16 distanceRawLast;
+		uint16 publishCountDistanceRaw;
+		uint16 distanceAvgLast;
+		uint16 publishCountDistanceAvg;
 		
-		static const uint8_t avgLength = 128;
+		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void publishDistanceRaw();
 		void publishDistanceAvg();
 		void calc();
-		uint16_t calcAvg(uint16_t raw);
-		void calcDistanceDebug(String name, uint16_t avg, uint16_t raw);
+		uint16 calcAvg(uint16 raw);
+		void calcDistanceDebug(String name, uint16 avg, uint16 raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 136 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleDistance wpDistance;
 

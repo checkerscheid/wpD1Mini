@@ -8,26 +8,26 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 164                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.h 163 2024-07-14 19:03:20Z                    $ #
+//# File-ID      : $Id:: moduleRpm.h 164 2024-07-14 19:05:04Z                     $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleRain_h
-#define moduleRain_h
+#ifndef moduleRpm_h
+#define moduleRpm_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleRain {
+class moduleRpm {
 	public:
-		moduleRain();
+		moduleRpm();
 		moduleBase* mb;
-		uint16 rain;
+		uint16 rpm;
 		int8 correction = 0;
 
 		// values
-		String mqttTopicRain;
+		String mqttTopicRpm;
 		// settings
 		String mqttTopicCorrection;
 
@@ -54,9 +54,9 @@ class moduleRain {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 RainPin;
-		int rainLast;
-		uint16 publishCountRain;
+		uint8 RpmPin;
+		short rpmLast;
+		uint16 publishCountRpm;
 		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
@@ -67,8 +67,8 @@ class moduleRain {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 164 $";
 };
-extern moduleRain wpRain;
+extern moduleRpm wpRpm;
 
 #endif

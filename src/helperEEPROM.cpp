@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 161                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 161 2024-07-13 23:51:36Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -31,10 +31,10 @@ void helperEEPROM::cycle() {
 	publishValues();
 }
 
-uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 161 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 helperEEPROM::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -66,7 +66,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
 }
 
-void helperEEPROM::saveBool(uint16_t &addr, byte &by, uint8_t &bi, bool v) {
+void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
 	bitWrite(by, bi, v);
 	EEPROM.write(addr, by);
 	EEPROM.commit();
@@ -161,6 +161,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
 	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
 	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
+	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
@@ -195,6 +196,7 @@ void helperEEPROM::readVars() {
 	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
 	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
 	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
+	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm));
 	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
 	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
 	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
@@ -210,6 +212,7 @@ void helperEEPROM::readVars() {
 	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
 	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
 	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
+	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
 	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
@@ -237,6 +240,7 @@ void helperEEPROM::readVars() {
 	wpAnalogOut.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut));
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
+	wpRpm.MaxCycle(EEPROM.read(byteMaxCycleRpm));
 	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));
 	wpRain.correction = EEPROM.read(byteRainCorrection);
 	wpMoisture.MaxCycle(EEPROM.read(byteMaxCycleMoisture));
@@ -247,7 +251,7 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
-	EEPROM.get(byteLightCorrection, wpLight.correction); // int16_t
+	EEPROM.get(byteLightCorrection, wpLight.correction); // int
 	EEPROM.get(byteBMThreshold, wpBM.threshold);
 	EEPROM.get(byteWindowThreshold, wpWindow.threshold);
 	EEPROM.get(bytePumpPause, wpRelais.pumpPause);
