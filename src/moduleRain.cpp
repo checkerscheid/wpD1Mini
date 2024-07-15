@@ -121,10 +121,8 @@ void moduleRain::calc() {
 			avg = calcAvg(avg);
 		}
 		correct = avg;
-		raw = map(correct, 1023, 0, 0, 500);
+		raw = wpFZ.Map(correct, 1023, 0, 0, 500);
 		/// 0 - 50 l/m²
-		if(raw > 500) raw = 500;
-		if(raw < 0) raw = 0;
 		rain = (float)(raw / 10.0) + correction;
 		mb->error = false;
 		if(mb->debug) {

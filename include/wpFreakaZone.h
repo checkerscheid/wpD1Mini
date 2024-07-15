@@ -108,6 +108,7 @@ class wpFreakaZone {
 		String getOnlineTime(bool forDebug);
 		String funcToString(String msg);
 		void blink();
+		long Map(long in, long inMin, long inMax, long outMin, long outMax);
 
 		static String JsonKeyValue(String name, String value);
 		static String JsonKeyString(String name, String value);

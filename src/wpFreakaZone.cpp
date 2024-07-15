@@ -138,6 +138,17 @@ void wpFreakaZone::blink() {
 	}
 }
 
+long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
+	if(inMax - inMin == 0) {
+		DebugWS(strERRROR, "Map", "risky math operation: 'inMax - inMin == 0'");
+		return 0;
+	}
+	long returns = map(in, inMin, inMax, outMin, outMax);
+	if(returns < outMin) returns = outMin;
+	if(returns > outMax) returns = outMax;
+	return returns;
+}
+
 String wpFreakaZone::JsonKeyValue(String name, String value) {
 	String message = "\"" + name + "\":" + value;
 	if(value == "nan") {

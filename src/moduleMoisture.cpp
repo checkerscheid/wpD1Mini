@@ -170,9 +170,7 @@ void moduleMoisture::calc() {
 				wet = ++i;
 			} while((wet - dry) > 0);
 		}
-		moisture = map(correct, dry, wet, 0, 100);
-		if(moisture > 100) moisture = 100;
-		if(moisture < 0) moisture = 0;
+		moisture = wpFZ.Map(correct, dry, wet, 0, 100);
 		if(moisture < minValue) errorMin = true;
 		if(moisture > minValue) errorMin = false;
 		mb->error = false;

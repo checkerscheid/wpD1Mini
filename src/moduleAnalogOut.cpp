@@ -179,7 +179,7 @@ void moduleAnalogOut::calc() {
 	}
 	if(output > 100) output = 100;
 	if(output < 0) output = 0;
-	uint16 hardwareout = map(output, 0, 100, 0, 255);
+	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, 255);
 	analogWrite(analogOutPin, hardwareout);
 }
 void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
