@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 165                                                     $ #
+//# Revision     : $Rev:: 167                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 165 2024-07-15 11:28:43Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 167 2024-07-15 19:58:12Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -25,7 +25,7 @@ moduleRpm::moduleRpm() {
 void moduleRpm::init() {
 
 	// section for define
-	RpmPin = D8;
+	RpmPin = D5;
 	pinMode(RpmPin, INPUT);
 	rpm = 0;
 	// values
@@ -159,7 +159,7 @@ void moduleRpm::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 165 $";
+	String SVN = "$Rev: 167 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

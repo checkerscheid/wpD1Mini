@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 167                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 167 2024-07-15 19:58:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -21,11 +21,17 @@ helperUpdate::helperUpdate() {}
 void helperUpdate::init() {
 	// values
 	mqttTopicMode = wpFZ.DeviceName + "/UpdateMode";
+	mqttTopicNewVersion = wpFZ.DeviceName + "/ERROR/NewVersion";
 	// settings
 	mqttTopicServer = wpFZ.DeviceName + "/info/Update/Server";
 	// commands
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
+	
+	lastUpdateCheck = 0;
+	twelveHours = 12 * 60 * 60 * 1000;
+	serverVersion = "";
+	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
 }
 
 //###################################################################################
@@ -35,10 +41,11 @@ void helperUpdate::init() {
 void helperUpdate::cycle() {
 	if(UpdateFW) ArduinoOTA.handle();
 	publishValues();
+	doCheckUpdate();
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 167 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -86,6 +93,7 @@ bool helperUpdate::setupOta() {
 }
 
 void helperUpdate::check() {
+	lastUpdateCheck = millis();
 	WiFiClient wifi;
 	HTTPClient http;
 	JsonDocument doc;
@@ -96,13 +104,13 @@ void helperUpdate::check() {
 	String payload = http.getString();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	deserializeJson(doc, payload);
-	//v3.0-build121
-	String vServer = String(doc["wpFreakaZone"]["Version"]);
-	String vInstalled = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
-	wpFZ.DebugWS(vServer == vInstalled ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + vInstalled);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + vServer);
+	serverVersion = String(doc["wpFreakaZone"]["Version"]);
+	newVersion = !(serverVersion == installedVersion);
+	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + serverVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + String(doc["wpFreakaZone"]["date"]));
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + String(doc["wpFreakaZone"]["filename"]));
+	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {
 	start("firmware.bin");
@@ -157,7 +165,16 @@ void helperUpdate::publishValues() {
 	publishValues(false);
 }
 void helperUpdate::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(force) {
+		publishCountDebug = wpFZ.publishQoS;
+		publishCountNewVersion = wpFZ.publishQoS;
+	}
+	if(newVersionLast != newVersion || ++publishCountNewVersion > wpFZ.sekunde10) {
+		newVersionLast = newVersion;
+		wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str());
+		wpFZ.SendNewVersion(newVersion);
+		publishCountNewVersion = 0;
+	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
@@ -185,6 +202,12 @@ void helperUpdate::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 // private
 //###################################################################################
+void helperUpdate::doCheckUpdate() {
+	unsigned long m = millis();
+	if(m > lastUpdateCheck + twelveHours) {
+		check();
+	}
+}
 void helperUpdate::started() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 169                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 163 2024-07-14 19:03:20Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 169 2024-07-16 16:11:05Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 169 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -116,11 +116,13 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 // JSON Status
 //###################################################################################
+
 	webServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String message = "{\"FreakaZoneDevice\":{";
 		message += wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
 		message += wpFZ.JsonKeyString("DeviceDescription", wpFZ.DeviceDescription) + ",";
 		message += wpFZ.JsonKeyString("Version", wpFZ.Version) + ",";
+		message += wpFZ.JsonKeyValue("newVersion", wpUpdate.newVersion ? "true" : "false") + ",";
 		String minimac = WiFi.macAddress();
 		minimac.replace(":", "");
 		minimac.toLowerCase();
@@ -316,7 +318,9 @@ void helperWebServer::setupWebServer() {
 		request->send(200, "application/json", message.c_str());
 	});
 
-// commands
+//###################################################################################
+// command set Module
+//###################################################################################
 
 	webServer.on("/setModule", HTTP_GET, [](AsyncWebServerRequest *request) {
 		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setModule");
@@ -378,6 +382,10 @@ void helperWebServer::setupWebServer() {
 		wpWebServer.setBlink();
 	});
 
+//###################################################################################
+// command set SendRest
+//###################################################################################
+
 	webServer.on("/setSendRest", HTTP_GET, [](AsyncWebServerRequest *request) {
 		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setSendRest");
 		if(request->hasParam("sendRest")) {
@@ -433,6 +441,10 @@ void helperWebServer::setupWebServer() {
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
+
+//###################################################################################
+// command set Debug
+//###################################################################################
 
 	webServer.on("/setDebug", HTTP_GET, [](AsyncWebServerRequest *request) {
 		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setDebug");
@@ -521,6 +533,10 @@ void helperWebServer::setupWebServer() {
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
+
+//###################################################################################
+// command set Cmd
+//###################################################################################
 
 	webServer.on("/setCmd", HTTP_GET, [](AsyncWebServerRequest *request) {
 		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCmd");
@@ -718,6 +734,7 @@ String helperWebServer::getChangeRest(String id, String name, bool state) {
 	"</li>";
 	return returns;
 }
+
 //###################################################################################
 // stuff
 //###################################################################################
@@ -857,3 +874,4 @@ String processor(const String& var) {
 	}
 	return String();
 }
+
