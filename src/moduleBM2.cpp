@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 145                                                     $ #
+//# Revision     : $Rev:: 171                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM2.cpp 145 2024-06-18 17:20:41Z                   $ #
+//# File-ID      : $Id:: moduleWindow.cpp 171 2024-07-21 20:07:23Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM2.h>
@@ -26,7 +26,7 @@ void moduleBM2::init() {
 	// section for define
 	BMPin = D6;
 	pinMode(BMPin, INPUT_PULLUP);
-	bm = 0;
+	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
@@ -149,10 +149,10 @@ void moduleBM2::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleBM2::getVersion() {
-	String SVN = "$Rev: 145 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleWindow::getVersion() {
+	String SVN = "$Rev: 171 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
