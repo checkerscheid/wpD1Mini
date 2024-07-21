@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 168                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 163 2024-07-14 19:03:20Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 168 2024-07-16 16:09:07Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -27,7 +27,7 @@ void moduleAnalogOut::init() {
 	// section for define
 	analogOutPin = D8;
 
-	pinMode(analogOutPin, OUTPUT);
+	pinMode(analogOutPin, OUTPUT_OPEN_DRAIN);
 	output = false;
 	autoValue = false;
 	handValue = false;
@@ -191,7 +191,7 @@ void moduleAnalogOut::printPublishValueDebug(String name, String value, String p
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 168 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

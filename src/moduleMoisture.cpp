@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 166                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 163 2024-07-14 19:03:20Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 166 2024-07-15 12:09:13Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -212,7 +212,7 @@ void moduleMoisture::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 166 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 167                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 163 2024-07-14 19:03:20Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 167 2024-07-15 19:58:12Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -121,7 +121,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 167 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 };
@@ -152,8 +152,9 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.setChange span { white-space:nowrap; }
 		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
 		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
-		#restartRequired, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
+		#restartRequired, #newVersion, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
 		#restartRequired { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		#newVersion { text-align:center; border-color:#cebd2f; color:#cebd2f; text-shadow:0 0 3px #12130c; }
 		#progressBg { border:1px solid #555; border-radius: 5px; box-shadow: 2px 2px 3px #333 inset; }
 		#progress { background-color:#6060dd; height:25px; width:25%; text-align:left;
 			box-shadow: -1px -3px 5px #222 inset, 1px 1px 5px #ccc inset; border-radius: 5px; }
@@ -180,6 +181,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
 		<div id="restartRequired" class="wpContainer wpHidden"></div>
+		<div id="newVersion" class="wpContainer wpHidden"></div>
 		<div id="progressContainer" class="wpHidden">
 			<div class="wpContainer">
 				<div id="progressBg">
@@ -239,6 +241,7 @@ function initWebSocket() {
 	websocket.onclose = onClose;
 	websocket.onmessage = onMessage;
 	document.getElementById('restartRequired').classList.add('wpHidden');
+	document.getElementById('newVersion').classList.add('wpHidden');
 	document.getElementById('LiPump').classList.add('wpHidden');
 	document.getElementById('progressContainer').classList.add('wpHidden');
 }
@@ -279,6 +282,16 @@ function onMessage(event) {
 			let restartRequired = document.getElementById('restartRequired');
 			restartRequired.classList.remove('wpHidden');
 			restartRequired.innerHTML = '!!! Restart Required !!!';
+		} else if(d.cmd == 'newVersion') {
+			let newVersion = document.getElementById('newVersion');
+			if(d.msg.newVersion) {
+				console.log('newVersionAvailable:');
+				console.log(d);
+				newVersion.classList.remove('wpHidden');
+				newVersion.innerHTML = '--- Update Available ---<br />installed: ' + d.msg.installedVersion + '<br />update: ' + d.msg.serverVersion;
+			} else {
+				newVersion.classList.add('wpHidden');
+			}
 		} else if(d.cmd == 'remainPumpInPause') {
 			console.log('remainPumpInPause:');
 			console.log(d);

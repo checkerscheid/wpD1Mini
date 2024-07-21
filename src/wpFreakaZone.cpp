@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 167                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 167 2024-07-15 19:58:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -52,7 +52,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 167 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -280,6 +280,14 @@ void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::SendNewVersion(bool isnew) {
+	String msg = "{"
+		"\"installedVersion\":\"" + wpUpdate.installedVersion + "\","
+		"\"serverVersion\":\"" + wpUpdate.serverVersion + "\","
+		"\"newVersion\":" + (isnew ? "true" : "false") + 
+		"}";
+	wpWebServer.webSocket.textAll("{\"cmd\":\"newVersion\",\"msg\":" + msg + "}");
 }
 void wpFreakaZone::SendRemainPumpInPause(String readableTime) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"remainPumpInPause\",\"msg\":\"" + readableTime + "\"}");

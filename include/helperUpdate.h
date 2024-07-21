@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 167                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.h 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: helperUpdate.h 167 2024-07-15 19:58:12Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperUpdate_h
@@ -27,6 +27,7 @@ class helperUpdate {
 		bool Debug = false;
 		// values
 		String mqttTopicMode;
+		String mqttTopicNewVersion;
 		// settings
 		String mqttTopicServer;
 		// commands
@@ -34,6 +35,10 @@ class helperUpdate {
 		String mqttTopicDebug;
 
 		bool UpdateFW = false;
+		unsigned long lastUpdateCheck;
+		bool newVersion = false;
+		String serverVersion;
+		String installedVersion;
 
 		helperUpdate();
 		void init();
@@ -52,9 +57,13 @@ class helperUpdate {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 167 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
+		bool newVersionLast;
+		uint16 publishCountNewVersion = 0;
+		unsigned long twelveHours;
+		void doCheckUpdate();
 		static void started();
 		static void finished();
 		static void progress(int cur, int total);
