@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 167                                                     $ #
+//# Revision     : $Rev:: 170                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 167 2024-07-15 19:58:12Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 170 2024-07-16 16:50:17Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -28,8 +28,8 @@ void helperUpdate::init() {
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
 	
-	lastUpdateCheck = 0;
 	twelveHours = 12 * 60 * 60 * 1000;
+	lastUpdateCheck = twelveHours - (12 * 58 * 60 * 1000);
 	serverVersion = "";
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
 }
@@ -45,7 +45,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 167 $";
+	String SVN = "$Rev: 170 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
