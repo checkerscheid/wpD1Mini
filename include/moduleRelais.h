@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 136 2024-06-09 15:37:41Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -32,8 +32,8 @@ class moduleRelais {
 		// wpModules.useModuleMoisture {
 		bool waterEmptySet = false;
 		bool waterEmptyError;
-		uint8_t pumpActive;
-		uint16_t pumpPause;
+		uint8 pumpActive; // in seconds
+		uint16 pumpPause; // show in minutes, save in seconds
 		// }
 
 		// values
@@ -55,7 +55,7 @@ class moduleRelais {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -71,22 +71,25 @@ class moduleRelais {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
-		uint8_t relaisPin;
+		uint8 relaisPin;
 		bool outputLast;
-		uint16_t publishCountOutput;
+		uint16 publishCountOutput;
 		bool autoValueLast;
-		uint16_t publishCountAutoValue;
+		uint16 publishCountAutoValue;
 		bool handValueLast;
-		uint16_t publishCountHandValue;
+		uint16 publishCountHandValue;
 		bool handErrorLast;
-		uint16_t publishCountHandError;
-		uint16_t publishCountWaterEmptyError;
+		uint16 publishCountHandError;
+		uint16 publishCountWaterEmptyError;
 		// if wpModules.useMoisture
 		bool pumpCycleActive;
 		bool pumpStarted;
 		bool pumpInPause;
 		unsigned long pumpTimeStart;
 		unsigned long pumpTimePause;
+
+		uint8 debugCalcPumpCounter;
+		unsigned long remainPumpTimePause;
 		// }
 
 		void publishValue();
@@ -95,11 +98,13 @@ class moduleRelais {
 		void calcPump();
 		// }
 		void printPublishValueDebug(String name, String value, String publishCount);
-		void printCalcDebug(String name, int16_t value, float raw);
+		void printCalcDebug(String name, int value, float raw);
+		void SendPumpStatus();
+		String getReadableTime(unsigned long time);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 136 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleRelais wpRelais;
 

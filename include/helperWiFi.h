@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.h 136 2024-06-09 15:37:41Z                    $ #
+//# File-ID      : $Id:: helperWiFi.h 163 2024-07-14 19:03:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWiFi_h
@@ -38,7 +38,7 @@ class helperWiFi {
 		helperWiFi();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		void changeSendRest();
 		void setupWiFi();
@@ -50,17 +50,18 @@ class helperWiFi {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void checkDns();
 	private:
-		String SVNh = "$Rev: 136 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
-		uint16_t publishCountRssi = 0;
+		uint16 publishCountDebug = 0;
+		uint16 publishCountRssi = 0;
 		String printEncryptionType(int thisType);
-		uint16_t addrSendRest;
+		uint16 addrSendRest;
 		byte byteSendRest;
-		uint8_t bitSendRest;
+		uint8 bitSendRest;
 		bool sendRestLast;
-		uint16_t publishCountSendRest;
+		uint16 publishCountSendRest;
 };
 extern helperWiFi wpWiFi;
 #endif

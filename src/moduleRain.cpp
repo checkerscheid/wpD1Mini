@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 139                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 139 2024-06-11 10:08:54Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -82,7 +82,7 @@ void moduleRain::setSubscribes() {
 
 void moduleRain::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8_t readCorrection = msg.toInt();
+		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			EEPROM.put(wpEEPROM.byteRainCorrection, correction);
@@ -121,10 +121,8 @@ void moduleRain::calc() {
 			avg = calcAvg(avg);
 		}
 		correct = avg;
-		raw = map(correct, 1023, 0, 0, 500);
+		raw = wpFZ.Map(correct, 1023, 0, 0, 500);
 		/// 0 - 50 l/m²
-		if(raw > 500) raw = 500;
-		if(raw < 0) raw = 0;
 		rain = (float)(raw / 10.0) + correction;
 		mb->error = false;
 		if(mb->debug) {
@@ -141,7 +139,7 @@ void moduleRain::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 	}
 }
-uint16_t moduleRain::calcAvg(uint16_t raw) {
+uint16 moduleRain::calcAvg(uint16 raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -164,10 +162,10 @@ void moduleRain::printPublishValueDebug(String name, String value, String publis
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleRain::getVersion() {
-	String SVN = "$Rev: 139 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleRain::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -198,10 +196,10 @@ bool moduleRain::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8_t moduleRain::MaxCycle(){
-	return mb->maxCycle;
+uint8 moduleRain::MaxCycle(){
+	return mb->maxCycle / (1000 / wpFZ.loopTime);
 }
-uint8_t moduleRain::MaxCycle(uint8_t maxCycle){
+uint8 moduleRain::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
 	return 0;
 }

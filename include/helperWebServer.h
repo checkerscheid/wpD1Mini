@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 144 2024-06-18 17:20:09Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 163 2024-07-14 19:03:20Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -23,80 +23,87 @@ class helperWebServer {
 		bool Debug = false;
 		// commands
 		String mqttTopicDebug;
-		const int8_t cmdDoNothing = 0;
+		const int8 cmdDoNothing = 0;
 
-		const int8_t cmdBlink = 1;
-		const int8_t cmdForceMqttUpdate = 2;
-		const int8_t cmdForceRenewValue = 3;
-		const int8_t cmdUpdateFW = 4;
-		const int8_t cmdUpdateCheck = 5;
-		const int8_t cmdUpdateHTTP = 6;
-		const int8_t cmdRestartESP = 7;
-		const int8_t cmdScanWiFi = 8;
-		int8_t doCommand;
+		const int8 cmdBlink = 1;
+		const int8 cmdForceMqttUpdate = 2;
+		const int8 cmdForceRenewValue = 3;
+		const int8 cmdUpdateFW = 4;
+		const int8 cmdUpdateCheck = 5;
+		const int8 cmdUpdateHTTP = 6;
+		const int8 cmdRestartESP = 7;
+		const int8 cmdScanWiFi = 8;
+		const int8 cmdCheckDns = 9;
+		int8 doCommand;
 
-		const int8_t cmdSendRestWiFi = 1;
-		const int8_t cmdSendRestDHT = 2;
-		const int8_t cmdSendRestLDR = 3;
-		const int8_t cmdSendRestLight = 4;
-		const int8_t cmdSendRestBM = 5;
-		const int8_t cmdSendRestBM2 = 6;
-		const int8_t cmdSendRestRelais = 7;
-		const int8_t cmdSendRestRain = 8;
-		const int8_t cmdSendRestMoisture = 9;
-		const int8_t cmdSendRestDistance = 10;
-		int8_t doSendRestChange;
+		const int8 cmdSendRestWiFi = 1;
+		const int8 cmdSendRestDHT = 2;
+		const int8 cmdSendRestLDR = 3;
+		const int8 cmdSendRestLight = 4;
+		const int8 cmdSendRestBM = 5;
+		const int8 cmdSendRestWindow = 6;
+		const int8 cmdSendRestRelais = 7;
+		const int8 cmdSendRestRain = 8;
+		const int8 cmdSendRestMoisture = 9;
+		const int8 cmdSendRestDistance = 10;
+		const int8 cmdSendRestAnalogOut = 11;
+		const int8 cmdSendRestRpm = 12;
+		int8 doSendRestChange;
 
-		const int8_t cmdDebugEEPROM = 1;
-		const int8_t cmdDebugFinder = 2;
-		const int8_t cmdDebugModules = 3;
-		const int8_t cmdDebugMqtt = 4;
-		const int8_t cmdDebugOnlineToggler = 5;
-		const int8_t cmdDebugRest = 6;
-		const int8_t cmdDebugUpdate = 7;
-		const int8_t cmdDebugWebServer = 8;
-		const int8_t cmdDebugWiFi = 9;
+		const int8 cmdDebugEEPROM = 1;
+		const int8 cmdDebugFinder = 2;
+		const int8 cmdDebugModules = 3;
+		const int8 cmdDebugMqtt = 4;
+		const int8 cmdDebugOnlineToggler = 5;
+		const int8 cmdDebugRest = 6;
+		const int8 cmdDebugUpdate = 7;
+		const int8 cmdDebugWebServer = 8;
+		const int8 cmdDebugWiFi = 9;
 
-		const int8_t cmdDebugDHT = 20;
-		const int8_t cmdDebugLDR = 21;
-		const int8_t cmdDebugLight = 22;
-		const int8_t cmdDebugBM = 23;
-		const int8_t cmdDebugBM2 = 24;
-		const int8_t cmdDebugRelais = 25;
-		const int8_t cmdDebugRain = 26;
-		const int8_t cmdDebugMoisture = 27;
-		const int8_t cmdDebugDistance = 28;
-		int8_t doDebugChange;
+		const int8 cmdDebugDHT = 20;
+		const int8 cmdDebugLDR = 21;
+		const int8 cmdDebugLight = 22;
+		const int8 cmdDebugBM = 23;
+		const int8 cmdDebugWindow = 24;
+		const int8 cmdDebugRelais = 25;
+		const int8 cmdDebugRain = 26;
+		const int8 cmdDebugMoisture = 27;
+		const int8 cmdDebugDistance = 28;
+		const int8 cmdDebugAnalogOut = 29;
+		const int8 cmdDebugRpm = 30;
+		int8 doDebugChange;
 
-		const int8_t cmdModuleDHT11 = 1;
-		const int8_t cmdModuleDHT22 = 2;
-		const int8_t cmdModuleLDR = 3;
-		const int8_t cmdModuleLight = 4;
-		const int8_t cmdModuleBM = 5;
-		const int8_t cmdModuleBM2 = 6;
-		const int8_t cmdModuleRelais = 7;
-		const int8_t cmdModuleRelaisShield = 8;
-		const int8_t cmdModuleRain = 9;
-		const int8_t cmdModuleMoisture = 10;
-		const int8_t cmdModuleDistance = 11;
-		int8_t doModuleChange;
+		const int8 cmdModuleDHT11 = 1;
+		const int8 cmdModuleDHT22 = 2;
+		const int8 cmdModuleLDR = 3;
+		const int8 cmdModuleLight = 4;
+		const int8 cmdModuleBM = 5;
+		const int8 cmdModuleWindow = 6;
+		const int8 cmdModuleRelais = 7;
+		const int8 cmdModuleRelaisShield = 8;
+		const int8 cmdModuleRain = 9;
+		const int8 cmdModuleMoisture = 10;
+		const int8 cmdModuleDistance = 11;
+		const int8 cmdModuleAnalogOut = 12;
+		const int8 cmdModuleRpm = 13;
+		int8 doModuleChange;
 
-		int8_t doBlink;
+		int8 doBlink;
 
 		helperWebServer();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 
 		AsyncWebServer webServer = AsyncWebServer(80);
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
-		
+
 		void setupWebServer();
-		void setCommand(int8_t command);
-		void setModuleChange(int8_t modul);
-		void setSendRestChange(int8_t sendRest);
-		void setDebugChange(int8_t debug);
+		void setCommand(int8 command);
+		void setModuleChange(int8 modul);
+		void setSendRestChange(int8 sendRest);
+		void setDebugChange(int8 debug);
 		void setBlink();
 		void doTheCommand();
 		void doTheModuleChange();
@@ -110,10 +117,13 @@ class helperWebServer {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		String getchangeModule(String id, String name, bool state);
+		String getChangeDebug(String id, String name, bool state);
+		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 144 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 };
 extern helperWebServer wpWebServer;
 
@@ -129,19 +139,30 @@ const char index_html[] PROGMEM = R"rawliteral(
 	<style>
 		body { background-color:#606060; color:#ececfb; }
 		* { margin:0; padding:0; }
-		#FreakaZoneWebSerial { margin:20px 50px; font-family:Consolas, Verdana, Arial, sans-serif; font-size:15px; }
 		h1 { font-size:25px; }
 		h2 { font-size:20px; }
-		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
-		div.ul { display:flex; }
 		ul { margin-left:20px; list-style:none; }
 		hr { height:1px; border:none; margin:5px 5%; background-color:#CCC; }
-		#restartRequired.active, #WebSerialBox, .ul ul { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset; }
-		#restartRequired.active, .ul ul { box-shadow: 3px 3px 5px #222; }
-		.ul input { margin-right:5px; }
-		#restartRequired.active { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		.z { color:#a91919; text-shadow:2px 2px #9f9f9f; font-weight:bold; font-size:30px; }
+		.ulContainer { display:flex; }
+		.wpContainer { margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px; box-shadow:3px 3px 5px #222 inset;
+			background-color:#444; }
+		.setChange { border: 1px solid transparent; padding: 3px 5px; border-radius: 5px; cursor: pointer; }
+		.setChange:hover { border-color:#ccc; }
+		.setChange span { white-space:nowrap; }
+		#FreakaZoneWebSerial { margin:20px 50px; font-family:Verdana, Arial, sans-serif; font-size:12px; }
+		#WebSerialBox * { font-family:Consolas, Verdana, Arial, sans-serif; font-size:12px; }
+		#restartRequired, .ulContainer ul { box-shadow: 3px 3px 5px #222; }
+		#restartRequired { text-align:center; border-color:#a91919; color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		#progressBg { border:1px solid #555; border-radius: 5px; box-shadow: 2px 2px 3px #333 inset; }
+		#progress { background-color:#6060dd; height:25px; width:25%; text-align:left;
+			box-shadow: -1px -3px 5px #222 inset, 1px 1px 5px #ccc inset; border-radius: 5px; }
+		#progressVal { line-height:25px; padding-left: 10px; white-space:nowrap; }
+		.ulContainer input { margin-right:5px; }
+		.wpHidden { display:none !important; }
+		.wpInput { padding:5px; text-align:center; }
 		.wpButton { display:inline-block; margin:2px 5px; padding:7px; width:150px; color:#ececfb; white-space:nowrap; cursor:pointer;
-			line-height:16px; font-size:13px; font-weight:bold; text-align:center;
+			line-height:16px; font-weight:bold; text-align:center;
 			border:1px solid #888; border-radius:4px;
 			background-color:#555; background-image:linear-gradient(#606060 .25em, #222 1.75em); box-shadow:0px 0px 2px 0px #888; }
 		.wpButton:hover { border-color:#AAA; }
@@ -149,34 +170,55 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.bold { font-weight:bold; }
 		.color-debug { color:#aaa; text-shadow:0 0 3px #313131; }
 		.color-info { color:#ececfb; text-shadow:0 0 3px #000; }
+		.color-ok { color:#38C133; text-shadow:0 0 3px #313131; }
 		.color-warn { color:#cebd2f; text-shadow:0 0 3px #12130c; }
 		.color-error { color:#df0d0d; text-shadow:0 0 3px #1e1414; }
 	</style>
 </head>
 <body>
 	<div id="FreakaZoneWebSerial">
-		<div id="restartRequired"></div>
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
-		<div class="ul">
+		<div id="restartRequired" class="wpContainer wpHidden"></div>
+		<div id="progressContainer" class="wpHidden">
+			<div class="wpContainer">
+				<div id="progressBg">
+					<div id="progress">
+						<span id="progressVal">0</span>
+					</div>
+				</div>
+			</diV>
+		</div>
+		<div class="ulContainer">
 			%Debug%
 			%SendRest%
 			%CompiledWith%
-			<ul>
-				<li><li><span class='bold'>Device:</span></li><hr /></li>
+			<ul class="wpContainer">
+				<li><span class='bold'>Device:</span></li><li><hr /></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
-				<li><li><span class='bold'>Updates:</span></li><hr /></li>
+				<li><span class='bold'>Updates:</span></li><li><hr /></li>
 				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li>
 				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
-				<li><li><span class='bold'>Stuff:</span></li><hr /></li>
+				<li><span class='bold'>Stuff:</span></li><li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
+				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
 				<li><span id="Blink" class="wpButton" onclick="cmdHandle(event)">Blink</span></li>
 			</ul>
+			<ul id="LiPump" class="wpContainer wpHidden">
+				<li><li><span class='bold'>Pump:</span></li><hr /></li>
+				<li>
+					Cycle: <span id="pumpCycleActive" class="color-info"></span><br />
+					Pump: <span id="pumpStarted" class="color-info"></span><br />
+					Pause: <span id="pumpInPause" class="color-info"></span>
+					<p>in Pause:</p>
+					<p id="remainPumpInPause" class="wpContainer wpInput"></p>
+				</li>
+			</ul>
 		</div>
-		<pre id="WebSerialBox"></pre>
+		<pre id="WebSerialBox" class="wpContainer"></pre>
 	</div>
 	<script>
 var gateway = 'ws://%IPADRESS%/ws';
@@ -187,43 +229,91 @@ window.addEventListener('load', onLoad);
 function onLoad(event) {
 	initWebSocket();
 	xmlHttp = new XMLHttpRequest();
+	WebSerialBox = document.getElementById('WebSerialBox');
+	setInterval(checkConnection, 5000);
 }
 function initWebSocket() {
 	console.log('Trying to open a WebSocket connection...');
 	websocket = new WebSocket(gateway);
-	WebSerialBox = document.getElementById('WebSerialBox');
 	websocket.onopen = onOpen;
 	websocket.onclose = onClose;
 	websocket.onmessage = onMessage;
+	document.getElementById('restartRequired').classList.add('wpHidden');
+	document.getElementById('LiPump').classList.add('wpHidden');
+	document.getElementById('progressContainer').classList.add('wpHidden');
+}
+function checkConnection() {
+	websocket.send('PING');
+	if(websocket.readyState != WebSocket.OPEN) {
+		console.log('Connection Lost');
+		initWebSocket();
+	}
 }
 function onOpen(event) {
 	console.log('Connection opened');
+	pingpongmsg = 1;
 }
 function onClose(event) {
-	console.log('Connection closed');
-	setTimeout(initWebSocket, 2000);
+	console.log('Connection closed, waitForReconnect');
+	pingpong = null;
 }
 function onMessage(event) {
 	%debugWebServer%
 	const d = JSON.parse(event.data);
-	if(typeof d.cmd != undefined && d.cmd == 'setDebug') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'setSendRest') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'setModule') {
-		document.getElementById(d.msg.id).checked = d.msg.value;
-	} else if(typeof d.cmd != undefined && d.cmd == 'restartRequired') {
-		if(d.msg) {
+	if(typeof d.cmd != 'undefined') {
+		if(d.cmd == 'setDebug') {
+			console.log('setDebug:');
+			console.log(d);
+			changeBoolValue(d.msg.id, d.msg.value);
+		} else if(d.cmd == 'setSendRest') {
+			console.log('setSendRest:');
+			console.log(d);
+			changeBoolValue(d.msg.id, d.msg.value);
+		} else if(d.cmd == 'setModule') {
+			console.log('setModule:');
+			console.log(d);
+			changeBoolValue(d.msg.id, d.msg.value);
+		} else if(d.cmd == 'restartRequired') {
+			console.log('restartRequired:');
+			console.log(d);
 			let restartRequired = document.getElementById('restartRequired');
-			restartRequired.classList.add('active');
-			restartRequired.innerHTML = '!!! Restart Required !!!'
+			restartRequired.classList.remove('wpHidden');
+			restartRequired.innerHTML = '!!! Restart Required !!!';
+		} else if(d.cmd == 'remainPumpInPause') {
+			console.log('remainPumpInPause:');
+			console.log(d);
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.remove('wpHidden');
+			let remainPumpInPause = document.getElementById('remainPumpInPause');
+			remainPumpInPause.innerHTML = d.msg;
+		} else if(d.cmd == 'pumpStatus') {
+			console.log('pumpStatus:');
+			console.log(d);
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.remove('wpHidden');
+			changePumpState('pumpCycleActive', d.msg.pumpCycleActive != 0);
+			changePumpState('pumpStarted', d.msg.pumpStarted != 0);
+			changePumpState('pumpInPause', d.msg.pumpInPause != 0);
+		} else if(d.cmd == 'pumpCycleFinished') {
+			console.log('pumpCycleFinished:');
+			console.log(d);
+			let LiPump = document.getElementById('LiPump');
+			LiPump.classList.add('wpHidden');
+		} else if(d.cmd == 'updateProgress') {
+			console.log('updateProgress:');
+			console.log(d);
+			document.getElementById('progressContainer').classList.remove('wpHidden');
+			let progress = document.getElementById('progress');
+			let progressVal = document.getElementById('progressVal');
+			progress.style.width = d.percent.replace(/\s/g, '');
+			progressVal.innerHTML = d.percent;
+		} else {
+			console.log('unknown command:');
+			console.log(d);
 		}
 	} else {
-		if(!d.newline) {
-			if(WebSerialBox.hasChildNodes()) {
-				WebSerialBox.removeChild(WebSerialBox.children[0]);
-			}
-		}
+		console.log('[d.cmd = undefined]:');
+		console.log(d);
 		WebSerialBox.innerHTML =
 			'<p>' +
 				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
@@ -231,16 +321,34 @@ function onMessage(event) {
 			'</p>' + WebSerialBox.innerHTML;
 	}
 }
+function changePumpState(elem, state) {
+	let elemHTML = document.getElementById(elem);
+	if(state) {
+		elemHTML.classList.add('color-ok');
+		elemHTML.innerHTML = 'On';
+	} else {
+		elemHTML.classList.remove('color-ok');
+		elemHTML.innerHTML = 'Off';
+	}
+}
+function changeBoolValue(elem, state) {
+	let elemHTML = document.getElementById(elem);
+	if(state) {
+		elemHTML.classList.add('color-ok');
+	} else {
+		elemHTML.classList.remove('color-ok');
+	}
+}
 function changeModule(e) {
 	xmlHttp.open("GET", "/setModule?Module=" + e.target.id, false);
 	xmlHttp.send(null);
 }
-function changeSendRest(e) {
-	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
-	xmlHttp.send(null);
-}
 function changeDebug(e) {
 	xmlHttp.open("GET", "/setDebug?Debug=" + e.target.id, false);
+	xmlHttp.send(null);
+}
+function changeSendRest(e) {
+	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
 	xmlHttp.send(null);
 }
 function cmdHandle(e) {

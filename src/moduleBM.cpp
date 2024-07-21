@@ -81,7 +81,7 @@ void moduleBM::setSubscribes() {
 void moduleBM::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
-			uint16_t readThreshold = msg.toInt();
+			uint16 readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
 				EEPROM.put(wpEEPROM.byteBMThreshold, threshold);
@@ -102,7 +102,7 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 void moduleBM::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("bm", String(bm));
+		wpRest.error = wpRest.error | !wpRest.sendRest("bm", bm ? "true" : "false");
 		wpRest.trySend = true;
 	}
 	bmLast = bm;

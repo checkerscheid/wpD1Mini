@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 142                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 142 2024-06-14 07:49:48Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 163 2024-07-14 19:03:20Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -25,7 +25,6 @@ void helperOnlineToggler::init() {
 	// commands
 	mqttTopicOnlineToggler = wpFZ.DeviceName + "/info/Online";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/OnlineToggler";
-
 }
 
 //###################################################################################
@@ -42,10 +41,10 @@ void helperOnlineToggler::cycle() {
 	}
 }
 
-uint16_t helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 142 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 helperOnlineToggler::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -75,7 +74,10 @@ void helperOnlineToggler::publishValues() {
 	publishValues(false);
 }
 void helperOnlineToggler::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
+	if(force) {
+		publishCountDebug = wpFZ.publishQoS;
+		wpMqtt.mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
+	}
 	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());

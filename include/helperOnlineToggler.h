@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 141                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.h 141 2024-06-12 06:33:28Z           $ #
+//# File-ID      : $Id:: helperOnlineToggler.h 163 2024-07-14 19:03:20Z           $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperOnlineToggler_h
@@ -30,7 +30,7 @@ class helperOnlineToggler {
 		helperOnlineToggler();
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 		void changeDebug();
 		void setMqttOffline();
 
@@ -41,9 +41,9 @@ class helperOnlineToggler {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 141 $";
+		String SVNh = "$Rev: 163 $";
 		bool DebugLast = false;
-		uint16_t publishCountDebug = 0;
+		uint16 publishCountDebug = 0;
 		unsigned long lastContact;
 		const unsigned long Minutes10 = 1000 * 60 * 60;
 };

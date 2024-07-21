@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 139                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.h 139 2024-06-11 10:08:54Z                     $ #
+//# File-ID      : $Id:: moduleLDR.h 163 2024-07-14 19:03:20Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLDR_h
@@ -23,8 +23,8 @@ class moduleLDR {
 	public:
 		moduleLDR();
 		moduleBase* mb;
-		int16_t ldr;
-		int8_t correction = 0;
+		int ldr;
+		int8 correction = 0;
 
 		// values
 		String mqttTopicLdr;
@@ -34,7 +34,7 @@ class moduleLDR {
 		// section to copy
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -51,24 +51,24 @@ class moduleLDR {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8_t MaxCycle();
-		uint8_t MaxCycle(uint8_t maxCycle);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t LDRPin;
-		int16_t ldrLast;
-		uint16_t publishCountLdr;
-		static const uint8_t avgLength = 128;
+		uint8 LDRPin;
+		int ldrLast;
+		uint16 publishCountLdr;
+		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint16_t calcAvg(uint16_t raw);
+		uint16 calcAvg(uint16 raw);
 		void printPublishValueDebug(String name, String value, String publishCount);
 
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 139 $";
+		String SVNh = "$Rev: 163 $";
 };
 extern moduleLDR wpLDR;
 

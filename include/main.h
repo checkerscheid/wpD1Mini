@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 144 2024-06-18 17:20:09Z                          $ #
+//# File-ID      : $Id:: main.h 163 2024-07-14 19:03:20Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -30,25 +30,27 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
-#include <moduleBM2.h>
+#include <moduleWindow.h>
+#include <moduleAnalogOut.h>
 #include <moduleRelais.h>
+#include <moduleRpm.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
 #include <wpFreakaZone.h>
 
-uint16_t getVersion();
-void buildChecker(uint16_t &v, uint16 moduleBuild);
-uint16_t getBuild();
+uint16 getVersion();
+void buildChecker(uint16 &v, uint16 moduleBuild);
+uint16 getBuild();
 String getStringVersion();
-uint16_t getGlobalBuild();
-void BuildChecker(uint16_t &v, uint16 moduleBuild);
+uint16 getGlobalBuild();
+void BuildChecker(uint16 &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 144 $";
+String SVNh = "$Rev: 163 $";
 // counter
-uint16_t publishCountRssi = 0;
+uint16 publishCountRssi = 0;
 
 // value stores for Com
 int rssi = 0;

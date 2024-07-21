@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 136 2024-06-09 15:37:41Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -51,17 +51,17 @@ void wpFreakaZone::cycle() {
 	publishValues();
 }
 
-uint16_t wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 136 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 wpFreakaZone::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-uint16_t wpFreakaZone::getBuild(String Rev) {
+uint16 wpFreakaZone::getBuild(String Rev) {
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
-	uint16_t returns = Rev.toInt();
+	uint16 returns = Rev.toInt();
 	return returns;
 }
 
@@ -136,6 +136,17 @@ void wpFreakaZone::blink() {
 		digitalWrite(LED_BUILTIN, led);
 		delay(blinkDelay);
 	}
+}
+
+long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
+	if(inMax - inMin == 0) {
+		DebugWS(strERRROR, "Map", "risky math operation: 'inMax - inMin == 0'");
+		return 0;
+	}
+	long returns = map(in, inMin, inMax, outMin, outMax);
+	if(returns < outMin) returns = outMin;
+	if(returns > outMax) returns = outMax;
+	return returns;
 }
 
 String wpFreakaZone::JsonKeyValue(String name, String value) {
@@ -242,9 +253,6 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 
 void wpFreakaZone::DebugWS(String typ, String func, String msg) {
-	DebugWS(typ, func, msg, true);
-}
-void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 	String msgheader = getTime() + getOnlineTime() + typ + funcToString(func);
 	String cssClass = "color-debug";
 	if(typ == wpFZ.strINFO) cssClass = "color-info";
@@ -253,8 +261,7 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg, bool newline) {
 	String toSend = msgheader + msg;
 	Serial.println(toSend);
 	wpWebServer.webSocket.textAll("{\"msgheader\":\"" + msgheader + "\"," +
-		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"," +
-		"\"newline\":" + (newline ? "true" : "false") + "}");
+		"\"msgbody\":\"" + msg + "\",\"cssClass\":\"" + cssClass + "\"}");
 }
 // void wpFreakaZone::SendWS(String msg) {
 // 	wpWebServer.webSocket.textAll(msg);
@@ -273,6 +280,18 @@ void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");
+}
+void wpFreakaZone::SendRemainPumpInPause(String readableTime) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"remainPumpInPause\",\"msg\":\"" + readableTime + "\"}");
+}
+void wpFreakaZone::SendPumpStatus(String pumpStatus) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpStatus\",\"msg\":{" + pumpStatus + "}}");
+}
+void wpFreakaZone::pumpCycleFinished() {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpCycleFinished\"}");
+}
+void wpFreakaZone::updateProgress(int percent) {
+	wpWebServer.webSocket.textAll("{\"cmd\":\"updateProgress\",\"percent\":\"" + String(percent) + " %\"}");
 }
 void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;

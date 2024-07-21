@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 136                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 136 2024-06-09 15:37:41Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -21,6 +21,10 @@ moduleRelais::moduleRelais() {
 	// section to config and copy
 	ModuleName = "Relais";
 	mb = new moduleBase(ModuleName);
+
+	
+	debugCalcPumpCounter = 0;
+	remainPumpTimePause = 0;
 }
 void moduleRelais::init() {
 
@@ -68,8 +72,8 @@ void moduleRelais::init() {
 	// }
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
+	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestRelais);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais);
 }
 
 //###################################################################################
@@ -91,7 +95,7 @@ void moduleRelais::publishSettings() {
 void moduleRelais::publishSettings(bool force) {
 	if(wpModules.useModuleMoisture) {
 		wpMqtt.mqttClient.publish(mqttTopicPumpActive.c_str(), String(pumpActive).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicPumpPause.c_str(), String(pumpPause).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicPumpPause.c_str(), String(pumpPause / 60).c_str());
 	}
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
@@ -176,7 +180,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
-			uint8_t readPumpActive = msg.toInt();
+			uint8 readPumpActive = msg.toInt();
 			if(pumpActive != readPumpActive) {
 				pumpActive = readPumpActive;
 				EEPROM.write(wpEEPROM.bytePumpActive, pumpActive);
@@ -185,7 +189,8 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpPause.c_str()) == 0) {
-			uint16_t readPumpPause = msg.toInt();
+			uint16 readPumpPause = msg.toInt();
+			readPumpPause *= 60;
 			if(pumpPause != readPumpPause) {
 				pumpPause = readPumpPause;
 				EEPROM.put(wpEEPROM.bytePumpPause, pumpPause);
@@ -223,7 +228,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 void moduleRelais::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("relais", String(output));
+		wpRest.error = wpRest.error | !wpRest.sendRest("relais", output ? "true" : "false");
 		wpRest.trySend = true;
 	}
 	outputLast = output;
@@ -267,6 +272,7 @@ void moduleRelais::calcPump() {
 				pumpCycleActive = true;
 				pumpStarted = false;
 				pumpInPause = false;
+				SendPumpStatus();
 				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "Detect 'toDry', start Pump Cycle");
 				}
@@ -276,6 +282,7 @@ void moduleRelais::calcPump() {
 				autoValue = true;
 				pumpStarted = true;
 				pumpTimeStart = m;
+				SendPumpStatus();
 				if(mb->debug) {
 					wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "start 'pump' (" + String(pumpTimeStart) + ")");
 				}
@@ -286,6 +293,8 @@ void moduleRelais::calcPump() {
 					autoValue = false;
 					pumpInPause = true;
 					pumpTimePause = m;
+					remainPumpTimePause = pumpTimePause + (pumpPause * 1000);
+					SendPumpStatus();
 					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pump', start 'pumpPause' (" + String(pumpTimePause) + ")");
 					}
@@ -297,13 +306,40 @@ void moduleRelais::calcPump() {
 					pumpCycleActive = false;
 					pumpStarted = false;
 					pumpInPause = false;
+					wpFZ.pumpCycleFinished();
 					if(mb->debug) {
 						wpFZ.DebugWS(wpFZ.strDEBUG, "calcPump", "stopped 'pumpPause' and reset");
 					}
 				}
+				if(mb->debug) {
+					if(++debugCalcPumpCounter >= 4) {
+						unsigned long calced = remainPumpTimePause - m;
+						wpFZ.SendRemainPumpInPause(getReadableTime(calced));
+						debugCalcPumpCounter = 0;
+					}
+				}
 			}
+
 		}
 	}
+}
+void moduleRelais::SendPumpStatus() {
+	if(mb->debug) {
+		wpFZ.SendPumpStatus(
+			"\"pumpCycleActive\":" + String(pumpCycleActive) + ","
+			"\"pumpStarted\":" + String(pumpStarted) + ","
+			"\"pumpInPause\":" + String(pumpInPause)
+		);
+	}
+}
+String moduleRelais::getReadableTime(unsigned long time) {
+	unsigned long secall = (unsigned long) time / 1000;
+	unsigned long minohnesec = (unsigned long) round(secall / 60);
+	byte sec = secall % 60;
+	unsigned long h = (unsigned long) round(minohnesec / 60);
+	byte min = minohnesec % 60;
+	String msg = (h < 10 ? "0" + String(h) : String(h)) + ":" + (min < 10 ? "0" + String(min) : String(min)) + ":" + (sec < 10 ? "0" + String(sec) : String(sec));
+	return msg;
 }
 // }
 void moduleRelais::printPublishValueDebug(String name, String value, String publishCount) {
@@ -314,10 +350,10 @@ void moduleRelais::printPublishValueDebug(String name, String value, String publ
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16_t moduleRelais::getVersion() {
-	String SVN = "$Rev: 136 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 moduleRelais::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

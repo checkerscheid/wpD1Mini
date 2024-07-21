@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 137                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 137 2024-06-09 15:38:30Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -30,20 +30,20 @@ moduleBase::moduleBase(String moduleName) {
 	_useMaxCycle = false;
 	_useError = false;
 }
-void moduleBase::initRest(uint16_t addrSendRest, byte byteSendRest, uint8_t bitSendRest) {
+void moduleBase::initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest) {
 	_addrSendRest = addrSendRest;
 	_byteSendRest = byteSendRest;
 	_bitSendRest = bitSendRest;
 	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + _name;
 }
-void moduleBase::initUseAvg(uint16_t addrUseAvg, byte byteUseAvg, uint8_t bitUseAvg) {
+void moduleBase::initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg) {
 	_useUseAvg = true;
 	_addrUseAvg = addrUseAvg;
 	_byteUseAvg = byteUseAvg;
 	_bitUseAvg = bitUseAvg;
 	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + _name + "/useAvg";
 }
-void moduleBase::initDebug(uint16_t addrDebug, byte byteDebug, uint8_t bitDebug) {
+void moduleBase::initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug) {
 	_addrDebug = addrDebug;
 	_byteDebug = byteDebug;
 	_bitDebug = bitDebug;
@@ -53,7 +53,7 @@ void moduleBase::initError() {
 	_useError = true;
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + _name;
 }
-void moduleBase::initMaxCycle(uint16_t addrMaxCycle) {
+void moduleBase::initMaxCycle(uint16 addrMaxCycle) {
 	_useMaxCycle = true;
 	_addrMaxCycle = addrMaxCycle;
 	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + _name + "/maxCycle";
@@ -61,13 +61,13 @@ void moduleBase::initMaxCycle(uint16_t addrMaxCycle) {
 void moduleBase::changeSendRest() {
 	sendRest = !sendRest;
 	writeEEPROMsendRest();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value: sendRest = " + String(sendRest));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value " + _name + ": sendRest = " + String(sendRest));
 	wpFZ.blink();
 }
 void moduleBase::changeDebug() {
 	debug = !debug;
 	writeEEPROMdebug();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value: debug = " + String(debug));
+	wpFZ.DebugWS(wpFZ.strDEBUG, "changeDebug", "new value" + _name + ": debug = " + String(debug));
 	wpFZ.blink();
 }
 
@@ -82,7 +82,7 @@ void moduleBase::publishSettings(bool force) {
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
 		}
 		if(_useMaxCycle) {
-			wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle / (1000 / wpFZ.loopTime)).c_str());
 		}
 	}
 }
@@ -148,7 +148,8 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		uint8_t readMaxCycle = msg.toInt();
+		uint8 readMaxCycle = msg.toInt();
+		readMaxCycle *= (1000 / wpFZ.loopTime);
 		if(maxCycle != readMaxCycle) {
 			maxCycle = readMaxCycle;
 			writeEEPROMmaxCycle();

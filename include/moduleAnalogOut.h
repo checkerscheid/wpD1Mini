@@ -6,39 +6,44 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 18.06.2024                                                       #
+//# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 145                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM2.h 145 2024-06-18 17:20:41Z                     $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 163 2024-07-14 19:03:20Z               $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleBM2_h
-#define moduleBM2_h
+#ifndef moduleAnalogOut_h
+#define moduleAnalogOut_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleBM2 {
+class moduleAnalogOut {
 	public:
-		moduleBM2();
+		moduleAnalogOut();
 		moduleBase* mb;
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
+		bool handError;
+		bool handSet = false;
+		uint8 handValueSet = false;
 
-		// section for define
-		bool bm;
-		uint16_t threshold = 500;
-		String lightToTurnOn = "_";
-		String mqttTopicBM;
-		String mqttTopicThreshold;
-		String mqttTopicLightToTurnOn;
+		// values
+		String mqttTopicOut;
+		String mqttTopicAutoValue;
+		String mqttTopicHandValue;
+		String mqttTopicErrorHand;
+		// settings
+		// commands
+		String mqttTopicSetHand;
+		String mqttTopicSetHandValue;
 
 		// section to copy
-		uint8_t maxCycle = 5;
-		uint8_t cycleCounter = 0;
-		String mqttTopicMaxCycle;
 		void init();
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -53,19 +58,27 @@ class moduleBM2 {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+		uint8 MaxCycle();
+		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8_t BMPin;
-		int16_t bmLast;
-		uint16_t publishCountBM;
+		uint8 analogOutPin;
+		uint8 outputLast;
+		uint16 publishCountOutput;
+		uint8 autoValueLast;
+		uint16 publishCountAutoValue;
+		uint8 handValueLast;
+		uint16 publishCountHandValue;
+		bool handErrorLast;
+		uint16 publishCountHandError;
+
 		void publishValue();
-		void printPublishValueDebug(String name, String value, String publishCount);
 		void calc();
+		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 145 $";
-
+		String SVNh = "$Rev: 163 $";
 };
-extern moduleBM2 wpBM2;
+extern moduleAnalogOut wpAnalogOut;
 
 #endif

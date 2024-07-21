@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 144                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 144 2024-06-18 17:20:09Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 163 2024-07-14 19:03:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -32,8 +32,10 @@
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
-#include <moduleBM2.h>
+#include <moduleWindow.h>
+#include <moduleAnalogOut.h>
 #include <moduleRelais.h>
+#include <moduleRpm.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
@@ -49,22 +51,22 @@ class wpFreakaZone {
 		const char* password = "Welc0me@wp-Scheid.com";
 
 		const char* mqttServer = "mqtt.freakazone.com";
-		const uint16_t mqttServerPort = 1883;
+		const uint16 mqttServerPort = 1883;
 		const char* restServer = "light.freakazone.com";
-		const uint16_t restServerPort = 255;
-		const char* updateServer = "http://d1miniupdate.freakazone.com";
-		const uint16_t finderListenPort = 51346;
-		const uint16_t loopTime = 200; // ms
-		const uint16_t minute10  = 5 * 60 * 10;
-		const uint16_t minute5 = 5 * 60 * 5;
-		const uint16_t minute2 = 5 * 60 * 2;
-		const uint16_t sekunde30 = 5 * 30;
-		const uint16_t sekunde10 = 5 * 10;
-		const uint16_t publishQoS = minute10; // 5 because loopTime = 200
+		const uint16 restServerPort = 255;
+		const char* updateServer = "d1miniupdate.freakazone.com";
+		const uint16 finderListenPort = 51346;
+		const uint16 loopTime = 200; // ms
+		const uint16 minute10  = 5 * 60 * 10;
+		const uint16 minute5 = 5 * 60 * 5;
+		const uint16 minute2 = 5 * 60 * 2;
+		const uint16 sekunde30 = 5 * 30;
+		const uint16 sekunde10 = 5 * 10;
+		const uint16 publishQoS = minute10; // 5 because loopTime = 200
 
-		uint16_t MajorVersion = 3;
-		uint16_t MinorVersion = 1;
-		uint16_t Build;
+		uint16 MajorVersion = 3;
+		uint16 MinorVersion = 1;
+		uint16 Build;
 		String Version;
 
 		String OnSince;
@@ -97,26 +99,30 @@ class wpFreakaZone {
 		wpFreakaZone();
 		void init(String);
 		void cycle();
-		uint16_t getVersion();
+		uint16 getVersion();
 
-		uint16_t getBuild(String);
+		uint16 getBuild(String);
 		String getTime();
 		String getDateTime();
 		String getOnlineTime();
 		String getOnlineTime(bool forDebug);
 		String funcToString(String msg);
 		void blink();
+		long Map(long in, long inMin, long inMax, long outMin, long outMax);
 
 		static String JsonKeyValue(String name, String value);
 		static String JsonKeyString(String name, String value);
 
 		void DebugWS(String typ, String func, String msg);
-		void DebugWS(String typ, String func, String msg, bool newline);
 		//void SendWS(String msg);
 		void SendWSModule(String htmlId, bool value);
 		void SendWSSendRest(String htmlId, bool value);
 		void SendWSDebug(String htmlId, bool value);
 		void SendRestartRequired(String msg);
+		void SendRemainPumpInPause(String readableTime);
+		void SendPumpStatus(String pumpStatus);
+		void pumpCycleFinished();
+		void updateProgress(int percent);
 		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();
@@ -129,12 +135,12 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 144 $";
-		uint16_t publishCountOnDuration;
+		String SVNh = "$Rev: 163 $";
+		uint16 publishCountOnDuration;
 		bool calcValuesLast;
-		uint16_t publishCountCalcValues;
+		uint16 publishCountCalcValues;
 		bool restartRequiredLast;
-		uint16_t publishCountRestartRequired;
+		uint16 publishCountRestartRequired;
 };
 extern wpFreakaZone wpFZ;
 

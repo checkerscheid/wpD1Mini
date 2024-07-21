@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 132                                                     $ #
+//# Revision     : $Rev:: 163                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 132 2024-06-06 11:07:48Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 163 2024-07-14 19:03:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -37,10 +37,10 @@ void helperUpdate::cycle() {
 	publishValues();
 }
 
-uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 132 $";
-	uint16_t v = wpFZ.getBuild(SVN);
-	uint16_t vh = wpFZ.getBuild(SVNh);
+uint16 helperUpdate::getVersion() {
+	String SVN = "$Rev: 163 $";
+	uint16 v = wpFZ.getBuild(SVN);
+	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -66,7 +66,8 @@ bool helperUpdate::setupOta() {
 	});
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		String logmessage = "OTA Progress: " + String((progress / (total / 100))) + " %";
-		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
+		//wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage, false);
+		wpFZ.updateProgress((progress / (total / 100)));
 	});
 	ArduinoOTA.onError([](ota_error_t error) {
 		String logmessage = "Error (" + String(error) + ") ";
@@ -88,7 +89,8 @@ void helperUpdate::check() {
 	WiFiClient wifi;
 	HTTPClient http;
 	JsonDocument doc;
-	http.begin(wifi, String(wpFZ.updateServer));
+	const String url = "http://" + String(wpFZ.updateServer);
+	http.begin(wifi, url);
 	int httpCode = http.GET();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
 	String payload = http.getString();
@@ -117,8 +119,13 @@ void helperUpdate::start(String file) {
 
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, wpFZ.updateServer);
 	// Or:
+	// 
 	// t_httpUpdate_return ret = ESPhttpUpdate.update(client, server, 80, file);
-	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer) + "/" + file);
+	
+	//const String urlfile = "http://" + String(wpFZ.updateServer) + "/" + file;
+	//t_httpUpdate_return ret = ESPhttpUpdate.update(client, urlfile);
+	
+	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer), 80, "/" + file);
 
 	switch (ret) {
 		case HTTP_UPDATE_FAILED:
@@ -188,7 +195,8 @@ void helperUpdate::finished() {
 
 void helperUpdate::progress(int cur, int total) {
 	String logmessage = "HTTP update: " + String(cur) + " of " + String(total) + " bytes";
-	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
+	//wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::progress", logmessage, false);
+	wpFZ.updateProgress((cur / (total / 100)));
 }
 
 void helperUpdate::error(int err) {
