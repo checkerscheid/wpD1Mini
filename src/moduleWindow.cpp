@@ -133,15 +133,15 @@ void moduleWindow::printPublishValueDebug(String name, String value, String publ
 }
 void moduleWindow::calc() {
 	if(digitalRead(BMPin) == LOW) {
-		bm = false;
-	} else {
 		if(bm == false) {
-			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
 				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Fenster offen");
 			}
 		}
+		bm = true;
+	} else {
+		bm = false;
 	}
 }
 

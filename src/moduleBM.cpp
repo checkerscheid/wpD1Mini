@@ -133,15 +133,15 @@ void moduleBM::printPublishValueDebug(String name, String value, String publishC
 }
 void moduleBM::calc() {
 	if(digitalRead(BMPin) == LOW) {
-		bm = false;
-	} else {
 		if(bm == false) {
-			bm = true;
 			wpFZ.blink();
 			if(mb->debug) {
 				wpFZ.DebugWS(wpFZ.strDEBUG, "calcBM", "Bewegung erkannt");
 			}
 		}
+		bm = true;
+	} else {
+		bm = false;
 	}
 }
 
