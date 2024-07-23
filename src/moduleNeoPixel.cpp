@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 173                                                     $ #
+//# Revision     : $Rev:: 174                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 173 2024-07-23 22:02:13Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 174 2024-07-23 22:24:23Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -51,7 +51,7 @@ moduleNeoPixel::moduleNeoPixel() {
 	wpFZ.loopTime = 10;
 }
 void moduleNeoPixel::init() {
-	neoPixelPin = D5;
+	neoPixelPin = D6;
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, neoPixelPin, NEO_RGB + NEO_KHZ800);
@@ -475,7 +475,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 173 $";
+	String SVN = "$Rev: 174 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
