@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 163 2024-07-14 19:03:20Z                        $ #
+//# File-ID      : $Id:: main.cpp 172 2024-07-23 22:01:24Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -53,6 +53,12 @@ void setup() {
 	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.init();
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.init();
+	}
+	if(wpModules.useModuleNeoPixel) {
+		wpNeoPixel.init();
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
@@ -108,6 +114,12 @@ void loop() {
 		if(wpModules.useModuleAnalogOut) {
 			wpAnalogOut.cycle();
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			wpAnalogOut2.cycle();
+		}
+		if(wpModules.useModuleNeoPixel) {
+			wpNeoPixel.cycle();
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
 		}
@@ -132,7 +144,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 172 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -167,6 +179,8 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpBM.getVersion());
 	buildChecker(v, wpWindow.getVersion());
 	buildChecker(v, wpAnalogOut.getVersion());
+	buildChecker(v, wpAnalogOut2.getVersion());
+	buildChecker(v, wpNeoPixel.getVersion());
 	buildChecker(v, wpRelais.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpRain.getVersion());

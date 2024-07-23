@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 172 2024-07-23 22:01:24Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 172 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -159,6 +159,8 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
 	wpModules.useModuleWindow = bitRead(bitsModules1, bitUseWindow);
 	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
+	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
+	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
 	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
 	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
 	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
@@ -195,6 +197,8 @@ void helperEEPROM::readVars() {
 	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
 	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
 	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
+	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2));
+	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel));
 	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
 	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm));
 	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
@@ -211,6 +215,8 @@ void helperEEPROM::readVars() {
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
 	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
 	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
+	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
+	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));
 	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
 	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
@@ -223,6 +229,7 @@ void helperEEPROM::readVars() {
 	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
 	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
 	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
+	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
 	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
 	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue);
 	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
@@ -239,6 +246,12 @@ void helperEEPROM::readVars() {
 	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
 	wpAnalogOut.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut));
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
+	wpAnalogOut2.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut2));
+	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
+	wpNeoPixel.MaxCycle(EEPROM.read(byteMaxCycleNeoPixel));
+	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
+	wpNeoPixel.setValueG(EEPROM.read(byteNeoPixelValueG));
+	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 	wpRpm.MaxCycle(EEPROM.read(byteMaxCycleRpm));
 	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));

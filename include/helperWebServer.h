@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 167                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 167 2024-07-15 19:58:12Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 172 2024-07-23 22:01:24Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -47,7 +47,9 @@ class helperWebServer {
 		const int8 cmdSendRestMoisture = 9;
 		const int8 cmdSendRestDistance = 10;
 		const int8 cmdSendRestAnalogOut = 11;
-		const int8 cmdSendRestRpm = 12;
+		const int8 cmdSendRestAnalogOut2 = 12;
+		const int8 cmdSendRestNeoPixel = 13;
+		const int8 cmdSendRestRpm = 14;
 		int8 doSendRestChange;
 
 		const int8 cmdDebugEEPROM = 1;
@@ -70,7 +72,9 @@ class helperWebServer {
 		const int8 cmdDebugMoisture = 27;
 		const int8 cmdDebugDistance = 28;
 		const int8 cmdDebugAnalogOut = 29;
-		const int8 cmdDebugRpm = 30;
+		const int8 cmdDebugAnalogOut2 = 30;
+		const int8 cmdDebugNeoPixel = 31;
+		const int8 cmdDebugRpm = 32;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -85,7 +89,9 @@ class helperWebServer {
 		const int8 cmdModuleMoisture = 10;
 		const int8 cmdModuleDistance = 11;
 		const int8 cmdModuleAnalogOut = 12;
-		const int8 cmdModuleRpm = 13;
+		const int8 cmdModuleAnalogOut2 = 13;
+		const int8 cmdModuleNeoPixel = 14;
+		const int8 cmdModuleRpm = 15;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -121,7 +127,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 167 $";
+		String SVNh = "$Rev: 172 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 };

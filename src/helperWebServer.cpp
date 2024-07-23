@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 169                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 169 2024-07-16 16:11:05Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 172 2024-07-23 22:01:24Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 169 $";
+	String SVN = "$Rev: 172 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -178,6 +178,19 @@ void helperWebServer::setupWebServer() {
 			message += wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue));
 			message += "},";
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += "\"AnalogOut2\":{";
+			message += wpFZ.JsonKeyValue("Hand", wpAnalogOut2.handError ? "true" : "false") + ",";
+			message += wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut2.handValue));
+			message += "},";
+		}
+		if(wpModules.useModuleNeoPixel) {
+			message += "\"NeoPixel\":{";
+			message += wpFZ.JsonKeyValue("HandValueR", String(wpNeoPixel.getValueR())) + ",";
+			message += wpFZ.JsonKeyValue("HandValueG", String(wpNeoPixel.getValueG())) + ",";
+			message += wpFZ.JsonKeyValue("HandValueB", String(wpNeoPixel.getValueB()));
+			message += "},";
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "\"Relais\":{";
 			message += wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + ",";
@@ -250,6 +263,12 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += "," + wpFZ.JsonKeyValue("AnalogOut", wpAnalogOut.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += "," + wpFZ.JsonKeyValue("AnalogOut2", wpAnalogOut2.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleNeoPixel) {
+			message += "," + wpFZ.JsonKeyValue("NeoPixel", wpNeoPixel.Debug() ? "true" : "false");
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.Debug() ? "true" : "false");
 		}
@@ -285,6 +304,12 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += "," + wpFZ.JsonKeyValue("AnalogOut", wpAnalogOut.SendRest() ? "true" : "false");
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += "," + wpFZ.JsonKeyValue("AnalogOut2", wpAnalogOut2.SendRest() ? "true" : "false");
+		}
+		if(wpModules.useModuleNeoPixel) {
+			message += "," + wpFZ.JsonKeyValue("NeoPixel", wpAnalogOut.SendRest() ? "true" : "false");
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.SendRest() ? "true" : "false");
 		}
@@ -308,6 +333,8 @@ void helperWebServer::setupWebServer() {
 		message += wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Window", wpModules.useModuleWindow ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("AnalogOut", wpModules.useModuleAnalogOut ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("AnalogOut2", wpModules.useModuleAnalogOut2 ? "true" : "false") + ",";
+		message += wpFZ.JsonKeyValue("NeoPixel", wpModules.useModuleNeoPixel ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
 		message += wpFZ.JsonKeyValue("Rpm", wpModules.useModuleRpm ? "true" : "false") + ",";
@@ -352,6 +379,14 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Module")->value() == "useAnalogOut") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useAnalogOut");
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut);
+			}
+			if(request->getParam("Module")->value() == "useAnalogOut2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useAnalogOut2");
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut2);
+			}
+			if(request->getParam("Module")->value() == "useNeoPixel") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useNeoPixel");
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleNeoPixel);
 			}
 			if(request->getParam("Module")->value() == "useRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRelais");
@@ -416,6 +451,14 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("sendRest")->value() == "sendRestAnalogOut") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestAnalogOut");
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut);
+			}
+			if(request->getParam("sendRest")->value() == "sendRestAnalogOut2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestAnalogOut2");
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut2);
+			}
+			if(request->getParam("sendRest")->value() == "sendRestNeoPixel") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestNeoPixel");
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestNeoPixel);
 			}
 			if(request->getParam("sendRest")->value() == "sendRestRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRelais");
@@ -509,6 +552,14 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugAnalogOut");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut);
 			}
+			if(request->getParam("Debug")->value() == "DebugAnalogOut2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugAnalogOut2");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut2);
+			}
+			if(request->getParam("Debug")->value() == "DebugNeoPixel") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugNeoPixel");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugNeoPixel);
+			}
 			if(request->getParam("Debug")->value() == "DebugRelais") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRelais");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRelais);
@@ -588,6 +639,67 @@ void helperWebServer::setupWebServer() {
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
 	});
+
+	if(wpModules.useModuleNeoPixel) {
+		webServer.on("/setNeoPixelDemo", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam("demo")) {
+				wpNeoPixel.demoMode = true;
+			}
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam("effect")) {
+				uint effect = request->getParam("effect")->value().toInt();
+				wpNeoPixel.demoMode = false;
+				wpNeoPixel.modeCurrent = effect;
+			}
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelSimple", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple");
+			byte r = 0;
+			byte g = 0;
+			byte b = 0;
+			if(request->hasParam("r")) {
+				r = request->getParam("r")->value().toInt();
+			}
+			if(request->hasParam("g")) {
+				g = request->getParam("g")->value().toInt();
+			}
+			if(request->hasParam("b")) {
+				b = request->getParam("b")->value().toInt();
+			}
+			wpNeoPixel.SimpleEffect(r, g, b);
+			
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
+			uint pixel = 0;
+			byte r = 0;
+			byte g = 0;
+			byte b = 0;
+			if(request->hasParam("pixel")) {
+				pixel = request->getParam("pixel")->value().toInt();
+			}
+			if(request->hasParam("r")) {
+				r = request->getParam("r")->value().toInt();
+			}
+			if(request->hasParam("g")) {
+				g = request->getParam("g")->value().toInt();
+			}
+			if(request->hasParam("b")) {
+				b = request->getParam("b")->value().toInt();
+			}
+			wpNeoPixel.ComplexEffect(pixel, r, g, b);
+			
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+	}
 	webServer.begin();
 }
 
@@ -657,6 +769,8 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleBM) wpModules.changeModuleBM(!wpModules.useModuleBM);
 		if(doModuleChange == cmdModuleWindow) wpModules.changeModuleWindow(!wpModules.useModuleWindow);
 		if(doModuleChange == cmdModuleAnalogOut) wpModules.changeModuleAnalogOut(!wpModules.useModuleAnalogOut);
+		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
+		if(doModuleChange == cmdModuleNeoPixel) wpModules.changeModuleNeoPixel(!wpModules.useModuleNeoPixel);
 		if(doModuleChange == cmdModuleRelais) wpModules.changeModuleRelais(!wpModules.useModuleRelais);
 		if(doModuleChange == cmdModuleRelaisShield) wpModules.changeModuleRelaisShield(!wpModules.useModuleRelaisShield);
 		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
@@ -676,6 +790,8 @@ void helperWebServer::doTheSendRestChange() {
 		if(doSendRestChange == cmdSendRestBM) wpBM.changeSendRest();
 		if(doSendRestChange == cmdSendRestWindow) wpWindow.changeSendRest();
 		if(doSendRestChange == cmdSendRestAnalogOut) wpAnalogOut.changeSendRest();
+		if(doSendRestChange == cmdSendRestAnalogOut2) wpAnalogOut2.changeSendRest();
+		if(doSendRestChange == cmdSendRestNeoPixel) wpNeoPixel.changeSendRest();
 		if(doSendRestChange == cmdSendRestRelais) wpRelais.changeSendRest();
 		if(doSendRestChange == cmdSendRestRpm) wpRpm.changeSendRest();
 		if(doSendRestChange == cmdSendRestRain) wpRain.changeSendRest();
@@ -702,6 +818,8 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugBM) wpBM.changeDebug();
 		if(doDebugChange == cmdDebugWindow) wpWindow.changeDebug();
 		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
+		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
+		if(doDebugChange == cmdDebugNeoPixel) wpNeoPixel.changeDebug();
 		if(doDebugChange == cmdDebugRelais) wpRelais.changeDebug();
 		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
@@ -763,6 +881,8 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule("useBM", "wpBM", wpModules.useModuleBM) +
 			wpWebServer.getchangeModule("useWindow", "wpWindow", wpModules.useModuleWindow) +
 			wpWebServer.getchangeModule("useAnalogOut", "wpAnalogOut", wpModules.useModuleAnalogOut) +
+			wpWebServer.getchangeModule("useAnalogOut2", "wpAnalogOut2", wpModules.useModuleAnalogOut2) +
+			wpWebServer.getchangeModule("useNeoPixel", "wpNeoPixel", wpModules.useModuleNeoPixel) +
 			wpWebServer.getchangeModule("useRelais", "wpRelais", wpModules.useModuleRelais) +
 			wpWebServer.getchangeModule("useRelaisShield", "wpRelaisShield", wpModules.useModuleRelaisShield) +
 			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
@@ -807,6 +927,12 @@ String processor(const String& var) {
 		if(wpModules.useModuleAnalogOut) {
 			returns += wpWebServer.getChangeDebug("DebugAnalogOut", "AnalogOut", wpAnalogOut.Debug());
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			returns += wpWebServer.getChangeDebug("DebugAnalogOut2", "AnalogOut2", wpAnalogOut2.Debug());
+		}
+		if(wpModules.useModuleNeoPixel) {
+			returns += wpWebServer.getChangeDebug("DebugNeoPixel", "NeoPixel", wpNeoPixel.Debug());
+		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += wpWebServer.getChangeDebug("DebugRelais", "Relais", wpRelais.Debug());
 		}
@@ -846,6 +972,12 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleAnalogOut) {
 			returns += wpWebServer.getChangeRest("sendRestAnalogOut", "AnalogOut", wpAnalogOut.SendRest());
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			returns += wpWebServer.getChangeRest("sendRestAnalogOut2", "AnalogOut2", wpAnalogOut2.SendRest());
+		}
+		if(wpModules.useModuleNeoPixel) {
+			returns += wpWebServer.getChangeRest("sendRestNeoPixel", "NeoPixel", wpNeoPixel.SendRest());
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += wpWebServer.getChangeRest("sendRestRelais", "Relais", wpRelais.SendRest());

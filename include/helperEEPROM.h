@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 172 2024-07-23 22:01:24Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -42,6 +42,8 @@ class helperEEPROM {
 		const uint8 bitUseWindow = 2; // include in bitsModules1
 		const uint8 bitUseAnalogOut = 3; // include in bitsModules1
 		const uint8 bitUseRpm = 4; // include in bitsModules1
+		const uint8 bitUseAnalogOut2 = 5; // include in bitsModules1
+		const uint8 bitUseNeoPixel = 6; // include in bitsModules1
 		
 		const uint16 addrBitsModules2 = 2;
 		byte bitsModules2;
@@ -84,7 +86,9 @@ class helperEEPROM {
 		byte bitsSendRestModules1;
 		const uint8 bitSendRestWindow = 0; // include in bitsSendRestModules1
 		const uint8 bitSendRestAnalogOut = 1; // include in bitsSendRestModules1
-		const uint8 bitSendRestRpm = 1; // include in bitsSendRestModules1
+		const uint8 bitSendRestRpm = 2; // include in bitsSendRestModules1
+		const uint8 bitSendRestAnalogOut2 = 3; // include in bitsSendRestModules1
+		const uint8 bitSendRestNeoPixel = 4; // include in bitsSendRestModules1
 		
 		const uint16 addrBitsSendRestModules2 = 8;
 		byte bitsSendRestModules2;
@@ -107,6 +111,8 @@ class helperEEPROM {
 		const uint8 bitDebugWindow = 0; // include in bitsDebugModules1
 		const uint8 bitDebugAnalogOut = 1; // include in bitsDebugModules1
 		const uint8 bitDebugRpm = 2; // include in bitsDebugModules1
+		const uint8 bitDebugAnalogOut2 = 3; // include in bitsDebugModules1
+		const uint8 bitDebugNeoPixel = 4; // include in bitsDebugModules1
 		
 		const uint16 addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
@@ -126,7 +132,8 @@ class helperEEPROM {
 
 		const uint16 addrBitsSettingsModules1 = 13;
 		byte bitsSettingsModules1;
-		const uint8 bitUseRpmAvg = 1; // include in bitsSettingsModules0
+		const uint8 bitUseRpmAvg = 0; // include in bitsSettingsModules1
+		const uint8 bitAnalogOut2Hand = 1; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
@@ -151,6 +158,12 @@ class helperEEPROM {
 		const uint16 byteAnalogOutHandValue = 35;
 		const uint16 byteMaxCycleRpm = 36;
 		const uint16 byteRpmCorrection = 37; // int8
+		const uint16 byteMaxCycleAnalogOut2 = 38;
+		const uint16 byteAnalogOut2HandValue = 39;
+		const uint16 byteMaxCycleNeoPixel = 40;
+		const uint16 byteNeoPixelValueR = 41;
+		const uint16 byteNeoPixelValueG = 42;
+		const uint16 byteNeoPixelValueB = 43;
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
@@ -185,7 +198,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 172 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 		const uint16 addrStartForString0 = 500;
