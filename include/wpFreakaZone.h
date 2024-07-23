@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 167                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 167 2024-07-15 19:58:12Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 172 2024-07-23 22:01:24Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -34,6 +34,8 @@
 #include <moduleBM.h>
 #include <moduleWindow.h>
 #include <moduleAnalogOut.h>
+#include <moduleAnalogOut2.h>
+#include <moduleNeoPixel.h>
 #include <moduleRelais.h>
 #include <moduleRpm.h>
 #include <moduleRain.h>
@@ -56,7 +58,7 @@ class wpFreakaZone {
 		const uint16 restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16 finderListenPort = 51346;
-		const uint16 loopTime = 200; // ms
+		uint16 loopTime = 200; // ms
 		const uint16 minute10  = 5 * 60 * 10;
 		const uint16 minute5 = 5 * 60 * 5;
 		const uint16 minute2 = 5 * 60 * 2;
@@ -136,7 +138,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 167 $";
+		String SVNh = "$Rev: 172 $";
 		uint16 publishCountOnDuration;
 		bool calcValuesLast;
 		uint16 publishCountCalcValues;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 170                                                     $ #
+//# Revision     : $Rev:: 172                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 170 2024-07-16 16:50:17Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 172 2024-07-23 22:01:24Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -45,7 +45,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 170 $";
+	String SVN = "$Rev: 172 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -169,7 +169,7 @@ void helperUpdate::publishValues(bool force) {
 		publishCountDebug = wpFZ.publishQoS;
 		publishCountNewVersion = wpFZ.publishQoS;
 	}
-	if(newVersionLast != newVersion || ++publishCountNewVersion > wpFZ.sekunde10) {
+	if(newVersionLast != newVersion || ++publishCountNewVersion > wpFZ.publishQoS) {
 		newVersionLast = newVersion;
 		wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str());
 		wpFZ.SendNewVersion(newVersion);
