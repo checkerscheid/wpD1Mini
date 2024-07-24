@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 175                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperRest.h 172 2024-07-23 22:01:24Z                    $ #
+//# File-ID      : $Id:: helperRest.h 175 2024-07-24 15:31:08Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperRest_h
@@ -38,7 +38,7 @@ class helperRest {
 		uint16 getVersion();
 		void changeDebug();
 		bool sendRest(String name, String value);
-		bool sendRestRGB(uint8 r, uint8 g, uint8 b);
+		bool sendRestRGB(uint8 r, uint8 g, uint8 b, uint8 br);
 		bool sendRawRest(String target);
 		void publishErrorRest();
 
@@ -49,7 +49,7 @@ class helperRest {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 172 $";
+		String SVNh = "$Rev: 175 $";
 		bool errorLast = false;
 		uint16 publishCountError = 0;
 		bool DebugLast = false;

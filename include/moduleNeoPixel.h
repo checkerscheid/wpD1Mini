@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 173                                                     $ #
+//# Revision     : $Rev:: 175                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 173 2024-07-23 22:02:13Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 175 2024-07-24 15:31:08Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -52,6 +52,7 @@ class moduleNeoPixel {
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
+		String mqttTopicBrightness;
 		String mqttTopicSetMode;
 		String mqttTopicDemoMode;
 
@@ -76,6 +77,7 @@ class moduleNeoPixel {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 		void SimpleEffect(byte r, byte g, byte b);
+		void SimpleEffect(byte r, byte g, byte b, byte br);
 		void ComplexEffect(uint pixel, byte r, byte g, byte b);
 		void ComplexEffect(uint pixel, uint32_t color);
 		void setValueR(uint8 r);
@@ -84,6 +86,9 @@ class moduleNeoPixel {
 		uint8 getValueG();
 		void setValueB(uint8 b);
 		uint8 getValueB();
+		void setBrightness(uint8 bn);
+		uint8 getBrightness();
+		String getStrip();
 	private:
 		uint8 neoPixelPin;
 		uint pixelCount;
@@ -93,6 +98,8 @@ class moduleNeoPixel {
 		uint8 valueGLast;
 		uint8 valueB = 0;
 		uint8 valueBLast;
+		uint8 brightness = 0;
+		uint8 brightnessLast;
 		uint16 publishCountValue;
 
 		unsigned long pixelPrevious;	// Previous Pixel Millis
@@ -119,7 +126,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 173 $";
+		String SVNh = "$Rev: 175 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 175                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 172 2024-07-23 22:01:24Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 175 2024-07-24 15:31:08Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 172 $";
+	String SVN = "$Rev: 175 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -118,133 +118,134 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 
 	webServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
-		String message = "{\"FreakaZoneDevice\":{";
-		message += wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + ",";
-		message += wpFZ.JsonKeyString("DeviceDescription", wpFZ.DeviceDescription) + ",";
-		message += wpFZ.JsonKeyString("Version", wpFZ.Version) + ",";
-		message += wpFZ.JsonKeyValue("newVersion", wpUpdate.newVersion ? "true" : "false") + ",";
 		String minimac = WiFi.macAddress();
 		minimac.replace(":", "");
 		minimac.toLowerCase();
-		message += wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + ",";
-		message += wpFZ.JsonKeyString("miniMAC", minimac) + ",";
-		message += wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + ",";
-		message += wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
+		String message = "{\"FreakaZoneDevice\":{" +
+			wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + "," +
+			wpFZ.JsonKeyString("DeviceDescription", wpFZ.DeviceDescription) + "," +
+			wpFZ.JsonKeyString("Version", wpFZ.Version) + "," +
+			wpFZ.JsonKeyValue("newVersion", wpUpdate.newVersion ? "true" : "false") + "," +
+			wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + "," +
+			wpFZ.JsonKeyString("miniMAC", minimac) + "," +
+			wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + "," +
+			wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			message += "\"DHT\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleDHT", String(wpDHT.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + ",";
-			message += wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0)));
-			message += "},";
+			message += "\"DHT\":{" +
+				wpFZ.JsonKeyValue("MaxCycleDHT", String(wpDHT.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + "," +
+				wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0))) +
+				"},";
 		}
 		if(wpModules.useModuleLDR) {
-			message += "\"LDR\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleLDR", String(wpLDR.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("useLDRAvg", wpLDR.UseAvg() ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("LDRCorrection", String(wpLDR.correction));
-			message += "},";
+			message += "\"LDR\":{" +
+				wpFZ.JsonKeyValue("MaxCycleLDR", String(wpLDR.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("useLDRAvg", wpLDR.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("LDRCorrection", String(wpLDR.correction)) +
+				"},";
 		}
 		if(wpModules.useModuleLight) {
-			message += "\"Light\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleLight", String(wpLight.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("useLightAvg", wpLight.UseAvg() ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("LightCorrection", String(wpLight.correction));
-			message += "},";
+			message += "\"Light\":{" +
+				wpFZ.JsonKeyValue("MaxCycleLight", String(wpLight.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("useLightAvg", wpLight.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("LightCorrection", String(wpLight.correction)) +
+				"},";
 		}
 		if(wpModules.useModuleBM) {
 			message += "\"BM\":{";
 			if(wpModules.useModuleLDR) {
-				message += "\"LDR\":{";
-				message += wpFZ.JsonKeyValue("Threshold", String(wpBM.threshold)) + ",";
-				message += wpFZ.JsonKeyString("LightToTurnOn", wpBM.lightToTurnOn);
-				message += "}";
+				message += "\"LDR\":{" +
+					wpFZ.JsonKeyValue("Threshold", String(wpBM.threshold)) + "," +
+					wpFZ.JsonKeyString("LightToTurnOn", wpBM.lightToTurnOn) +
+					"}";
 			}
 			message += "},";
 		}
 		if(wpModules.useModuleWindow) {
 			message += "\"Window\":{";
 			if(wpModules.useModuleLDR) {
-				message += "\"LDR\":{";
-				message += wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + ",";
-				message += wpFZ.JsonKeyString("LightToTurnOn", wpWindow.lightToTurnOn);
-				message += "}";
+				message += "\"LDR\":{" +
+					wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + "," +
+					wpFZ.JsonKeyString("LightToTurnOn", wpWindow.lightToTurnOn) +
+					"}";
 			}
 			message += "},";
 		}
 		if(wpModules.useModuleAnalogOut) {
-			message += "\"AnalogOut\":{";
-			message += wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue));
-			message += "},";
+			message += "\"AnalogOut\":{" +
+				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
+				"},";
 		}
 		if(wpModules.useModuleAnalogOut2) {
-			message += "\"AnalogOut2\":{";
-			message += wpFZ.JsonKeyValue("Hand", wpAnalogOut2.handError ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut2.handValue));
-			message += "},";
+			message += "\"AnalogOut2\":{" +
+				wpFZ.JsonKeyValue("Hand", wpAnalogOut2.handError ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut2.handValue)) +
+				"},";
 		}
 		if(wpModules.useModuleNeoPixel) {
-			message += "\"NeoPixel\":{";
-			message += wpFZ.JsonKeyValue("HandValueR", String(wpNeoPixel.getValueR())) + ",";
-			message += wpFZ.JsonKeyValue("HandValueG", String(wpNeoPixel.getValueG())) + ",";
-			message += wpFZ.JsonKeyValue("HandValueB", String(wpNeoPixel.getValueB()));
-			message += "},";
+			message += "\"NeoPixel\":{" +
+				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.getValueR())) + "," +
+				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.getValueG())) + "," +
+				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.getValueB())) + "," +
+				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.getBrightness())) +
+				"},";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			message += "\"Relais\":{";
-			message += wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("HandValue", wpRelais.handValue ? "true" : "false");
+			message += "\"Relais\":{" +
+				wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("HandValue", wpRelais.handValue ? "true" : "false");
 			if(wpModules.useModuleMoisture) {
-				message += ",\"Moisture\":{";
-				message += wpFZ.JsonKeyValue("waterEmpty", wpRelais.waterEmptySet ? "true" : "false") + ",";
-				message += wpFZ.JsonKeyValue("pumpActive", String(wpRelais.pumpActive)) + ",";
-				message += wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause / 60));
-				message += "}";
+				message += ",\"Moisture\":{" +
+					wpFZ.JsonKeyValue("waterEmpty", wpRelais.waterEmptySet ? "true" : "false") + "," +
+					wpFZ.JsonKeyValue("pumpActive", String(wpRelais.pumpActive)) + "," +
+					wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause / 60)) +
+					"}";
 			}
 			message += "},";
 		}
 		if(wpModules.useModuleRpm) {
-			message += "\"Rpm\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleRpm", String(wpRpm.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("useRpmAvg", wpRain.UseAvg() ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("RpmCorrection", String(wpRain.correction));
-			message += "},";
+			message += "\"Rpm\":{" +
+				wpFZ.JsonKeyValue("MaxCycleRpm", String(wpRpm.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("useRpmAvg", wpRain.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("RpmCorrection", String(wpRain.correction)) +
+				"},";
 		}
 		if(wpModules.useModuleRain) {
-			message += "\"Rain\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleRain", String(wpRain.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("useRainAvg", wpRain.UseAvg() ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("RainCorrection", String(wpRain.correction));
-			message += "},";
+			message += "\"Rain\":{" +
+				wpFZ.JsonKeyValue("MaxCycleRain", String(wpRain.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("useRainAvg", wpRain.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("RainCorrection", String(wpRain.correction)) +
+				"},";
 		}
 		if(wpModules.useModuleMoisture) {
-			message += "\"Moisture\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleMoisture", String(wpMoisture.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("useMoistureAvg", wpMoisture.UseAvg() ? "true" : "false") + ",";
-			message += wpFZ.JsonKeyValue("MoistureMin", String(wpMoisture.minValue)) + ",";
-			message += wpFZ.JsonKeyValue("MoistureDry", String(wpMoisture.dry)) + ",";
-			message += wpFZ.JsonKeyValue("MoistureWet", String(wpMoisture.wet));
-			message += "},";
+			message += "\"Moisture\":{" +
+				wpFZ.JsonKeyValue("MaxCycleMoisture", String(wpMoisture.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("useMoistureAvg", wpMoisture.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("MoistureMin", String(wpMoisture.minValue)) + "," +
+				wpFZ.JsonKeyValue("MoistureDry", String(wpMoisture.dry)) + "," +
+				wpFZ.JsonKeyValue("MoistureWet", String(wpMoisture.wet)) +
+				"},";
 		}
 		if(wpModules.useModuleDistance) {
-			message += "\"Distance\":{";
-			message += wpFZ.JsonKeyValue("MaxCycleDistance", String(wpDistance.MaxCycle())) + ",";
-			message += wpFZ.JsonKeyValue("distanceCorrection", String(wpDistance.correction)) + ",";
-			message += wpFZ.JsonKeyValue("maxVolume", String(wpDistance.maxVolume)) + ",";
-			message += wpFZ.JsonKeyValue("height", String(wpDistance.height));
-			message += "},";
+			message += "\"Distance\":{" +
+				wpFZ.JsonKeyValue("MaxCycleDistance", String(wpDistance.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("distanceCorrection", String(wpDistance.correction)) + "," +
+				wpFZ.JsonKeyValue("maxVolume", String(wpDistance.maxVolume)) + "," +
+				wpFZ.JsonKeyValue("height", String(wpDistance.height)) +
+				"},";
 		}
-		message += "\"Debug\":{";
-		message += wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Modules", wpModules.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("MQTT", wpMqtt.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("OnlineToggler", wpOnlineToggler.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Rest", wpRest.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Update", wpUpdate.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("WebServer", wpWebServer.Debug ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("WiFi", wpWiFi.Debug ? "true" : "false");
+		message += "\"Debug\":{" +
+			wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Modules", wpModules.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("MQTT", wpMqtt.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("OnlineToggler", wpOnlineToggler.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Rest", wpRest.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Update", wpUpdate.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("WebServer", wpWebServer.Debug ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("WiFi", wpWiFi.Debug ? "true" : "false");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += "," + wpFZ.JsonKeyValue("DHT", wpDHT.Debug() ? "true" : "false");
 		}
@@ -284,8 +285,8 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.Debug() ? "true" : "false");
 		}
-		message += "},\"SendRest\":{";
-		message += wpFZ.JsonKeyValue("WiFi", wpWiFi.sendRest ? "true" : "false");
+		message += "},\"SendRest\":{" +
+			wpFZ.JsonKeyValue("WiFi", wpWiFi.sendRest ? "true" : "false");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += "," + wpFZ.JsonKeyValue("DHT", wpDHT.SendRest() ? "true" : "false");
 		}
@@ -325,23 +326,23 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.SendRest() ? "true" : "false");
 		}
-		message += "},\"useModul\":{";
-		message += wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Window", wpModules.useModuleWindow ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("AnalogOut", wpModules.useModuleAnalogOut ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("AnalogOut2", wpModules.useModuleAnalogOut2 ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("NeoPixel", wpModules.useModuleNeoPixel ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Rpm", wpModules.useModuleRpm ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + ",";
-		message += wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false");
-		message += "}}}";
+		message += "},\"useModul\":{" +
+			wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Window", wpModules.useModuleWindow ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("AnalogOut", wpModules.useModuleAnalogOut ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("AnalogOut2", wpModules.useModuleAnalogOut2 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("NeoPixel", wpModules.useModuleNeoPixel ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Rpm", wpModules.useModuleRpm ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") +
+			"}}}";
 		request->send(200, "application/json", message.c_str());
 	});
 
@@ -643,7 +644,7 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleNeoPixel) {
 		webServer.on("/setNeoPixelDemo", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam("demo")) {
-				wpNeoPixel.demoMode = true;
+				wpNeoPixel.demoMode = !wpNeoPixel.demoMode;
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
@@ -673,6 +674,15 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.SimpleEffect(r, g, b);
 			
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelBrightness", HTTP_GET, [](AsyncWebServerRequest *request) {
+			byte b = 0;
+			if(request->hasParam("brightness")) {
+				b = request->getParam("brightness")->value().toInt();
+			}
+			wpNeoPixel.setBrightness(b);
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});

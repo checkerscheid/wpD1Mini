@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 173                                                     $ #
+//# Revision     : $Rev:: 176                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 173 2024-07-23 22:02:13Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 176 2024-07-24 16:02:43Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -55,6 +55,13 @@ void moduleNeoPixel::init() {
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, neoPixelPin, NEO_RGB + NEO_KHZ800);
+	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
+		// RGB LED has CW + WW
+		// must have output limitations
+		// @todo make logik, that CW + WW <= 254
+		wpAnalogOut.hardwareoutMax = 127;
+		wpAnalogOut2.hardwareoutMax = 127;
+	}
 
 	// Argument 1 = Number of pixels in NeoPixel strip
 	// Argument 2 = Arduino pin number (most are valid)
@@ -84,6 +91,7 @@ void moduleNeoPixel::init() {
 	mqttTopicValueR = wpFZ.DeviceName + "/ValueR";
 	mqttTopicValueG = wpFZ.DeviceName + "/ValueG";
 	mqttTopicValueB = wpFZ.DeviceName + "/ValueB";
+	mqttTopicBrightness = wpFZ.DeviceName + "/Brightness";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 
@@ -105,7 +113,7 @@ void moduleNeoPixel::init() {
 
 	strip->begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
 	strip->show();            // Turn OFF all pixels ASAP
-	strip->setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+	strip->setBrightness(brightness); // Set BRIGHTNESS to about 1/5 (max = 255)
 }
 
 // loop() function -- runs repeatedly as long as board is on ---------------
@@ -132,7 +140,7 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishCountValue = wpFZ.publishQoS;
 	}
-	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB ||
+	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightness != brightnessLast ||
 		++publishCountValue > wpFZ.publishQoS) {
 		publishValue();
 	}
@@ -143,6 +151,7 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicValueR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicValueG.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicValueB.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicBrightness.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDemoMode.c_str());
 	mb->setSubscribes();
@@ -168,6 +177,13 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 		if(valueB != readValueB) {
 			setValueB(readValueB);
 			wpFZ.DebugcheckSubscribes(mqttTopicValueB, String(valueB));
+		}
+	}
+	if(strcmp(topic, mqttTopicBrightness.c_str()) == 0) {
+		uint8 readBrightness = msg.toInt();
+		if(brightness != readBrightness) {
+			setBrightness(readBrightness);
+			wpFZ.DebugcheckSubscribes(mqttTopicBrightness, String(brightness));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetMode.c_str()) == 0) {
@@ -204,7 +220,31 @@ void moduleNeoPixel::setValueB(uint8 b) {
 	EEPROM.commit();
 }
 uint8 moduleNeoPixel::getValueB() { return valueB; }
+void moduleNeoPixel::setBrightness(uint8 br) {
+	brightness = br;
+	EEPROM.write(wpEEPROM.byteNeoPixelBrightness, brightness);
+	EEPROM.commit();
+}
+uint8 moduleNeoPixel::getBrightness() { return brightness; }
 
+String moduleNeoPixel::getStrip() {
+	String returns = "{";
+	for(uint i = 0; i < pixelCount; i++) {
+		uint32_t c = strip->getPixelColor(i);
+		uint8_t r = c >> 16;
+		uint8_t g = c >> 8;
+		uint8_t b = c;
+		returns += "\"p" + String(i) + "\"={"
+			"\"r\"=\"" + String(r) + "\","
+			"\"g\"=\"" + String(g) + "\","
+			"\"b\"=\"" + String(b) + "\""
+			"},";
+	}
+	returns += "\"ww\":" + String(wpAnalogOut.output) + ","
+		"\"cw\":" + String(wpAnalogOut2.output) + ","
+		"\"b\":" + String(strip->getBrightness()) + "}";
+	return returns;
+}
 //###################################################################################
 // private
 //###################################################################################
@@ -212,17 +252,20 @@ void moduleNeoPixel::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicValueR.c_str(), String(valueR).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueG.c_str(), String(valueG).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueB.c_str(), String(valueB).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicBrightness.c_str(), String(brightness).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRestRGB(valueR, valueG, valueB);
+		wpRest.error = wpRest.error | !wpRest.sendRestRGB(valueR, valueG, valueB, brightness);
 		wpRest.trySend = true;
 	}
 	valueRLast = valueR;
 	valueGLast = valueG;
 	valueBLast = valueB;
+	brightnessLast = brightness;
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("NeoPixel Value R", String(valueR), String(publishCountValue));
 		printPublishValueDebug("NeoPixel Value G", String(valueG), String(publishCountValue));
 		printPublishValueDebug("NeoPixel Value B", String(valueB), String(publishCountValue));
+		printPublishValueDebug("NeoPixel Brightness", String(brightness), String(publishCountValue));
 	}
 	mb->cycleCounter = 0;
 	publishCountValue = 0;
@@ -312,7 +355,7 @@ void moduleNeoPixel::calc() {
 			default:
 				if(modeCurrentLast != modeCurrent)
 					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Mode Static");
-				SimpleEffect(valueR, valueG, valueB);
+				SimpleEffect(valueR, valueG, valueB, brightness);
 				break;
 		}
 		modeCurrentLast = modeCurrent;
@@ -435,6 +478,11 @@ void moduleNeoPixel::RandomEffect(int wait) {
 	strip->show();
 }
 
+void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b, byte br) {
+	setBrightness(br);
+	strip->setBrightness(br);
+	SimpleEffect(r, g, b);
+}
 void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b) {
 	setValueR(r);
 	setValueG(g);
@@ -444,7 +492,6 @@ void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b) {
 	strip->fill(strip->Color(r, g, b));
 	strip->show();
 }
-
 void moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
 	if(pixel > pixelCount) pixel = pixelCount;
 	ComplexEffect(pixel, strip->Color(r, g, b));
@@ -475,7 +522,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 173 $";
+	String SVN = "$Rev: 176 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
