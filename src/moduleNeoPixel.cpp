@@ -51,7 +51,7 @@ moduleNeoPixel::moduleNeoPixel() {
 	wpFZ.loopTime = 10;
 }
 void moduleNeoPixel::init() {
-	neoPixelPin = D5;
+	neoPixelPin = D6;
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, neoPixelPin, NEO_RGB + NEO_KHZ800);
