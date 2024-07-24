@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 173                                                     $ #
+//# Revision     : $Rev:: 176                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 173 2024-07-23 22:02:13Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 176 2024-07-24 16:02:43Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -25,10 +25,11 @@ moduleAnalogOut2::moduleAnalogOut2() {
 void moduleAnalogOut2::init() {
 
 	// section for define
-	analogOut2Pin = D7;
+	analogOut2Pin = D6;
 
 	pinMode(analogOut2Pin, OUTPUT_OPEN_DRAIN);
 	output = 0;
+	hardwareoutMax = 255;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
@@ -177,7 +178,7 @@ void moduleAnalogOut2::calc() {
 	} else {
 		output = autoValue;
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, 255);
+	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(analogOut2Pin, hardwareout);
 }
 void moduleAnalogOut2::printPublishValueDebug(String name, String value, String publishCount) {
@@ -189,7 +190,7 @@ void moduleAnalogOut2::printPublishValueDebug(String name, String value, String 
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 173 $";
+	String SVN = "$Rev: 176 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

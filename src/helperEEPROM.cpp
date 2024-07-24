@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 175                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 172 2024-07-23 22:01:24Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 175 2024-07-24 15:31:08Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 172 $";
+	String SVN = "$Rev: 175 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -252,6 +252,7 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.setValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
+	wpNeoPixel.setBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 	wpRpm.MaxCycle(EEPROM.read(byteMaxCycleRpm));
 	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 174                                                     $ #
+//# Revision     : $Rev:: 176                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 174 2024-07-23 22:24:23Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 176 2024-07-24 16:02:43Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -29,6 +29,7 @@ void moduleAnalogOut::init() {
 
 	pinMode(analogOutPin, OUTPUT_OPEN_DRAIN);
 	output = 0;
+	hardwareoutMax = 255;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
@@ -177,7 +178,7 @@ void moduleAnalogOut::calc() {
 	} else {
 		output = autoValue;
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, 255);
+	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(analogOutPin, hardwareout);
 }
 void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
@@ -189,7 +190,7 @@ void moduleAnalogOut::printPublishValueDebug(String name, String value, String p
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 174 $";
+	String SVN = "$Rev: 176 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

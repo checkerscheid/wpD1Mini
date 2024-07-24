@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 173                                                     $ #
+//# Revision     : $Rev:: 176                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 173 2024-07-23 22:02:13Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 176 2024-07-24 16:02:43Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -24,6 +24,7 @@ class moduleAnalogOut2 {
 		moduleAnalogOut2();
 		moduleBase* mb;
 		uint8 output;
+		uint hardwareoutMax;
 		uint8 autoValue;
 		uint8 handValue;
 		bool handError;
@@ -77,7 +78,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 173 $";
+		String SVNh = "$Rev: 176 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 
