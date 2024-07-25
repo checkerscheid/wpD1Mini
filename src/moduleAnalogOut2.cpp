@@ -29,7 +29,7 @@ void moduleAnalogOut2::init() {
 
 	pinMode(analogOut2Pin, OUTPUT_OPEN_DRAIN);
 	output = 0;
-	hardwareoutMax = 255;
+	hardwareoutMax = 100;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;

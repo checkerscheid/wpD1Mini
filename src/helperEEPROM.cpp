@@ -272,6 +272,18 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteMoistureDry, wpMoisture.dry);
 	EEPROM.get(byteMoistureWet, wpMoisture.wet);
 	EEPROM.get(byteMaxVolume, wpDistance.volume);
+	short outKp;
+	EEPROM.get(byteAnalogOutKp, outKp);
+	wpAnalogOut.setKp(outKp);
+	short outTv;
+	EEPROM.get(byteAnalogOutTv, outTv);
+	wpAnalogOut.setTv(outTv);
+	short outTn;
+	EEPROM.get(byteAnalogOutTn, outTn);
+	wpAnalogOut.setTn(outTn);
+	short outSetPoint;
+	EEPROM.get(byteAnalogOutSetPoint, outSetPoint);
+	wpAnalogOut.setSetPoint(outSetPoint);
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
