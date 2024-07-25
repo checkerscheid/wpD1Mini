@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 163 2024-07-14 19:03:20Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 177 2024-07-25 17:36:45Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -24,7 +24,8 @@ moduleLight::moduleLight() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleLight::init() {
-
+	PinSCL = D1;
+	PinSDA = D2;
 	// section for define
 	light = 0;
 	// values
@@ -160,7 +161,7 @@ void moduleLight::printPublishValueDebug(String name, String value, String publi
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

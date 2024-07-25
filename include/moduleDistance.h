@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: moduleDistance.h 177 2024-07-25 17:36:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDistance_h
@@ -23,6 +23,10 @@ class moduleDistance {
 	public:
 		moduleDistance();
 		moduleBase* mb;
+		uint8 PinTrig;
+		uint8 PinEcho;
+
+		// section for define
 		uint16 volume;
 		uint16 distanceRaw;
 		uint16 distanceAvg;
@@ -62,8 +66,6 @@ class moduleDistance {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 trigPin;
-		uint8 echoPin;
 		uint16 volumeLast;
 		uint16 publishCountVolume;
 		uint16 distanceRawLast;
@@ -84,7 +86,7 @@ class moduleDistance {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleDistance wpDistance;
 

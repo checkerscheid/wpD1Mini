@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 172 2024-07-23 22:01:24Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 177 2024-07-25 17:36:45Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -79,6 +79,10 @@ class wpFreakaZone {
 		const String strWARN   = "[* WARN  *]";
 		const String strERRROR = "[! ERROR !]";
 
+		const char* Pins[17] = {"D3", "TX", "D4", "RX", "D2", "D1",
+			"6", "7", "8", "9", "10", "11",
+			"D6", "D7", "D5", "D8", "D0"};
+
 		String DeviceName = "BasisEmpty";
 		String DeviceDescription = "BasisEmpty";
 		bool calcValues;
@@ -138,7 +142,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 172 $";
+		String SVNh = "$Rev: 177 $";
 		uint16 publishCountOnDuration;
 		bool calcValuesLast;
 		uint16 publishCountCalcValues;

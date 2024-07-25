@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.h 163 2024-07-14 19:03:20Z                    $ #
+//# File-ID      : $Id:: moduleRain.h 177 2024-07-25 17:36:45Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRain_h
@@ -23,6 +23,9 @@ class moduleRain {
 	public:
 		moduleRain();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		uint16 rain;
 		int8 correction = 0;
 
@@ -54,7 +57,6 @@ class moduleRain {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 RainPin;
 		int rainLast;
 		uint16 publishCountRain;
 		static const uint8 avgLength = 128;
@@ -67,7 +69,7 @@ class moduleRain {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleRain wpRain;
 

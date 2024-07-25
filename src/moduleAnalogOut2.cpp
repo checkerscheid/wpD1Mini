@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 176                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 176 2024-07-24 16:02:43Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 177 2024-07-25 17:36:45Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -23,11 +23,10 @@ moduleAnalogOut2::moduleAnalogOut2() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleAnalogOut2::init() {
-
 	// section for define
-	analogOut2Pin = D6;
+	Pin = D6;
 
-	pinMode(analogOut2Pin, OUTPUT_OPEN_DRAIN);
+	pinMode(Pin, OUTPUT_OPEN_DRAIN);
 	output = 0;
 	hardwareoutMax = 100;
 	autoValue = 0;
@@ -179,7 +178,7 @@ void moduleAnalogOut2::calc() {
 		output = autoValue;
 	}
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
-	analogWrite(analogOut2Pin, hardwareout);
+	analogWrite(Pin, hardwareout);
 }
 void moduleAnalogOut2::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
@@ -190,7 +189,7 @@ void moduleAnalogOut2::printPublishValueDebug(String name, String value, String 
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 176 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 163 2024-07-14 19:03:20Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 177 2024-07-25 17:36:45Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -25,6 +25,10 @@ class moduleLight {
 	public:
 		moduleLight();
 		moduleBase* mb;
+		uint8 PinSCL;
+		uint8 PinSDA;
+
+		// section for define
 		uint32 light;
 		int correction = 0;
 
@@ -72,7 +76,7 @@ class moduleLight {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleLight wpLight;
 

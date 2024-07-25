@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 166                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 166 2024-07-15 12:09:13Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 177 2024-07-25 17:36:45Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -23,9 +23,8 @@ moduleMoisture::moduleMoisture() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleMoisture::init() {
-
 	// section for define
-	moisturePin = A0;
+	Pin = A0;
 	moisture = 0;
 	errorMin = false;
 
@@ -151,7 +150,7 @@ void moduleMoisture::publishValue() {
 }
 
 void moduleMoisture::calc() {
-	int read = analogRead(moisturePin);
+	int read = analogRead(Pin);
 	int minMax, avg, correct;
 	if(!isnan(read)) {
 		minMax = read;
@@ -212,7 +211,7 @@ void moduleMoisture::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 166 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

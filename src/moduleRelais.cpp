@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 177 2024-07-25 17:36:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -27,13 +27,12 @@ moduleRelais::moduleRelais() {
 	remainPumpTimePause = 0;
 }
 void moduleRelais::init() {
-
 	// section for define
-	relaisPin = D6;
+	Pin = D6;
 	if(wpModules.useModuleRelaisShield) {
-		relaisPin = D1;
+		Pin = D1;
 	}
-	pinMode(relaisPin, OUTPUT);
+	pinMode(Pin, OUTPUT);
 	output = false;
 	autoValue = false;
 	handValue = false;
@@ -250,14 +249,14 @@ void moduleRelais::calc() {
 	} else {
 		output = autoValue;
 	}
-	if(output && digitalRead(relaisPin) == LOW) {
-		digitalWrite(relaisPin, HIGH);
+	if(output && digitalRead(Pin) == LOW) {
+		digitalWrite(Pin, HIGH);
 		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calc", "Relais turns on");
 		}
 	}
-	if(!output && digitalRead(relaisPin) == HIGH) {
-		digitalWrite(relaisPin, LOW);
+	if(!output && digitalRead(Pin) == HIGH) {
+		digitalWrite(Pin, LOW);
 		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calc", "Relais turns off");
 		}
@@ -351,7 +350,7 @@ void moduleRelais::printPublishValueDebug(String name, String value, String publ
 // section to copy
 //###################################################################################
 uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
