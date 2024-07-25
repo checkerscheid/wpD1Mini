@@ -51,17 +51,10 @@ moduleNeoPixel::moduleNeoPixel() {
 	wpFZ.loopTime = 10;
 }
 void moduleNeoPixel::init() {
-	neoPixelPin = D6;
+	neoPixelPin = D5;
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, neoPixelPin, NEO_RGB + NEO_KHZ800);
-	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
-		// RGB LED has CW + WW
-		// must have output limitations
-		// @todo make logik, that CW + WW <= 254
-		wpAnalogOut.hardwareoutMax = 127;
-		wpAnalogOut2.hardwareoutMax = 127;
-	}
 
 	// Argument 1 = Number of pixels in NeoPixel strip
 	// Argument 2 = Arduino pin number (most are valid)
@@ -122,6 +115,16 @@ void moduleNeoPixel::cycle() {
 		calc();
 	}
 	publishValues();
+
+	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
+		// RGB LED has CW + WW
+		// must have output limitations
+		// @todo make logik, that CW + WW <= 254
+		wpAnalogOut.hardwareoutMax = 50;
+		wpAnalogOut.handSet = true;
+		wpAnalogOut2.hardwareoutMax = 50;
+		wpAnalogOut2.handSet = true;
+	}
 }
 
 void moduleNeoPixel::publishSettings() {

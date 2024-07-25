@@ -175,6 +175,10 @@ class helperEEPROM {
 		const uint16 byteMoistureWet = 58;
 		const uint16 byteMaxVolume = 60;
 		const uint16 byteWindowThreshold = 62;
+		const uint16 byteAnalogOutKp = 64;
+		const uint16 byteAnalogOutTn = 66;
+		const uint16 byteAnalogOutTv = 68;
+		const uint16 byteAnalogOutSetPoint = 70;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
