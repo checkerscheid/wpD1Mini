@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 178                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 177 2024-07-25 17:36:45Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 178 2024-07-25 17:53:39Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -118,12 +118,12 @@ void moduleNeoPixel::cycle() {
 
 	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
 		// RGB LED has CW + WW
+		// use AnalogOut for WW or White
+		// use AnalogOut2 for CW with WW
 		// must have output limitations
 		// @todo make logik, that CW + WW <= 254
 		wpAnalogOut.hardwareoutMax = 50;
-		wpAnalogOut.handSet = true;
 		wpAnalogOut2.hardwareoutMax = 50;
-		wpAnalogOut2.handSet = true;
 	}
 }
 
@@ -525,7 +525,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 178 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
