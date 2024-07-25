@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 172 2024-07-23 22:01:24Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 177 2024-07-25 17:36:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -24,8 +24,8 @@ moduleWindow::moduleWindow() {
 }
 void moduleWindow::init() {
 	// section for define
-	BMPin = D6;
-	pinMode(BMPin, INPUT_PULLUP);
+	Pin = D6;
+	pinMode(Pin, INPUT_PULLUP);
 	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
@@ -132,7 +132,7 @@ void moduleWindow::printPublishValueDebug(String name, String value, String publ
 	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
 void moduleWindow::calc() {
-	if(digitalRead(BMPin) == LOW) {
+	if(digitalRead(Pin) == LOW) {
 		if(bm == false) {
 			wpFZ.blink();
 			if(mb->debug) {
@@ -150,7 +150,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 172 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

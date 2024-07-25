@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.h 163 2024-07-14 19:03:20Z                     $ #
+//# File-ID      : $Id:: moduleLDR.h 177 2024-07-25 17:36:45Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLDR_h
@@ -23,6 +23,9 @@ class moduleLDR {
 	public:
 		moduleLDR();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		int ldr;
 		int8 correction = 0;
 
@@ -54,7 +57,6 @@ class moduleLDR {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 LDRPin;
 		int ldrLast;
 		uint16 publishCountLdr;
 		static const uint8 avgLength = 128;
@@ -68,7 +70,7 @@ class moduleLDR {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleLDR wpLDR;
 

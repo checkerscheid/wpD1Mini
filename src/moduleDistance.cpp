@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 163 2024-07-14 19:03:20Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 177 2024-07-25 17:36:45Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -23,12 +23,11 @@ moduleDistance::moduleDistance() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleDistance::init() {
-
 	// section for define
-	trigPin = D1;
-	echoPin = D2;
-	pinMode(trigPin, OUTPUT);
-	pinMode(echoPin, INPUT);
+	PinTrig = D1;
+	PinEcho = D2;
+	pinMode(PinTrig, OUTPUT);
+	pinMode(PinEcho, INPUT);
 	volume = 0;
 	distanceRaw = 0;
 	distanceAvg = 0;
@@ -171,14 +170,14 @@ void moduleDistance::publishDistanceAvg() {
 void moduleDistance::calc() {
 	unsigned long duration;
 	// Sender kurz ausschalten um Störungen des Signal zu vermeiden
-	digitalWrite(trigPin, LOW);
+	digitalWrite(PinTrig, LOW);
 	delay(10);
 	// Signal senden
-	digitalWrite(trigPin, HIGH);
+	digitalWrite(PinTrig, HIGH);
 	delayMicroseconds(10);
-	digitalWrite(trigPin, LOW);
+	digitalWrite(PinTrig, LOW);
 	// Zeit messen, bis das Signal zurückkommt, mit timeout
-	duration = pulseIn(echoPin, HIGH, wpFZ.loopTime * 1000);
+	duration = pulseIn(PinEcho, HIGH, wpFZ.loopTime * 1000);
 	if(duration > 0) {
 		distanceRaw = ((duration * 0.03432 / 2) * 10) + correction;
 		distanceAvg = calcAvg(distanceRaw);
@@ -224,7 +223,7 @@ void moduleDistance::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

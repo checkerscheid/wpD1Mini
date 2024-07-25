@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 172 2024-07-23 22:01:24Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 177 2024-07-25 17:36:45Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -23,10 +23,9 @@ moduleRpm::moduleRpm() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleRpm::init() {
-
 	// section for define
-	RpmPin = D5;
-	pinMode(RpmPin, INPUT);
+	Pin = D5;
+	pinMode(Pin, INPUT);
 	rpm = 0;
 	// values
 	mqttTopicRpm = wpFZ.DeviceName + "/" + ModuleName;
@@ -111,7 +110,7 @@ void moduleRpm::publishValue() {
 }
 
 void moduleRpm::calc() {
-	uint32 raw = pulseIn(RpmPin, HIGH, 200 * 1000);
+	uint32 raw = pulseIn(Pin, HIGH, 200 * 1000);
 	if(raw > 0) {
 		uint32 duration = raw / 1000;
 		uint32 read = 1000 / duration / 4 * 60;
@@ -159,7 +158,7 @@ void moduleRpm::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 172 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

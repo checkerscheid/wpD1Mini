@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 175                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 175 2024-07-24 15:31:08Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 177 2024-07-25 17:36:45Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 175 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -133,6 +133,7 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += "\"DHT\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpDHT.Pin])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleDHT", String(wpDHT.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + "," +
 				wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0))) +
@@ -140,6 +141,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleLDR) {
 			message += "\"LDR\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpLDR.Pin])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleLDR", String(wpLDR.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("useLDRAvg", wpLDR.UseAvg() ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("LDRCorrection", String(wpLDR.correction)) +
@@ -147,15 +149,18 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleLight) {
 			message += "\"Light\":{" +
+				wpFZ.JsonKeyString("PinSCL", String(wpFZ.Pins[wpLight.PinSCL])) + "," +
+				wpFZ.JsonKeyString("PinSDA", String(wpFZ.Pins[wpLight.PinSDA])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleLight", String(wpLight.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("useLightAvg", wpLight.UseAvg() ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("LightCorrection", String(wpLight.correction)) +
 				"},";
 		}
 		if(wpModules.useModuleBM) {
-			message += "\"BM\":{";
+			message += "\"BM\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpBM.Pin]));
 			if(wpModules.useModuleLDR) {
-				message += "\"LDR\":{" +
+				message += ",\"LDR\":{" +
 					wpFZ.JsonKeyValue("Threshold", String(wpBM.threshold)) + "," +
 					wpFZ.JsonKeyString("LightToTurnOn", wpBM.lightToTurnOn) +
 					"}";
@@ -163,7 +168,8 @@ void helperWebServer::setupWebServer() {
 			message += "},";
 		}
 		if(wpModules.useModuleWindow) {
-			message += "\"Window\":{";
+			message += "\"Window\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpWindow.Pin]));
 			if(wpModules.useModuleLDR) {
 				message += "\"LDR\":{" +
 					wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + "," +
@@ -174,18 +180,21 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleAnalogOut) {
 			message += "\"AnalogOut\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + "," +
 				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
 				"},";
 		}
 		if(wpModules.useModuleAnalogOut2) {
 			message += "\"AnalogOut2\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut2.Pin])) + "," +
 				wpFZ.JsonKeyValue("Hand", wpAnalogOut2.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut2.handValue)) +
 				"},";
 		}
 		if(wpModules.useModuleNeoPixel) {
 			message += "\"NeoPixel\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpNeoPixel.Pin])) + "," +
 				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.getValueR())) + "," +
 				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.getValueG())) + "," +
 				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.getValueB())) + "," +
@@ -194,6 +203,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += "\"Relais\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRelais.Pin])) + "," +
 				wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", wpRelais.handValue ? "true" : "false");
 			if(wpModules.useModuleMoisture) {
@@ -207,6 +217,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleRpm) {
 			message += "\"Rpm\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRpm.Pin])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleRpm", String(wpRpm.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("useRpmAvg", wpRain.UseAvg() ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("RpmCorrection", String(wpRain.correction)) +
@@ -214,6 +225,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleRain) {
 			message += "\"Rain\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRain.Pin])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleRain", String(wpRain.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("useRainAvg", wpRain.UseAvg() ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("RainCorrection", String(wpRain.correction)) +
@@ -221,6 +233,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleMoisture) {
 			message += "\"Moisture\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpMoisture.Pin])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleMoisture", String(wpMoisture.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("useMoistureAvg", wpMoisture.UseAvg() ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("MoistureMin", String(wpMoisture.minValue)) + "," +
@@ -230,6 +243,8 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleDistance) {
 			message += "\"Distance\":{" +
+				wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[wpDistance.PinTrig])) + "," +
+				wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[wpDistance.PinEcho])) + "," +
 				wpFZ.JsonKeyValue("MaxCycleDistance", String(wpDistance.MaxCycle())) + "," +
 				wpFZ.JsonKeyValue("distanceCorrection", String(wpDistance.correction)) + "," +
 				wpFZ.JsonKeyValue("maxVolume", String(wpDistance.maxVolume)) + "," +

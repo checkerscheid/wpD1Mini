@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 176                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 176 2024-07-24 16:02:43Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 177 2024-07-25 17:36:45Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -23,11 +23,10 @@ moduleAnalogOut::moduleAnalogOut() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleAnalogOut::init() {
-
 	// section for define
-	analogOutPin = D8;
+	Pin = D8;
 
-	pinMode(analogOutPin, OUTPUT_OPEN_DRAIN);
+	pinMode(Pin, OUTPUT_OPEN_DRAIN);
 	output = 0;
 	hardwareoutMax = 100;
 	autoValue = 0;
@@ -261,7 +260,7 @@ void moduleAnalogOut::calc() {
 		output = autoValue;
 	}
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
-	analogWrite(analogOutPin, hardwareout);
+	analogWrite(Pin, hardwareout);
 }
 void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
 	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
@@ -300,7 +299,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 176 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

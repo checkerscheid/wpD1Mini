@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 163 2024-07-14 19:03:20Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 177 2024-07-25 17:36:45Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -24,7 +24,7 @@ moduleDHT::moduleDHT() {
 }
 void moduleDHT::init() {
 	// section for define
-	DHTPin = D7;
+	Pin = D7;
 	temperature = 0;
 	humidity = 0;
 	// values
@@ -39,7 +39,7 @@ void moduleDHT::init() {
 	humidityLast = 0;
 	publishCountHumidity = 0;
 
-	dht = new DHT(DHTPin, wpModules.choosenDHTmodul);
+	dht = new DHT(Pin, wpModules.choosenDHTmodul);
 	dht->begin();
 
 	// section to copy
@@ -194,7 +194,7 @@ void moduleDHT::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

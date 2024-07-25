@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 177 2024-07-25 17:36:45Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -23,6 +23,9 @@ class moduleRelais {
 	public:
 		moduleRelais();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		bool output;
 		bool autoValue;
 		bool handValue;
@@ -71,7 +74,6 @@ class moduleRelais {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
-		uint8 relaisPin;
 		bool outputLast;
 		uint16 publishCountOutput;
 		bool autoValueLast;
@@ -104,7 +106,7 @@ class moduleRelais {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleRelais wpRelais;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 175                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 175 2024-07-24 15:31:08Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 177 2024-07-25 17:36:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -25,6 +25,7 @@ class moduleNeoPixel {
 		moduleNeoPixel();
 		moduleBase* mb;
 		Adafruit_NeoPixel* strip;
+		uint8 Pin;
 
 		static const uint8 ModeStatic = 0;
 		static const uint8 ModeColorWipeRed = 1;
@@ -90,7 +91,6 @@ class moduleNeoPixel {
 		uint8 getBrightness();
 		String getStrip();
 	private:
-		uint8 neoPixelPin;
 		uint pixelCount;
 		uint8 valueR = 255;
 		uint8 valueRLast;
@@ -126,7 +126,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 175 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 163 2024-07-14 19:03:20Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 177 2024-07-25 17:36:45Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -23,9 +23,8 @@ moduleLDR::moduleLDR() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleLDR::init() {
-
 	// section for define
-	LDRPin = A0;
+	Pin = A0;
 	ldr = 0;
 	// values
 	mqttTopicLdr = wpFZ.DeviceName + "/" + ModuleName;
@@ -110,7 +109,7 @@ void moduleLDR::publishValue() {
 }
 
 void moduleLDR::calc() {
-	int read = analogRead(LDRPin);
+	int read = analogRead(Pin);
 	int minMax, avg, correct;
 	if(!isnan(read)) {
 		minMax = read;
@@ -160,7 +159,7 @@ void moduleLDR::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

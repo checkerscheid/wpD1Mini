@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.h 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: moduleMoisture.h 177 2024-07-25 17:36:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleMoisture_h
@@ -23,6 +23,9 @@ class moduleMoisture {
 	public:
 		moduleMoisture();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		int moisture;
 		byte minValue = 30;
 		uint16 dry = 1023; // high value
@@ -60,7 +63,6 @@ class moduleMoisture {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 moisturePin;
 		int moistureLast;
 		uint16 publishCountMoisture;
 		bool errorMinLast;
@@ -75,7 +77,7 @@ class moduleMoisture {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleMoisture wpMoisture;
 

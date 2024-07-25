@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 166                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 166 2024-07-15 12:09:13Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 177 2024-07-25 17:36:45Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -23,9 +23,8 @@ moduleRain::moduleRain() {
 	mb = new moduleBase(ModuleName);
 }
 void moduleRain::init() {
-
 	// section for define
-	RainPin = A0;
+	Pin = A0;
 	rain = 0;
 	// values
 	mqttTopicRain = wpFZ.DeviceName + "/" + ModuleName;
@@ -110,7 +109,7 @@ void moduleRain::publishValue() {
 }
 
 void moduleRain::calc() {
-	int read = analogRead(RainPin);
+	int read = analogRead(Pin);
 	int minMax, avg, correct, raw;
 	if(!isnan(read)) {
 		minMax = read;
@@ -163,7 +162,7 @@ void moduleRain::printPublishValueDebug(String name, String value, String publis
 // section to copy
 //###################################################################################
 uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 166 $";
+	String SVN = "$Rev: 177 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

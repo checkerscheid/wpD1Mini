@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 164                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.h 164 2024-07-14 19:05:04Z                     $ #
+//# File-ID      : $Id:: moduleRpm.h 177 2024-07-25 17:36:45Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRpm_h
@@ -23,6 +23,9 @@ class moduleRpm {
 	public:
 		moduleRpm();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		uint16 rpm;
 		int8 correction = 0;
 
@@ -54,7 +57,6 @@ class moduleRpm {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 RpmPin;
 		short rpmLast;
 		uint16 publishCountRpm;
 		static const uint8 avgLength = 128;
@@ -67,7 +69,7 @@ class moduleRpm {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 164 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleRpm wpRpm;
 

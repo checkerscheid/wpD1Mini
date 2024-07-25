@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 176                                                     $ #
+//# Revision     : $Rev:: 177                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 176 2024-07-24 16:02:43Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 177 2024-07-25 17:36:45Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -23,6 +23,9 @@ class moduleAnalogOut2 {
 	public:
 		moduleAnalogOut2();
 		moduleBase* mb;
+		uint8 Pin;
+
+		// section for define
 		uint8 output;
 		uint hardwareoutMax;
 		uint8 autoValue;
@@ -62,7 +65,6 @@ class moduleAnalogOut2 {
 		uint8 MaxCycle();
 		uint8 MaxCycle(uint8 maxCycle);
 	private:
-		uint8 analogOut2Pin;
 		uint8 outputLast;
 		uint16 publishCountOutput;
 		uint8 autoValueLast;
@@ -78,7 +80,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 176 $";
+		String SVNh = "$Rev: 177 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 
