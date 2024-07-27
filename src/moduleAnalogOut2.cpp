@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 177 2024-07-25 17:36:45Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 179 2024-07-26 06:43:08Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -55,7 +55,6 @@ void moduleAnalogOut2::init() {
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestAnalogOut2);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut2);
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleAnalogOut2);
 }
 
 //###################################################################################
@@ -161,7 +160,6 @@ void moduleAnalogOut2::publishValue() {
 	if(wpMqtt.Debug) {
 		printPublishValueDebug("AnalogOut2", String(output), String(publishCountOutput));
 	}
-	mb->cycleCounter = 0;
 	publishCountOutput = 0;
 }
 
@@ -169,13 +167,18 @@ void moduleAnalogOut2::calc() {
 	if(handValue != handValueSet) {
 		handValue = handValueSet;
 	}
-	if(handError != handSet) {
-		handError = handSet;
-	}
-	if(handError) {
+	if(wpModules.useModuleNeoPixel) { //AnalogOut2 is used for CW
+		handError = false;
 		output = handValue;
 	} else {
-		output = autoValue;
+		if(handError != handSet) {
+			handError = handSet;
+		}
+		if(handError) {
+			output = handValue;
+		} else {
+			output = autoValue;
+		}
 	}
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(Pin, hardwareout);
@@ -189,7 +192,7 @@ void moduleAnalogOut2::printPublishValueDebug(String name, String value, String 
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -214,11 +217,4 @@ bool moduleAnalogOut2::Debug() {
 bool moduleAnalogOut2::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
-}
-uint8 moduleAnalogOut2::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
-}
-uint8 moduleAnalogOut2::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
-	return 0;
 }

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.h 177 2024-07-25 17:36:45Z                      $ #
+//# File-ID      : $Id:: moduleBM.h 179 2024-07-26 06:43:08Z                      $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBM_h
@@ -34,9 +34,6 @@ class moduleBM {
 		String mqttTopicLightToTurnOn;
 
 		// section to copy
-		uint8 maxCycle = 5;
-		uint8 cycleCounter = 0;
-		String mqttTopicMaxCycle;
 		void init();
 		void cycle();
 		uint16 getVersion();
@@ -63,7 +60,7 @@ class moduleBM {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 179 $";
 
 };
 extern moduleBM wpBM;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 177 2024-07-25 17:36:45Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 179 2024-07-26 06:43:08Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -46,7 +46,7 @@ void moduleRain::init() {
 // public
 //###################################################################################
 void moduleRain::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
 		calc();
 		mb->cycleCounter = 0;
 	}
@@ -162,7 +162,7 @@ void moduleRain::printPublishValueDebug(String name, String value, String publis
 // section to copy
 //###################################################################################
 uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

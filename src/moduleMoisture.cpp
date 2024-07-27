@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 177 2024-07-25 17:36:45Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 179 2024-07-26 06:43:08Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -53,7 +53,7 @@ void moduleMoisture::init() {
 // public
 //###################################################################################
 void moduleMoisture::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
 		calc();
 		mb->cycleCounter = 0;
 	}
@@ -211,7 +211,7 @@ void moduleMoisture::printPublishValueDebug(String name, String value, String pu
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -245,7 +245,7 @@ bool moduleMoisture::Debug(bool debug) {
 	return true;
 }
 uint8 moduleMoisture::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
+	return mb->maxCycle;
 }
 uint8 moduleMoisture::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;

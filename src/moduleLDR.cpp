@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 177 2024-07-25 17:36:45Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 179 2024-07-26 06:43:08Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -46,7 +46,7 @@ void moduleLDR::init() {
 // public
 //###################################################################################
 void moduleLDR::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
 		calc();
 		mb->cycleCounter = 0;
 	}
@@ -159,7 +159,7 @@ void moduleLDR::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -193,7 +193,7 @@ bool moduleLDR::Debug(bool debug) {
 	return true;
 }
 uint8 moduleLDR::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
+	return mb->maxCycle;
 }
 uint8 moduleLDR::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;

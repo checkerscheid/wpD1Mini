@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 180                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 172 2024-07-23 22:01:24Z                        $ #
+//# File-ID      : $Id:: main.cpp 180 2024-07-27 03:21:05Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -78,6 +78,7 @@ void setup() {
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
+	loopCounter = 0;
 }
 
 //###################################################################################
@@ -96,47 +97,51 @@ void loop() {
 	wpUpdate.cycle();
 	wpWebServer.cycle();
 	if(!wpFZ.restartRequired) {
-		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			wpDHT.cycle();
-		}
-		if(wpModules.useModuleLDR) {
-			wpLDR.cycle();
-		}
-		if(wpModules.useModuleLight) {
-			wpLight.cycle();
-		}
-		if(wpModules.useModuleBM) {
-			wpBM.cycle();
-		}
-		if(wpModules.useModuleWindow) {
-			wpWindow.cycle();
-		}
-		if(wpModules.useModuleAnalogOut) {
-			wpAnalogOut.cycle();
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			wpAnalogOut2.cycle();
+		if(++loopCounter >= 2) {
+			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+				wpDHT.cycle();
+			}
+			if(wpModules.useModuleLDR) {
+				wpLDR.cycle();
+			}
+			if(wpModules.useModuleLight) {
+				wpLight.cycle();
+			}
+			if(wpModules.useModuleBM) {
+				wpBM.cycle();
+			}
+			if(wpModules.useModuleWindow) {
+				wpWindow.cycle();
+			}
+			if(wpModules.useModuleAnalogOut) {
+				wpAnalogOut.cycle();
+			}
+			if(wpModules.useModuleAnalogOut2) {
+				wpAnalogOut2.cycle();
+			}
+			if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+				wpRelais.cycle();
+			}
+			if(wpModules.useModuleRpm) {
+				wpRpm.cycle();
+			}
+			if(wpModules.useModuleRain) {
+				wpRain.cycle();
+			}
+			if(wpModules.useModuleMoisture) {
+				wpMoisture.cycle();
+			}
+			if(wpModules.useModuleDistance) {
+				wpDistance.cycle();
+			}
+			loopCounter = 0;
 		}
 		if(wpModules.useModuleNeoPixel) {
 			wpNeoPixel.cycle();
 		}
-		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			wpRelais.cycle();
-		}
-		if(wpModules.useModuleRpm) {
-			wpRpm.cycle();
-		}
-		if(wpModules.useModuleRain) {
-			wpRain.cycle();
-		}
-		if(wpModules.useModuleMoisture) {
-			wpMoisture.cycle();
-		}
-		if(wpModules.useModuleDistance) {
-			wpDistance.cycle();
-		}
 	}
 	wpRest.cycle();
+	if(wpFZ.loopTime <= 0) wpFZ.loopTime = 100;
 	delay(wpFZ.loopTime);
 }
 
@@ -144,7 +149,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 172 $";
+	String SVN = "$Rev: 180 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
