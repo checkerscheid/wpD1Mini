@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 180                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 177 2024-07-25 17:36:45Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 180 2024-07-27 03:21:05Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 180 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -171,7 +171,7 @@ void helperWebServer::setupWebServer() {
 			message += "\"Window\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpWindow.Pin]));
 			if(wpModules.useModuleLDR) {
-				message += "\"LDR\":{" +
+				message += ",\"LDR\":{" +
 					wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + "," +
 					wpFZ.JsonKeyString("LightToTurnOn", wpWindow.lightToTurnOn) +
 					"}";
@@ -701,6 +701,24 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
+		webServer.on("/setNeoPixelWW", HTTP_GET, [](AsyncWebServerRequest *request) {
+			byte ww = 0;
+			if(request->hasParam("ww")) {
+				ww = request->getParam("ww")->value().toInt();
+			}
+			wpAnalogOut.handValueSet = ww;
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelCW", HTTP_GET, [](AsyncWebServerRequest *request) {
+			byte cw = 0;
+			if(request->hasParam("cw")) {
+				cw = request->getParam("cw")->value().toInt();
+			}
+			wpAnalogOut2.handValueSet = cw;
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
 		webServer.on("/setNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
 			uint pixel = 0;
@@ -722,6 +740,10 @@ void helperWebServer::setupWebServer() {
 			wpNeoPixel.ComplexEffect(pixel, r, g, b);
 			
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
+			request->send_P(200, "application/json", wpNeoPixel.getStripStatus().c_str());
 			wpWebServer.setBlink();
 		});
 	}

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 178                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 178 2024-07-25 17:53:39Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 179 2024-07-26 06:43:08Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -48,10 +48,10 @@ moduleNeoPixel::moduleNeoPixel() {
 	// section to config and copy
 	ModuleName = "NeoPixel";
 	mb = new moduleBase(ModuleName);
-	wpFZ.loopTime = 10;
+	//wpFZ.loopTime = 100;
 }
 void moduleNeoPixel::init() {
-	Pin = D5;
+	Pin = D7;
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
@@ -93,7 +93,6 @@ void moduleNeoPixel::init() {
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugNeoPixel);
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleNeoPixel);
 
 	// setup() function -- runs once at startup --------------------------------
 
@@ -230,18 +229,17 @@ void moduleNeoPixel::setBrightness(uint8 br) {
 }
 uint8 moduleNeoPixel::getBrightness() { return brightness; }
 
-String moduleNeoPixel::getStrip() {
+String moduleNeoPixel::getStripStatus() {
 	String returns = "{";
 	for(uint i = 0; i < pixelCount; i++) {
 		uint32_t c = strip->getPixelColor(i);
 		uint8_t r = c >> 16;
 		uint8_t g = c >> 8;
 		uint8_t b = c;
-		returns += "\"p" + String(i) + "\"={"
-			"\"r\"=\"" + String(r) + "\","
-			"\"g\"=\"" + String(g) + "\","
-			"\"b\"=\"" + String(b) + "\""
-			"},";
+		returns += "\"p" + String(i) + "\":{"
+			"\"r\":" + String(r) + ","
+			"\"g\":" + String(g) + ","
+			"\"b\":" + String(b) + "},";
 	}
 	returns += "\"ww\":" + String(wpAnalogOut.output) + ","
 		"\"cw\":" + String(wpAnalogOut2.output) + ","
@@ -270,7 +268,6 @@ void moduleNeoPixel::publishValue() {
 		printPublishValueDebug("NeoPixel Value B", String(valueB), String(publishCountValue));
 		printPublishValueDebug("NeoPixel Brightness", String(brightness), String(publishCountValue));
 	}
-	mb->cycleCounter = 0;
 	publishCountValue = 0;
 }
 
@@ -525,7 +522,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 178 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -550,11 +547,4 @@ bool moduleNeoPixel::Debug() {
 bool moduleNeoPixel::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
-}
-uint8 moduleNeoPixel::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
-}
-uint8 moduleNeoPixel::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
-	return 0;
 }

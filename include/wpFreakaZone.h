@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 180                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 177 2024-07-25 17:36:45Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 180 2024-07-27 03:21:05Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -58,7 +58,7 @@ class wpFreakaZone {
 		const uint16 restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16 finderListenPort = 51346;
-		uint16 loopTime = 200; // ms
+		uint16 loopTime = 50; // ms
 		const uint16 minute10  = 5 * 60 * 10;
 		const uint16 minute5 = 5 * 60 * 5;
 		const uint16 minute2 = 5 * 60 * 2;
@@ -79,9 +79,9 @@ class wpFreakaZone {
 		const String strWARN   = "[* WARN  *]";
 		const String strERRROR = "[! ERROR !]";
 
-		const char* Pins[17] = {"D3", "TX", "D4", "RX", "D2", "D1",
+		const char* Pins[18] = {"D3", "TX", "D4", "RX", "D2", "D1",
 			"6", "7", "8", "9", "10", "11",
-			"D6", "D7", "D5", "D8", "D0"};
+			"D6", "D7", "D5", "D8", "D0", "A0"};
 
 		String DeviceName = "BasisEmpty";
 		String DeviceDescription = "BasisEmpty";
@@ -142,7 +142,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 180 $";
 		uint16 publishCountOnDuration;
 		bool calcValuesLast;
 		uint16 publishCountCalcValues;

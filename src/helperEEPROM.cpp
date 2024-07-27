@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 177 2024-07-25 17:36:45Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 179 2024-07-26 06:43:08Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -244,11 +244,8 @@ void helperEEPROM::readVars() {
 	wpLDR.MaxCycle(EEPROM.read(byteMaxCycleLDR));
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
 	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
-	wpAnalogOut.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut));
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
-	wpAnalogOut2.MaxCycle(EEPROM.read(byteMaxCycleAnalogOut2));
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
-	wpNeoPixel.MaxCycle(EEPROM.read(byteMaxCycleNeoPixel));
 	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.setValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));

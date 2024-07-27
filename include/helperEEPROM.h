@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 177 2024-07-25 17:36:45Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 179 2024-07-26 06:43:08Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -154,13 +154,10 @@ class helperEEPROM {
 		const uint16 byteMaxCycleDistance = 31;
 		const uint16 byteDistanceCorrection = 32; // int8
 		const uint16 byteHeight = 33;
-		const uint16 byteMaxCycleAnalogOut = 34;
 		const uint16 byteAnalogOutHandValue = 35;
 		const uint16 byteMaxCycleRpm = 36;
 		const uint16 byteRpmCorrection = 37; // int8
-		const uint16 byteMaxCycleAnalogOut2 = 38;
 		const uint16 byteAnalogOut2HandValue = 39;
-		const uint16 byteMaxCycleNeoPixel = 40;
 		const uint16 byteNeoPixelValueR = 41;
 		const uint16 byteNeoPixelValueG = 42;
 		const uint16 byteNeoPixelValueB = 43;
@@ -203,7 +200,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 179 $";
 		bool DebugLast = false;
 		uint16 publishCountDebug = 0;
 		const uint16 addrStartForString0 = 500;

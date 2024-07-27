@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 177 2024-07-25 17:36:45Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 179 2024-07-26 06:43:08Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -26,6 +26,7 @@ void moduleWindow::init() {
 	// section for define
 	Pin = D6;
 	pinMode(Pin, INPUT_PULLUP);
+	digitalWrite(Pin, HIGH);
 	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
@@ -35,7 +36,6 @@ void moduleWindow::init() {
 	publishCountBM = 0;
 
 	// section to copy
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxCycle";
 
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestWindow);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugWindow);
@@ -133,6 +133,8 @@ void moduleWindow::printPublishValueDebug(String name, String value, String publ
 }
 void moduleWindow::calc() {
 	if(digitalRead(Pin) == LOW) {
+		bm = false;
+	} else {
 		if(bm == false) {
 			wpFZ.blink();
 			if(mb->debug) {
@@ -140,8 +142,6 @@ void moduleWindow::calc() {
 			}
 		}
 		bm = true;
-	} else {
-		bm = false;
 	}
 }
 
@@ -150,7 +150,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

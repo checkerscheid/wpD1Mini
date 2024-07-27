@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 177 2024-07-25 17:36:45Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 179 2024-07-26 06:43:08Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -62,8 +62,6 @@ class moduleAnalogOut2 {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8 MaxCycle();
-		uint8 MaxCycle(uint8 maxCycle);
 	private:
 		uint8 outputLast;
 		uint16 publishCountOutput;
@@ -80,7 +78,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 179 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 

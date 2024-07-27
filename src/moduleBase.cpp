@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 179 2024-07-26 06:43:08Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -82,7 +82,7 @@ void moduleBase::publishSettings(bool force) {
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
 		}
 		if(_useMaxCycle) {
-			wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle / (1000 / wpFZ.loopTime)).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
 		}
 	}
 }
@@ -149,7 +149,6 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
 		uint8 readMaxCycle = msg.toInt();
-		readMaxCycle *= (1000 / wpFZ.loopTime);
 		if(maxCycle != readMaxCycle) {
 			maxCycle = readMaxCycle;
 			writeEEPROMmaxCycle();

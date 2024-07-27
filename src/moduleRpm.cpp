@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 179                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 177 2024-07-25 17:36:45Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 179 2024-07-26 06:43:08Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -47,7 +47,7 @@ void moduleRpm::init() {
 // public
 //###################################################################################
 void moduleRpm::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= mb->maxCycle) {
+	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
 		calc();
 		mb->cycleCounter = 0;
 	}
@@ -158,7 +158,7 @@ void moduleRpm::printPublishValueDebug(String name, String value, String publish
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 179 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -192,7 +192,7 @@ bool moduleRpm::Debug(bool debug) {
 	return true;
 }
 uint8 moduleRpm::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
+	return mb->maxCycle;
 }
 uint8 moduleRpm::MaxCycle(uint8 maxCycle){
 	mb->maxCycle = maxCycle;
