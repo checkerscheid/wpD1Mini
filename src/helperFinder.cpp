@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.cpp 163 2024-07-14 19:03:20Z                $ #
+//# File-ID      : $Id:: helperFinder.cpp 181 2024-07-27 23:14:47Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperFinder.h>
@@ -32,7 +32,7 @@ void helperFinder::cycle() {
 }
 
 uint16 helperFinder::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -60,11 +60,11 @@ void helperFinder::publishValues() {
 	publishValues(false);
 }
 void helperFinder::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(force) publishDebugLast = 0;
+	if(DebugLast != Debug || wpFZ.loopStartedAt > publishDebugLast + wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 

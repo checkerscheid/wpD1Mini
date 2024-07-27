@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 175                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperRest.cpp 175 2024-07-24 15:31:08Z                  $ #
+//# File-ID      : $Id:: helperRest.cpp 181 2024-07-27 23:14:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperRest.h>
@@ -41,7 +41,7 @@ void helperRest::cycle() {
 }
 
 uint16 helperRest::getVersion() {
-	String SVN = "$Rev: 175 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -130,18 +130,18 @@ void helperRest::publishValues() {
 }
 void helperRest::publishValues(bool force) {
 	if(force) {
-		publishCountError = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
+		publishForceError = wpFZ.publishQoS;
+		publishForceDebug = wpFZ.publishQoS;
 	}
-	if(errorLast != errorIsSet || ++publishCountError > wpFZ.publishQoS) {
+	if(errorLast != errorIsSet || ++publishForceError > wpFZ.publishQoS) {
 		errorLast = errorIsSet;
 		wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(errorIsSet).c_str());
-		publishCountError = 0;
+		publishForceError = 0;
 	}
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
+		publishForceDebug = 0;
 	}
 }
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 179 2024-07-26 06:43:08Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 181 2024-07-27 23:14:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -32,23 +32,25 @@ void moduleRain::init() {
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
 
 	rainLast = 0;
-	publishCountRain = 0;
+	publishRainLast = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestRain);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRain);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseRainAvg);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleRain);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleRain);
+
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleRain::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -66,9 +68,9 @@ void moduleRain::publishValues() {
 }
 void moduleRain::publishValues(bool force) {
 	if(force) {
-		publishCountRain = wpFZ.publishQoS;
+		publishRainLast = 0;
 	}
-	if(rainLast != rain || ++publishCountRain > wpFZ.publishQoS) {
+	if(rainLast != rain || mb->CheckQoS(publishRainLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -103,9 +105,9 @@ void moduleRain::publishValue() {
 	}
 	rainLast = rain;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Rain", String(rain), String(publishCountRain));
+		mb->printPublishValueDebug("Rain", String(rain));
 	}
-	publishCountRain = 0;
+	publishRainLast = 0;
 }
 
 void moduleRain::calc() {
@@ -153,16 +155,11 @@ uint16 moduleRain::calcAvg(uint16 raw) {
 	return round(avg / avgCount);
 }
 
-void moduleRain::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -195,10 +192,10 @@ bool moduleRain::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleRain::MaxCycle(){
-	return mb->maxCycle / (1000 / wpFZ.loopTime);
+uint32 moduleRain::CalcCycle(){
+	return mb->calcCycle;
 }
-uint8 moduleRain::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleRain::CalcCycle(uint8 calcCycle){
+	mb->calcCycle = calcCycle * 1000;
 	return 0;
 }

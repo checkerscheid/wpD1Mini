@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 180                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 180 2024-07-27 03:21:05Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 181 2024-07-27 23:14:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -58,13 +58,14 @@ class wpFreakaZone {
 		const uint16 restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16 finderListenPort = 51346;
-		uint16 loopTime = 50; // ms
-		const uint16 minute10  = 5 * 60 * 10;
-		const uint16 minute5 = 5 * 60 * 5;
-		const uint16 minute2 = 5 * 60 * 2;
-		const uint16 sekunde30 = 5 * 30;
-		const uint16 sekunde10 = 5 * 10;
-		const uint16 publishQoS = minute10; // 5 because loopTime = 200
+		const uint32 minute10  = 1000 * 60 * 10;
+		const uint32 minute5 = 1000 * 60 * 5;
+		const uint32 minute2 = 1000 * 60 * 2;
+		const uint32 sekunde30 = 1000 * 30;
+		const uint32 sekunde10 = 1000 * 10;
+		const uint32 publishQoS = minute10; // 10 minutes in ms
+
+		unsigned long loopStartedAt;
 
 		uint16 MajorVersion = 3;
 		uint16 MinorVersion = 1;
@@ -142,12 +143,12 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 180 $";
-		uint16 publishCountOnDuration;
+		String SVNh = "$Rev: 181 $";
+		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
-		uint16 publishCountCalcValues;
+		unsigned long publishCalcValuesLast;
 		bool restartRequiredLast;
-		uint16 publishCountRestartRequired;
+		unsigned long publishRestartRequiredLast;
 };
 extern wpFreakaZone wpFZ;
 

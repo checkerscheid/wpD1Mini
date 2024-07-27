@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 177 2024-07-25 17:36:45Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 181 2024-07-27 23:14:47Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -59,11 +59,11 @@ class moduleLight {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8 MaxCycle();
-		uint8 MaxCycle(uint8 maxCycle);
+		uint32 CalcCycle();
+		uint32 CalcCycle(uint8 calcCycle);
 	private:
 		uint32 lightLast;
-		uint16 publishCountLight;
+		unsigned long publishLightLast;
 		static const uint8 avgLength = 128;
 		uint32 avgValues[avgLength];
 
@@ -72,11 +72,10 @@ class moduleLight {
 		uint32 calcAvg(uint32 raw);
 		void printCalcError(String name);
 		void printCalcDebug(String name, uint32 value, float raw);
-		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 181 $";
 };
 extern moduleLight wpLight;
 

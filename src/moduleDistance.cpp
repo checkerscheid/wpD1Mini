@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 179 2024-07-26 06:43:08Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 181 2024-07-27 23:14:47Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -41,25 +41,27 @@ void moduleDistance::init() {
 	mqttTopicMaxVolume = wpFZ.DeviceName + "/settings/" + ModuleName + "/maxVolume";
 
 	volumeLast = 0;
-	publishCountVolume = 0;
+	publishVolumeLast = 0;
 	distanceRawLast = 0;
-	publishCountDistanceRaw = 0;
+	publishDistanceRawLast = 0;
 	distanceAvgLast = 0;
-	publishCountDistanceAvg = 0;
+	publishDistanceAvgLast = 0;
 
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDistance);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleDistance);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleDistance);
+
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleDistance::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -79,17 +81,17 @@ void moduleDistance::publishValues() {
 }
 void moduleDistance::publishValues(bool force) {
 	if(force) {
-		publishCountVolume = wpFZ.publishQoS;
-		publishCountDistanceRaw = wpFZ.publishQoS;
-		publishCountDistanceAvg = wpFZ.publishQoS;
+		publishVolumeLast = 0;
+		publishDistanceRawLast = 0;
+		publishDistanceAvgLast = 0;
 	}
-	if(volumeLast != volume || ++publishCountVolume > wpFZ.publishQoS) {
+	if(volumeLast != volume ||mb->CheckQoS(publishVolumeLast)) {
 		publishValue();
 	}
-	if(distanceRawLast != distanceRaw || ++publishCountDistanceRaw > wpFZ.publishQoS) {
+	if(distanceRawLast != distanceRaw || mb->CheckQoS(publishDistanceRawLast)) {
 		publishDistanceRaw();
 	}
-	if(distanceAvgLast != distanceAvg || ++publishCountDistanceAvg > wpFZ.publishQoS) {
+	if(distanceAvgLast != distanceAvg || mb->CheckQoS(publishDistanceAvgLast)) {
 		publishDistanceAvg();
 	}
 	mb->publishValues(force);
@@ -144,27 +146,27 @@ void moduleDistance::publishValue() {
 	}
 	volumeLast = volume;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Volume", String(volume), String(publishCountVolume));
+		mb->printPublishValueDebug("Volume", String(volume));
 	}
-	publishCountVolume = 0;
+	publishVolumeLast = 0;
 }
 
 void moduleDistance::publishDistanceRaw() {
 	wpMqtt.mqttClient.publish(mqttTopicDistanceRaw.c_str(), String(distanceRaw).c_str());
 	distanceRawLast = distanceRaw;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("DistanceRaw", String(distanceRaw), String(publishCountDistanceRaw));
+		mb->printPublishValueDebug("DistanceRaw", String(distanceRaw));
 	}
-	publishCountDistanceRaw = 0;
+	publishDistanceRawLast = 0;
 }
 
 void moduleDistance::publishDistanceAvg() {
 	wpMqtt.mqttClient.publish(mqttTopicDistanceAvg.c_str(), String(distanceAvg).c_str());
 	distanceAvgLast = distanceAvg;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("DistanceAvg", String(distanceAvg), String(publishCountDistanceAvg));
+		mb->printPublishValueDebug("DistanceAvg", String(distanceAvg));
 	}
-	publishCountDistanceAvg = 0;
+	publishDistanceAvgLast = 0;
 }
 
 void moduleDistance::calc() {
@@ -177,7 +179,7 @@ void moduleDistance::calc() {
 	delayMicroseconds(10);
 	digitalWrite(PinTrig, LOW);
 	// Zeit messen, bis das Signal zurückkommt, mit timeout
-	duration = pulseIn(PinEcho, HIGH, wpFZ.loopTime * 1000);
+	duration = pulseIn(PinEcho, HIGH, 100 * 1000);
 	if(duration > 0) {
 		distanceRaw = ((duration * 0.03432 / 2) * 10) + correction;
 		distanceAvg = calcAvg(distanceRaw);
@@ -213,17 +215,12 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw) {
 	String logmessage = name + ": " + String(avg) + " (" + String(raw) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "calcDistance", logmessage);
 }
-void moduleDistance::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -249,10 +246,10 @@ bool moduleDistance::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleDistance::MaxCycle(){
-	return mb->maxCycle;
+uint32 moduleDistance::CalcCycle(){
+	return mb->calcCycle;
 }
-uint8 moduleDistance::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleDistance::CalcCycle(uint8 calcCycle){
+	mb->calcCycle = calcCycle * 1000;
 	return 0;
 }

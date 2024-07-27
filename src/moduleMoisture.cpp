@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 179 2024-07-26 06:43:08Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 181 2024-07-27 23:14:47Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -37,25 +37,27 @@ void moduleMoisture::init() {
 	mqttTopicWet = wpFZ.DeviceName + "/settings/" + ModuleName + "/Wet";
 
 	moistureLast = 0;
-	publishCountMoisture = 0;
+	publishMoistureLast = 0;
 	errorMinLast = false;
-	publishCountErrorMin = 0;
+	publishErrorMinLast = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestMoisture);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseMoistureAvg);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleMoisture);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleMoisture);
+
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleMoisture::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -75,16 +77,16 @@ void moduleMoisture::publishValues() {
 }
 void moduleMoisture::publishValues(bool force) {
 	if(force) {
-		publishCountMoisture = wpFZ.publishQoS;
-		publishCountErrorMin = wpFZ.publishQoS;
+		publishMoistureLast = 0;
+		publishErrorMinLast = 0;
 	}
-	if(moistureLast != moisture || ++publishCountMoisture > wpFZ.publishQoS) {
+	if(moistureLast != moisture || mb->CheckQoS(publishMoistureLast)) {
 		publishValue();
 	}
-	if(errorMinLast != errorMin || ++publishCountErrorMin > wpFZ.publishQoS) {
+	if(errorMinLast != errorMin || mb->CheckQoS(publishErrorMinLast)) {
 		errorMinLast = errorMin;
 		wpMqtt.mqttClient.publish(mqttTopicErrorMin.c_str(), String(errorMin).c_str());
-		publishCountErrorMin = 0;
+		publishErrorMinLast = 0;
 	}
 	mb->publishValues(force);
 }
@@ -144,9 +146,9 @@ void moduleMoisture::publishValue() {
 	}
 	moistureLast = moisture;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Moisture", String(moisture), String(publishCountMoisture));
+		mb->printPublishValueDebug("Moisture", String(moisture));
 	}
-	publishCountMoisture = 0;
+	publishMoistureLast = 0;
 }
 
 void moduleMoisture::calc() {
@@ -202,16 +204,11 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 	return round(avg / avgCount);
 }
 
-void moduleMoisture::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -244,10 +241,10 @@ bool moduleMoisture::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleMoisture::MaxCycle(){
-	return mb->maxCycle;
+uint32 moduleMoisture::CalcCycle(){
+	return mb->calcCycle;
 }
-uint8 moduleMoisture::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleMoisture::CalcCycle(uint8 calcCycle){
+	mb->calcCycle = calcCycle * 1000;
 	return 0;
 }

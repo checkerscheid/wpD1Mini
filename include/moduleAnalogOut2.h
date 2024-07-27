@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 179 2024-07-26 06:43:08Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 181 2024-07-27 23:14:47Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -64,21 +64,20 @@ class moduleAnalogOut2 {
 		bool Debug(bool debug);
 	private:
 		uint8 outputLast;
-		uint16 publishCountOutput;
+		uint32 publishForceOutput;
 		uint8 autoValueLast;
-		uint16 publishCountAutoValue;
+		uint32 publishForceAutoValue;
 		uint8 handValueLast;
-		uint16 publishCountHandValue;
+		uint32 publishForceHandValue;
 		bool handErrorLast;
-		uint16 publishCountHandError;
+		uint32 publishForceHandError;
 
 		void publishValue();
 		void calc();
-		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 179 $";
+		String SVNh = "$Rev: 181 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 

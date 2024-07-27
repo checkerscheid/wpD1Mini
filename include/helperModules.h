@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 172                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 172 2024-07-23 22:01:24Z                 $ #
+//# File-ID      : $Id:: helperModules.h 181 2024-07-27 23:14:47Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -94,39 +94,39 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 172 $";
+		String SVNh = "$Rev: 181 $";
 		bool useDHT11Last = false;
-		uint16 publishCountUseDHT11 = 0;
+		uint32 publishForceUseDHT11 = 0;
 		bool useDHT22Last = false;
-		uint16 publishCountUseDHT22 = 0;
+		uint32 publishForceUseDHT22 = 0;
 		bool useLDRLast = false;
-		uint16 publishCountUseLDR = 0;
+		uint32 publishForceUseLDR = 0;
 		bool useLightLast = false;
-		uint16 publishCountUseLight = 0;
+		uint32 publishForceUseLight = 0;
 		bool useBMLast = false;
-		uint16 publishCountUseBM = 0;
+		uint32 publishForceUseBM = 0;
 		bool useWindowLast = false;
-		uint16 publishCountUseWindow = 0;
+		uint32 publishForceUseWindow = 0;
 		bool useAnalogOutLast = false;
-		uint16 publishCountUseAnalogOut = 0;
+		uint32 publishForceUseAnalogOut = 0;
 		bool useAnalogOut2Last = false;
-		uint16 publishCountUseAnalogOut2 = 0;
+		uint32 publishForceUseAnalogOut2 = 0;
 		bool useNeoPixelLast = false;
-		uint16 publishCountUseNeoPixel = 0;
+		uint32 publishForceUseNeoPixel = 0;
 		bool useRelaisLast = false;
-		uint16 publishCountUseRelais = 0;
+		uint32 publishForceUseRelais = 0;
 		bool useRelaisShieldLast = false;
-		uint16 publishCountUseRelaisShield = 0;
+		uint32 publishForceUseRelaisShield = 0;
 		bool useRpmLast = false;
-		uint16 publishCountUseRpm = 0;
+		uint32 publishForceUseRpm = 0;
 		bool useRainLast = false;
-		uint16 publishCountUseRain = 0;
+		uint32 publishForceUseRain = 0;
 		bool useMoistureLast = false;
-		uint16 publishCountUseMoisture = 0;
+		uint32 publishForceUseMoisture = 0;
 		bool useDistanceLast = false;
-		uint16 publishCountUseDistance = 0;
+		uint32 publishForceUseDistance = 0;
 		bool DebugLast = false;
-		uint16 publishCountDebug = 0;
+		uint32 publishForceDebug = 0;
 };
 extern helperModules wpModules;
 #endif

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 179 2024-07-26 06:43:08Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 181 2024-07-27 23:14:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -20,14 +20,13 @@ moduleBase::moduleBase(String moduleName) {
 	_name = moduleName;
 
 	sendRestLast = false;
-	publishCountSendRest = 0;
+	publishSendRestLast = 0;
 	DebugLast = false;
-	publishCountDebug = 0;
+	publishDebugLast = 0;
 	errorLast = false;
-	publishCountError = 0;
-	cycleCounter = 0;
+	publishErrorLast = 0;
 	_useUseAvg = false;
-	_useMaxCycle = false;
+	_useCalcCycle = false;
 	_useError = false;
 }
 void moduleBase::initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest) {
@@ -53,10 +52,10 @@ void moduleBase::initError() {
 	_useError = true;
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + _name;
 }
-void moduleBase::initMaxCycle(uint16 addrMaxCycle) {
-	_useMaxCycle = true;
-	_addrMaxCycle = addrMaxCycle;
-	mqttTopicMaxCycle = wpFZ.DeviceName + "/settings/" + _name + "/maxCycle";
+void moduleBase::initCalcCycle(uint16 addrCalcCycle) {
+	_useCalcCycle = true;
+	_addrCalcCycle = addrCalcCycle;
+	mqttTopicCalcCycle = wpFZ.DeviceName + "/settings/" + _name + "/CalcCycle";
 }
 void moduleBase::changeSendRest() {
 	sendRest = !sendRest;
@@ -81,34 +80,34 @@ void moduleBase::publishSettings(bool force) {
 		if(_useError) {
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
 		}
-		if(_useMaxCycle) {
-			wpMqtt.mqttClient.publish(mqttTopicMaxCycle.c_str(), String(maxCycle).c_str());
+		if(_useCalcCycle) {
+			wpMqtt.mqttClient.publish(mqttTopicCalcCycle.c_str(), String(calcCycle).c_str());
 		}
 	}
 }
 void moduleBase::publishValues(bool force) {
 	if(force) {
-		publishCountSendRest = wpFZ.publishQoS;
-		publishCountDebug = wpFZ.publishQoS;
-		publishCountError = wpFZ.publishQoS;
+		publishSendRestLast = 0;
+		publishDebugLast = 0;
+		publishErrorLast = 0;
 	}
-	if(sendRestLast != sendRest || ++publishCountSendRest > wpFZ.publishQoS) {
+	if(sendRestLast != sendRest || CheckQoS(publishSendRestLast)) {
 		sendRestLast = sendRest;
 		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
 		wpFZ.SendWSSendRest("sendRest" + _name, sendRest);
-		publishCountSendRest = 0;
+		publishSendRestLast = wpFZ.loopStartedAt;
 	}
-	if(DebugLast != debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(DebugLast != debug || CheckQoS(publishDebugLast)) {
 		DebugLast = debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(debug).c_str());
 		wpFZ.SendWSDebug("Debug" + _name, debug);
-		publishCountDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 	if(_useError) {
-		if(errorLast != error || ++publishCountError > wpFZ.publishQoS) {
+		if(errorLast != error || CheckQoS(publishErrorLast)) {
 			errorLast = error;
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
-			publishCountError = 0;
+			publishErrorLast = wpFZ.loopStartedAt;
 		}
 	}
 }
@@ -118,8 +117,8 @@ void moduleBase::setSubscribes() {
 		wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
-	if(_useMaxCycle) {
-		wpMqtt.mqttClient.subscribe(mqttTopicMaxCycle.c_str());
+	if(_useCalcCycle) {
+		wpMqtt.mqttClient.subscribe(mqttTopicCalcCycle.c_str());
 	}
 }
 void moduleBase::checkSubscribes(char* topic, String msg) {
@@ -147,31 +146,50 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(debug));
 		}
 	}
-	if(strcmp(topic, mqttTopicMaxCycle.c_str()) == 0) {
-		uint8 readMaxCycle = msg.toInt();
-		if(maxCycle != readMaxCycle) {
-			maxCycle = readMaxCycle;
-			writeEEPROMmaxCycle();
-			wpFZ.DebugcheckSubscribes(mqttTopicMaxCycle, String(maxCycle));
+	if(strcmp(topic, mqttTopicCalcCycle.c_str()) == 0) {
+		uint32 readCalcCycle = msg.toInt();
+		if(calcCycle != readCalcCycle) {
+			calcCycle = readCalcCycle;
+			writeEEPROMCalcCycle();
+			wpFZ.DebugcheckSubscribes(mqttTopicCalcCycle, String(calcCycle));
 		}
 	}
 }
+bool moduleBase::CheckQoS(unsigned long lastSend) {
+	if(lastSend == 0) return true;
+	if(wpFZ.loopStartedAt > lastSend + wpFZ.publishQoS) return true;
+	return false;
+}
+
 void moduleBase::writeEEPROMsendRest() {
 	bitWrite(_byteSendRest, _bitSendRest, sendRest);
 	EEPROM.write(_addrSendRest, _byteSendRest);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " sendRest: " + String(sendRest));
 }
 void moduleBase::writeEEPROMuseAvg() {
 	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
 	EEPROM.write(_addrUseAvg, _byteUseAvg);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " useAvg: " + String(useAvg));
 }
 void moduleBase::writeEEPROMdebug() {
 	bitWrite(_byteDebug, _bitDebug, debug);
 	EEPROM.write(_addrDebug, _byteDebug);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " debug: " + String(debug));
 }
-void moduleBase::writeEEPROMmaxCycle() {
-	EEPROM.write(_addrMaxCycle, maxCycle);
+void moduleBase::writeEEPROMCalcCycle() {
+	double r = round(calcCycle / 100);
+	if(r < 1) r = 1;
+	if(r > 200) r = 200;
+	uint8 saveCalcCycle = (uint8) r;
+	EEPROM.write(_addrCalcCycle, saveCalcCycle);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " CalcCycle: " + String(saveCalcCycle));
+}
+
+void moduleBase::printPublishValueDebug(String name, String value) {
+	String logmessage = "MQTT Send '" + name + "': " + value;
+	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
