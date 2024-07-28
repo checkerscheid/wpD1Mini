@@ -238,12 +238,12 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: byte 20 - 49
-	wpDHT.CalcCycle(EEPROM.read(byteCalcCycleDHT));
+	wpDHT.CalcCycle(EEPROM.read(byteCalcCycleDHT) * 100);
 	wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 	wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
-	wpLDR.CalcCycle(EEPROM.read(byteCalcCycleLDR));
+	wpLDR.CalcCycle(EEPROM.read(byteCalcCycleLDR) * 100);
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
-	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight));
+	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight) * 100);
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
@@ -251,12 +251,12 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
 	wpNeoPixel.setBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
-	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm));
-	wpRain.CalcCycle(EEPROM.read(byteCalcCycleRain));
+	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
+	wpRain.CalcCycle(EEPROM.read(byteCalcCycleRain) * 100);
 	wpRain.correction = EEPROM.read(byteRainCorrection);
-	wpMoisture.CalcCycle(EEPROM.read(byteCalcCycleMoisture));
+	wpMoisture.CalcCycle(EEPROM.read(byteCalcCycleMoisture) * 100);
 	wpMoisture.minValue = EEPROM.read(byteMoistureMin);
-	wpDistance.CalcCycle(EEPROM.read(byteCalcCycleDistance));
+	wpDistance.CalcCycle(EEPROM.read(byteCalcCycleDistance) * 100);
 	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
 	wpDistance.height = EEPROM.read(byteHeight);
 

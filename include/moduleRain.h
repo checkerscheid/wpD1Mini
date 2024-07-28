@@ -55,7 +55,7 @@ class moduleRain {
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
-		uint32 CalcCycle(uint8 calcCycle);
+		uint32 CalcCycle(uint32 calcCycle);
 	private:
 		int rainLast;
 		unsigned long publishRainLast;

@@ -249,7 +249,7 @@ bool moduleDistance::Debug(bool debug) {
 uint32 moduleDistance::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleDistance::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleDistance::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

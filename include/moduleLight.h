@@ -60,7 +60,7 @@ class moduleLight {
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
-		uint32 CalcCycle(uint8 calcCycle);
+		uint32 CalcCycle(uint32 calcCycle);
 	private:
 		uint32 lightLast;
 		unsigned long publishLightLast;

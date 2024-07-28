@@ -191,7 +191,7 @@ bool moduleRpm::Debug(bool debug) {
 uint32 moduleRpm::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRpm::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleRpm::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

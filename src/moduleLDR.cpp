@@ -192,7 +192,7 @@ bool moduleLDR::Debug(bool debug) {
 uint32 moduleLDR::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleLDR::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleLDR::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

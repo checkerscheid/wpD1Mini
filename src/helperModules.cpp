@@ -85,118 +85,134 @@ void helperModules::publishValues() {
 }
 void helperModules::publishValues(bool force) {
 	if(force) {
-		publishForceUseDHT11 = wpFZ.publishQoS;
-		publishForceUseDHT22 = wpFZ.publishQoS;
-		publishForceUseLDR = wpFZ.publishQoS;
-		publishForceUseLight = wpFZ.publishQoS;
-		publishForceUseBM = wpFZ.publishQoS;
-		publishForceUseWindow = wpFZ.publishQoS;
-		publishForceUseAnalogOut = wpFZ.publishQoS;
-		publishForceUseAnalogOut2 = wpFZ.publishQoS;
-		publishForceUseNeoPixel = wpFZ.publishQoS;
-		publishForceUseRelais = wpFZ.publishQoS;
-		publishForceUseRelaisShield = wpFZ.publishQoS;
-		publishForceUseRpm = wpFZ.publishQoS;
-		publishForceUseRain = wpFZ.publishQoS;
-		publishForceUseMoisture = wpFZ.publishQoS;
-		publishForceUseDistance = wpFZ.publishQoS;
+		publishUseDHT11Last = 0;
+		publishUseDHT22Last = 0;
+		publishUseLDRLast = 0;
+		publishUseLightLast = 0;
+		publishUseBMLast = 0;
+		publishUseWindowLast = 0;
+		publishUseAnalogOutLast = 0;
+		publishUseAnalogOut2Last = 0;
+		publishUseNeoPixelLast = 0;
+		publishUseRelaisLast = 0;
+		publishUseRelaisShieldLast = 0;
+		publishUseRpmLast = 0;
+		publishUseRainLast = 0;
+		publishUseMoistureLast = 0;
+		publishUseDistanceLast = 0;
+		publishDebugLast = 0;
 	}
-	if(useDHT11Last != useModuleDHT11 || ++publishForceUseDHT11 > wpFZ.publishQoS) {
+	if(useDHT11Last != useModuleDHT11 || publishUseDHT11Last == 0 ||
+		wpFZ.loopStartedAt > publishUseDHT11Last + wpFZ.publishQoS) {
 		useDHT11Last = useModuleDHT11;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT11.c_str(), String(useModuleDHT11).c_str());
 		wpFZ.SendWSModule("useDHT11", useModuleDHT11);
-		publishForceUseDHT11 = 0;
+		publishUseDHT11Last = wpFZ.loopStartedAt;
 	}
-	if(useDHT22Last != useModuleDHT22 || ++publishForceUseDHT22 > wpFZ.publishQoS) {
+	if(useDHT22Last != useModuleDHT22 || publishUseDHT22Last == 0 ||
+		wpFZ.loopStartedAt > publishUseDHT22Last + wpFZ.publishQoS) {
 		useDHT22Last = useModuleDHT22;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT22.c_str(), String(useModuleDHT22).c_str());
 		wpFZ.SendWSModule("useDHT22", useModuleDHT22);
-		publishForceUseDHT22 = 0;
+		publishUseDHT22Last = wpFZ.loopStartedAt;
 	}
-	if(useLDRLast != useModuleLDR || ++publishForceUseLDR > wpFZ.publishQoS) {
+	if(useLDRLast != useModuleLDR || publishUseLDRLast == 0 ||
+		wpFZ.loopStartedAt > publishUseLDRLast + wpFZ.publishQoS) {
 		useLDRLast = useModuleLDR;
 		wpMqtt.mqttClient.publish(mqttTopicUseLDR.c_str(), String(useModuleLDR).c_str());
 		wpFZ.SendWSModule("useLDR", useModuleLDR);
-		publishForceUseLDR = 0;
+		publishUseLDRLast = wpFZ.loopStartedAt;
 	}
-	if(useLightLast != useModuleLight || ++publishForceUseLight > wpFZ.publishQoS) {
+	if(useLightLast != useModuleLight || publishUseLightLast == 0 ||
+		wpFZ.loopStartedAt > publishUseLightLast + wpFZ.publishQoS) {
 		useLightLast = useModuleLight;
 		wpMqtt.mqttClient.publish(mqttTopicUseLight.c_str(), String(useModuleLight).c_str());
 		wpFZ.SendWSModule("useLight", useModuleLight);
-		publishForceUseLight = 0;
+		publishUseLightLast = wpFZ.loopStartedAt;
 	}
-	if(useBMLast != useModuleBM || ++publishForceUseBM > wpFZ.publishQoS) {
+	if(useBMLast != useModuleBM || publishUseBMLast == 0 ||
+		wpFZ.loopStartedAt > publishUseBMLast + wpFZ.publishQoS) {
 		useBMLast = useModuleBM;
 		wpMqtt.mqttClient.publish(mqttTopicUseBM.c_str(), String(useModuleBM).c_str());
 		wpFZ.SendWSModule("useBM", useModuleBM);
-		publishForceUseBM = 0;
+		publishUseBMLast = wpFZ.loopStartedAt;
 	}
-	if(useWindowLast != useModuleWindow || ++publishForceUseWindow > wpFZ.publishQoS) {
+	if(useWindowLast != useModuleWindow || publishUseWindowLast == 0 ||
+		wpFZ.loopStartedAt > publishUseWindowLast + wpFZ.publishQoS) {
 		useWindowLast = useModuleWindow;
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow.c_str(), String(useModuleWindow).c_str());
 		wpFZ.SendWSModule("useWindow", useModuleWindow);
-		publishForceUseWindow = 0;
+		publishUseWindowLast = wpFZ.loopStartedAt;
 	}
-	if(useAnalogOutLast != useModuleAnalogOut || ++publishForceUseAnalogOut > wpFZ.publishQoS) {
+	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
+		wpFZ.loopStartedAt > publishUseAnalogOutLast + wpFZ.publishQoS) {
 		useAnalogOutLast = useModuleAnalogOut;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
 		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
-		publishForceUseAnalogOut = 0;
+		publishUseAnalogOutLast = wpFZ.loopStartedAt;
 	}
-	if(useAnalogOut2Last != useModuleAnalogOut2 || ++publishForceUseAnalogOut2 > wpFZ.publishQoS) {
+	if(useAnalogOut2Last != useModuleAnalogOut2 || publishUseAnalogOut2Last == 0 ||
+		wpFZ.loopStartedAt > publishUseAnalogOut2Last + wpFZ.publishQoS) {
 		useAnalogOut2Last = useModuleAnalogOut2;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut2.c_str(), String(useModuleAnalogOut2).c_str());
 		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
-		publishForceUseAnalogOut2 = 0;
+		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
 	}
-	if(useNeoPixelLast != useModuleNeoPixel || ++publishForceUseNeoPixel > wpFZ.publishQoS) {
+	if(useNeoPixelLast != useModuleNeoPixel || publishUseNeoPixelLast == 0 ||
+		wpFZ.loopStartedAt > publishUseNeoPixelLast + wpFZ.publishQoS) {
 		useNeoPixelLast = useModuleNeoPixel;
 		wpMqtt.mqttClient.publish(mqttTopicUseNeoPixel.c_str(), String(useModuleNeoPixel).c_str());
 		wpFZ.SendWSModule("useNeoPixel", useModuleNeoPixel);
-		publishForceUseNeoPixel = 0;
+		publishUseNeoPixelLast = wpFZ.loopStartedAt;
 	}
-	if(useRelaisLast != useModuleRelais || ++publishForceUseRelais > wpFZ.publishQoS) {
+	if(useRelaisLast != useModuleRelais || publishUseRelaisLast == 0 ||
+		wpFZ.loopStartedAt > publishUseRelaisLast + wpFZ.publishQoS) {
 		useRelaisLast = useModuleRelais;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelais.c_str(), String(useModuleRelais).c_str());
 		wpFZ.SendWSModule("useRelais", useModuleRelais);
-		publishForceUseRelais = 0;
+		publishUseRelaisLast = wpFZ.loopStartedAt;
 	}
-	if(useRelaisShieldLast != useModuleRelaisShield || ++publishForceUseRelaisShield > wpFZ.publishQoS) {
+	if(useRelaisShieldLast != useModuleRelaisShield || publishUseRelaisShieldLast == 0 ||
+		wpFZ.loopStartedAt > publishUseRelaisShieldLast + wpFZ.publishQoS) {
 		useRelaisShieldLast = useModuleRelaisShield;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelaisShield.c_str(), String(useModuleRelaisShield).c_str());
 		wpFZ.SendWSModule("useRelaisShield", useModuleRelaisShield);
-		publishForceUseRelaisShield = 0;
+		publishUseRelaisShieldLast = wpFZ.loopStartedAt;
 	}
-	if(useRpmLast != useModuleRpm || ++publishForceUseRpm > wpFZ.publishQoS) {
+	if(useRpmLast != useModuleRpm || publishUseRpmLast == 0 ||
+		wpFZ.loopStartedAt > publishUseRpmLast + wpFZ.publishQoS) {
 		useRpmLast = useModuleRpm;
 		wpMqtt.mqttClient.publish(mqttTopicUseRpm.c_str(), String(useModuleRpm).c_str());
 		wpFZ.SendWSModule("useRpm", useModuleRpm);
-		publishForceUseRpm = 0;
+		publishUseRpmLast = wpFZ.loopStartedAt;
 	}
-	if(useRainLast != useModuleRain || ++publishForceUseRain > wpFZ.publishQoS) {
+	if(useRainLast != useModuleRain || publishUseRainLast == 0 ||
+		wpFZ.loopStartedAt > publishUseRainLast + wpFZ.publishQoS) {
 		useRainLast = useModuleRain;
 		wpMqtt.mqttClient.publish(mqttTopicUseRain.c_str(), String(useModuleRain).c_str());
 		wpFZ.SendWSModule("useRain", useModuleRain);
-		publishForceUseRain = 0;
+		publishUseRainLast = wpFZ.loopStartedAt;
 	}
-	if(useMoistureLast != useModuleMoisture || ++publishForceUseMoisture > wpFZ.publishQoS) {
+	if(useMoistureLast != useModuleMoisture || publishUseMoistureLast == 0 ||
+		wpFZ.loopStartedAt > publishUseMoistureLast + wpFZ.publishQoS) {
 		useMoistureLast = useModuleMoisture;
 		wpMqtt.mqttClient.publish(mqttTopicUseMoisture.c_str(), String(useModuleMoisture).c_str());
 		wpFZ.SendWSModule("useMoisture", useModuleMoisture);
-		publishForceUseMoisture = 0;
+		publishUseMoistureLast = wpFZ.loopStartedAt;
 	}
-	if(useDistanceLast != useModuleDistance || ++publishForceUseDistance > wpFZ.publishQoS) {
+	if(useDistanceLast != useModuleDistance || publishUseDistanceLast == 0 ||
+		wpFZ.loopStartedAt > publishUseDistanceLast + wpFZ.publishQoS) {
 		useDistanceLast = useModuleDistance;
 		wpMqtt.mqttClient.publish(mqttTopicUseDistance.c_str(), String(useModuleDistance).c_str());
 		wpFZ.SendWSModule("useDistance", useModuleDistance);
-		publishForceUseDistance = 0;
+		publishUseDistanceLast = wpFZ.loopStartedAt;
 	}
-	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
+	if(DebugLast != Debug || publishDebugLast == 0 ||
+		wpFZ.loopStartedAt > publishDebugLast + wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishForceDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
-	if(force) publishForceDebug = wpFZ.publishQoS;
 }
 
 void helperModules::setSubscribes() {

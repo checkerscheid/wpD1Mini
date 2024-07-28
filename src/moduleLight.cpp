@@ -194,7 +194,7 @@ bool moduleLight::Debug(bool debug) {
 uint32 moduleLight::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleLight::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleLight::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

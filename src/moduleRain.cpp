@@ -195,7 +195,7 @@ bool moduleRain::Debug(bool debug) {
 uint32 moduleRain::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRain::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleRain::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

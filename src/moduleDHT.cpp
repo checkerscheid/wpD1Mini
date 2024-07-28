@@ -218,7 +218,7 @@ bool moduleDHT::Debug(bool debug) {
 uint32 moduleDHT::CalcCycle() {
 	return mb->calcCycle;
 }
-uint32 moduleDHT::CalcCycle(uint8 calcCycle){
-	mb->calcCycle = calcCycle * 1000;
+uint32 moduleDHT::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }
