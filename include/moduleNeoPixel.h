@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 179 2024-07-26 06:43:08Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 181 2024-07-27 23:14:47Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -98,7 +98,7 @@ class moduleNeoPixel {
 		uint8 valueBLast;
 		uint8 brightness = 0;
 		uint8 brightnessLast;
-		uint16 publishCountValue;
+		uint32 publishForceValue;
 
 		unsigned long pixelPrevious;	// Previous Pixel Millis
 		unsigned long patternPrevious;	// Previous Pattern Millis
@@ -112,7 +112,6 @@ class moduleNeoPixel {
 
 		void publishValue();
 		void calc();
-		void printPublishValueDebug(String name, String value, String publishCount);
 		
 		void ColorWipeEffect(uint32_t color, int wait);
 		void TheaterChaseEffect(uint32_t color, int wait);
@@ -124,7 +123,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 179 $";
+		String SVNh = "$Rev: 181 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

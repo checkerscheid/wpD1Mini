@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 179 2024-07-26 06:43:08Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 181 2024-07-27 23:14:47Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -88,7 +88,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 
-	publishCountValue = 0;
+	publishForceValue = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
@@ -140,10 +140,10 @@ void moduleNeoPixel::publishValues() {
 }
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
-		publishCountValue = wpFZ.publishQoS;
+		publishForceValue = wpFZ.publishQoS;
 	}
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightness != brightnessLast ||
-		++publishCountValue > wpFZ.publishQoS) {
+		++publishForceValue > wpFZ.publishQoS) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -263,12 +263,12 @@ void moduleNeoPixel::publishValue() {
 	valueBLast = valueB;
 	brightnessLast = brightness;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("NeoPixel Value R", String(valueR), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Value G", String(valueG), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Value B", String(valueB), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Brightness", String(brightness), String(publishCountValue));
+		mb->printPublishValueDebug("NeoPixel Value R", String(valueR));
+		mb->printPublishValueDebug("NeoPixel Value G", String(valueG));
+		mb->printPublishValueDebug("NeoPixel Value B", String(valueB));
+		mb->printPublishValueDebug("NeoPixel Brightness", String(brightness));
 	}
-	publishCountValue = 0;
+	publishForceValue = 0;
 }
 
 void moduleNeoPixel::calc() {
@@ -360,10 +360,6 @@ void moduleNeoPixel::calc() {
 		}
 		modeCurrentLast = modeCurrent;
 	}
-}
-void moduleNeoPixel::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
 
 // Some functions of our own for creating animated effects -----------------
@@ -522,7 +518,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 179 2024-07-26 06:43:08Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 181 2024-07-27 23:14:47Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -77,29 +77,28 @@ class moduleAnalogOut {
 		const double minOutput = 0.0;
 		const double maxOutput = 100.0;
 		uint8 outputLast;
-		uint16 publishCountOutput;
+		uint32 publishForceOutput;
 		uint8 autoValueLast;
-		uint16 publishCountAutoValue;
+		uint32 publishForceAutoValue;
 		uint8 handValueLast;
-		uint16 publishCountHandValue;
+		uint32 publishForceHandValue;
 		bool handErrorLast;
-		uint16 publishCountHandError;
+		uint32 publishForceHandError;
 		double PIDinput, PIDoutput, PIDsetPoint;
 // Kp: Determines how aggressively the PID reacts to the current amount of error (Proportional)
 // Ki (Tv): Determines how aggressively the PID reacts to error over time (Integral)
 // Kd (Tn): Determines how aggressively the PID reacts to the change in error (Derivative)
 		double Kp, Tv, Tn, SetPoint;
 		double KpLast, TvLast, TnLast, SetPointLast;
-		uint16 publishCountPID;
+		uint32 publishForcePID;
 
 		void publishValue();
 		void calc();
 		void calcOutput();
-		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 179 $";
+		String SVNh = "$Rev: 181 $";
 };
 extern moduleAnalogOut wpAnalogOut;
 

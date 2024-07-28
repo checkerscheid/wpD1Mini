@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 180                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 180 2024-07-27 03:21:05Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 181 2024-07-27 23:14:47Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 180 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -69,11 +69,13 @@ void helperWebServer::publishValues() {
 	publishValues(false);
 }
 void helperWebServer::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(force) publishDebugLast = 0;
+	if(DebugLast != Debug || publishDebugLast == 0 ||
+		wpFZ.loopStartedAt > publishDebugLast + wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
+		wpFZ.SendWSDebug("Debug WebServer", Debug);
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 
@@ -134,7 +136,7 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += "\"DHT\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpDHT.Pin])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleDHT", String(wpDHT.MaxCycle())) + "," +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpDHT.CalcCycle())) + "," +
 				wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + "," +
 				wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0))) +
 				"},";
@@ -142,18 +144,18 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleLDR) {
 			message += "\"LDR\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpLDR.Pin])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleLDR", String(wpLDR.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("useLDRAvg", wpLDR.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("LDRCorrection", String(wpLDR.correction)) +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpLDR.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("useAvg", wpLDR.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("Correction", String(wpLDR.correction)) +
 				"},";
 		}
 		if(wpModules.useModuleLight) {
 			message += "\"Light\":{" +
 				wpFZ.JsonKeyString("PinSCL", String(wpFZ.Pins[wpLight.PinSCL])) + "," +
 				wpFZ.JsonKeyString("PinSDA", String(wpFZ.Pins[wpLight.PinSDA])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleLight", String(wpLight.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("useLightAvg", wpLight.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("LightCorrection", String(wpLight.correction)) +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpLight.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("useAvg", wpLight.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("Correction", String(wpLight.correction)) +
 				"},";
 		}
 		if(wpModules.useModuleBM) {
@@ -218,35 +220,35 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleRpm) {
 			message += "\"Rpm\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRpm.Pin])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleRpm", String(wpRpm.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("useRpmAvg", wpRain.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("RpmCorrection", String(wpRain.correction)) +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpRpm.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("useAvg", wpRain.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("Correction", String(wpRain.correction)) +
 				"},";
 		}
 		if(wpModules.useModuleRain) {
 			message += "\"Rain\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRain.Pin])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleRain", String(wpRain.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("useRainAvg", wpRain.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("RainCorrection", String(wpRain.correction)) +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpRain.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("useAvg", wpRain.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("Correction", String(wpRain.correction)) +
 				"},";
 		}
 		if(wpModules.useModuleMoisture) {
 			message += "\"Moisture\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpMoisture.Pin])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleMoisture", String(wpMoisture.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("useMoistureAvg", wpMoisture.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("MoistureMin", String(wpMoisture.minValue)) + "," +
-				wpFZ.JsonKeyValue("MoistureDry", String(wpMoisture.dry)) + "," +
-				wpFZ.JsonKeyValue("MoistureWet", String(wpMoisture.wet)) +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpMoisture.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("useAvg", wpMoisture.UseAvg() ? "true" : "false") + "," +
+				wpFZ.JsonKeyValue("Min", String(wpMoisture.minValue)) + "," +
+				wpFZ.JsonKeyValue("Dry", String(wpMoisture.dry)) + "," +
+				wpFZ.JsonKeyValue("Wet", String(wpMoisture.wet)) +
 				"},";
 		}
 		if(wpModules.useModuleDistance) {
 			message += "\"Distance\":{" +
 				wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[wpDistance.PinTrig])) + "," +
 				wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[wpDistance.PinEcho])) + "," +
-				wpFZ.JsonKeyValue("MaxCycleDistance", String(wpDistance.MaxCycle())) + "," +
-				wpFZ.JsonKeyValue("distanceCorrection", String(wpDistance.correction)) + "," +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpDistance.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("Correction", String(wpDistance.correction)) + "," +
 				wpFZ.JsonKeyValue("maxVolume", String(wpDistance.maxVolume)) + "," +
 				wpFZ.JsonKeyValue("height", String(wpDistance.height)) +
 				"},";

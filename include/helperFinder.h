@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.h 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: helperFinder.h 181 2024-07-27 23:14:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperFinder_h
@@ -38,9 +38,9 @@ class helperFinder {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 163 $";
+		String SVNh = "$Rev: 181 $";
 		bool DebugLast = false;
-		uint16 publishCountDebug = 0;
+		unsigned long publishDebugLast = 0;
 };
 extern helperFinder wpFinder;
 #endif

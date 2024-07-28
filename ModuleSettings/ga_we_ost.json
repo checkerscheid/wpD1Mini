@@ -9,17 +9,17 @@
 		"UpdateMode": false,
 		"calcValues": true,
 		"HT": {
-			"MaxCycleHT": 50,
+			"PublishForceHT": 50,
 			"TemperatureCorrection": 0.00,
 			"HumidityCorrection": 0.00
 		},
 		"Light": {
-			"MaxCycleLight": 50,
+			"PublishForceLight": 50,
 			"useLightAvg": 0,
 			"LightCorrection": 0
 		},
 		"Rain": {
-			"MaxCycleRain": 50,
+			"PublishForceRain": 50,
 			"useRainAvg": 0,
 			"RainCorrection": -26.00
 		},

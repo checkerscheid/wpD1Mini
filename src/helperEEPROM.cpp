@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 179 2024-07-26 06:43:08Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 182 2024-07-28 02:12:39Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 182 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -85,11 +85,11 @@ void helperEEPROM::publishValues() {
 	publishValues(false);
 }
 void helperEEPROM::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(force) publishForceDebug = wpFZ.publishQoS;
+	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
+		publishForceDebug = 0;
 	}
 }
 
@@ -238,12 +238,12 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: byte 20 - 49
-	wpDHT.MaxCycle(EEPROM.read(byteMaxCycleDHT));
+	wpDHT.CalcCycle(EEPROM.read(byteCalcCycleDHT) * 100);
 	wpDHT.temperatureCorrection = EEPROM.read(byteTemperatureCorrection);
 	wpDHT.humidityCorrection = EEPROM.read(byteHumidityCorrection);
-	wpLDR.MaxCycle(EEPROM.read(byteMaxCycleLDR));
+	wpLDR.CalcCycle(EEPROM.read(byteCalcCycleLDR) * 100);
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
-	wpLight.MaxCycle(EEPROM.read(byteMaxCycleLight));
+	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight) * 100);
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
@@ -251,12 +251,12 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
 	wpNeoPixel.setBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
-	wpRpm.MaxCycle(EEPROM.read(byteMaxCycleRpm));
-	wpRain.MaxCycle(EEPROM.read(byteMaxCycleRain));
+	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
+	wpRain.CalcCycle(EEPROM.read(byteCalcCycleRain) * 100);
 	wpRain.correction = EEPROM.read(byteRainCorrection);
-	wpMoisture.MaxCycle(EEPROM.read(byteMaxCycleMoisture));
+	wpMoisture.CalcCycle(EEPROM.read(byteCalcCycleMoisture) * 100);
 	wpMoisture.minValue = EEPROM.read(byteMoistureMin);
-	wpDistance.MaxCycle(EEPROM.read(byteMaxCycleDistance));
+	wpDistance.CalcCycle(EEPROM.read(byteCalcCycleDistance) * 100);
 	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
 	wpDistance.height = EEPROM.read(byteHeight);
 

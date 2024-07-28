@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 179 2024-07-26 06:43:08Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 182 2024-07-28 02:12:39Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -37,23 +37,25 @@ void moduleLight::init() {
 	lightMeter->begin();
 
 	lightLast = 0;
-	publishCountLight = 0;
+	publishLightLast = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLight);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLightAvg);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleLight);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleLight);
+
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleLight::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -71,9 +73,9 @@ void moduleLight::publishValues() {
 }
 void moduleLight::publishValues(bool force) {
 	if(force) {
-		publishCountLight = wpFZ.publishQoS;
+		publishLightLast = 0;
 	}
-	if(lightLast != light || ++publishCountLight > wpFZ.publishQoS) {
+	if(lightLast != light || mb->CheckQoS(publishLightLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -108,9 +110,9 @@ void moduleLight::publishValue() {
 	}
 	lightLast = light;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Light", String(light), String(publishCountLight));
+		mb->printPublishValueDebug("Light", String(light));
 	}
-	publishCountLight = 0;
+	publishLightLast = wpFZ.loopStartedAt;
 }
 
 void moduleLight::calc() {
@@ -152,16 +154,11 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 	return round(avg / avgCount);
 }
 
-void moduleLight::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 182 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -194,10 +191,10 @@ bool moduleLight::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleLight::MaxCycle(){
-	return mb->maxCycle;
+uint32 moduleLight::CalcCycle(){
+	return mb->calcCycle;
 }
-uint8 moduleLight::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleLight::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

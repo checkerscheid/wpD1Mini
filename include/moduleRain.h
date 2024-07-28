@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.h 177 2024-07-25 17:36:45Z                    $ #
+//# File-ID      : $Id:: moduleRain.h 182 2024-07-28 02:12:39Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRain_h
@@ -54,22 +54,21 @@ class moduleRain {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint8 MaxCycle();
-		uint8 MaxCycle(uint8 maxCycle);
+		uint32 CalcCycle();
+		uint32 CalcCycle(uint32 calcCycle);
 	private:
 		int rainLast;
-		uint16 publishCountRain;
+		unsigned long publishRainLast;
 		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
 		uint16 calcAvg(uint16 raw);
-		void printPublishValueDebug(String name, String value, String publishCount);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 177 $";
+		String SVNh = "$Rev: 182 $";
 };
 extern moduleRain wpRain;
 

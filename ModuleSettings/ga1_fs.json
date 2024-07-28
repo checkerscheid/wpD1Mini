@@ -9,12 +9,12 @@
 		"UpdateMode": true,
 		"calcValues": true,
 		"HT": {
-			"MaxCycleHT": 50,
+			"PublishForceHT": 50,
 			"TemperatureCorrection": 0.00,
 			"HumidityCorrection": 0.00
 		},
 		"Distance": {
-			"MaxCycleDistance": 50,
+			"PublishForceDistance": 50,
 			"distanceCorrection": 0,
 			"maxVolume": 6000,
 			"height": 120

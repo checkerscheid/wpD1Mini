@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 177                                                     $ #
+//# Revision     : $Rev:: 181                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 177 2024-07-25 17:36:45Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 181 2024-07-27 23:14:47Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -55,13 +55,13 @@ void moduleRelais::init() {
 	mqttTopicSetWaterEmpty = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetWaterEmpty";
 
 	outputLast = false;
-	publishCountOutput = 0;
+	publishForceOutput = 0;
 	autoValueLast = false;
-	publishCountAutoValue = 0;
+	publishForceAutoValue = 0;
 	handValueLast = false;
-	publishCountHandValue = 0;
+	publishForceHandValue = 0;
 	handErrorLast = false;
-	publishCountHandError = 0;
+	publishForceHandError = 0;
 	// if wpModules.useMoisture
 	pumpCycleActive = false;
 	pumpStarted = false;
@@ -109,47 +109,47 @@ void moduleRelais::publishValues() {
 }
 void moduleRelais::publishValues(bool force) {
 	if(force) {
-		publishCountOutput = wpFZ.publishQoS;
-		publishCountAutoValue = wpFZ.publishQoS;
-		publishCountHandValue = wpFZ.publishQoS;
-		publishCountHandError = wpFZ.publishQoS;
-		publishCountWaterEmptyError = wpFZ.publishQoS;
+		publishForceOutput = wpFZ.publishQoS;
+		publishForceAutoValue = wpFZ.publishQoS;
+		publishForceHandValue = wpFZ.publishQoS;
+		publishForceHandError = wpFZ.publishQoS;
+		publishForceWaterEmptyError = wpFZ.publishQoS;
 	}
-	if(outputLast != output || ++publishCountOutput > wpFZ.publishQoS) {
+	if(outputLast != output || ++publishForceOutput > wpFZ.publishQoS) {
 		publishValue();
 	}
-	if(autoValueLast != autoValue || ++publishCountAutoValue > wpFZ.publishQoS) {
+	if(autoValueLast != autoValue || ++publishForceAutoValue > wpFZ.publishQoS) {
 		autoValueLast = autoValue;
 		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String(autoValue).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais Auto Value", String(autoValue), String(publishCountAutoValue));
+			mb->printPublishValueDebug("Relais Auto Value", String(autoValue));
 		}
-		publishCountAutoValue = 0;
+		publishForceAutoValue = 0;
 	}
-	if(handValueLast != handValue || ++publishCountHandValue > wpFZ.publishQoS) {
+	if(handValueLast != handValue || ++publishForceHandValue > wpFZ.publishQoS) {
 		handValueLast = handValue;
 		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String(handValue).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais Hand Value", String(handValue), String(publishCountHandValue));
+			mb->printPublishValueDebug("Relais Hand Value", String(handValue));
 		}
-		publishCountHandValue = 0;
+		publishForceHandValue = 0;
 	}
-	if(handErrorLast != handError || ++publishCountHandError > wpFZ.publishQoS) {
+	if(handErrorLast != handError || ++publishForceHandError > wpFZ.publishQoS) {
 		handErrorLast = handError;
 		wpMqtt.mqttClient.publish(mqttTopicErrorHand.c_str(), String(handError).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais handError", String(handError), String(publishCountHandError));
+			mb->printPublishValueDebug("Relais handError", String(handError));
 		}
-		publishCountHandError = 0;
+		publishForceHandError = 0;
 	}
-	if(waterEmptyError != waterEmptySet || ++publishCountWaterEmptyError > wpFZ.publishQoS) {
+	if(waterEmptyError != waterEmptySet || ++publishForceWaterEmptyError > wpFZ.publishQoS) {
 		waterEmptyError = waterEmptySet;
 		wpMqtt.mqttClient.publish(mqttTopicErrorWaterEmpty.c_str(), String(waterEmptyError).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetWaterEmpty.c_str(), String(waterEmptyError).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("Relais waterEmptyError", String(waterEmptyError), String(publishCountWaterEmptyError));
+			mb->printPublishValueDebug("Relais waterEmptyError", String(waterEmptyError));
 		}
-		publishCountWaterEmptyError = 0;
+		publishForceWaterEmptyError = 0;
 	}
 	mb->publishValues(force);
 }
@@ -232,9 +232,9 @@ void moduleRelais::publishValue() {
 	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Relais", String(output), String(publishCountOutput));
+		mb->printPublishValueDebug("Relais", String(output));
 	}
-	publishCountOutput = 0;
+	publishForceOutput = 0;
 }
 
 void moduleRelais::calc() {
@@ -341,16 +341,12 @@ String moduleRelais::getReadableTime(unsigned long time) {
 	return msg;
 }
 // }
-void moduleRelais::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
 
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 177 $";
+	String SVN = "$Rev: 181 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
