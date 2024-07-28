@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 181 2024-07-27 23:14:47Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 182 2024-07-28 02:12:39Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -75,7 +75,7 @@ class moduleLight {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 181 $";
+		String SVNh = "$Rev: 182 $";
 };
 extern moduleLight wpLight;
 

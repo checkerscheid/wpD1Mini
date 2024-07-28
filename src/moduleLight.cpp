@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 181 2024-07-27 23:14:47Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 182 2024-07-28 02:12:39Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -112,7 +112,7 @@ void moduleLight::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Light", String(light));
 	}
-	publishLightLast = 0;
+	publishLightLast = wpFZ.loopStartedAt;
 }
 
 void moduleLight::calc() {
@@ -158,7 +158,7 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 182 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

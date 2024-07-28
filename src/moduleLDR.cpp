@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 181 2024-07-27 23:14:47Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 182 2024-07-28 02:12:39Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -107,7 +107,7 @@ void moduleLDR::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("LDR", String(ldr));
 	}
-	publishLdrLast = 0;
+	publishLdrLast = wpFZ.loopStartedAt;
 }
 
 void moduleLDR::calc() {
@@ -156,7 +156,7 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 182 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

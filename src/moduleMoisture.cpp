@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 182                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 181 2024-07-27 23:14:47Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 182 2024-07-28 02:12:39Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -148,7 +148,7 @@ void moduleMoisture::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Moisture", String(moisture));
 	}
-	publishMoistureLast = 0;
+	publishMoistureLast = wpFZ.loopStartedAt;
 }
 
 void moduleMoisture::calc() {
@@ -208,7 +208,7 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 182 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
