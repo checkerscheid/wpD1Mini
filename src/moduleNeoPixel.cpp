@@ -349,8 +349,7 @@ void moduleNeoPixel::calc() {
 				RandomEffect(500); // Random
 				break;
 			case ModeComplex:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Complex");
+				// nothing todo, but save LED state
 				break;
 			default:
 				if(modeCurrentLast != modeCurrent)
