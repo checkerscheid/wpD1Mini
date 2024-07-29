@@ -308,6 +308,9 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 		case ModeRainbow:
 			returns = "ModeRainbow";
 			break;
+		case ModeRainbowTv:
+			returns = "ModeRainbowTv";
+			break;
 		case ModeTheaterChaseRainbow:
 			returns = "ModeTheaterChaseRainbow";
 			break;
@@ -422,6 +425,9 @@ void moduleNeoPixel::calc() {
 			case ModeRainbow:
 				RainbowEffect(10); // Flowing rainbow cycle along the whole strip
 				break;
+			case ModeRainbowTv:
+				RainbowTvEffect(10);
+				break;
 			case ModeTheaterChaseRainbow:
 				TheaterChaseRainbowEffect(50); // Rainbow-enhanced theaterChase variant
 				break;
@@ -505,7 +511,22 @@ void moduleNeoPixel::TheaterChaseEffect(uint32_t color, int wait) {
 void moduleNeoPixel::RainbowEffect(uint8_t wait) {
 	if(pixelInterval != wait)
 		pixelInterval = wait;
-	for(uint16_t i=0; i < pixelCount; i++) {
+	for(uint16_t i = 0; i < pixelCount; i++) {
+		strip->setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
+	}
+	strip->show();                          //  Update strip to match
+	pixelCycle++;                           //  Advance current cycle
+	if(pixelCycle >= 256)
+		pixelCycle = 0;                     //  Loop the cycle back to the begining
+}
+// Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
+void moduleNeoPixel::RainbowTvEffect(uint8_t wait) {
+	if(pixelInterval != wait)
+		pixelInterval = wait;
+	for(uint16_t i = 0; i < pixelStartForTv; i++) {
+		strip->setPixelColor(i, strip->Color(0, 0, 0)); //  Update delay time  
+	}
+	for(uint16_t i = pixelStartForTv; i < pixelCount; i++) {
 		strip->setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
 	}
 	strip->show();                          //  Update strip to match

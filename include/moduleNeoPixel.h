@@ -42,6 +42,7 @@ class moduleNeoPixel {
 		static const uint8 ModeRunnerBlue = 12;
 		static const uint8 ModeRandom = 13;
 		static const uint8 ModeComplex = 14;
+		static const uint8 ModeRainbowTv = 15;
 		// Pia
 		static const uint8 ModeColorWipePurple = 20;
 		static const uint8 ModeRunnerPurple = 21;
@@ -103,6 +104,7 @@ class moduleNeoPixel {
 		String getStripStatus();
 	private:
 		uint16 pixelCount = 50;
+		uint16 pixelStartForTv = 25;
 		uint8 valueR = 255;
 		uint8 valueRLast;
 		uint8 valueG = 75;
@@ -135,6 +137,7 @@ class moduleNeoPixel {
 		void ColorWipeEffect(uint32_t color, int wait);
 		void TheaterChaseEffect(uint32_t color, int wait);
 		void RainbowEffect(uint8_t wait);
+		void RainbowTvEffect(uint8_t wait);
 		void TheaterChaseRainbowEffect(uint8_t wait);
 		void RunnerEffect(uint32_t color, int wait);
 		void RandomEffect(int wait);
