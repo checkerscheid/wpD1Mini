@@ -246,10 +246,10 @@ void helperEEPROM::readVars() {
 	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight) * 100);
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
-	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
-	wpNeoPixel.setValueG(EEPROM.read(byteNeoPixelValueG));
-	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
-	wpNeoPixel.setBrightness(EEPROM.read(byteNeoPixelBrightness));
+	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
+	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
+	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
+	wpNeoPixel.InitBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpRain.CalcCycle(EEPROM.read(byteCalcCycleRain) * 100);
@@ -271,16 +271,19 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteMaxVolume, wpDistance.volume);
 	short outKp;
 	EEPROM.get(byteAnalogOutKp, outKp);
-	wpAnalogOut.setKp(outKp);
+	wpAnalogOut.InitKp(outKp);
 	short outTv;
 	EEPROM.get(byteAnalogOutTv, outTv);
-	wpAnalogOut.setTv(outTv);
+	wpAnalogOut.InitTv(outTv);
 	short outTn;
 	EEPROM.get(byteAnalogOutTn, outTn);
-	wpAnalogOut.setTn(outTn);
+	wpAnalogOut.InitTn(outTn);
 	short outSetPoint;
 	EEPROM.get(byteAnalogOutSetPoint, outSetPoint);
-	wpAnalogOut.setSetPoint(outSetPoint);
+	wpAnalogOut.InitSetPoint(outSetPoint);
+	uint16 pixelCount;
+	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
+	wpNeoPixel.InitPixelCount(pixelCount);
 
 //###################################################################################
 /// byte values: 4byte 80 - 99

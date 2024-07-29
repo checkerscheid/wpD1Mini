@@ -279,16 +279,16 @@ void moduleAnalogOut::calcOutput() {
 	}
 }
 
-void moduleAnalogOut::setKp(short kp) {
+void moduleAnalogOut::InitKp(short kp) {
 	Kp = (double) (kp / 10.0);
 }
-void moduleAnalogOut::setTv(short tv) {
+void moduleAnalogOut::InitTv(short tv) {
 	Tv = (double) (tv / 10.0);
 }
-void moduleAnalogOut::setTn(short tn) {
+void moduleAnalogOut::InitTn(short tn) {
 	Tn = (double) (tn / 10.0);
 }
-void moduleAnalogOut::setSetPoint(short setpoint) {
+void moduleAnalogOut::InitSetPoint(short setpoint) {
 	SetPoint = (double) (setpoint / 10.0);
 }
 void moduleAnalogOut::resetPID() {

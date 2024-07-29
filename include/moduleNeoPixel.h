@@ -51,6 +51,7 @@ class moduleNeoPixel {
 		// values
 		String mqttTopicModeName;
 		// settings
+		String mqttTopicPixelCount;
 		// commands
 		String mqttTopicValueR;
 		String mqttTopicValueG;
@@ -82,19 +83,26 @@ class moduleNeoPixel {
 		void PiaEffect();
 		void ComplexEffect(uint pixel, byte r, byte g, byte b);
 		void ComplexEffect(uint pixel, uint32_t color);
-		void setValueR(uint8 r);
-		uint8 getValueR();
-		void setValueG(uint8 g);
-		uint8 getValueG();
-		void setValueB(uint8 b);
-		uint8 getValueB();
-		void setBrightness(uint8 bn);
-		uint8 getBrightness();
+		void InitValueR(uint8 r);
+		uint8 GetValueR();
+		void SetValueR(uint8 r);
+		void InitValueG(uint8 g);
+		uint8 GetValueG();
+		void SetValueG(uint8 g);
+		void InitValueB(uint8 b);
+		uint8 GetValueB();
+		void SetValueB(uint8 b);
+		void InitBrightness(uint8 bn);
+		uint8 GetBrightness();
+		void SetBrightness(uint8 bn);
 		String GetModeName(uint actualMode);
 		void SetMode(uint8 newMode);
+		void InitPixelCount(uint16 pc);
+		uint16 GetPixelCount();
+		void SetPixelCount(uint16 pc);
 		String getStripStatus();
 	private:
-		uint pixelCount;
+		uint16 pixelCount = 50;
 		uint8 valueR = 255;
 		uint8 valueRLast;
 		uint8 valueG = 75;
@@ -120,7 +128,6 @@ class moduleNeoPixel {
 		uint pixelInterval;				// Pixel Interval (ms)
 		int pixelQueue;					// Pattern Pixel Queue
 		int pixelCycle;					// Pattern Pixel Cycle
-		uint16_t pixelNumber;			// Total Number of Pixels
 
 		void publishValue();
 		void calc();

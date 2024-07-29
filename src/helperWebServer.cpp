@@ -197,10 +197,11 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleNeoPixel) {
 			message += "\"NeoPixel\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpNeoPixel.Pin])) + "," +
-				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.getValueR())) + "," +
-				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.getValueG())) + "," +
-				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.getValueB())) + "," +
-				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.getBrightness())) +
+				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.GetValueR())) + "," +
+				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.GetValueG())) + "," +
+				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.GetValueB())) + "," +
+				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.GetBrightness())) + "," +
+				wpFZ.JsonKeyValue("PixelCount", String(wpNeoPixel.GetPixelCount())) +
 				"},";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
@@ -710,7 +711,7 @@ void helperWebServer::setupWebServer() {
 			byte b = 0;
 			if(request->hasParam("brightness")) {
 				b = request->getParam("brightness")->value().toInt();
-				wpNeoPixel.setBrightness(b);
+				wpNeoPixel.SetBrightness(b);
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBrightness, '" + String(b) + "'");
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");

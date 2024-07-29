@@ -68,10 +68,10 @@ class moduleAnalogOut {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		void setKp(short kp);
-		void setTv(short tv);
-		void setTn(short tn);
-		void setSetPoint(short setpoint);
+		void InitKp(short kp);
+		void InitTv(short tv);
+		void InitTn(short tn);
+		void InitSetPoint(short setpoint);
 		void resetPID();
 	private:
 		const double minOutput = 0.0;

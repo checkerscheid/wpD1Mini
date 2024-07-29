@@ -176,6 +176,7 @@ class helperEEPROM {
 		const uint16 byteAnalogOutTn = 66;
 		const uint16 byteAnalogOutTv = 68;
 		const uint16 byteAnalogOutSetPoint = 70;
+		const uint16 byteNeoPixelPixelCount = 72;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
