@@ -98,18 +98,16 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLDR::publishValue() {
-	if(publishLdrLast > wpFZ.loopStartedAt + 10000) {
-		wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
-			wpRest.trySend = true;
-		}
-		ldrLast = ldr;
-		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("LDR", String(ldr));
-		}
-		publishLdrLast = wpFZ.loopStartedAt;
+	wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
+	if(mb->sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
+		wpRest.trySend = true;
 	}
+	ldrLast = ldr;
+	if(wpMqtt.Debug) {
+		mb->printPublishValueDebug("LDR", String(ldr));
+	}
+	publishLdrLast = wpFZ.loopStartedAt;
 }
 
 void moduleLDR::calc() {

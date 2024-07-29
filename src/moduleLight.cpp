@@ -103,18 +103,16 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLight::publishValue() {
-	if(publishLightLast > wpFZ.loopStartedAt + 10000) {
-		wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
-			wpRest.trySend = true;
-		}
-		lightLast = light;
-		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("Light", String(light));
-		}
-		publishLightLast = wpFZ.loopStartedAt;
+	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
+	if(mb->sendRest) {
+		wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
+		wpRest.trySend = true;
 	}
+	lightLast = light;
+	if(wpMqtt.Debug) {
+		mb->printPublishValueDebug("Light", String(light));
+	}
+	publishLightLast = wpFZ.loopStartedAt;
 }
 
 void moduleLight::calc() {
