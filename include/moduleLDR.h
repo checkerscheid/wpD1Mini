@@ -59,6 +59,7 @@ class moduleLDR {
 	private:
 		int ldrLast;
 		unsigned long publishLdrLast;
+		const uint16 publishLdrMin = 15000;
 		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
