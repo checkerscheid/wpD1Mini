@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 181 2024-07-27 23:14:47Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -33,7 +33,7 @@ void moduleBM::init() {
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
 	bmLast = 0;
-	publishForceBM = 0;
+	publishBMLast = 0;
 
 	// section to copy
 
@@ -64,9 +64,9 @@ void moduleBM::publishValues() {
 }
 void moduleBM::publishValues(bool force) {
 	if(force) {
-		publishForceBM = wpFZ.publishQoS;
+		publishBMLast = 0;
 	}
-	if(bmLast != bm || ++publishForceBM > wpFZ.publishQoS) {
+	if(bmLast != bm || wpFZ.CheckQoS(publishBMLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -125,7 +125,7 @@ void moduleBM::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("BM", String(bm));
 	}
-	publishForceBM = 0;
+	publishBMLast = wpFZ.loopStartedAt;
 }
 void moduleBM::calc() {
 	if(digitalRead(Pin) == LOW) {
@@ -146,7 +146,7 @@ void moduleBM::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

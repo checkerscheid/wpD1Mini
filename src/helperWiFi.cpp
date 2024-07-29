@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 181 2024-07-27 23:14:47Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 183 2024-07-29 03:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -36,8 +36,6 @@ void helperWiFi::init() {
 	setupWiFi();
 	// because DateTime Only works with NTP Server
 	wpFZ.OnSince = wpFZ.getDateTime();
-	sendRestLast = false;
-	publishForceSendRest = 0;
 }
 
 //###################################################################################
@@ -54,7 +52,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -155,27 +153,27 @@ void helperWiFi::publishValues() {
 }
 void helperWiFi::publishValues(bool force) {
 	if(force) {
-		publishForceDebug = wpFZ.publishQoS;
-		publishForceRssi = wpFZ.minute2;
+		publishSendRestLast = 0;
+		publishDebugLast = 0;
 	}
-	if(sendRestLast != sendRest || ++publishForceSendRest > wpFZ.publishQoS) {
+	if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
 		sendRestLast = sendRest;
 		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
 		wpFZ.SendWSSendRest("SendRestWiFi", sendRest);
-		publishForceSendRest = 0;
+		publishSendRestLast = wpFZ.loopStartedAt;
 	}
-	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishForceDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
-	if(++publishForceRssi > wpFZ.minute2) {
+	if(wpFZ.loopStartedAt > publishRssiLast + wpFZ.minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
 		if(sendRest) {
 			wpRest.error = wpRest.error | !wpRest.sendRest("rssi", String(WiFi.RSSI()));
 			wpRest.trySend = true;
 		}
-		publishForceRssi = 0;
+		publishRssiLast = wpFZ.loopStartedAt;
 	}
 }
 

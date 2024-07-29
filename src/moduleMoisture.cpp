@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 182 2024-07-28 02:12:39Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 183 2024-07-29 03:32:26Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -80,13 +80,13 @@ void moduleMoisture::publishValues(bool force) {
 		publishMoistureLast = 0;
 		publishErrorMinLast = 0;
 	}
-	if(moistureLast != moisture || mb->CheckQoS(publishMoistureLast)) {
+	if(moistureLast != moisture || wpFZ.CheckQoS(publishMoistureLast)) {
 		publishValue();
 	}
-	if(errorMinLast != errorMin || mb->CheckQoS(publishErrorMinLast)) {
+	if(errorMinLast != errorMin || wpFZ.CheckQoS(publishErrorMinLast)) {
 		errorMinLast = errorMin;
 		wpMqtt.mqttClient.publish(mqttTopicErrorMin.c_str(), String(errorMin).c_str());
-		publishErrorMinLast = 0;
+		publishErrorMinLast = wpFZ.loopStartedAt;
 	}
 	mb->publishValues(force);
 }
@@ -208,7 +208,7 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

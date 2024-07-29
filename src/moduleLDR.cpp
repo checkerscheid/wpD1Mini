@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 182 2024-07-28 02:12:39Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 183 2024-07-29 03:32:26Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -70,7 +70,7 @@ void moduleLDR::publishValues(bool force) {
 	if(force) {
 		publishLdrLast = 0;
 	}
-	if(ldrLast != ldr || mb->CheckQoS(publishLdrLast)) {
+	if(ldrLast != ldr || wpFZ.CheckQoS(publishLdrLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -98,16 +98,18 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLDR::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
-		wpRest.trySend = true;
+	if(publishLdrLast > wpFZ.loopStartedAt + 10000) {
+		wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
+			wpRest.trySend = true;
+		}
+		ldrLast = ldr;
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug("LDR", String(ldr));
+		}
+		publishLdrLast = wpFZ.loopStartedAt;
 	}
-	ldrLast = ldr;
-	if(wpMqtt.Debug) {
-		mb->printPublishValueDebug("LDR", String(ldr));
-	}
-	publishLdrLast = wpFZ.loopStartedAt;
 }
 
 void moduleLDR::calc() {
@@ -156,7 +158,7 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 181 2024-07-27 23:14:47Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 183 2024-07-29 03:32:26Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -663,6 +663,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("demo")) {
 				wpNeoPixel.demoMode = !wpNeoPixel.demoMode;
 			}
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setNeoPixelDemo");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
@@ -670,13 +671,13 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("effect")) {
 				uint effect = request->getParam("effect")->value().toInt();
 				wpNeoPixel.demoMode = false;
-				wpNeoPixel.modeCurrent = effect;
+				wpNeoPixel.SetMode(effect);
 			}
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setNeoPixelEffect");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelSimple", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple");
 			byte r = 0;
 			byte g = 0;
 			byte b = 0;
@@ -690,6 +691,17 @@ void helperWebServer::setupWebServer() {
 				b = request->getParam("b")->value().toInt();
 			}
 			wpNeoPixel.SimpleEffect(r, g, b);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
+				"r: '" + String(r) + "', "
+				"g: '" + String(g) + "', "
+				"b: '" + String(b) + "'");
+			
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelPia", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpNeoPixel.PiaEffect();
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelPia");
 			
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
@@ -698,8 +710,9 @@ void helperWebServer::setupWebServer() {
 			byte b = 0;
 			if(request->hasParam("brightness")) {
 				b = request->getParam("brightness")->value().toInt();
+				wpNeoPixel.setBrightness(b);
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBrightness, '" + String(b) + "'");
 			}
-			wpNeoPixel.setBrightness(b);
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
@@ -707,8 +720,9 @@ void helperWebServer::setupWebServer() {
 			byte ww = 0;
 			if(request->hasParam("ww")) {
 				ww = request->getParam("ww")->value().toInt();
+				wpAnalogOut.handValueSet = ww;
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '" + String(ww) + "'");
 			}
-			wpAnalogOut.handValueSet = ww;
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
@@ -716,8 +730,9 @@ void helperWebServer::setupWebServer() {
 			byte cw = 0;
 			if(request->hasParam("cw")) {
 				cw = request->getParam("cw")->value().toInt();
+				wpAnalogOut2.handValueSet = cw;
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '" + String(cw) + "'");
 			}
-			wpAnalogOut2.handValueSet = cw;
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
@@ -740,7 +755,7 @@ void helperWebServer::setupWebServer() {
 				b = request->getParam("b")->value().toInt();
 			}
 			wpNeoPixel.ComplexEffect(pixel, r, g, b);
-			
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 182 2024-07-28 02:12:39Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 183 2024-07-29 03:32:26Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -75,7 +75,7 @@ void moduleLight::publishValues(bool force) {
 	if(force) {
 		publishLightLast = 0;
 	}
-	if(lightLast != light || mb->CheckQoS(publishLightLast)) {
+	if(lightLast != light || wpFZ.CheckQoS(publishLightLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -103,16 +103,18 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLight::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
-		wpRest.trySend = true;
+	if(publishLightLast > wpFZ.loopStartedAt + 10000) {
+		wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
+			wpRest.trySend = true;
+		}
+		lightLast = light;
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug("Light", String(light));
+		}
+		publishLightLast = wpFZ.loopStartedAt;
 	}
-	lightLast = light;
-	if(wpMqtt.Debug) {
-		mb->printPublishValueDebug("Light", String(light));
-	}
-	publishLightLast = wpFZ.loopStartedAt;
 }
 
 void moduleLight::calc() {
@@ -158,7 +160,7 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

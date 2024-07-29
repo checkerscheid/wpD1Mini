@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 181 2024-07-27 23:14:47Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 183 2024-07-29 03:32:26Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -42,7 +42,7 @@ void helperOnlineToggler::cycle() {
 }
 
 uint16 helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -75,13 +75,13 @@ void helperOnlineToggler::publishValues() {
 }
 void helperOnlineToggler::publishValues(bool force) {
 	if(force) {
-		publishForceDebug = wpFZ.publishQoS;
+		publishDebugLast = 0;
 		wpMqtt.mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
 	}
-	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishForceDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 

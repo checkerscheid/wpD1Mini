@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 181 2024-07-27 23:14:47Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 183 2024-07-29 03:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -91,20 +91,20 @@ void moduleBase::publishValues(bool force) {
 		publishDebugLast = 0;
 		publishErrorLast = 0;
 	}
-	if(sendRestLast != sendRest || CheckQoS(publishSendRestLast)) {
+	if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
 		sendRestLast = sendRest;
 		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
 		wpFZ.SendWSSendRest("sendRest" + _name, sendRest);
 		publishSendRestLast = wpFZ.loopStartedAt;
 	}
-	if(DebugLast != debug || CheckQoS(publishDebugLast)) {
+	if(DebugLast != debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(debug).c_str());
 		wpFZ.SendWSDebug("Debug" + _name, debug);
 		publishDebugLast = wpFZ.loopStartedAt;
 	}
 	if(_useError) {
-		if(errorLast != error || CheckQoS(publishErrorLast)) {
+		if(errorLast != error || wpFZ.CheckQoS(publishErrorLast)) {
 			errorLast = error;
 			wpMqtt.mqttClient.publish(mqttTopicError.c_str(), String(error).c_str());
 			publishErrorLast = wpFZ.loopStartedAt;
@@ -154,11 +154,6 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicCalcCycle, String(calcCycle));
 		}
 	}
-}
-bool moduleBase::CheckQoS(unsigned long lastSend) {
-	if(lastSend == 0) return true;
-	if(wpFZ.loopStartedAt > lastSend + wpFZ.publishQoS) return true;
-	return false;
 }
 
 void moduleBase::writeEEPROMsendRest() {

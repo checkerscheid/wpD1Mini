@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 182 2024-07-28 02:12:39Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 183 2024-07-29 03:32:26Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -85,13 +85,13 @@ void moduleDistance::publishValues(bool force) {
 		publishDistanceRawLast = 0;
 		publishDistanceAvgLast = 0;
 	}
-	if(volumeLast != volume ||mb->CheckQoS(publishVolumeLast)) {
+	if(volumeLast != volume || wpFZ.CheckQoS(publishVolumeLast)) {
 		publishValue();
 	}
-	if(distanceRawLast != distanceRaw || mb->CheckQoS(publishDistanceRawLast)) {
+	if(distanceRawLast != distanceRaw || wpFZ.CheckQoS(publishDistanceRawLast)) {
 		publishDistanceRaw();
 	}
-	if(distanceAvgLast != distanceAvg || mb->CheckQoS(publishDistanceAvgLast)) {
+	if(distanceAvgLast != distanceAvg || wpFZ.CheckQoS(publishDistanceAvgLast)) {
 		publishDistanceAvg();
 	}
 	mb->publishValues(force);
@@ -157,7 +157,7 @@ void moduleDistance::publishDistanceRaw() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("DistanceRaw", String(distanceRaw));
 	}
-	publishDistanceRawLast = 0;
+	publishDistanceRawLast = wpFZ.loopStartedAt;
 }
 
 void moduleDistance::publishDistanceAvg() {
@@ -166,7 +166,7 @@ void moduleDistance::publishDistanceAvg() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("DistanceAvg", String(distanceAvg));
 	}
-	publishDistanceAvgLast = 0;
+	publishDistanceAvgLast = wpFZ.loopStartedAt;
 }
 
 void moduleDistance::calc() {
@@ -220,7 +220,7 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

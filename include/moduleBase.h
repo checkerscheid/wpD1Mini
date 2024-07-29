@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 181 2024-07-27 23:14:47Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h
@@ -44,7 +44,6 @@ class moduleBase {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		bool CheckQoS(unsigned long lastSend);
 		void printPublishValueDebug(String name, String value);
 	private:
 		String _name;

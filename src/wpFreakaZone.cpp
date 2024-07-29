@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 181 2024-07-27 23:14:47Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -53,7 +53,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -251,6 +251,12 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 			DebugcheckSubscribes(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
+}
+
+bool wpFreakaZone::CheckQoS(unsigned long lastSend) {
+	if(lastSend == 0) return true;
+	if(loopStartedAt > lastSend + publishQoS) return true;
+	return false;
 }
 
 //###################################################################################

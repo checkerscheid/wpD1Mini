@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 182 2024-07-28 02:12:39Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 183 2024-07-29 03:32:26Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -71,7 +71,7 @@ void moduleRpm::publishValues(bool force) {
 	if(force) {
 		publishRpmLast = 0;
 	}
-	if(rpmLast != rpm || mb->CheckQoS(publishRpmLast)) {
+	if(rpmLast != rpm || wpFZ.CheckQoS(publishRpmLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -155,7 +155,7 @@ uint16 moduleRpm::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

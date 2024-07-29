@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 181 2024-07-27 23:14:47Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 183 2024-07-29 03:32:26Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -77,20 +77,23 @@ class moduleAnalogOut {
 		const double minOutput = 0.0;
 		const double maxOutput = 100.0;
 		uint8 outputLast;
-		uint32 publishForceOutput;
+		unsigned long publishOutputLast;
 		uint8 autoValueLast;
-		uint32 publishForceAutoValue;
+		unsigned long publishAutoValueLast;
 		uint8 handValueLast;
-		uint32 publishForceHandValue;
+		unsigned long publishHandValueLast;
 		bool handErrorLast;
-		uint32 publishForceHandError;
+		unsigned long publishHandErrorLast;
 		double PIDinput, PIDoutput, PIDsetPoint;
 // Kp: Determines how aggressively the PID reacts to the current amount of error (Proportional)
 // Ki (Tv): Determines how aggressively the PID reacts to error over time (Integral)
 // Kd (Tn): Determines how aggressively the PID reacts to the change in error (Derivative)
-		double Kp, Tv, Tn, SetPoint;
+		double Kp = 1.0;
+		double Tv = 0.2;
+		double Tn = 0.0;
+		double SetPoint = 75.0;
 		double KpLast, TvLast, TnLast, SetPointLast;
-		uint32 publishForcePID;
+		unsigned long publishPIDLast;
 
 		void publishValue();
 		void calc();
@@ -98,7 +101,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 181 $";
+		String SVNh = "$Rev: 183 $";
 };
 extern moduleAnalogOut wpAnalogOut;
 

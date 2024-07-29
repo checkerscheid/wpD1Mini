@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 182 2024-07-28 02:12:39Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 183 2024-07-29 03:32:26Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -79,10 +79,10 @@ void moduleDHT::publishValues(bool force) {
 		publishTemperatureLast = 0;
 		publishHumidityLast = 0;
 	}
-	if(temperatureLast != temperature || mb->CheckQoS(publishTemperatureLast)) {
+	if(temperatureLast != temperature || wpFZ.CheckQoS(publishTemperatureLast)) {
 		publishValueTemp();
 	}
-	if(humidityLast != humidity || mb->CheckQoS(publishHumidityLast)) {
+	if(humidityLast != humidity || wpFZ.CheckQoS(publishHumidityLast)) {
 		publishValueHum();
 	}
 	mb->publishValues(force);
@@ -189,7 +189,7 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

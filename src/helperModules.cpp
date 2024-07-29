@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 182 2024-07-28 02:12:39Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 183 2024-07-29 03:32:26Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -56,7 +56,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -462,6 +462,7 @@ void helperModules::publishAllSettings() {
 	publishAllSettings(false);
 }
 void helperModules::publishAllSettings(bool force) {
+	wpFZ.DebugWS(wpFZ.strDEBUG, "Modules::Settings", "Start publish");
 	wpFZ.publishSettings(force);
 	wpEEPROM.publishSettings(force);
 	wpFinder.publishSettings(force);
@@ -512,6 +513,7 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleDistance) {
 		wpDistance.publishSettings(force);
 	}
+	wpFZ.DebugWS(wpFZ.strDEBUG, "Modules::Settings", "Stop publish");
 }
 
 void helperModules::publishAllValues() {

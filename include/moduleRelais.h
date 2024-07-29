@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 181 2024-07-27 23:14:47Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 183 2024-07-29 03:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -75,14 +75,14 @@ class moduleRelais {
 		bool Debug(bool debug);
 	private:
 		bool outputLast;
-		uint32 publishForceOutput;
+		unsigned long publishOutputLast;
 		bool autoValueLast;
-		uint32 publishForceAutoValue;
+		unsigned long publishAutoValueLast;
 		bool handValueLast;
-		uint32 publishForceHandValue;
+		unsigned long publishHandValueLast;
 		bool handErrorLast;
-		uint32 publishForceHandError;
-		uint32 publishForceWaterEmptyError;
+		unsigned long publishHandErrorLast;
+		unsigned long publishWaterEmptyErrorLast;
 		// if wpModules.useMoisture
 		bool pumpCycleActive;
 		bool pumpStarted;
@@ -105,7 +105,7 @@ class moduleRelais {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 181 $";
+		String SVNh = "$Rev: 183 $";
 };
 extern moduleRelais wpRelais;
 

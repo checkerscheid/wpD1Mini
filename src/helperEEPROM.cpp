@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 182 2024-07-28 02:12:39Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -85,11 +85,11 @@ void helperEEPROM::publishValues() {
 	publishValues(false);
 }
 void helperEEPROM::publishValues(bool force) {
-	if(force) publishForceDebug = wpFZ.publishQoS;
-	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
+	if(force) publishDebugLast = 0;
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishForceDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 

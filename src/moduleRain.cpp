@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 182 2024-07-28 02:12:39Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 183 2024-07-29 03:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -70,7 +70,7 @@ void moduleRain::publishValues(bool force) {
 	if(force) {
 		publishRainLast = 0;
 	}
-	if(rainLast != rain || mb->CheckQoS(publishRainLast)) {
+	if(rainLast != rain || wpFZ.CheckQoS(publishRainLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -107,7 +107,7 @@ void moduleRain::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Rain", String(rain));
 	}
-	publishRainLast = 0;
+	publishRainLast = wpFZ.loopStartedAt;
 }
 
 void moduleRain::calc() {
@@ -159,7 +159,7 @@ uint16 moduleRain::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 182 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

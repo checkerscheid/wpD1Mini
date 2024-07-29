@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 181 2024-07-27 23:14:47Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -45,7 +45,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -166,19 +166,19 @@ void helperUpdate::publishValues() {
 }
 void helperUpdate::publishValues(bool force) {
 	if(force) {
-		publishForceDebug = wpFZ.publishQoS;
-		publishForceNewVersion = wpFZ.publishQoS;
+		publishNewVersionLast = 0;
+		publishDebugLast = 0;
 	}
-	if(newVersionLast != newVersion || ++publishForceNewVersion > wpFZ.publishQoS) {
+	if(newVersionLast != newVersion || wpFZ.CheckQoS(publishNewVersionLast)) {
 		newVersionLast = newVersion;
 		wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str());
 		wpFZ.SendNewVersion(newVersion);
-		publishForceNewVersion = 0;
+		publishNewVersionLast = wpFZ.loopStartedAt;
 	}
-	if(DebugLast != Debug || ++publishForceDebug > wpFZ.publishQoS) {
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishForceDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 

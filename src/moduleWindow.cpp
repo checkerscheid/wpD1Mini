@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 181 2024-07-27 23:14:47Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -33,7 +33,7 @@ void moduleWindow::init() {
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
 	bmLast = 0;
-	publishForceBM = 0;
+	publishBMLast = 0;
 
 	// section to copy
 
@@ -64,9 +64,9 @@ void moduleWindow::publishValues() {
 }
 void moduleWindow::publishValues(bool force) {
 	if(force) {
-		publishForceBM = wpFZ.publishQoS;
+		publishBMLast = 0;
 	}
-	if(bmLast != bm || ++publishForceBM > wpFZ.publishQoS) {
+	if(bmLast != bm || wpFZ.CheckQoS(publishBMLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -125,7 +125,7 @@ void moduleWindow::publishValue() {
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Window", String(bm));
 	}
-	publishForceBM = 0;
+	publishBMLast = wpFZ.loopStartedAt;
 }
 void moduleWindow::calc() {
 	if(digitalRead(Pin) == LOW) {
@@ -146,7 +146,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
