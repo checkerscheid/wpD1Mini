@@ -8,7 +8,7 @@
 		"UpdateMode": false,
 		"calcValues": true,
 		"DHT": {
-			"MaxCycleDHT": 56,
+			"PublishForceDHT": 56,
 			"TemperatureCorrection": 3.00,
 			"HumidityCorrection": 4.90
 		},
@@ -22,7 +22,7 @@
 			}
 		},
 		"Moisture": {
-			"MaxCycleMoisture": 50,
+			"PublishForceMoisture": 50,
 			"useMoistureAvg": 1,
 			"MoistureMin": 30,
 			"MoistureDry": 1023,

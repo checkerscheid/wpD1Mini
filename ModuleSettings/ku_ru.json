@@ -8,12 +8,12 @@
 		"UpdateMode": false,
 		"calcValues": true,
 		"DHT": {
-			"MaxCycleDHT": 50,
+			"PublishForceDHT": 50,
 			"TemperatureCorrection": 0.00,
 			"HumidityCorrection": 0.00
 		},
 		"LDR": {
-			"MaxCycleLDR": 50,
+			"PublishForceLDR": 50,
 			"useLDRAvg": 0,
 			"LDRCorrection": 0
 		},

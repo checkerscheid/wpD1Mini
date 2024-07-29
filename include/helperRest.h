@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 175                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperRest.h 175 2024-07-24 15:31:08Z                    $ #
+//# File-ID      : $Id:: helperRest.h 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperRest_h
@@ -49,11 +49,11 @@ class helperRest {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 175 $";
-		bool errorLast = false;
-		uint16 publishCountError = 0;
-		bool DebugLast = false;
-		uint16 publishCountDebug = 0;
+		String SVNh = "$Rev: 183 $";
+		bool errorLast;
+		unsigned long publishErrorLast;
+		bool DebugLast;
+		unsigned long publishDebugLast;
 		String macId;
 };
 extern helperRest wpRest;

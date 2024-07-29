@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.h 179 2024-07-26 06:43:08Z                      $ #
+//# File-ID      : $Id:: moduleBM.h 183 2024-07-29 03:32:26Z                      $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBM_h
@@ -53,14 +53,13 @@ class moduleBM {
 		bool Debug(bool debug);
 	private:
 		int bmLast;
-		uint16 publishCountBM;
+		unsigned long publishBMLast;
 		void publishValue();
-		void printPublishValueDebug(String name, String value, String publishCount);
 		void calc();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 179 $";
+		String SVNh = "$Rev: 183 $";
 
 };
 extern moduleBM wpBM;

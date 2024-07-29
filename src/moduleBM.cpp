@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 179 2024-07-26 06:43:08Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -33,7 +33,7 @@ void moduleBM::init() {
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
 	bmLast = 0;
-	publishCountBM = 0;
+	publishBMLast = 0;
 
 	// section to copy
 
@@ -64,9 +64,9 @@ void moduleBM::publishValues() {
 }
 void moduleBM::publishValues(bool force) {
 	if(force) {
-		publishCountBM = wpFZ.publishQoS;
+		publishBMLast = 0;
 	}
-	if(bmLast != bm || ++publishCountBM > wpFZ.publishQoS) {
+	if(bmLast != bm || wpFZ.CheckQoS(publishBMLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -123,13 +123,9 @@ void moduleBM::publishValue() {
 		}
 	}
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("BM", String(bm), String(publishCountBM));
+		mb->printPublishValueDebug("BM", String(bm));
 	}
-	publishCountBM = 0;
-}
-void moduleBM::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
+	publishBMLast = wpFZ.loopStartedAt;
 }
 void moduleBM::calc() {
 	if(digitalRead(Pin) == LOW) {
@@ -150,7 +146,7 @@ void moduleBM::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

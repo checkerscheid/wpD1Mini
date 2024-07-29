@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 179 2024-07-26 06:43:08Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -42,8 +42,10 @@ class moduleNeoPixel {
 		static const uint8 ModeRunnerBlue = 12;
 		static const uint8 ModeRandom = 13;
 		static const uint8 ModeComplex = 14;
+		// Pia
+		static const uint8 ModeColorWipePurple = 20;
+		static const uint8 ModeRunnerPurple = 21;
 
-		uint modeCurrent;				// Current Pattern Number
 		bool demoMode;
 
 		// values
@@ -77,6 +79,7 @@ class moduleNeoPixel {
 		bool Debug(bool debug);
 		void SimpleEffect(byte r, byte g, byte b);
 		void SimpleEffect(byte r, byte g, byte b, byte br);
+		void PiaEffect();
 		void ComplexEffect(uint pixel, byte r, byte g, byte b);
 		void ComplexEffect(uint pixel, uint32_t color);
 		void setValueR(uint8 r);
@@ -87,6 +90,8 @@ class moduleNeoPixel {
 		uint8 getValueB();
 		void setBrightness(uint8 bn);
 		uint8 getBrightness();
+		String GetModeName(uint actualMode);
+		void SetMode(uint8 newMode);
 		String getStripStatus();
 	private:
 		uint pixelCount;
@@ -98,11 +103,18 @@ class moduleNeoPixel {
 		uint8 valueBLast;
 		uint8 brightness = 0;
 		uint8 brightnessLast;
-		uint16 publishCountValue;
+		unsigned long publishValueLast;
+		uint modeCurrent;
+		uint modeCurrentLast;
+		unsigned long publishModeLast;
+
+		uint32_t piasFavColor;
+		uint8_t piasFavColorR;
+		uint8_t piasFavColorG;
+		uint8_t piasFavColorB;
 
 		unsigned long pixelPrevious;	// Previous Pixel Millis
 		unsigned long patternPrevious;	// Previous Pattern Millis
-		uint modeCurrentLast;			// reduce MQTT msg
 		uint patternInterval;			// Pattern Interval (ms)
 
 		uint pixelInterval;				// Pixel Interval (ms)
@@ -112,7 +124,6 @@ class moduleNeoPixel {
 
 		void publishValue();
 		void calc();
-		void printPublishValueDebug(String name, String value, String publishCount);
 		
 		void ColorWipeEffect(uint32_t color, int wait);
 		void TheaterChaseEffect(uint32_t color, int wait);
@@ -124,7 +135,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 179 $";
+		String SVNh = "$Rev: 183 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

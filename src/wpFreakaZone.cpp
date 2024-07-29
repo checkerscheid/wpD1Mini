@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 167                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 167 2024-07-15 19:58:12Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 183 2024-07-29 03:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -37,10 +37,11 @@ void wpFreakaZone::init(String deviceName) {
 	mqttTopicRestartDevice = wpFZ.DeviceName + "/RestartDevice";
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 
-	publishCountCalcValues = 0;
-	publishCountOnDuration = 0;
+	loopStartedAt = millis();
+	publishCalcValuesLast = 0;
+	publishOnDurationLast = 0;
 	restartRequiredLast = false;
-	publishCountRestartRequired = 0;
+	publishRestartRequiredLast = 0;
 }
 
 //###################################################################################
@@ -52,7 +53,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 167 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -182,16 +183,20 @@ void wpFreakaZone::publishValues() {
 }
 
 void wpFreakaZone::publishValues(bool force) {
-	if(force) publishCountOnDuration = minute2;
-	if(++publishCountOnDuration > minute2) {
-		wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
-		publishCountOnDuration = 0;
+	if(force) {
+		publishOnDurationLast = 0;
+		publishCalcValuesLast = 0;
 	}
-	if(calcValuesLast != calcValues || publishCountCalcValues > wpFZ.publishQoS) {
+	if(publishOnDurationLast == 0 || loopStartedAt > publishOnDurationLast + publishQoS) {
+		wpMqtt.mqttClient.publish(mqttTopicOnDuration.c_str(), OnDuration.c_str());
+		publishOnDurationLast = loopStartedAt;
+	}
+	if(calcValuesLast != calcValues || publishCalcValuesLast == 0 ||
+		loopStartedAt > publishCalcValuesLast + publishQoS) {
 		calcValuesLast = calcValues;
 		wpMqtt.mqttClient.publish(mqttTopicCalcValues.c_str(), String(calcValues).c_str());
 		wpFZ.SendWSDebug("CalcValues", wpFZ.calcValues);
-		publishCountCalcValues = 0;
+		publishCalcValuesLast = loopStartedAt;
 	}
 	if(restartRequired) {
 		if(!restartRequiredLast) {
@@ -200,10 +205,10 @@ void wpFreakaZone::publishValues(bool force) {
 			SendRestartRequired("true");
 			restartRequiredLast = restartRequired;
 		}
-		if(restartRequiredLast && ++publishCountRestartRequired > sekunde10) {
+		if(restartRequiredLast && loopStartedAt > publishRestartRequiredLast + sekunde10) {
 			wpMqtt.mqttClient.publish(mqttTopicRestartRequired.c_str(), String(restartRequired).c_str());
 			SendRestartRequired("true");
-			publishCountRestartRequired = 0;
+			publishRestartRequiredLast = loopStartedAt;
 		}
 	}
 }
@@ -246,6 +251,12 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 			DebugcheckSubscribes(wpFZ.mqttTopicCalcValues, String(wpFZ.calcValues));
 		}
 	}
+}
+
+bool wpFreakaZone::CheckQoS(unsigned long lastSend) {
+	if(lastSend == 0) return true;
+	if(loopStartedAt > lastSend + publishQoS) return true;
+	return false;
 }
 
 //###################################################################################

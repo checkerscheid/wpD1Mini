@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 163 2024-07-14 19:03:20Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h
@@ -24,19 +24,19 @@ class moduleBase {
 		bool useAvg = false;
 		bool debug = false;
 		bool error = false;
+		uint32 calcCycle = 1000 * 5;
+		unsigned long calcLast;
 
-		uint8 maxCycle = 5;
-		uint8 cycleCounter;
 		String mqttTopicSendRest;
 		String mqttTopicUseAvg;
 		String mqttTopicDebug;
 		String mqttTopicError;
-		String mqttTopicMaxCycle;
+		String mqttTopicCalcCycle;
 		void initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest);
 		void initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg);
 		void initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug);
 		void initError();
-		void initMaxCycle(uint16 addrMaxCycle);
+		void initCalcCycle(uint16 addrCalcCycle);
 		void changeSendRest();
 		void changeDebug();
 
@@ -44,6 +44,7 @@ class moduleBase {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
+		void printPublishValueDebug(String name, String value);
 	private:
 		String _name;
 
@@ -56,22 +57,22 @@ class moduleBase {
 		uint16 _addrDebug;
 		byte _byteDebug;
 		uint8 _bitDebug;
-		uint16 _addrMaxCycle;
+		uint16 _addrCalcCycle;
 		bool _useUseAvg;
-		bool _useMaxCycle;
+		bool _useCalcCycle;
 		bool _useError;
 
 		bool sendRestLast;
-		uint16 publishCountSendRest;
+		uint32 publishSendRestLast;
 		bool DebugLast;
-		uint16 publishCountDebug;
+		uint32 publishDebugLast;
 		bool errorLast;
-		uint16 publishCountError;
+		uint32 publishErrorLast;
 
 		void writeEEPROMsendRest();
 		void writeEEPROMuseAvg();
 		void writeEEPROMdebug();
-		void writeEEPROMmaxCycle();
+		void writeEEPROMCalcCycle();
 };
 
 #endif

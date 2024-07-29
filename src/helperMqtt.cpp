@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 163                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 163 2024-07-14 19:03:20Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 183 2024-07-29 03:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -54,7 +54,7 @@ void helperMqtt::cycle() {
 }
 
 uint16 helperMqtt::getVersion() {
-	String SVN = "$Rev: 163 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -87,11 +87,11 @@ void helperMqtt::publishValues() {
 	publishValues(false);
 }
 void helperMqtt::publishValues(bool force) {
-	if(force) publishCountDebug = wpFZ.publishQoS;
-	if(DebugLast != Debug || ++publishCountDebug > wpFZ.publishQoS) {
+	if(force) publishDebugLast = 0;
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		publishCountDebug = 0;
+		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
 void helperMqtt::setSubscribes() {

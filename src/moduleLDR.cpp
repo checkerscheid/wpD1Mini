@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 179 2024-07-26 06:43:08Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 183 2024-07-29 03:32:26Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -32,23 +32,25 @@ void moduleLDR::init() {
 	mqttTopicCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction";
 
 	ldrLast = 0;
-	publishCountLdr = 0;
+	publishLdrLast = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLdrAvg);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleLDR);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleLDR);
+
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleLDR::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -66,9 +68,9 @@ void moduleLDR::publishValues() {
 }
 void moduleLDR::publishValues(bool force) {
 	if(force) {
-		publishCountLdr = wpFZ.publishQoS;
+		publishLdrLast = 0;
 	}
-	if(ldrLast != ldr || ++publishCountLdr > wpFZ.publishQoS) {
+	if(ldrLast != ldr || wpFZ.CheckQoS(publishLdrLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
@@ -96,16 +98,18 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleLDR::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
-		wpRest.trySend = true;
+	if(wpFZ.loopStartedAt > publishLdrLast + publishLdrMin) {
+		wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
+			wpRest.trySend = true;
+		}
+		ldrLast = ldr;
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug("LDR", String(ldr));
+		}
+		publishLdrLast = wpFZ.loopStartedAt;
 	}
-	ldrLast = ldr;
-	if(wpMqtt.Debug) {
-		printPublishValueDebug("LDR", String(ldr), String(publishCountLdr));
-	}
-	publishCountLdr = 0;
 }
 
 void moduleLDR::calc() {
@@ -150,16 +154,11 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 	return round(avg / avgCount);
 }
 
-void moduleLDR::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -192,10 +191,10 @@ bool moduleLDR::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleLDR::MaxCycle(){
-	return mb->maxCycle;
+uint32 moduleLDR::CalcCycle(){
+	return mb->calcCycle;
 }
-uint8 moduleLDR::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleLDR::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }

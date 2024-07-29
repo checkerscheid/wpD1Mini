@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 179 2024-07-26 06:43:08Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 183 2024-07-29 03:32:26Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -48,6 +48,10 @@ moduleNeoPixel::moduleNeoPixel() {
 	// section to config and copy
 	ModuleName = "NeoPixel";
 	mb = new moduleBase(ModuleName);
+
+	piasFavColorR = 137;
+	piasFavColorG = 0;
+	piasFavColorB = 183;
 	//wpFZ.loopTime = 100;
 }
 void moduleNeoPixel::init() {
@@ -55,6 +59,7 @@ void moduleNeoPixel::init() {
 	pixelCount = 50;
 	// Declare our NeoPixel strip object:
 	strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
+	piasFavColor = strip->Color(piasFavColorR, piasFavColorG, piasFavColorB);
 
 	// Argument 1 = Number of pixels in NeoPixel strip
 	// Argument 2 = Arduino pin number (most are valid)
@@ -81,14 +86,15 @@ void moduleNeoPixel::init() {
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
 	// settings
 	// commands
-	mqttTopicValueR = wpFZ.DeviceName + "/ValueR";
-	mqttTopicValueG = wpFZ.DeviceName + "/ValueG";
-	mqttTopicValueB = wpFZ.DeviceName + "/ValueB";
-	mqttTopicBrightness = wpFZ.DeviceName + "/Brightness";
+	mqttTopicValueR = wpFZ.DeviceName + "/" + ModuleName + "/R";
+	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
+	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
+	mqttTopicBrightness = wpFZ.DeviceName + "/" + ModuleName + "/Brightness";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 
-	publishCountValue = 0;
+	publishValueLast = 0;
+	publishModeLast = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
@@ -121,8 +127,8 @@ void moduleNeoPixel::cycle() {
 		// use AnalogOut2 for CW with WW
 		// must have output limitations
 		// @todo make logik, that CW + WW <= 254
-		wpAnalogOut.hardwareoutMax = 50;
-		wpAnalogOut2.hardwareoutMax = 50;
+		//wpAnalogOut.hardwareoutMax = 50;
+		//wpAnalogOut2.hardwareoutMax = 50;
 	}
 }
 
@@ -140,11 +146,24 @@ void moduleNeoPixel::publishValues() {
 }
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
-		publishCountValue = wpFZ.publishQoS;
+		publishValueLast = 0;
+		publishModeLast = 0;
 	}
-	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightness != brightnessLast ||
-		++publishCountValue > wpFZ.publishQoS) {
+	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightnessLast != brightness ||
+		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
+	}
+	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
+		modeCurrentLast = modeCurrent;
+		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
+			wpRest.trySend = true;
+		}
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
+		}
+		publishModeLast = wpFZ.loopStartedAt;
 	}
 	mb->publishValues(force);
 }
@@ -229,6 +248,69 @@ void moduleNeoPixel::setBrightness(uint8 br) {
 }
 uint8 moduleNeoPixel::getBrightness() { return brightness; }
 
+String moduleNeoPixel::GetModeName(uint actualMode) {
+	String returns;
+	switch(actualMode) {
+		case ModeStatic:
+			returns = "ModeStatic";
+			break;
+		case ModeColorWipeRed:
+			returns = "ModeColorWipeRed";
+			break;
+		case ModeColorWipeGreen:
+			returns = "ModeColorWipeGreen";
+			break;
+		case ModeColorWipeBlue:
+			returns = "ModeColorWipeBlue";
+			break;
+		case ModeTheaterChaseWhite:
+			returns = "ModeTheaterChaseWhite";
+			break;
+		case ModeTheaterChaseRed:
+			returns = "ModeTheaterChaseRed";
+			break;
+		case ModeTheaterChaseGreen:
+			returns = "ModeTheaterChaseGreen";
+			break;
+		case ModeTheaterChaseBlue:
+			returns = "ModeTheaterChaseBlue";
+			break;
+		case ModeRainbow:
+			returns = "ModeRainbow";
+			break;
+		case ModeTheaterChaseRainbow:
+			returns = "ModeTheaterChaseRainbow";
+			break;
+		case ModeRunnerRed:
+			returns = "ModeRunnerRed";
+			break;
+		case ModeRunnerGreen:
+			returns = "ModeRunnerGreen";
+			break;
+		case ModeRunnerBlue:
+			returns = "ModeRunnerBlue";
+			break;
+		case ModeRandom:
+			returns = "ModeRandom";
+			break;
+		case ModeComplex:
+			returns = "ModeComplex";
+			break;
+		case ModeColorWipePurple:
+			returns = "ModeColorWipePurple";
+			break;
+		case ModeRunnerPurple:
+			returns = "ModeRunnerPurple";
+			break;
+		default:
+			returns = String(actualMode);
+			break;
+	}
+	return returns;
+}
+void moduleNeoPixel::SetMode(uint8 newMode) {
+	modeCurrent = newMode;
+}
 String moduleNeoPixel::getStripStatus() {
 	String returns = "{";
 	for(uint i = 0; i < pixelCount; i++) {
@@ -250,6 +332,10 @@ String moduleNeoPixel::getStripStatus() {
 // private
 //###################################################################################
 void moduleNeoPixel::publishValue() {
+	valueRLast = valueR;
+	valueGLast = valueG;
+	valueBLast = valueB;
+	brightnessLast = brightness;
 	wpMqtt.mqttClient.publish(mqttTopicValueR.c_str(), String(valueR).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueG.c_str(), String(valueG).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueB.c_str(), String(valueB).c_str());
@@ -258,17 +344,13 @@ void moduleNeoPixel::publishValue() {
 		wpRest.error = wpRest.error | !wpRest.sendRestRGB(valueR, valueG, valueB, brightness);
 		wpRest.trySend = true;
 	}
-	valueRLast = valueR;
-	valueGLast = valueG;
-	valueBLast = valueB;
-	brightnessLast = brightness;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("NeoPixel Value R", String(valueR), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Value G", String(valueG), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Value B", String(valueB), String(publishCountValue));
-		printPublishValueDebug("NeoPixel Brightness", String(brightness), String(publishCountValue));
+		mb->printPublishValueDebug(mqttTopicValueR, String(valueR));
+		mb->printPublishValueDebug(mqttTopicValueG, String(valueG));
+		mb->printPublishValueDebug(mqttTopicValueB, String(valueB));
+		mb->printPublishValueDebug(mqttTopicBrightness, String(brightness));
 	}
-	publishCountValue = 0;
+	publishValueLast = wpFZ.loopStartedAt;
 }
 
 void moduleNeoPixel::calc() {
@@ -276,7 +358,7 @@ void moduleNeoPixel::calc() {
 	if(demoMode) {
 		if((currentMillis - patternPrevious) >= patternInterval) {  //  Check for expired time
 			patternPrevious = currentMillis;
-			if(++modeCurrent > 9)
+			if(++modeCurrent > 14)
 				modeCurrent = 1;
 		}
 	}
@@ -284,85 +366,58 @@ void moduleNeoPixel::calc() {
 		pixelPrevious = currentMillis;                            //  Run current frame
 		switch (modeCurrent) {
 			case ModeColorWipeRed:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "colorWipe Red");
 				ColorWipeEffect(strip->Color(255, 0, 0), 50); // Red
 				break;
 			case ModeColorWipeGreen:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "colorWipe Green");
 				ColorWipeEffect(strip->Color(0, 255, 0), 50); // Green
 				break;
 			case ModeColorWipeBlue:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "colorWipe Blue");
 				ColorWipeEffect(strip->Color(0, 0, 255), 50); // Blue
 				break;
+			case ModeColorWipePurple:
+				ColorWipeEffect(piasFavColor, 50); // Purple
+				break;
 			case ModeTheaterChaseWhite:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "theaterChase White");
 				TheaterChaseEffect(strip->Color(127, 127, 127), 50); // White
 				break;
 			case ModeTheaterChaseRed:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "theaterChase Red");
 				TheaterChaseEffect(strip->Color(127, 0, 0), 50); // Red
 				break;
 			case ModeTheaterChaseGreen:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "theaterChase Green");
 				TheaterChaseEffect(strip->Color(0, 127, 0), 50); // Green
 				break;
 			case ModeTheaterChaseBlue:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "theaterChase Blue");
 				TheaterChaseEffect(strip->Color(0, 0, 127), 50); // Blue
 				break;
 			case ModeRainbow:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "rainbow");
 				RainbowEffect(10); // Flowing rainbow cycle along the whole strip
 				break;
 			case ModeTheaterChaseRainbow:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "theaterChaseRainbow");
 				TheaterChaseRainbowEffect(50); // Rainbow-enhanced theaterChase variant
 				break;
 			case ModeRunnerRed:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Runner Red");
 				RunnerEffect(strip->Color(127, 0, 0), 50); // Runner Red
 				break;
 			case ModeRunnerGreen:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Runner Green");
 				RunnerEffect(strip->Color(0, 127, 0), 50); // Runner Green
 				break;
 			case ModeRunnerBlue:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Runner Blue");
 				RunnerEffect(strip->Color(0, 0, 127), 50); // Runner Blue
 				break;
+			case ModeRunnerPurple:
+				RunnerEffect(piasFavColor, 50); // Runner Purple
+				break;
 			case ModeRandom:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Random");
 				RandomEffect(500); // Random
 				break;
 			case ModeComplex:
 				// nothing todo, but save LED state
 				break;
 			default:
-				if(modeCurrentLast != modeCurrent)
-					wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), "Mode Static");
 				SimpleEffect(valueR, valueG, valueB, brightness);
 				break;
 		}
-		modeCurrentLast = modeCurrent;
 	}
-}
-void moduleNeoPixel::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
 }
 
 // Some functions of our own for creating animated effects -----------------
@@ -486,10 +541,17 @@ void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b) {
 	setValueR(r);
 	setValueG(g);
 	setValueB(b);
+	uint32_t color = strip->Color(r, g, b);
 	demoMode = false;
 	modeCurrent = ModeStatic;
-	strip->fill(strip->Color(r, g, b));
+	strip->fill(color);
 	strip->show();
+}
+void moduleNeoPixel::PiaEffect() {
+	setValueR(piasFavColorR);
+	setValueG(piasFavColorG);
+	setValueB(piasFavColorB);
+	SimpleEffect(piasFavColorR, piasFavColorG, piasFavColorB);
 }
 void moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
 	if(pixel > pixelCount) pixel = pixelCount;
@@ -521,7 +583,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

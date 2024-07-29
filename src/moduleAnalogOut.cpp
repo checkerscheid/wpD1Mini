@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 179 2024-07-26 06:43:08Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 183 2024-07-29 03:32:26Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -24,9 +24,9 @@ moduleAnalogOut::moduleAnalogOut() {
 }
 void moduleAnalogOut::init() {
 	// section for define
-	Pin = D8;
+	Pin = D6;
 
-	pinMode(Pin, OUTPUT_OPEN_DRAIN);
+	pinMode(Pin, OUTPUT);
 	output = 0;
 	hardwareoutMax = 100;
 	autoValue = 0;
@@ -57,14 +57,14 @@ void moduleAnalogOut::init() {
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
 
 	outputLast = 0;
-	publishCountOutput = 0;
+	publishOutputLast = 0;
 	autoValueLast = 0;
-	publishCountAutoValue = 0;
+	publishAutoValueLast = 0;
 	handValueLast = 0;
-	publishCountHandValue = 0;
+	publishHandValueLast = 0;
 	handErrorLast = false;
-	publishCountHandError = 0;
-	publishCountPID = 0;;
+	publishHandErrorLast = 0;
+	publishPIDLast = 0;;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestAnalogOut);
@@ -100,54 +100,55 @@ void moduleAnalogOut::publishValues() {
 }
 void moduleAnalogOut::publishValues(bool force) {
 	if(force) {
-		publishCountOutput = wpFZ.publishQoS;
-		publishCountAutoValue = wpFZ.publishQoS;
-		publishCountHandValue = wpFZ.publishQoS;
-		publishCountHandError = wpFZ.publishQoS;
-		publishCountPID = wpFZ.publishQoS;
+		publishOutputLast = 0;
+		publishAutoValueLast = 0;
+		publishHandValueLast = 0;
+		publishHandErrorLast = 0;
+		publishPIDLast = 0;
 	}
-	if(outputLast != output || ++publishCountOutput > wpFZ.publishQoS) {
+	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
 	}
-	if(autoValueLast != autoValue || ++publishCountAutoValue > wpFZ.publishQoS) {
+	if(autoValueLast != autoValue || wpFZ.CheckQoS(publishAutoValueLast)) {
 		autoValueLast = autoValue;
 		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String(autoValue).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("AnalogOut Auto Value", String(autoValue), String(publishCountAutoValue));
+			mb->printPublishValueDebug("AnalogOut Auto Value", String(autoValue));
 		}
-		publishCountAutoValue = 0;
+		publishAutoValueLast = wpFZ.loopStartedAt;
 	}
-	if(handValueLast != handValue || ++publishCountHandValue > wpFZ.publishQoS) {
+	if(handValueLast != handValue || wpFZ.CheckQoS(publishHandValueLast)) {
 		handValueLast = handValue;
 		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String(handValue).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("AnalogOut Hand Value", String(handValue), String(publishCountHandValue));
+			mb->printPublishValueDebug("AnalogOut Hand Value", String(handValue));
 		}
-		publishCountHandValue = 0;
+		publishHandValueLast = wpFZ.loopStartedAt;
 	}
-	if(handErrorLast != handError || ++publishCountHandError > wpFZ.publishQoS) {
+	if(handErrorLast != handError || wpFZ.CheckQoS(publishHandErrorLast)) {
 		handErrorLast = handError;
 		wpMqtt.mqttClient.publish(mqttTopicErrorHand.c_str(), String(handError).c_str());
 		if(wpMqtt.Debug) {
-			printPublishValueDebug("AnalogOut handError", String(handError), String(publishCountHandError));
+			mb->printPublishValueDebug("AnalogOut handError", String(handError));
 		}
-		publishCountHandError = 0;
+		publishHandErrorLast = wpFZ.loopStartedAt;
 	}
-	if(KpLast != Kp || TvLast != Tv  || TnLast != Tn|| SetPointLast != SetPoint || ++publishCountPID > wpFZ.publishQoS) {
-		KpLast = Kp;
-		TvLast = Tv;
-		TnLast = Tn;
-		SetPointLast = SetPoint;
-		wpMqtt.mqttClient.publish(mqttTopicKp.c_str(), String(Kp).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicTv.c_str(), String(Tv).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicTn.c_str(), String(Tn).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SetPoint).c_str());
-		if(wpMqtt.Debug) {
-			printPublishValueDebug("AnalogOut Kp, Tv, Tn, SetPoint",
-				String(Kp) + ", " + String(Tv) + ", " + String(Tn) + ", " + String(SetPoint),
-				String(publishCountPID));
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		if(KpLast != Kp || TvLast != Tv  || TnLast != Tn || SetPointLast != SetPoint || wpFZ.CheckQoS(publishPIDLast)) {
+			KpLast = Kp;
+			TvLast = Tv;
+			TnLast = Tn;
+			SetPointLast = SetPoint;
+			wpMqtt.mqttClient.publish(mqttTopicKp.c_str(), String(Kp).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicTv.c_str(), String(Tv).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicTn.c_str(), String(Tn).c_str());
+			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SetPoint).c_str());
+			if(wpMqtt.Debug) {
+				mb->printPublishValueDebug("AnalogOut Kp, Tv, Tn, SetPoint",
+					String(Kp) + ", " + String(Tv) + ", " + String(Tn) + ", " + String(SetPoint));
+			}
+			publishPIDLast = wpFZ.loopStartedAt;
 		}
-		publishCountPID = 0;
 	}
 	mb->publishValues(force);
 }
@@ -240,9 +241,9 @@ void moduleAnalogOut::publishValue() {
 	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("AnalogOut", String(output), String(publishCountOutput));
+		mb->printPublishValueDebug("AnalogOut", String(output));
 	}
-	publishCountOutput = 0;
+	publishOutputLast = wpFZ.loopStartedAt;
 }
 
 void moduleAnalogOut::calc() {
@@ -265,10 +266,7 @@ void moduleAnalogOut::calc() {
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(Pin, hardwareout);
 }
-void moduleAnalogOut::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
+
 void moduleAnalogOut::calcOutput() {
 	// @ the moment is configured as Ventilator with Humidity
 	PIDinput = (double) (wpDHT.humidity / 100.0);
@@ -302,7 +300,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

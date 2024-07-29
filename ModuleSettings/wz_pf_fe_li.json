@@ -17,7 +17,7 @@
 			}
 		},
 		"Moisture": {
-			"MaxCycleMoisture": 50,
+			"PublishForceMoisture": 50,
 			"useMoistureAvg": 1,
 			"MoistureMin": 30,
 			"MoistureDry": 1023,

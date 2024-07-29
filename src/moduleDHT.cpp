@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 179                                                     $ #
+//# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 179 2024-07-26 06:43:08Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 183 2024-07-29 03:32:26Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -35,9 +35,9 @@ void moduleDHT::init() {
 	mqttTopicHumidityCorrection = wpFZ.DeviceName + "/settings/" + ModuleName + "/Correction/Humidity";
 
 	temperatureLast = 0;
-	publishCountTemperature = 0;
+	publishTemperatureLast = 0;
 	humidityLast = 0;
-	publishCountHumidity = 0;
+	publishHumidityLast = 0;
 
 	dht = new DHT(Pin, wpModules.choosenDHTmodul);
 	dht->begin();
@@ -46,17 +46,18 @@ void moduleDHT::init() {
 	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDHT);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDHT);
 	mb->initError();
-	mb->initMaxCycle(wpEEPROM.byteMaxCycleDHT);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleDHT);
 
+	mb->calcLast = 0;
 }
 
 //###################################################################################
 // public
 //###################################################################################
 void moduleDHT::cycle() {
-	if(wpFZ.calcValues && ++mb->cycleCounter >= (mb->maxCycle * 1000 / wpFZ.loopTime)) {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calc();
-		mb->cycleCounter = 0;
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
@@ -75,13 +76,13 @@ void moduleDHT::publishValues() {
 }
 void moduleDHT::publishValues(bool force) {
 	if(force) {
-		publishCountTemperature = wpFZ.publishQoS;
-		publishCountHumidity = wpFZ.publishQoS;
+		publishTemperatureLast = 0;
+		publishHumidityLast = 0;
 	}
-	if(temperatureLast != temperature || ++publishCountTemperature > wpFZ.publishQoS) {
+	if(temperatureLast != temperature || wpFZ.CheckQoS(publishTemperatureLast)) {
 		publishValueTemp();
 	}
-	if(humidityLast != humidity || ++publishCountHumidity > wpFZ.publishQoS) {
+	if(humidityLast != humidity || wpFZ.CheckQoS(publishHumidityLast)) {
 		publishValueHum();
 	}
 	mb->publishValues(force);
@@ -127,9 +128,9 @@ void moduleDHT::publishValueTemp() {
 	}
 	temperatureLast = temperature;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Temperature", sendTemperature, String(publishCountTemperature));
+		mb->printPublishValueDebug("Temperature", sendTemperature);
 	}
-	publishCountTemperature = 0;
+	publishTemperatureLast = wpFZ.loopStartedAt;
 }
 
 void moduleDHT::publishValueHum() {
@@ -141,9 +142,9 @@ void moduleDHT::publishValueHum() {
 	}
 	humidityLast = humidity;
 	if(wpMqtt.Debug) {
-		printPublishValueDebug("Humidity", sendHumidity, String(publishCountHumidity));
+		mb->printPublishValueDebug("Humidity", sendHumidity);
 	}
-	publishCountHumidity = 0;
+	publishHumidityLast = wpFZ.loopStartedAt;
 }
 
 void moduleDHT::calc() {
@@ -184,17 +185,11 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 	wpFZ.DebugWS(wpFZ.strDEBUG, "wpDHT::calc", logmessage);
 }
 
-void moduleDHT::printPublishValueDebug(String name, String value, String publishCount) {
-	String logmessage = "MQTT Send '" + name + "': " + value + " (" + publishCount + " / " + wpFZ.publishQoS + ")";
-	wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", logmessage);
-}
-
-
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 179 $";
+	String SVN = "$Rev: 183 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -220,10 +215,10 @@ bool moduleDHT::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint8 moduleDHT::MaxCycle(){
-	return mb->maxCycle;
+uint32 moduleDHT::CalcCycle() {
+	return mb->calcCycle;
 }
-uint8 moduleDHT::MaxCycle(uint8 maxCycle){
-	mb->maxCycle = maxCycle;
+uint32 moduleDHT::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
 	return 0;
 }
