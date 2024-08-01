@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 183 2024-07-29 03:32:26Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 184 2024-08-01 00:19:53Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 184 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -246,10 +246,10 @@ void helperEEPROM::readVars() {
 	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight) * 100);
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
-	wpNeoPixel.setValueR(EEPROM.read(byteNeoPixelValueR));
-	wpNeoPixel.setValueG(EEPROM.read(byteNeoPixelValueG));
-	wpNeoPixel.setValueB(EEPROM.read(byteNeoPixelValueB));
-	wpNeoPixel.setBrightness(EEPROM.read(byteNeoPixelBrightness));
+	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
+	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
+	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
+	wpNeoPixel.InitBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpRelais.pumpActive = EEPROM.read(bytePumpActive);
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpRain.CalcCycle(EEPROM.read(byteCalcCycleRain) * 100);
@@ -271,16 +271,19 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteMaxVolume, wpDistance.volume);
 	short outKp;
 	EEPROM.get(byteAnalogOutKp, outKp);
-	wpAnalogOut.setKp(outKp);
+	wpAnalogOut.InitKp(outKp);
 	short outTv;
 	EEPROM.get(byteAnalogOutTv, outTv);
-	wpAnalogOut.setTv(outTv);
+	wpAnalogOut.InitTv(outTv);
 	short outTn;
 	EEPROM.get(byteAnalogOutTn, outTn);
-	wpAnalogOut.setTn(outTn);
+	wpAnalogOut.InitTn(outTn);
 	short outSetPoint;
 	EEPROM.get(byteAnalogOutSetPoint, outSetPoint);
-	wpAnalogOut.setSetPoint(outSetPoint);
+	wpAnalogOut.InitSetPoint(outSetPoint);
+	uint16 pixelCount;
+	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
+	wpNeoPixel.InitPixelCount(pixelCount);
 
 //###################################################################################
 /// byte values: 4byte 80 - 99

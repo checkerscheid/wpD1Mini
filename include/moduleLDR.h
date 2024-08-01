@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.h 182 2024-07-28 02:12:39Z                     $ #
+//# File-ID      : $Id:: moduleLDR.h 184 2024-08-01 00:19:53Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLDR_h
@@ -70,7 +70,7 @@ class moduleLDR {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 182 $";
+		String SVNh = "$Rev: 184 $";
 };
 extern moduleLDR wpLDR;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 183 2024-07-29 03:32:26Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 184 2024-08-01 00:19:53Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -176,6 +176,7 @@ class helperEEPROM {
 		const uint16 byteAnalogOutTn = 66;
 		const uint16 byteAnalogOutTv = 68;
 		const uint16 byteAnalogOutSetPoint = 70;
+		const uint16 byteNeoPixelPixelCount = 72;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
@@ -200,7 +201,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 184 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

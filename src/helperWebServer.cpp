@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 183 2024-07-29 03:32:26Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 184 2024-08-01 00:19:53Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 184 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -197,10 +197,11 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleNeoPixel) {
 			message += "\"NeoPixel\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpNeoPixel.Pin])) + "," +
-				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.getValueR())) + "," +
-				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.getValueG())) + "," +
-				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.getValueB())) + "," +
-				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.getBrightness())) +
+				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.GetValueR())) + "," +
+				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.GetValueG())) + "," +
+				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.GetValueB())) + "," +
+				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.GetBrightness())) + "," +
+				wpFZ.JsonKeyValue("PixelCount", String(wpNeoPixel.GetPixelCount())) +
 				"},";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
@@ -690,7 +691,10 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("b")) {
 				b = request->getParam("b")->value().toInt();
 			}
-			wpNeoPixel.SimpleEffect(r, g, b);
+			wpNeoPixel.SetValueR(r);
+			wpNeoPixel.SetValueG(g);
+			wpNeoPixel.SetValueB(b);
+			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
 				"r: '" + String(r) + "', "
 				"g: '" + String(g) + "', "
@@ -700,7 +704,10 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelPia", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpNeoPixel.PiaEffect();
+			wpNeoPixel.SetValueR(wpNeoPixel.piasFavColorR);
+			wpNeoPixel.SetValueG(wpNeoPixel.piasFavColorG);
+			wpNeoPixel.SetValueB(wpNeoPixel.piasFavColorB);
+			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelPia");
 			
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -710,7 +717,7 @@ void helperWebServer::setupWebServer() {
 			byte b = 0;
 			if(request->hasParam("brightness")) {
 				b = request->getParam("brightness")->value().toInt();
-				wpNeoPixel.setBrightness(b);
+				wpNeoPixel.SetBrightness(b);
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBrightness, '" + String(b) + "'");
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -756,6 +763,31 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.ComplexEffect(pixel, r, g, b);
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
+			uint seconds = 0;
+			if(request->hasParam("sleep")) {
+				seconds = request->getParam("sleep")->value().toInt();
+			}
+			wpNeoPixel.SetSleep(seconds);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSleep");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelOff", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
+			wpAnalogOut.handValueSet = 0;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '0'");
+			wpAnalogOut2.handValueSet = 0;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '0'");
+			wpNeoPixel.SetValueR(0);
+			wpNeoPixel.SetValueG(0);
+			wpNeoPixel.SetValueB(0);
+			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
+				"r: '0', g: '0', b: '0'");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
