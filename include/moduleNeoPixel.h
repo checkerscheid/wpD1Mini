@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 183 2024-07-29 03:32:26Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 184 2024-08-01 00:19:53Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -46,20 +46,32 @@ class moduleNeoPixel {
 		// Pia
 		static const uint8 ModeColorWipePurple = 20;
 		static const uint8 ModeRunnerPurple = 21;
+		uint32_t piasFavColor;
+		uint8_t piasFavColorR;
+		uint8_t piasFavColorG;
+		uint8_t piasFavColorB;
 
 		bool demoMode;
 
 		// values
-		String mqttTopicModeName;
-		// settings
-		String mqttTopicPixelCount;
-		// commands
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
 		String mqttTopicBrightness;
-		String mqttTopicSetMode;
 		String mqttTopicDemoMode;
+		String mqttTopicModeName;
+		String mqttTopicSleep;
+		// settings
+		String mqttTopicPixelCount;
+		// commands
+		String mqttTopicSetR;
+		String mqttTopicSetG;
+		String mqttTopicSetB;
+		String mqttTopicSetBrightness;
+		String mqttTopicSetDemoMode;
+		String mqttTopicSetMode;
+		String mqttTopicSetSleep;
+		String mqttTopicSetPixelCount;
 
 		// section to copy
 		void init();
@@ -79,11 +91,6 @@ class moduleNeoPixel {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
-		void SimpleEffect(byte r, byte g, byte b);
-		void SimpleEffect(byte r, byte g, byte b, byte br);
-		void PiaEffect();
-		void ComplexEffect(uint pixel, byte r, byte g, byte b);
-		void ComplexEffect(uint pixel, uint32_t color);
 		void InitValueR(uint8 r);
 		uint8 GetValueR();
 		void SetValueR(uint8 r);
@@ -96,12 +103,17 @@ class moduleNeoPixel {
 		void InitBrightness(uint8 bn);
 		uint8 GetBrightness();
 		void SetBrightness(uint8 bn);
+		void ComplexEffect(uint pixel, byte r, byte g, byte b);
+		void ComplexEffect(uint pixel, uint32_t color);
 		String GetModeName(uint actualMode);
 		void SetMode(uint8 newMode);
+		void SetSleep(uint seconds);
 		void InitPixelCount(uint16 pc);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
 		String getStripStatus();
+		void setShelly(uint32_t c);
+		unsigned long lastShellySend;
 	private:
 		uint16 pixelCount = 50;
 		uint16 pixelStartForTv = 25;
@@ -113,15 +125,15 @@ class moduleNeoPixel {
 		uint8 valueBLast;
 		uint8 brightness = 0;
 		uint8 brightnessLast;
+		bool staticIsSet;
 		unsigned long publishValueLast;
 		uint modeCurrent;
 		uint modeCurrentLast;
 		unsigned long publishModeLast;
-
-		uint32_t piasFavColor;
-		uint8_t piasFavColorR;
-		uint8_t piasFavColorG;
-		uint8_t piasFavColorB;
+		uint sleep;
+		uint sleepLast;
+		unsigned long publishSleepLast;
+		unsigned long sleepAt;
 
 		unsigned long pixelPrevious;	// Previous Pixel Millis
 		unsigned long patternPrevious;	// Previous Pattern Millis
@@ -141,11 +153,14 @@ class moduleNeoPixel {
 		void TheaterChaseRainbowEffect(uint8_t wait);
 		void RunnerEffect(uint32_t color, int wait);
 		void RandomEffect(int wait);
+		void SimpleEffect(byte r, byte g, byte b);
+		void SimpleEffect(byte r, byte g, byte b, byte br);
+		void PiaEffect();
 		uint32_t Wheel(byte WheelPos);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 184 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

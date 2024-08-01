@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 184                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 183 2024-07-29 03:32:26Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 184 2024-08-01 00:19:53Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -158,7 +158,7 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 184 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
