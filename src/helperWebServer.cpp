@@ -776,6 +776,21 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
+		webServer.on("/setNeoPixelOff", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
+			wpAnalogOut.handValueSet = 0;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '0'");
+			wpAnalogOut2.handValueSet = 0;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '0'");
+			wpNeoPixel.SetValueR(0);
+			wpNeoPixel.SetValueG(0);
+			wpNeoPixel.SetValueB(0);
+			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
+				"r: '0', g: '0', b: '0'");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
 		webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
 			request->send_P(200, "application/json", wpNeoPixel.getStripStatus().c_str());
 			wpWebServer.setBlink();
