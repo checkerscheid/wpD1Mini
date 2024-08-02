@@ -411,18 +411,27 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 String moduleNeoPixel::getStripStatus() {
 	String returns = "{";
 	for(uint i = 0; i < pixelCount; i++) {
+		returns.concat("\"p");
+		returns.concat(i);
 		uint32_t c = strip->getPixelColor(i);
 		uint8_t r = c >> 16;
+		returns.concat("\":{\"r\":");
+		returns.concat(r);
 		uint8_t g = c >> 8;
+		returns.concat(",\"g\":");
+		returns.concat(g);
 		uint8_t b = c;
-		returns += "\"p" + String(i) + "\":{"
-			"\"r\":" + String(r) + ","
-			"\"g\":" + String(g) + ","
-			"\"b\":" + String(b) + "},";
+		returns.concat(",\"b\":");
+		returns.concat(b);
+		returns.concat("},");
 	}
-	returns += "\"ww\":" + String(wpAnalogOut.output) + ","
-		"\"cw\":" + String(wpAnalogOut2.output) + ","
-		"\"b\":" + String(strip->getBrightness()) + "}";
+	returns.concat("\"ww\":");
+	returns.concat(wpAnalogOut.output);
+	returns.concat(",\"cw\":");
+	returns.concat(wpAnalogOut2.output);
+	returns.concat(",\"b\":");
+	returns.concat(strip->getBrightness());
+	returns.concat("}");
 	return returns;
 }
 //###################################################################################
