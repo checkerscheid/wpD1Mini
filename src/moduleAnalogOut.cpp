@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 186                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 184 2024-08-01 00:19:53Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 186 2024-08-02 00:24:02Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -34,7 +34,7 @@ void moduleAnalogOut::init() {
 	handError = false;
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-		pid = new PID(&PIDinput, &PIDoutput, &PIDsetPoint, Kp, Tv, Tn, DIRECT);
+		pid = new PID(&PIDinput, &PIDoutput, &PIDsetPoint, Kp, Tv, Tn, REVERSE);
 		pid->SetMode(AUTOMATIC);
 		pid->SetTunings(Kp, Tv, Tn);
 		pid->SetOutputLimits(minOutput, maxOutput);
@@ -300,7 +300,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 186 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

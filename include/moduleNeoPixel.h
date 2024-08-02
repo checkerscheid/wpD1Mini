@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 186                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 184 2024-08-01 00:19:53Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 186 2024-08-02 00:24:02Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -41,11 +41,12 @@ class moduleNeoPixel {
 		static const uint8 ModeRunnerGreen = 11;
 		static const uint8 ModeRunnerBlue = 12;
 		static const uint8 ModeRandom = 13;
-		static const uint8 ModeComplex = 14;
 		static const uint8 ModeRainbowTv = 15;
 		// Pia
 		static const uint8 ModeColorWipePurple = 20;
 		static const uint8 ModeRunnerPurple = 21;
+
+		static const uint8 ModeComplex = 99;
 		uint32_t piasFavColor;
 		uint8_t piasFavColorR;
 		uint8_t piasFavColorG;
@@ -160,7 +161,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 184 $";
+		String SVNh = "$Rev: 186 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

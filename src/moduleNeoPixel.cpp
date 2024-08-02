@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 186                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 184 2024-08-01 00:19:53Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 186 2024-08-02 00:24:02Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -328,6 +328,7 @@ void moduleNeoPixel::SetSleep(uint seconds) {
 		sleep = seconds;
 		sleepAt = wpFZ.loopStartedAt + (seconds * 1000);
 	}
+	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetSleep", "Off in " + String(sleep) + " sec");
 }
 void moduleNeoPixel::InitPixelCount(uint16 pc) {
 	pixelCount = pc;
@@ -468,7 +469,7 @@ void moduleNeoPixel::calc() {
 	if(demoMode) {
 		if((wpFZ.loopStartedAt - patternPrevious) >= patternInterval) {  //  Check for expired time
 			patternPrevious = wpFZ.loopStartedAt;
-			if(++modeCurrent > 14)
+			if(++modeCurrent > 15)
 				modeCurrent = 1;
 		}
 	}
@@ -724,7 +725,7 @@ void moduleNeoPixel::setShelly(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 186 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
