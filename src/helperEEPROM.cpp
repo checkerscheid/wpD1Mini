@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 187                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 184 2024-08-01 00:19:53Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 187 2024-08-07 11:05:05Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 187 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -245,6 +245,7 @@ void helperEEPROM::readVars() {
 	wpLDR.correction = EEPROM.read(byteLDRCorrection);
 	wpLight.CalcCycle(EEPROM.read(byteCalcCycleLight) * 100);
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
+	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut));
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
