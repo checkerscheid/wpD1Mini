@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 186                                                     $ #
+//# Revision     : $Rev:: 187                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 186 2024-08-02 00:24:02Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 187 2024-08-07 11:05:05Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -28,23 +28,13 @@ class moduleNeoPixel {
 		uint8 Pin;
 
 		static const uint8 ModeStatic = 0;
-		static const uint8 ModeColorWipeRed = 1;
-		static const uint8 ModeColorWipeGreen = 2;
-		static const uint8 ModeColorWipeBlue = 3;
-		static const uint8 ModeTheaterChaseWhite = 4;
-		static const uint8 ModeTheaterChaseRed = 5;
-		static const uint8 ModeTheaterChaseGreen = 6;
-		static const uint8 ModeTheaterChaseBlue = 7;
-		static const uint8 ModeRainbow = 8;
-		static const uint8 ModeTheaterChaseRainbow = 9;
-		static const uint8 ModeRunnerRed = 10;
-		static const uint8 ModeRunnerGreen = 11;
-		static const uint8 ModeRunnerBlue = 12;
-		static const uint8 ModeRandom = 13;
-		static const uint8 ModeRainbowTv = 15;
-		// Pia
-		static const uint8 ModeColorWipePurple = 20;
-		static const uint8 ModeRunnerPurple = 21;
+		static const uint8 ModeColorWipe = 1;
+		static const uint8 ModeTheaterChase = 2;
+		static const uint8 ModeRainbow = 3;
+		static const uint8 ModeTheaterChaseRainbow = 4;
+		static const uint8 ModeRunner = 5;
+		static const uint8 ModeRandom = 6;
+		static const uint8 ModeRainbowTv = 7;
 
 		static const uint8 ModeComplex = 99;
 		uint32_t piasFavColor;
@@ -53,6 +43,7 @@ class moduleNeoPixel {
 		uint8_t piasFavColorB;
 
 		bool demoMode;
+		bool useShelly;
 
 		// values
 		String mqttTopicValueR;
@@ -109,6 +100,8 @@ class moduleNeoPixel {
 		String GetModeName(uint actualMode);
 		void SetMode(uint8 newMode);
 		void SetSleep(uint seconds);
+		void SetOff();
+		void SetOn();
 		void InitPixelCount(uint16 pc);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
@@ -147,21 +140,19 @@ class moduleNeoPixel {
 		void publishValue();
 		void calc();
 		
-		void ColorWipeEffect(uint32_t color, int wait);
-		void TheaterChaseEffect(uint32_t color, int wait);
+		void ColorWipeEffect(int wait);
+		void TheaterChaseEffect(int wait);
 		void RainbowEffect(uint8_t wait);
 		void RainbowTvEffect(uint8_t wait);
 		void TheaterChaseRainbowEffect(uint8_t wait);
-		void RunnerEffect(uint32_t color, int wait);
+		void RunnerEffect(int wait);
 		void RandomEffect(int wait);
-		void SimpleEffect(byte r, byte g, byte b);
-		void SimpleEffect(byte r, byte g, byte b, byte br);
-		void PiaEffect();
+		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 186 $";
+		String SVNh = "$Rev: 187 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 
