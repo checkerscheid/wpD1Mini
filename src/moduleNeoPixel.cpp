@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 186                                                     $ #
+//# Revision     : $Rev:: 187                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 186 2024-08-02 00:24:02Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 187 2024-08-07 11:05:05Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -81,6 +81,7 @@ void moduleNeoPixel::init() {
 	sleep = 0;
 
 	demoMode = false;
+	useShelly = false;
 	staticIsSet = false;
 
 	// values
@@ -330,6 +331,28 @@ void moduleNeoPixel::SetSleep(uint seconds) {
 	}
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetSleep", "Off in " + String(sleep) + " sec");
 }
+void moduleNeoPixel::SetOff() {
+	wpAnalogOut.handValueSet = 0;
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelWW, '0'");
+	wpAnalogOut2.handValueSet = 0;
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelCW, '0'");
+	uint32_t color = strip->Color(0, 0, 0);
+	demoMode = false;
+	modeCurrent = ModeStatic;
+	strip->fill(color);
+	strip->setBrightness(0);
+	strip->show();
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+}
+void moduleNeoPixel::SetOn() {
+	demoMode = false;
+	modeCurrent = ModeStatic;
+	uint32_t color = strip->Color(valueR, valueG, valueB);
+	strip->fill(color);
+	strip->setBrightness(brightness);
+	strip->show();
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Restore last state");
+}
 void moduleNeoPixel::InitPixelCount(uint16 pc) {
 	pixelCount = pc;
 }
@@ -347,26 +370,11 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 		case ModeStatic:
 			returns = "ModeStatic";
 			break;
-		case ModeColorWipeRed:
-			returns = "ModeColorWipeRed";
+		case ModeColorWipe:
+			returns = "ModeColorWipe";
 			break;
-		case ModeColorWipeGreen:
-			returns = "ModeColorWipeGreen";
-			break;
-		case ModeColorWipeBlue:
-			returns = "ModeColorWipeBlue";
-			break;
-		case ModeTheaterChaseWhite:
-			returns = "ModeTheaterChaseWhite";
-			break;
-		case ModeTheaterChaseRed:
-			returns = "ModeTheaterChaseRed";
-			break;
-		case ModeTheaterChaseGreen:
-			returns = "ModeTheaterChaseGreen";
-			break;
-		case ModeTheaterChaseBlue:
-			returns = "ModeTheaterChaseBlue";
+		case ModeTheaterChase:
+			returns = "ModeTheaterChase";
 			break;
 		case ModeRainbow:
 			returns = "ModeRainbow";
@@ -377,26 +385,14 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 		case ModeTheaterChaseRainbow:
 			returns = "ModeTheaterChaseRainbow";
 			break;
-		case ModeRunnerRed:
-			returns = "ModeRunnerRed";
-			break;
-		case ModeRunnerGreen:
-			returns = "ModeRunnerGreen";
-			break;
-		case ModeRunnerBlue:
-			returns = "ModeRunnerBlue";
+		case ModeRunner:
+			returns = "ModeRunner";
 			break;
 		case ModeRandom:
 			returns = "ModeRandom";
 			break;
 		case ModeComplex:
 			returns = "ModeComplex";
-			break;
-		case ModeColorWipePurple:
-			returns = "ModeColorWipePurple";
-			break;
-		case ModeRunnerPurple:
-			returns = "ModeRunnerPurple";
 			break;
 		default:
 			returns = String(actualMode);
@@ -459,7 +455,7 @@ void moduleNeoPixel::publishValue() {
 	publishValueLast = wpFZ.loopStartedAt;
 }
 
-void moduleNeoPixel::calc() {
+void moduleNeoPixel::calc() {	
 	if(sleepAt > 0) {
 		if(wpFZ.loopStartedAt > sleepAt) {
 			modeCurrent = ModeStatic;
@@ -478,36 +474,19 @@ void moduleNeoPixel::calc() {
 	if(demoMode) {
 		if((wpFZ.loopStartedAt - patternPrevious) >= patternInterval) {  //  Check for expired time
 			patternPrevious = wpFZ.loopStartedAt;
-			if(++modeCurrent > 15)
+			if(++modeCurrent > 7)
 				modeCurrent = 1;
 		}
 	}
 	if(wpFZ.loopStartedAt - pixelPrevious >= pixelInterval) {        //  Check for expired time
 		pixelPrevious = wpFZ.loopStartedAt;                            //  Run current frame
+		if(!staticIsSet) strip->setBrightness(brightness);
 		switch (modeCurrent) {
-			case ModeColorWipeRed:
-				ColorWipeEffect(strip->Color(255, 0, 0), 50); // Red
+			case ModeColorWipe:
+				ColorWipeEffect(50); // Red
 				break;
-			case ModeColorWipeGreen:
-				ColorWipeEffect(strip->Color(0, 255, 0), 50); // Green
-				break;
-			case ModeColorWipeBlue:
-				ColorWipeEffect(strip->Color(0, 0, 255), 50); // Blue
-				break;
-			case ModeColorWipePurple:
-				ColorWipeEffect(piasFavColor, 50); // Purple
-				break;
-			case ModeTheaterChaseWhite:
-				TheaterChaseEffect(strip->Color(127, 127, 127), 50); // White
-				break;
-			case ModeTheaterChaseRed:
-				TheaterChaseEffect(strip->Color(127, 0, 0), 50); // Red
-				break;
-			case ModeTheaterChaseGreen:
-				TheaterChaseEffect(strip->Color(0, 127, 0), 50); // Green
-				break;
-			case ModeTheaterChaseBlue:
-				TheaterChaseEffect(strip->Color(0, 0, 127), 50); // Blue
+			case ModeTheaterChase:
+				TheaterChaseEffect(50); // White
 				break;
 			case ModeRainbow:
 				RainbowEffect(10); // Flowing rainbow cycle along the whole strip
@@ -518,17 +497,8 @@ void moduleNeoPixel::calc() {
 			case ModeTheaterChaseRainbow:
 				TheaterChaseRainbowEffect(50); // Rainbow-enhanced theaterChase variant
 				break;
-			case ModeRunnerRed:
-				RunnerEffect(strip->Color(127, 0, 0), 50); // Runner Red
-				break;
-			case ModeRunnerGreen:
-				RunnerEffect(strip->Color(0, 127, 0), 50); // Runner Green
-				break;
-			case ModeRunnerBlue:
-				RunnerEffect(strip->Color(0, 0, 127), 50); // Runner Blue
-				break;
-			case ModeRunnerPurple:
-				RunnerEffect(piasFavColor, 50); // Runner Purple
+			case ModeRunner:
+				RunnerEffect(50); // Runner Red
 				break;
 			case ModeRandom:
 				RandomEffect(500); // Random
@@ -538,7 +508,7 @@ void moduleNeoPixel::calc() {
 				break;
 			default:
 				if(!staticIsSet) {
-					SimpleEffect(valueR, valueG, valueB, brightness);
+					StaticEffect();
 					staticIsSet = true;
 					wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::calc", "Static is set");
 				}
@@ -554,7 +524,8 @@ void moduleNeoPixel::calc() {
 // (as a single 'packed' 32-bit value, which you can get by calling
 // strip.Color(red, green, blue) as shown in the loop() function above),
 // and a delay time (in milliseconds) between pixels.
-void moduleNeoPixel::ColorWipeEffect(uint32_t color, int wait) {
+void moduleNeoPixel::ColorWipeEffect(int wait) {
+	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint16_t current_pixel = 0;
 	static bool ison = false;
 	pixelInterval = wait;                         //  Update delay time
@@ -573,7 +544,8 @@ void moduleNeoPixel::ColorWipeEffect(uint32_t color, int wait) {
 // Theater-marquee-style chasing lights. Pass in a color (32-bit value,
 // a la strip.Color(r,g,b) as mentioned above), and a delay time (in ms)
 // between frames.
-void moduleNeoPixel::TheaterChaseEffect(uint32_t color, int wait) {
+void moduleNeoPixel::TheaterChaseEffect(int wait) {
+	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint32_t loop_count = 0;
 	static uint16_t current_pixel = 0;
 
@@ -607,8 +579,10 @@ void moduleNeoPixel::RainbowEffect(uint8_t wait) {
 		lastval = Wheel((i + pixelCycle) % 255);
 		strip->setPixelColor(i, lastval); //  Update delay time  
 	}
-	if(lastShellySend == 0 || lastShellySend + 5000 < wpFZ.loopStartedAt) {
-		//setShelly(lastval);
+	if(useShelly) {
+		if(lastShellySend == 0 || lastShellySend + 5000 < wpFZ.loopStartedAt) {
+			setShelly(lastval);
+		}
 	}
 	strip->show();                          //  Update strip to match
 	pixelCycle++;                           //  Advance current cycle
@@ -650,7 +624,8 @@ void moduleNeoPixel::TheaterChaseRainbowEffect(uint8_t wait) {
 		pixelCycle = 0;                     //  Loop
 }
 
-void moduleNeoPixel::RunnerEffect(uint32_t color, int wait) {
+void moduleNeoPixel::RunnerEffect(int wait) {
+	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint16_t current_pixel = 0;
 	pixelInterval = wait;                         //  Update delay time
 	strip->clear();
@@ -679,23 +654,12 @@ void moduleNeoPixel::RandomEffect(int wait) {
 	strip->show();
 }
 
-void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b, byte br) {
-	brightness = br;
-	strip->setBrightness(brightness);
-	SimpleEffect(r, g, b);
-}
-void moduleNeoPixel::SimpleEffect(byte r, byte g, byte b) {
-	valueR = r;
-	valueG = g;
-	valueB = b;
-	uint32_t color = strip->Color(r, g, b);
+void moduleNeoPixel::StaticEffect() {
+	uint32_t color = strip->Color(valueR, valueG, valueB);
 	demoMode = false;
 	modeCurrent = ModeStatic;
 	strip->fill(color);
 	strip->show();
-}
-void moduleNeoPixel::PiaEffect() {
-	SimpleEffect(piasFavColorR, piasFavColorG, piasFavColorB);
 }
 void moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
 	if(pixel > pixelCount) pixel = pixelCount;
@@ -734,7 +698,7 @@ void moduleNeoPixel::setShelly(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 186 $";
+	String SVN = "$Rev: 187 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
