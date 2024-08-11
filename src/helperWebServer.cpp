@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 185                                                     $ #
+//# Revision     : $Rev:: 188                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 185 2024-08-01 02:03:02Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 188 2024-08-11 22:34:58Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 185 $";
+	String SVN = "$Rev: 188 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -182,7 +182,16 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleAnalogOut) {
 			message += "\"AnalogOut\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + "," +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + ",";
+			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+				message +=
+					wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
+					wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
+					wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
+					wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
+					wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
+			}
+			message +=
 				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
 				"},";
@@ -778,16 +787,12 @@ void helperWebServer::setupWebServer() {
 		});
 		webServer.on("/setNeoPixelOff", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
-			wpAnalogOut.handValueSet = 0;
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '0'");
-			wpAnalogOut2.handValueSet = 0;
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '0'");
-			wpNeoPixel.SetValueR(0);
-			wpNeoPixel.SetValueG(0);
-			wpNeoPixel.SetValueB(0);
-			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
-				"r: '0', g: '0', b: '0'");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBorder");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
