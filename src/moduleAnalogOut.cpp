@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 186                                                     $ #
+//# Revision     : $Rev:: 187                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 186 2024-08-02 00:24:02Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 187 2024-08-07 11:05:05Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -69,6 +69,7 @@ void moduleAnalogOut::init() {
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestAnalogOut);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleAnalogOut);
 }
 
 //###################################################################################
@@ -77,7 +78,10 @@ void moduleAnalogOut::init() {
 void moduleAnalogOut::cycle() {
 	if(wpFZ.calcValues) {
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			calcOutput();
+			if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
+				calcOutput();
+				mb->calcLast = wpFZ.loopStartedAt;
+			}
 		}
 		calc();
 	}
@@ -300,7 +304,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 186 $";
+	String SVN = "$Rev: 187 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -325,4 +329,11 @@ bool moduleAnalogOut::Debug() {
 bool moduleAnalogOut::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
+}
+uint32 moduleAnalogOut::CalcCycle() {
+	return mb->calcCycle;
+}
+uint32 moduleAnalogOut::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
+	return 0;
 }

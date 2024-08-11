@@ -183,15 +183,14 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += "\"AnalogOut\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + ",";
-			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-				message +=
-					wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
-					wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
-					wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
-					wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
-					wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
-			}
-			message +=
+				if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+					message +=
+						wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
+						wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
+						wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
+						wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
+						wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
+				}
 				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
 				"},";
@@ -687,7 +686,7 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
-		webServer.on("/setNeoPixelSimple", HTTP_GET, [](AsyncWebServerRequest *request) {
+		webServer.on("/setNeoPixelColor", HTTP_GET, [](AsyncWebServerRequest *request) {
 			byte r = 0;
 			byte g = 0;
 			byte b = 0;
@@ -703,21 +702,10 @@ void helperWebServer::setupWebServer() {
 			wpNeoPixel.SetValueR(r);
 			wpNeoPixel.SetValueG(g);
 			wpNeoPixel.SetValueB(b);
-			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSimple: "
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelColor: "
 				"r: '" + String(r) + "', "
 				"g: '" + String(g) + "', "
 				"b: '" + String(b) + "'");
-			
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
-			wpWebServer.setBlink();
-		});
-		webServer.on("/setNeoPixelPia", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpNeoPixel.SetValueR(wpNeoPixel.piasFavColorR);
-			wpNeoPixel.SetValueG(wpNeoPixel.piasFavColorG);
-			wpNeoPixel.SetValueB(wpNeoPixel.piasFavColorB);
-			wpNeoPixel.SetMode(wpNeoPixel.ModeStatic);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelPia");
 			
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
@@ -753,7 +741,6 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
 			uint pixel = 0;
 			byte r = 0;
 			byte g = 0;
@@ -785,7 +772,14 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
+		webServer.on("/setNeoPixelOn", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpNeoPixel.SetOn();
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOn");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
 		webServer.on("/setNeoPixelOff", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpNeoPixel.SetOff();
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();

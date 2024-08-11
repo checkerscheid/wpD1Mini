@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 187                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 184 2024-08-01 00:19:53Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 187 2024-08-07 11:05:05Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -35,6 +35,10 @@ class moduleAnalogOut {
 		bool handError;
 		bool handSet = false;
 		uint8 handValueSet = false;
+		double Kp = 1.0;
+		double Tv = 0.2;
+		double Tn = 0.0;
+		double SetPoint = 75.0;
 
 		// values
 		String mqttTopicOut;
@@ -68,6 +72,8 @@ class moduleAnalogOut {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+		uint32 CalcCycle();
+		uint32 CalcCycle(uint32 calcCycle);
 		void InitKp(short kp);
 		void InitTv(short tv);
 		void InitTn(short tn);
@@ -88,10 +94,6 @@ class moduleAnalogOut {
 // Kp: Determines how aggressively the PID reacts to the current amount of error (Proportional)
 // Ki (Tv): Determines how aggressively the PID reacts to error over time (Integral)
 // Kd (Tn): Determines how aggressively the PID reacts to the change in error (Derivative)
-		double Kp = 1.0;
-		double Tv = 0.2;
-		double Tn = 0.0;
-		double SetPoint = 75.0;
 		double KpLast, TvLast, TnLast, SetPointLast;
 		unsigned long publishPIDLast;
 
@@ -101,7 +103,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 184 $";
+		String SVNh = "$Rev: 187 $";
 };
 extern moduleAnalogOut wpAnalogOut;
 
