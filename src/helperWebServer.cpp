@@ -183,14 +183,15 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += "\"AnalogOut\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + ",";
-				if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-					message +=
-						wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
-						wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
-						wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
-						wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
-						wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
-				}
+			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+				message +=
+					wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
+					wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
+					wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
+					wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
+					wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
+			}
+			message +=
 				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
 				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
 				"},";
@@ -769,12 +770,6 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.SetSleep(seconds);
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSleep");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
-			wpWebServer.setBlink();
-		});
-		webServer.on("/setNeoPixelOn", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpNeoPixel.SetOn();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOn");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
