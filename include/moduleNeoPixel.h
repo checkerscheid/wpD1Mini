@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 188                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 187 2024-08-07 11:05:05Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 188 2024-08-11 22:34:58Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -43,7 +43,7 @@ class moduleNeoPixel {
 		uint8_t piasFavColorB;
 
 		bool demoMode;
-		bool useShelly;
+		bool useBorder;
 
 		// values
 		String mqttTopicValueR;
@@ -55,6 +55,7 @@ class moduleNeoPixel {
 		String mqttTopicSleep;
 		// settings
 		String mqttTopicPixelCount;
+		String mqttTopicUseBorder;
 		// commands
 		String mqttTopicSetR;
 		String mqttTopicSetG;
@@ -64,6 +65,7 @@ class moduleNeoPixel {
 		String mqttTopicSetMode;
 		String mqttTopicSetSleep;
 		String mqttTopicSetPixelCount;
+		String mqttTopicSetUseBorder;
 
 		// section to copy
 		void init();
@@ -101,13 +103,12 @@ class moduleNeoPixel {
 		void SetMode(uint8 newMode);
 		void SetSleep(uint seconds);
 		void SetOff();
-		void SetOn();
 		void InitPixelCount(uint16 pc);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
 		String getStripStatus();
-		void setShelly(uint32_t c);
-		unsigned long lastShellySend;
+		void setBorder(uint32_t c);
+		unsigned long lastBorderSend;
 	private:
 		uint16 pixelCount = 50;
 		uint16 pixelStartForTv = 25;
@@ -119,6 +120,7 @@ class moduleNeoPixel {
 		uint8 valueBLast;
 		uint8 brightness = 0;
 		uint8 brightnessLast;
+		bool useBorderLast;
 		bool staticIsSet;
 		unsigned long publishValueLast;
 		uint modeCurrent;
@@ -128,6 +130,7 @@ class moduleNeoPixel {
 		uint sleepLast;
 		unsigned long publishSleepLast;
 		unsigned long sleepAt;
+		unsigned long publishUseBorderLast;
 
 		unsigned long pixelPrevious;	// Previous Pixel Millis
 		unsigned long patternPrevious;	// Previous Pattern Millis
@@ -152,7 +155,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 187 $";
+		String SVNh = "$Rev: 188 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

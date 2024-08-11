@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 188                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 187 2024-08-07 11:05:05Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 188 2024-08-11 22:34:58Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 187 $";
+	String SVN = "$Rev: 188 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -784,9 +784,9 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
-		webServer.on("/setNeoPixelShelly", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpNeoPixel.useShelly = !wpNeoPixel.useShelly;
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelShelly");
+		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBorder");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});

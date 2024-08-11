@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 188                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 187 2024-08-07 11:05:05Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 188 2024-08-11 22:34:58Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -81,7 +81,7 @@ void moduleNeoPixel::init() {
 	sleep = 0;
 
 	demoMode = false;
-	useShelly = false;
+	useBorder = false;
 	staticIsSet = false;
 
 	// values
@@ -94,6 +94,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	// settings
 	mqttTopicPixelCount = wpFZ.DeviceName + "/" + ModuleName + "/PixelCount";
+	mqttTopicUseBorder = wpFZ.DeviceName + "/" + ModuleName + "/Border";
 	// commands
 	mqttTopicSetR = wpFZ.DeviceName + "/settings/" + ModuleName + "/R";
 	mqttTopicSetG = wpFZ.DeviceName + "/settings/" + ModuleName + "/G";
@@ -103,10 +104,11 @@ void moduleNeoPixel::init() {
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 	mqttTopicSetPixelCount = wpFZ.DeviceName + "/settings/" + ModuleName + "/PixelCount";
+	mqttTopicSetUseBorder = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetBorder";
 
 	publishValueLast = 0;
 	publishModeLast = 0;
-	lastShellySend = 0;
+	lastBorderSend = 0;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
@@ -159,6 +161,7 @@ void moduleNeoPixel::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetMode.c_str(), String(modeCurrent).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetPixelCount.c_str(), String(pixelCount).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetSleep.c_str(), String(sleep).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetUseBorder.c_str(), String(useBorder).c_str());
 	}
 	mb->publishSettings(force);
 }
@@ -170,6 +173,7 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishValueLast = 0;
 		publishModeLast = 0;
+		publishUseBorderLast = 0;
 	}
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightnessLast != brightness ||
 		wpFZ.CheckQoS(publishValueLast)) {
@@ -201,6 +205,14 @@ void moduleNeoPixel::publishValues(bool force) {
 			publishSleepLast = wpFZ.loopStartedAt;
 		}
 	}
+	if(useBorderLast != useBorder || wpFZ.CheckQoS(publishUseBorderLast)) {
+		useBorderLast = useBorder;
+		wpMqtt.mqttClient.publish(mqttTopicUseBorder.c_str(), String(useBorder).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicUseBorder, String(useBorder));
+		}
+		publishUseBorderLast = wpFZ.loopStartedAt;
+	}
 	mb->publishValues(force);
 }
 
@@ -213,6 +225,7 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetPixelCount.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSleep.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetUseBorder.c_str());
 	mb->setSubscribes();
 }
 
@@ -259,16 +272,23 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetMode, String(modeCurrent));
 		}
 	}
-	if(strcmp(topic, mqttTopicSetSleep.c_str()) == 0) {
-		uint readSleep = msg.toInt();
-		SetSleep(readSleep);
-		wpFZ.DebugcheckSubscribes(mqttTopicSleep, String(readSleep));
-	}
 	if(strcmp(topic, mqttTopicSetPixelCount.c_str()) == 0) {
 		uint16 readPixelCount = msg.toInt();
 		if(pixelCount != readPixelCount) {
 			SetPixelCount(readPixelCount);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetPixelCount, String(readPixelCount));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetSleep.c_str()) == 0) {
+		uint readSleep = msg.toInt();
+		SetSleep(readSleep);
+		wpFZ.DebugcheckSubscribes(mqttTopicSleep, String(readSleep));
+	}
+	if(strcmp(topic, mqttTopicSetUseBorder.c_str()) == 0) {
+		bool readUseBorder = msg.toInt();
+		if(useBorder != readUseBorder) {
+			useBorder = readUseBorder;
+			wpFZ.DebugcheckSubscribes(mqttTopicSetUseBorder, String(useBorder));
 		}
 	}
 	mb->checkSubscribes(topic, msg);
@@ -339,19 +359,11 @@ void moduleNeoPixel::SetOff() {
 	uint32_t color = strip->Color(0, 0, 0);
 	demoMode = false;
 	modeCurrent = ModeStatic;
+	staticIsSet = true;
 	strip->fill(color);
 	strip->setBrightness(0);
 	strip->show();
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
-}
-void moduleNeoPixel::SetOn() {
-	demoMode = false;
-	modeCurrent = ModeStatic;
-	uint32_t color = strip->Color(valueR, valueG, valueB);
-	strip->fill(color);
-	strip->setBrightness(brightness);
-	strip->show();
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Restore last state");
 }
 void moduleNeoPixel::InitPixelCount(uint16 pc) {
 	pixelCount = pc;
@@ -579,9 +591,9 @@ void moduleNeoPixel::RainbowEffect(uint8_t wait) {
 		lastval = Wheel((i + pixelCycle) % 255);
 		strip->setPixelColor(i, lastval); //  Update delay time  
 	}
-	if(useShelly) {
-		if(lastShellySend == 0 || lastShellySend + 5000 < wpFZ.loopStartedAt) {
-			setShelly(lastval);
+	if(useBorder) {
+		if(lastBorderSend == 0 || lastBorderSend + 5000 < wpFZ.loopStartedAt) {
+			setBorder(lastval);
 		}
 	}
 	strip->show();                          //  Update strip to match
@@ -686,19 +698,19 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 	WheelPos -= 170;
 	return strip->Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
-void moduleNeoPixel::setShelly(uint32_t c) {
+void moduleNeoPixel::setBorder(uint32_t c) {
 	String target = "http://172.17.80.97/color/0?"
 		"red=" + String((uint8_t)(c >> 16)) + "&"
 		"green=" + String((uint8_t)(c >>  8)) + "&"
 		"blue=" + String((uint8_t)(c >>  0));
 	wpRest.sendRawRest(target);
-	lastShellySend = wpFZ.loopStartedAt;
+	lastBorderSend = wpFZ.loopStartedAt;
 }
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 187 $";
+	String SVN = "$Rev: 188 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
