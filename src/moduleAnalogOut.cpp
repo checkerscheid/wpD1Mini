@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 187 2024-08-07 11:05:05Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 189 2024-08-13 11:58:56Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -184,9 +184,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
 		uint8 readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
-			handValueSet = readSetHandValue;
-			EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
-			EEPROM.commit();
+			SetHandValueSet(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
@@ -232,6 +230,12 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	mb->checkSubscribes(topic, msg);
+}
+void moduleAnalogOut::SetHandValueSet(uint8 val) {
+	handValueSet = val;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut::handValueSet' = " + String(handValueSet));
 }
 
 //###################################################################################
@@ -304,7 +308,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 187 $";
+	String SVN = "$Rev: 189 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

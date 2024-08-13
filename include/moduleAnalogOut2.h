@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 183 2024-07-29 03:32:26Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 189 2024-08-13 11:58:56Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -32,7 +32,7 @@ class moduleAnalogOut2 {
 		uint8 handValue;
 		bool handError;
 		bool handSet = false;
-		uint8 handValueSet = false;
+		uint8 handValueSet = 0;
 
 		// values
 		String mqttTopicOut;
@@ -62,6 +62,7 @@ class moduleAnalogOut2 {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+		void SetHandValueSet(uint8 val);
 	private:
 		uint8 outputLast;
 		unsigned long publishOutputLast;
@@ -77,7 +78,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 189 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 
