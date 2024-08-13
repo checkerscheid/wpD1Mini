@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 187 2024-08-07 11:05:05Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 189 2024-08-13 11:58:56Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -34,7 +34,7 @@ class moduleAnalogOut {
 		uint8 handValue;
 		bool handError;
 		bool handSet = false;
-		uint8 handValueSet = false;
+		uint8 handValueSet = 0;
 		double Kp = 1.0;
 		double Tv = 0.2;
 		double Tn = 0.0;
@@ -79,6 +79,7 @@ class moduleAnalogOut {
 		void InitTn(short tn);
 		void InitSetPoint(short setpoint);
 		void resetPID();
+		void SetHandValueSet(uint8 val);
 	private:
 		const double minOutput = 0.0;
 		const double maxOutput = 100.0;
@@ -103,7 +104,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 187 $";
+		String SVNh = "$Rev: 189 $";
 };
 extern moduleAnalogOut wpAnalogOut;
 

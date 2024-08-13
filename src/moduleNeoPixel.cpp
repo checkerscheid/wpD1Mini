@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 188                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 188 2024-08-11 22:34:58Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 189 2024-08-13 11:58:56Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -672,6 +672,11 @@ void moduleNeoPixel::StaticEffect() {
 	modeCurrent = ModeStatic;
 	strip->fill(color);
 	strip->show();
+	if(useBorder) {
+		if(lastBorderSend == 0 || lastBorderSend + 5000 < wpFZ.loopStartedAt) {
+			setBorder(color);
+		}
+	}
 }
 void moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
 	if(pixel > pixelCount) pixel = pixelCount;
@@ -702,7 +707,8 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 	String target = "http://172.17.80.97/color/0?"
 		"red=" + String((uint8_t)(c >> 16)) + "&"
 		"green=" + String((uint8_t)(c >>  8)) + "&"
-		"blue=" + String((uint8_t)(c >>  0));
+		"blue=" + String((uint8_t)(c >>  0)) + "&"
+		"gain=" + String((uint8_t)(round(brightness / 2.55)));
 	wpRest.sendRawRest(target);
 	lastBorderSend = wpFZ.loopStartedAt;
 }
@@ -710,7 +716,7 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 188 $";
+	String SVN = "$Rev: 189 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

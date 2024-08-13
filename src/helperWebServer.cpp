@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 188                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 188 2024-08-11 22:34:58Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 189 2024-08-13 11:58:56Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 188 $";
+	String SVN = "$Rev: 189 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -725,7 +725,7 @@ void helperWebServer::setupWebServer() {
 			byte ww = 0;
 			if(request->hasParam("ww")) {
 				ww = request->getParam("ww")->value().toInt();
-				wpAnalogOut.handValueSet = ww;
+				wpAnalogOut.SetHandValueSet(ww);
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '" + String(ww) + "'");
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -735,7 +735,7 @@ void helperWebServer::setupWebServer() {
 			byte cw = 0;
 			if(request->hasParam("cw")) {
 				cw = request->getParam("cw")->value().toInt();
-				wpAnalogOut2.handValueSet = cw;
+				wpAnalogOut2.SetHandValueSet(cw);
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '" + String(cw) + "'");
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");

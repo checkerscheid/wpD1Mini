@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 189                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 183 2024-07-29 03:32:26Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 189 2024-08-13 11:58:56Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -138,13 +138,17 @@ void moduleAnalogOut2::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
 		uint8 readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
-			handValueSet = readSetHandValue;
-			EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, handValueSet);
-			EEPROM.commit();
+			SetHandValueSet(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
 	mb->checkSubscribes(topic, msg);
+}
+void moduleAnalogOut2::SetHandValueSet(uint8 val) {
+	handValueSet = val;
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, handValueSet);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut2::handValueSet' = " + String(handValueSet));
 }
 
 //###################################################################################
@@ -188,7 +192,7 @@ void moduleAnalogOut2::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 189 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
