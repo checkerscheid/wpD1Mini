@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 189                                                     $ #
+//# Revision     : $Rev:: 190                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 189 2024-08-13 11:58:56Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 190 2024-08-14 02:34:46Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 189 $";
+	String SVN = "$Rev: 190 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -263,6 +263,14 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue("height", String(wpDistance.height)) +
 				"},";
 		}
+		if(wpModules.usemoduleImpulseCounter) {
+			message += "\"ImpulseCounter\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpImpulseCounter.Pin])) + "," +
+				wpFZ.JsonKeyValue("CalcCycle", String(wpImpulseCounter.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("Silver", String(wpImpulseCounter.counterSilver)) + "," +
+				wpFZ.JsonKeyValue("Red", String(wpImpulseCounter.counterRed)) +
+				"},";
+		}
 		message += "\"Debug\":{" +
 			wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + "," +
@@ -312,6 +320,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.Debug() ? "true" : "false");
 		}
+		if(wpModules.usemoduleImpulseCounter) {
+			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.Debug() ? "true" : "false");
+		}
 		message += "},\"SendRest\":{" +
 			wpFZ.JsonKeyValue("WiFi", wpWiFi.sendRest ? "true" : "false");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
@@ -353,6 +364,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.SendRest() ? "true" : "false");
 		}
+		if(wpModules.usemoduleImpulseCounter) {
+			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.SendRest() ? "true" : "false");
+		}
 		message += "},\"useModul\":{" +
 			wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + "," +
@@ -368,7 +382,8 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue("Rpm", wpModules.useModuleRpm ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") +
+			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.usemoduleImpulseCounter ? "true" : "false") +
 			"}}}";
 		request->send(200, "application/json", message.c_str());
 	});
@@ -440,6 +455,10 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useDistance");
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDistance);
 			}
+			if(request->getParam("Module")->value() == "useImpulseCounter") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useImpulseCounter");
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleImpulseCounter);
+			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
@@ -507,6 +526,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("sendRest")->value() == "sendRestDistance") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestDistance");
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestDistance);
+			}
+			if(request->getParam("sendRest")->value() == "sendRestImpulseCounter") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestImpulseCounter");
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestImpulseCounter);
 			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -607,6 +630,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Debug")->value() == "DebugDistance") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugDistance");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugDistance);
+			}
+			if(request->getParam("Debug")->value() == "DebugImpulseCounter") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugImpulseCounter");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugImpulseCounter);
 			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -867,6 +894,7 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
 		if(doModuleChange == cmdModuleMoisture) wpModules.changeModuleMoisture(!wpModules.useModuleMoisture);
 		if(doModuleChange == cmdModuleDistance) wpModules.changeModuleDistance(!wpModules.useModuleDistance);
+		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.usemoduleImpulseCounter);
 		doModuleChange = cmdDoNothing;
 	}
 }
@@ -887,6 +915,7 @@ void helperWebServer::doTheSendRestChange() {
 		if(doSendRestChange == cmdSendRestRain) wpRain.changeSendRest();
 		if(doSendRestChange == cmdSendRestMoisture) wpMoisture.changeSendRest();
 		if(doSendRestChange == cmdSendRestDistance) wpDistance.changeSendRest();
+		if(doSendRestChange == cmdSendRestImpulseCounter) wpImpulseCounter.changeSendRest();
 		doSendRestChange = cmdDoNothing;
 	}
 }
@@ -914,6 +943,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
+		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
 		doDebugChange = cmdDoNothing;
 	}
 }
@@ -978,7 +1008,8 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
 			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
 			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
-			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance);
+			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
+			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.usemoduleImpulseCounter);
 		return returns += "</ul>";
 	}
 //###################################################################################
@@ -1038,6 +1069,9 @@ String processor(const String& var) {
 		if(wpModules.useModuleDistance) {
 			returns += wpWebServer.getChangeDebug("DebugDistance", "Distance", wpDistance.Debug());
 		}
+		if(wpModules.usemoduleImpulseCounter) {
+			returns += wpWebServer.getChangeDebug("DebugImpulseCounter", "ImpulseCounter", wpImpulseCounter.Debug());
+		}
 		return returns += "</ul>";
 	}
 //###################################################################################
@@ -1083,6 +1117,9 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleDistance) {
 			returns += wpWebServer.getChangeRest("sendRestDistance", "Distance", wpDistance.SendRest());
+		}
+		if(wpModules.usemoduleImpulseCounter) {
+			returns += wpWebServer.getChangeRest("sendRestImpulseCounter", "ImpulseCounter", wpImpulseCounter.SendRest());
 		}
 		return returns += "</ul>";
 	}

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 190                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 181 2024-07-27 23:14:47Z                          $ #
+//# File-ID      : $Id:: main.h 190 2024-08-14 02:34:46Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -39,6 +39,7 @@
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
+#include <moduleImpulseCounter.h>
 #include <wpFreakaZone.h>
 
 uint16 getVersion();
@@ -50,7 +51,7 @@ void BuildChecker(uint16 &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 181 $";
+String SVNh = "$Rev: 190 $";
 // counter
 uint32 publishForceRssi = 0;
 

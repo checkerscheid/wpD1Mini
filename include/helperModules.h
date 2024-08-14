@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 190                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 182 2024-07-28 02:12:39Z                 $ #
+//# File-ID      : $Id:: helperModules.h 190 2024-08-14 02:34:46Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -37,6 +37,7 @@ class helperModules {
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
+		bool usemoduleImpulseCounter = false;
 
 		// commands
 		String mqttTopicDebug;
@@ -56,6 +57,7 @@ class helperModules {
 		String mqttTopicUseRain;
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
+		String mqttTopicUseImpulseCounter;
 
 		helperModules();
 		void init();
@@ -86,6 +88,7 @@ class helperModules {
 		void changeModuleRain(bool newValue);
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
+		void changemoduleImpulseCounter(bool newValue);
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -94,7 +97,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 182 $";
+		String SVNh = "$Rev: 190 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;
@@ -125,6 +128,8 @@ class helperModules {
 		uint32 publishUseMoistureLast;
 		bool useDistanceLast;
 		uint32 publishUseDistanceLast;
+		bool useImpulseCounterLast;
+		uint32 publishUseImpulseCounterLast;
 		bool DebugLast;
 		uint32 publishDebugLast;
 };
