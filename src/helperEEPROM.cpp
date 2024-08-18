@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 187                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 187 2024-08-07 11:05:05Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 192 2024-08-18 01:46:28Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 187 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -167,6 +167,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
+	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
 
 //###################################################################################
 
@@ -204,6 +205,7 @@ void helperEEPROM::readVars() {
 	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
 	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
 	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
+	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter));
 
 //###################################################################################
 
@@ -222,6 +224,7 @@ void helperEEPROM::readVars() {
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
 	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
+	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
 
 //###################################################################################
 
@@ -260,6 +263,8 @@ void helperEEPROM::readVars() {
 	wpDistance.CalcCycle(EEPROM.read(byteCalcCycleDistance) * 100);
 	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
 	wpDistance.height = EEPROM.read(byteHeight);
+	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
+	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
@@ -285,6 +290,9 @@ void helperEEPROM::readVars() {
 	uint16 pixelCount;
 	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
 	wpNeoPixel.InitPixelCount(pixelCount);
+	EEPROM.get(byteImpulseCounterKWh, wpImpulseCounter.KWh);
+	EEPROM.get(byteImpulseCounterSilver, wpImpulseCounter.counterSilver);
+	EEPROM.get(byteImpulseCounterRed, wpImpulseCounter.counterRed);
 
 //###################################################################################
 /// byte values: 4byte 80 - 99

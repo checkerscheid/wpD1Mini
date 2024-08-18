@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 181 2024-07-27 23:14:47Z                        $ #
+//# File-ID      : $Id:: main.cpp 192 2024-08-18 01:46:28Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -75,6 +75,9 @@ void setup() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.init();
 	}
+	if(wpModules.useModuleImpulseCounter) {
+		wpImpulseCounter.init();
+	}
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
@@ -133,6 +136,9 @@ void loop() {
 		if(wpModules.useModuleDistance) {
 			wpDistance.cycle();
 		}
+		if(wpModules.useModuleImpulseCounter) {
+			wpImpulseCounter.cycle();
+		}
 		if(wpModules.useModuleNeoPixel) {
 			wpNeoPixel.cycle();
 		}
@@ -145,7 +151,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -187,6 +193,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
+	buildChecker(v, wpImpulseCounter.getVersion());
 	return v;
 }
 void buildChecker(uint16 &v, uint16 moduleBuild) {
