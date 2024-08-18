@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 188                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 188 2024-08-11 22:34:58Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 192 2024-08-18 01:46:28Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -31,10 +31,11 @@ class moduleNeoPixel {
 		static const uint8 ModeColorWipe = 1;
 		static const uint8 ModeTheaterChase = 2;
 		static const uint8 ModeRainbow = 3;
-		static const uint8 ModeTheaterChaseRainbow = 4;
-		static const uint8 ModeRunner = 5;
-		static const uint8 ModeRandom = 6;
-		static const uint8 ModeRainbowTv = 7;
+		static const uint8 ModeWheelRainbow = 4;
+		static const uint8 ModeTheaterChaseRainbow = 5;
+		static const uint8 ModeRunner = 6;
+		static const uint8 ModeRandom = 7;
+		static const uint8 ModeRainbowTv = 8;
 
 		static const uint8 ModeComplex = 99;
 		uint32_t piasFavColor;
@@ -66,6 +67,7 @@ class moduleNeoPixel {
 		String mqttTopicSetSleep;
 		String mqttTopicSetPixelCount;
 		String mqttTopicSetUseBorder;
+		String mqttTopicSetIsRGB;
 
 		// section to copy
 		void init();
@@ -104,6 +106,9 @@ class moduleNeoPixel {
 		void SetSleep(uint seconds);
 		void SetOff();
 		void InitPixelCount(uint16 pc);
+		void InitRGB(bool rgb);
+		bool GetRGB();
+		void SetRGB(bool rgb);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
 		String getStripStatus();
@@ -122,6 +127,7 @@ class moduleNeoPixel {
 		uint8 brightnessLast;
 		bool useBorderLast;
 		bool staticIsSet;
+		bool isRGB = false;
 		unsigned long publishValueLast;
 		uint modeCurrent;
 		uint modeCurrentLast;
@@ -146,16 +152,17 @@ class moduleNeoPixel {
 		void ColorWipeEffect(int wait);
 		void TheaterChaseEffect(int wait);
 		void RainbowEffect(uint8_t wait);
+		void RainbowWheelEffect(uint8_t wait);
 		void RainbowTvEffect(uint8_t wait);
 		void TheaterChaseRainbowEffect(uint8_t wait);
-		void RunnerEffect(int wait);
-		void RandomEffect(int wait);
+		void RunnerEffect(uint wait);
+		void RandomEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 188 $";
+		String SVNh = "$Rev: 192 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

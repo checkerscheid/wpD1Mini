@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 189                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 189 2024-08-13 11:58:56Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 192 2024-08-18 01:46:28Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -58,7 +58,11 @@ moduleNeoPixel::moduleNeoPixel() {
 void moduleNeoPixel::init() {
 	Pin = D7;
 	// Declare our NeoPixel strip object:
-	strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
+	if(isRGB) {
+		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
+	} else {
+		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_GRB + NEO_KHZ800);
+	}
 	piasFavColor = strip->Color(piasFavColorR, piasFavColorG, piasFavColorB);
 
 	// Argument 1 = Number of pixels in NeoPixel strip
@@ -105,6 +109,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 	mqttTopicSetPixelCount = wpFZ.DeviceName + "/settings/" + ModuleName + "/PixelCount";
 	mqttTopicSetUseBorder = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetBorder";
+	mqttTopicSetIsRGB = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetRGB";
 
 	publishValueLast = 0;
 	publishModeLast = 0;
@@ -162,6 +167,7 @@ void moduleNeoPixel::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetPixelCount.c_str(), String(pixelCount).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetSleep.c_str(), String(sleep).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetUseBorder.c_str(), String(useBorder).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetIsRGB.c_str(), String(isRGB).c_str());
 	}
 	mb->publishSettings(force);
 }
@@ -226,6 +232,7 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetPixelCount.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSleep.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetUseBorder.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetIsRGB.c_str());
 	mb->setSubscribes();
 }
 
@@ -291,6 +298,13 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetUseBorder, String(useBorder));
 		}
 	}
+	if(strcmp(topic, mqttTopicSetIsRGB.c_str()) == 0) {
+		bool readIsRGB = msg.toInt();
+		if(isRGB != readIsRGB) {
+			SetRGB(readIsRGB);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetIsRGB, String(isRGB));
+		}
+	}
 	mb->checkSubscribes(topic, msg);
 }
 void moduleNeoPixel::InitValueR(uint8 r) {
@@ -351,6 +365,25 @@ void moduleNeoPixel::SetSleep(uint seconds) {
 	}
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetSleep", "Off in " + String(sleep) + " sec");
 }
+void moduleNeoPixel::InitRGB(bool rgb) {
+	isRGB = rgb;
+}
+bool moduleNeoPixel::GetRGB() {
+	return isRGB;
+}
+void moduleNeoPixel::SetRGB(bool rgb) {
+	isRGB = rgb;
+	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
+	EEPROM.write(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1);
+	EEPROM.commit();
+	if(isRGB) {
+		strip->updateType(NEO_RGB + NEO_KHZ800);
+	} else {
+		strip->updateType(NEO_GRB + NEO_KHZ800);
+	}
+	strip->clear();
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::isRGB", "Write 'isRGB' to EEPROM");
+}
 void moduleNeoPixel::SetOff() {
 	wpAnalogOut.handValueSet = 0;
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelWW, '0'");
@@ -390,6 +423,9 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 			break;
 		case ModeRainbow:
 			returns = "ModeRainbow";
+			break;
+		case ModeWheelRainbow:
+			returns = "ModeWheelRainbow";
 			break;
 		case ModeRainbowTv:
 			returns = "ModeRainbowTv";
@@ -503,6 +539,9 @@ void moduleNeoPixel::calc() {
 			case ModeRainbow:
 				RainbowEffect(10); // Flowing rainbow cycle along the whole strip
 				break;
+			case ModeWheelRainbow:
+				RainbowWheelEffect(10);
+				break;
 			case ModeRainbowTv:
 				RainbowTvEffect(10);
 				break;
@@ -582,8 +621,25 @@ void moduleNeoPixel::TheaterChaseEffect(int wait) {
 	}
 }
 
-// Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
 void moduleNeoPixel::RainbowEffect(uint8_t wait) {
+	if(pixelInterval != wait)
+		pixelInterval = wait;                         //  Update delay time
+	uint32_t lastval = Wheel(pixelCycle);
+	strip->fill(lastval);
+	if(useBorder) {
+		if(lastBorderSend == 0 || lastBorderSend + 1000 < wpFZ.loopStartedAt) {
+			setBorder(lastval);
+		}
+	}
+	strip->show();                          //  Update strip to match
+	pixelCycle++;                           //  Advance current cycle
+	if(pixelCycle >= 256)
+		pixelCycle = 0;                     //  Loop the cycle back to the begining
+
+}
+
+// Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
+void moduleNeoPixel::RainbowWheelEffect(uint8_t wait) {
 	if(pixelInterval != wait)
 		pixelInterval = wait;
 	uint32_t lastval = 0;
@@ -636,10 +692,11 @@ void moduleNeoPixel::TheaterChaseRainbowEffect(uint8_t wait) {
 		pixelCycle = 0;                     //  Loop
 }
 
-void moduleNeoPixel::RunnerEffect(int wait) {
+void moduleNeoPixel::RunnerEffect(uint wait) {
 	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint16_t current_pixel = 0;
-	pixelInterval = wait;                         //  Update delay time
+	if(pixelInterval != wait)
+		pixelInterval = wait;                         //  Update delay time
 	strip->clear();
 	strip->setPixelColor(current_pixel++, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
@@ -647,7 +704,7 @@ void moduleNeoPixel::RunnerEffect(int wait) {
 		current_pixel = 0;
 	}
 }
-void moduleNeoPixel::RandomEffect(int wait) {
+void moduleNeoPixel::RandomEffect(uint wait) {
 	int pixel;
 	byte r, g, b;
 	pixelInterval = wait;                         //  Update delay time
@@ -656,7 +713,8 @@ void moduleNeoPixel::RandomEffect(int wait) {
 	g = random(0, 255);
 	b = random(0, 255);
 	strip->fill(strip->Color(r, g, b));
-	for(uint p = 0; p < 20; p++) {
+	uint pCount = floor(pixelCount * 100 / 25);
+	for(uint p = 0; p < pCount; p++) {
 		pixel = random(0, pixelCount);
 		r = random(0, 255);
 		g = random(0, 255);
@@ -716,7 +774,7 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 189 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

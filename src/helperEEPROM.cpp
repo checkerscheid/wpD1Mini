@@ -229,6 +229,7 @@ void helperEEPROM::readVars() {
 //###################################################################################
 
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
+	bitsSettingsModules1 = EEPROM.read(addrBitsSettingsModules1);
 	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
 	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
 	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
@@ -238,6 +239,7 @@ void helperEEPROM::readVars() {
 	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
 	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg));
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
+	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
 
 //###################################################################################
 /// byte values: byte 20 - 49
