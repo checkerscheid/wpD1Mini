@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 190 2024-08-14 02:34:46Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 192 2024-08-18 01:46:28Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -57,7 +57,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 190 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -209,11 +209,11 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useDistance", useModuleDistance);
 		publishUseDistanceLast = wpFZ.loopStartedAt;
 	}
-	if(useImpulseCounterLast != usemoduleImpulseCounter || publishUseImpulseCounterLast == 0 ||
+	if(useImpulseCounterLast != useModuleImpulseCounter || publishUseImpulseCounterLast == 0 ||
 		wpFZ.loopStartedAt > publishUseImpulseCounterLast + wpFZ.publishQoS) {
-		useImpulseCounterLast = usemoduleImpulseCounter;
-		wpMqtt.mqttClient.publish(mqttTopicUseImpulseCounter.c_str(), String(usemoduleImpulseCounter).c_str());
-		wpFZ.SendWSModule("useImpulseCounter", usemoduleImpulseCounter);
+		useImpulseCounterLast = useModuleImpulseCounter;
+		wpMqtt.mqttClient.publish(mqttTopicUseImpulseCounter.c_str(), String(useModuleImpulseCounter).c_str());
+		wpFZ.SendWSModule("useImpulseCounter", useModuleImpulseCounter);
 		publishUseImpulseCounterLast = wpFZ.loopStartedAt;
 	}
 	if(DebugLast != Debug || publishDebugLast == 0 ||
@@ -470,14 +470,14 @@ void helperModules::changeModuleDistance(bool newValue) {
 	}
 }
 void helperModules::changemoduleImpulseCounter(bool newValue) {
-	if(usemoduleImpulseCounter != newValue) {
-		usemoduleImpulseCounter = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseImpulseCounter, usemoduleImpulseCounter);
+	if(useModuleImpulseCounter != newValue) {
+		useModuleImpulseCounter = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseImpulseCounter, useModuleImpulseCounter);
 		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("usemoduleImpulseCounter", usemoduleImpulseCounter);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseImpulseCounter, String(usemoduleImpulseCounter));
+		wpFZ.SendWSDebug("useModuleImpulseCounter", useModuleImpulseCounter);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseImpulseCounter, String(useModuleImpulseCounter));
 	}
 }
 
@@ -536,7 +536,7 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleDistance) {
 		wpDistance.publishSettings(force);
 	}
-	if(wpModules.usemoduleImpulseCounter) {
+	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.publishSettings(force);
 	}
 	wpFZ.DebugWS(wpFZ.strDEBUG, "Modules::Settings", "Stop publish");
@@ -596,7 +596,7 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleDistance) {
 		wpDistance.publishValues(force);
 	}
-	if(wpModules.usemoduleImpulseCounter) {
+	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.publishValues(force);
 	}
 }
@@ -652,7 +652,7 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.setSubscribes();
 	}
-	if(wpModules.usemoduleImpulseCounter) {
+	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.setSubscribes();
 	}
 }
@@ -706,7 +706,7 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleDistance) {
 		wpDistance.checkSubscribes(topic, msg);
 	}
-	if(wpModules.usemoduleImpulseCounter) {
+	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.checkSubscribes(topic, msg);
 	}
 }

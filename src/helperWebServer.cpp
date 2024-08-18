@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 190 2024-08-14 02:34:46Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 192 2024-08-18 01:46:28Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 190 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -263,12 +263,14 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue("height", String(wpDistance.height)) +
 				"},";
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			message += "\"ImpulseCounter\":{" +
 				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpImpulseCounter.Pin])) + "," +
 				wpFZ.JsonKeyValue("CalcCycle", String(wpImpulseCounter.CalcCycle())) + "," +
+				wpFZ.JsonKeyValue("UpKWh", String(wpImpulseCounter.UpKWh)) + "," +
 				wpFZ.JsonKeyValue("Silver", String(wpImpulseCounter.counterSilver)) + "," +
 				wpFZ.JsonKeyValue("Red", String(wpImpulseCounter.counterRed)) +
+
 				"},";
 		}
 		message += "\"Debug\":{" +
@@ -320,7 +322,7 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.Debug() ? "true" : "false");
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.Debug() ? "true" : "false");
 		}
 		message += "},\"SendRest\":{" +
@@ -364,7 +366,7 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDistance) {
 			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.SendRest() ? "true" : "false");
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.SendRest() ? "true" : "false");
 		}
 		message += "},\"useModul\":{" +
@@ -383,7 +385,7 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.usemoduleImpulseCounter ? "true" : "false") +
+			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.useModuleImpulseCounter ? "true" : "false") +
 			"}}}";
 		request->send(200, "application/json", message.c_str());
 	});
@@ -894,7 +896,7 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
 		if(doModuleChange == cmdModuleMoisture) wpModules.changeModuleMoisture(!wpModules.useModuleMoisture);
 		if(doModuleChange == cmdModuleDistance) wpModules.changeModuleDistance(!wpModules.useModuleDistance);
-		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.usemoduleImpulseCounter);
+		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
 		doModuleChange = cmdDoNothing;
 	}
 }
@@ -1009,7 +1011,7 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
 			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
 			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
-			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.usemoduleImpulseCounter);
+			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter);
 		return returns += "</ul>";
 	}
 //###################################################################################
@@ -1069,7 +1071,7 @@ String processor(const String& var) {
 		if(wpModules.useModuleDistance) {
 			returns += wpWebServer.getChangeDebug("DebugDistance", "Distance", wpDistance.Debug());
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			returns += wpWebServer.getChangeDebug("DebugImpulseCounter", "ImpulseCounter", wpImpulseCounter.Debug());
 		}
 		return returns += "</ul>";
@@ -1118,7 +1120,7 @@ String processor(const String& var) {
 		if(wpModules.useModuleDistance) {
 			returns += wpWebServer.getChangeRest("sendRestDistance", "Distance", wpDistance.SendRest());
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			returns += wpWebServer.getChangeRest("sendRestImpulseCounter", "ImpulseCounter", wpImpulseCounter.SendRest());
 		}
 		return returns += "</ul>";

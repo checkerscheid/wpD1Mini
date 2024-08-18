@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 190 2024-08-14 02:34:46Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 192 2024-08-18 01:46:28Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 190 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -167,7 +167,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
-	wpModules.usemoduleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
+	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
 
 //###################################################################################
 
@@ -264,6 +264,7 @@ void helperEEPROM::readVars() {
 	wpDistance.correction = EEPROM.read(byteDistanceCorrection);
 	wpDistance.height = EEPROM.read(byteHeight);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
+	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
@@ -289,7 +290,7 @@ void helperEEPROM::readVars() {
 	uint16 pixelCount;
 	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
 	wpNeoPixel.InitPixelCount(pixelCount);
-	EEPROM.get(byteImpulseCounter, wpImpulseCounter.impulseCounter);
+	EEPROM.get(byteImpulseCounterKWh, wpImpulseCounter.KWh);
 	EEPROM.get(byteImpulseCounterSilver, wpImpulseCounter.counterSilver);
 	EEPROM.get(byteImpulseCounterRed, wpImpulseCounter.counterRed);
 

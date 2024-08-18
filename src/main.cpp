@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 190 2024-08-14 02:34:46Z                        $ #
+//# File-ID      : $Id:: main.cpp 192 2024-08-18 01:46:28Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -75,7 +75,7 @@ void setup() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.init();
 	}
-	if(wpModules.usemoduleImpulseCounter) {
+	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.init();
 	}
 	wpModules.publishAllValues();
@@ -136,7 +136,7 @@ void loop() {
 		if(wpModules.useModuleDistance) {
 			wpDistance.cycle();
 		}
-		if(wpModules.usemoduleImpulseCounter) {
+		if(wpModules.useModuleImpulseCounter) {
 			wpImpulseCounter.cycle();
 		}
 		if(wpModules.useModuleNeoPixel) {
@@ -151,7 +151,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 190 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

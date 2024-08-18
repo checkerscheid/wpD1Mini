@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 191                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.cpp 191 2024-08-14 02:36:26Z        $ #
+//# File-ID      : $Id:: moduleImpulseCounter.cpp 192 2024-08-18 01:46:28Z        $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleImpulseCounter.h>
@@ -26,9 +26,12 @@ void moduleImpulseCounter::init() {
 	// section for define
 	Pin = A0;
 	bm = true;
-	mqttTopicCounter = wpFZ.DeviceName + "/" + ModuleName;
+	impulseCounterLast = 0;
+	mqttTopicCounter = wpFZ.DeviceName + "/" + ModuleName + "/Counter";
+	mqttTopicKWh = wpFZ.DeviceName + "/" + ModuleName + "/KWh";
 	// settings
-	mqttTopicSetCounter = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetCounter";
+	mqttTopicSetKWh = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetKWh";
+	mqttTopicUpKWh = wpFZ.DeviceName + "/settings/" + ModuleName + "/UpKWh";
 	mqttTopicSilver = wpFZ.DeviceName + "/settings/" + ModuleName + "/Silver";
 	mqttTopicRed = wpFZ.DeviceName + "/settings/" + ModuleName + "/Red";
 
@@ -51,7 +54,8 @@ void moduleImpulseCounter::publishSettings() {
 	publishSettings(false);
 }
 void moduleImpulseCounter::publishSettings(bool force) {
-	wpMqtt.mqttClient.publish(mqttTopicSetCounter.c_str(), String(impulseCounter).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicSetKWh.c_str(), String(KWh).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicUpKWh.c_str(), String(UpKWh).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicSilver.c_str(), String(counterSilver).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicRed.c_str(), String(counterRed).c_str());
 	mb->publishSettings(force);
@@ -61,28 +65,38 @@ void moduleImpulseCounter::publishValues() {
 }
 void moduleImpulseCounter::publishValues(bool force) {
 	if(force) {
-		publishCounterLast = 0;
+		publishKWhLast = 0;
 	}
-	if(impulseCounterLast != impulseCounter || wpFZ.CheckQoS(publishCounterLast)) {
+	if(KWhLast != KWh || wpFZ.CheckQoS(publishKWhLast)) {
 		publishValue();
 	}
 	mb->publishValues(force);
 }
 void moduleImpulseCounter::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicSetCounter.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetKWh.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUpKWh.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSilver.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicRed.c_str());
 	mb->setSubscribes();
 }
 void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
-	if(strcmp(topic, mqttTopicSetCounter.c_str()) == 0) {
-		uint16 readSetCounter = msg.toInt();
-		if(impulseCounter != readSetCounter) {
-			impulseCounter = readSetCounter;
-			EEPROM.put(wpEEPROM.byteImpulseCounter, impulseCounter);
+	if(strcmp(topic, mqttTopicSetKWh.c_str()) == 0) {
+		uint16 readSetKWh = msg.toInt();
+		if(KWh != readSetKWh) {
+			KWh = readSetKWh;
+			EEPROM.put(wpEEPROM.byteImpulseCounterKWh, KWh);
 			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicSetCounter, String(impulseCounter));
+			wpFZ.DebugcheckSubscribes(mqttTopicSetKWh, String(KWh));
+		}
+	}
+	if(strcmp(topic, mqttTopicUpKWh.c_str()) == 0) {
+		uint8 readUpKWh = msg.toInt();
+		if(UpKWh != readUpKWh) {
+			UpKWh = readUpKWh;
+			EEPROM.write(wpEEPROM.byteImpulseCounterUpKWh, UpKWh);
+			EEPROM.commit();
+			wpFZ.DebugcheckSubscribes(mqttTopicUpKWh, String(UpKWh));
 		}
 	}
 	if(strcmp(topic, mqttTopicSilver.c_str()) == 0) {
@@ -105,16 +119,17 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 	}
 }
 void moduleImpulseCounter::publishValue() {
-	impulseCounterLast = impulseCounter;
+	KWhLast = KWh;
 	wpMqtt.mqttClient.publish(mqttTopicCounter.c_str(), String(impulseCounter).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicKWh.c_str(), String(KWh).c_str());
 	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("counter", String(impulseCounter));
+		wpRest.error = wpRest.error | !wpRest.sendRest("KWh", String(KWh));
 		wpRest.trySend = true;
 	}
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("ImpulseCounter", String(impulseCounter));
 	}
-	publishCounterLast = wpFZ.loopStartedAt;
+	publishKWhLast = wpFZ.loopStartedAt;
 }
 void moduleImpulseCounter::calc() {
 	int ar = analogRead(Pin);
@@ -131,9 +146,14 @@ void moduleImpulseCounter::calc() {
 		if(redIsNow) impulseCounter++;
 		redIsNowLast = redIsNow;
 	}
+	if(impulseCounter % UpKWh == 0 && impulseCounterLast != impulseCounter) {
+		KWh++;
+		impulseCounterLast = impulseCounter;
+	}
 	if(mb->debug) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "moduleImpulseCounter::calc", "ar: '" + String(ar) + "', "
 			"redIsNow: '" + (redIsNow ? "true" : "false") + "', "
+			"KWh: '" + String(KWh) + "', "
 			"impulseCounter: '" + String(impulseCounter) + "'");
 	}
 }
@@ -143,7 +163,7 @@ void moduleImpulseCounter::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleImpulseCounter::getVersion() {
-	String SVN = "$Rev: 191 $";
+	String SVN = "$Rev: 192 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 190 2024-08-14 02:34:46Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 192 2024-08-18 01:46:28Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -94,7 +94,7 @@ class helperWebServer {
 		const int8 cmdModuleAnalogOut2 = 13;
 		const int8 cmdModuleNeoPixel = 14;
 		const int8 cmdModuleRpm = 15;
-		const int8 cmdmoduleImpulseCounter = 11;
+		const int8 cmdmoduleImpulseCounter = 16;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -130,7 +130,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 190 $";
+		String SVNh = "$Rev: 192 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 };

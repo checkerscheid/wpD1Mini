@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 190 2024-08-14 02:34:46Z                 $ #
+//# File-ID      : $Id:: helperModules.h 192 2024-08-18 01:46:28Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -37,7 +37,7 @@ class helperModules {
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
-		bool usemoduleImpulseCounter = false;
+		bool useModuleImpulseCounter = false;
 
 		// commands
 		String mqttTopicDebug;
@@ -97,7 +97,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 190 $";
+		String SVNh = "$Rev: 192 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;

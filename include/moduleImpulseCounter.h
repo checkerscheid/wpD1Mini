@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 191                                                     $ #
+//# Revision     : $Rev:: 192                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.h 191 2024-08-14 02:36:26Z          $ #
+//# File-ID      : $Id:: moduleImpulseCounter.h 192 2024-08-18 01:46:28Z          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleImpulseCounter_h
@@ -28,13 +28,17 @@ class moduleImpulseCounter {
 		// section for define
 		bool bm;
 		String mqttTopicCounter;
+		String mqttTopicKWh;
 		// settings
-		String mqttTopicSetCounter;
+		String mqttTopicSetKWh;
 		String mqttTopicSilver;
 		String mqttTopicRed;
+		String mqttTopicUpKWh;
 		unsigned long impulseCounter = 0;
+		unsigned long KWh = 0;
 		uint16 counterSilver = 50;
 		uint16 counterRed = 255;
+		uint8 UpKWh = 150;
 
 		// section to copy
 		void init();
@@ -59,14 +63,15 @@ class moduleImpulseCounter {
 	private:
 		bool redIsNow;
 		bool redIsNowLast;
-		unsigned long publishCounterLast;
-		unsigned long impulseCounterLast = 0;
+		unsigned long impulseCounterLast;
+		unsigned long publishKWhLast;
+		unsigned long KWhLast = 0;
 		void publishValue();
 		void calc();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 191 $";
+		String SVNh = "$Rev: 192 $";
 
 };
 extern moduleImpulseCounter wpImpulseCounter;
