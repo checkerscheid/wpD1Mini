@@ -210,7 +210,8 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.GetValueG())) + "," +
 				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.GetValueB())) + "," +
 				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.GetBrightness())) + "," +
-				wpFZ.JsonKeyValue("PixelCount", String(wpNeoPixel.GetPixelCount())) +
+				wpFZ.JsonKeyValue("PixelCount", String(wpNeoPixel.GetPixelCount())) + "," +
+				wpFZ.JsonKeyValue("isRGB", wpNeoPixel.GetRGB() ? "true" : "false") +
 				"},";
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
