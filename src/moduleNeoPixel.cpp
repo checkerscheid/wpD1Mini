@@ -571,10 +571,10 @@ void moduleNeoPixel::calc() {
 				RandomEffect(500); // Random
 				break;
 			case ModeOffRunner:
-				OffRunnerEffect(50); // ModeOffRunner
+				OffRunnerEffect(10); // ModeOffRunner
 				break;
 			case ModeOffBlender:
-				OffBlenderEffect(50); // ModeOffBlender
+				OffBlenderEffect(10); // ModeOffBlender
 				break;
 			case ModeComplex:
 				// nothing todo, but save LED state
