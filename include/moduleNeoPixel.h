@@ -37,6 +37,8 @@ class moduleNeoPixel {
 		static const uint8 ModeRandom = 7;
 		static const uint8 ModeRainbowTv = 8;
 
+		static const uint8 ModeOffRunner = 97;
+		static const uint8 ModeOffBlender = 98;
 		static const uint8 ModeComplex = 99;
 		uint32_t piasFavColor;
 		uint8_t piasFavColorR;
@@ -105,6 +107,8 @@ class moduleNeoPixel {
 		void SetMode(uint8 newMode);
 		void SetSleep(uint seconds);
 		void SetOff();
+		void SetOffBlender(uint8 steps);
+		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
 		void InitRGB(bool rgb);
 		bool GetRGB();
@@ -145,6 +149,7 @@ class moduleNeoPixel {
 		uint pixelInterval;				// Pixel Interval (ms)
 		int pixelQueue;					// Pattern Pixel Queue
 		int pixelCycle;					// Pattern Pixel Cycle
+		uint8 steps;
 
 		void publishValue();
 		void calc();
@@ -157,6 +162,8 @@ class moduleNeoPixel {
 		void TheaterChaseRainbowEffect(uint8_t wait);
 		void RunnerEffect(uint wait);
 		void RandomEffect(uint wait);
+		void OffBlenderEffect(uint wait);
+		void OffRunnerEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
 

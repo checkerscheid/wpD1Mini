@@ -54,6 +54,7 @@ moduleNeoPixel::moduleNeoPixel() {
 	piasFavColorG = 0;
 	piasFavColorB = 183;
 	//wpFZ.loopTime = 100;
+	steps = 5;
 }
 void moduleNeoPixel::init() {
 	Pin = D7;
@@ -398,6 +399,20 @@ void moduleNeoPixel::SetOff() {
 	strip->show();
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
 }
+void moduleNeoPixel::SetOffBlender(uint8 setSteps) {
+	steps = setSteps;
+	demoMode = false;
+	modeCurrent = ModeOffBlender;
+	staticIsSet = true;
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+}
+void moduleNeoPixel::SetOffRunner(uint8 setSteps) {
+	steps = setSteps;
+	demoMode = false;
+	modeCurrent = ModeOffRunner;
+	staticIsSet = true;
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+}
 void moduleNeoPixel::InitPixelCount(uint16 pc) {
 	pixelCount = pc;
 }
@@ -441,6 +456,12 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 			break;
 		case ModeComplex:
 			returns = "ModeComplex";
+			break;
+		case ModeOffRunner:
+			returns = "ModeOffRunner";
+			break;
+		case ModeOffBlender:
+			returns = "ModeOffBlender";
 			break;
 		default:
 			returns = String(actualMode);
@@ -506,13 +527,8 @@ void moduleNeoPixel::publishValue() {
 void moduleNeoPixel::calc() {	
 	if(sleepAt > 0) {
 		if(wpFZ.loopStartedAt > sleepAt) {
-			modeCurrent = ModeStatic;
-			SetValueR(0);
-			SetValueG(0);
-			SetValueB(0);
-			SetBrightness(0);
-			wpAnalogOut.handValueSet = 0;
-			wpAnalogOut2.handValueSet = 0;
+			demoMode = false;
+			modeCurrent = ModeOffBlender;
 			sleep = 0;
 			sleepAt = 0;
 		} else {
@@ -553,6 +569,12 @@ void moduleNeoPixel::calc() {
 				break;
 			case ModeRandom:
 				RandomEffect(500); // Random
+				break;
+			case ModeOffRunner:
+				OffRunnerEffect(50); // ModeOffRunner
+				break;
+			case ModeOffBlender:
+				OffBlenderEffect(50); // ModeOffBlender
 				break;
 			case ModeComplex:
 				// nothing todo, but save LED state
@@ -723,12 +745,72 @@ void moduleNeoPixel::RandomEffect(uint wait) {
 	}
 	strip->show();
 }
+void moduleNeoPixel::OffRunnerEffect(uint wait) {
+	uint32_t color = strip->Color(0, 0, 0);
+	static uint16_t current_pixel = pixelCount;
+	if(pixelInterval != wait)
+		pixelInterval = wait;                         //  Update delay time
+	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
+	strip->show();                                //  Update strip to match
+	if(wpModules.useModuleAnalogOut) {
+		if(wpAnalogOut.handValueSet >= steps) {
+			wpAnalogOut.handValueSet -= steps;
+		} else {
+			wpAnalogOut.handValueSet = 0;
+		}
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		if(wpAnalogOut2.handValueSet >= steps) {
+			wpAnalogOut2.handValueSet -= steps;
+		} else {
+			wpAnalogOut2.handValueSet = 0;
+		}
+	}
+	if(brightness <= 0 &&
+		(wpModules.useModuleAnalogOut && wpAnalogOut.handValueSet <= 0) &&
+		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.handValueSet <= 0)) {            //  Loop the pattern from the first LED
+		staticIsSet = true;
+		modeCurrent = ModeStatic;
+	}
+}
+void moduleNeoPixel::OffBlenderEffect(uint wait) {
+	if(pixelInterval != wait)
+		pixelInterval = wait;                         //  Update delay time
+	if(brightness >= steps) {
+		brightness -= steps;
+	} else {
+		brightness = 0;
+	}
+	strip->setBrightness(brightness);
+	strip->show();                                //  Update strip to match
+	if(wpModules.useModuleAnalogOut) {
+		if(wpAnalogOut.handValueSet >= steps) {
+			wpAnalogOut.handValueSet -= steps;
+		} else {
+			wpAnalogOut.handValueSet = 0;
+		}
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		if(wpAnalogOut2.handValueSet >= steps) {
+			wpAnalogOut2.handValueSet -= steps;
+		} else {
+			wpAnalogOut2.handValueSet = 0;
+		}
+	}
+	if(brightness <= 0 &&
+		(wpModules.useModuleAnalogOut && wpAnalogOut.handValueSet <= 0) &&
+		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.handValueSet <= 0)) {            //  Loop the pattern from the first LED
+		staticIsSet = true;
+		modeCurrent = ModeStatic;
+	}
+}
 
 void moduleNeoPixel::StaticEffect() {
 	uint32_t color = strip->Color(valueR, valueG, valueB);
 	demoMode = false;
 	modeCurrent = ModeStatic;
 	strip->fill(color);
+	strip->setBrightness(brightness);
 	strip->show();
 	if(useBorder) {
 		if(lastBorderSend == 0 || lastBorderSend + 5000 < wpFZ.loopStartedAt) {

@@ -780,6 +780,26 @@ void helperWebServer::setupWebServer() {
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
+		webServer.on("/setNeoPixelOffRunner", HTTP_GET, [](AsyncWebServerRequest *request) {
+			uint8 steps = 5;
+			if(request->hasParam("steps")) {
+				steps = request->getParam("steps")->value().toInt();
+			}
+			wpNeoPixel.SetOffRunner(steps);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOffRunner");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelOffBlender", HTTP_GET, [](AsyncWebServerRequest *request) {
+			uint8 steps = 5;
+			if(request->hasParam("steps")) {
+				steps = request->getParam("steps")->value().toInt();
+			}
+			wpNeoPixel.SetOffBlender(steps);
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
 		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
 			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBorder");
