@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 194                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 192 2024-08-18 01:46:28Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 194 2024-08-21 12:52:24Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -130,7 +130,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 192 $";
+		String SVNh = "$Rev: 194 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 };
