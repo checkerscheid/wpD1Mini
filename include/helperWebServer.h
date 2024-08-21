@@ -183,6 +183,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 		.color-ok { color:#38C133; text-shadow:0 0 3px #313131; }
 		.color-warn { color:#cebd2f; text-shadow:0 0 3px #12130c; }
 		.color-error { color:#df0d0d; text-shadow:0 0 3px #1e1414; }
+		.setChange span::before { content:'✘ '; }
+		.setChange span.color-ok::before { content:'✔ '; }
 	</style>
 </head>
 <body>
