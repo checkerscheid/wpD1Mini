@@ -53,6 +53,7 @@ void moduleRelais::init() {
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
 	mqttTopicSetWaterEmpty = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetWaterEmpty";
+	mqttTopicStartPumpTest = wpFZ.DeviceName + "/settings/" + ModuleName + "/StartPumpTest";
 
 	outputLast = false;
 	publishOutputLast = 0;
@@ -162,6 +163,7 @@ void moduleRelais::setSubscribes() {
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicStartPumpTest.c_str());
 	mb->setSubscribes();
 }
 
@@ -218,6 +220,14 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
+	if(strcmp(topic, mqttTopicStartPumpTest.c_str()) == 0) {
+		int readStartPumpTest = msg.toInt();
+		if(readStartPumpTest != 0) {
+			StartPumpTest();
+			wpFZ.DebugcheckSubscribes(mqttTopicStartPumpTest, String(handSet));
+			wpMqtt.mqttClient.publish(mqttTopicStartPumpTest.c_str(), String(0).c_str());
+		}
+	}
 	mb->checkSubscribes(topic, msg);
 }
 
@@ -238,16 +248,24 @@ void moduleRelais::publishValue() {
 }
 
 void moduleRelais::calc() {
-	if(handValue != handValueSet) {
-		handValue = handValueSet;
-	}
-	if(handError != handSet) {
-		handError = handSet;
-	}
-	if(handError) {
-		output = handValue;
+	if(startPumpTestActive) {
+		output = true;
+		if(millis() > startPumpTestAt + 500) {
+			output = false;
+			startPumpTestActive = false;
+		}
 	} else {
-		output = autoValue;
+		if(handValue != handValueSet) {
+			handValue = handValueSet;
+		}
+		if(handError != handSet) {
+			handError = handSet;
+		}
+		if(handError) {
+			output = handValue;
+		} else {
+			output = autoValue;
+		}
 	}
 	if(output && digitalRead(Pin) == LOW) {
 		digitalWrite(Pin, HIGH);
@@ -331,6 +349,12 @@ void moduleRelais::SendPumpStatus() {
 		);
 	}
 }
+
+void moduleRelais::StartPumpTest() {
+	startPumpTestAt = millis();
+	startPumpTestActive = true;
+}
+
 String moduleRelais::getReadableTime(unsigned long time) {
 	unsigned long secall = (unsigned long) time / 1000;
 	unsigned long minohnesec = (unsigned long) round(secall / 60);
