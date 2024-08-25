@@ -223,10 +223,7 @@ void wpFreakaZone::setSubscribes() {
 void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, wpFZ.mqttTopicSetDeviceName.c_str()) == 0) {
 		if(wpFZ.DeviceName != msg) {
-			wpFZ.DeviceName = msg;
-			wpEEPROM.writeStringsToEEPROM();
-			wpFZ.restartRequired = true;
-			DebugcheckSubscribes(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
+			SetDeviceName(msg);
 		}
 	}
 	if(strcmp(topic, wpFZ.mqttTopicSetDeviceDescription.c_str()) == 0) {
@@ -316,6 +313,13 @@ void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
 	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
 	wpFZ.blink();
+}
+
+void wpFreakaZone::SetDeviceName(String name) {
+	wpFZ.DeviceName = name;
+	wpEEPROM.writeStringsToEEPROM();
+	wpFZ.restartRequired = true;
+	DebugcheckSubscribes(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
 }
 
 void wpFreakaZone::printStart() {

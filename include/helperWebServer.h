@@ -34,6 +34,7 @@ class helperWebServer {
 		const int8 cmdRestartESP = 7;
 		const int8 cmdScanWiFi = 8;
 		const int8 cmdCheckDns = 9;
+		const int8 cmdSetName = 10;
 		int8 doCommand;
 
 		const int8 cmdSendRestWiFi = 1;
@@ -133,6 +134,7 @@ class helperWebServer {
 		String SVNh = "$Rev: 194 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
+		String newName;
 };
 extern helperWebServer wpWebServer;
 
@@ -189,7 +191,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 </head>
 <body>
 	<div id="FreakaZoneWebSerial">
-		<h1>Freaka<span class="z">Z</span>one %DeviceName% Web<span class="z">S</span>erial:</h1>
+		<h1>Freaka<span class="z">Z</span>one %DeviceName% <span class="setChange" onclick="changeName()">&#9998;</span> Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
 		<div id="restartRequired" class="wpContainer wpHidden"></div>
 		<div id="newVersion" class="wpContainer wpHidden"></div>
@@ -201,6 +203,11 @@ const char index_html[] PROGMEM = R"rawliteral(
 					</div>
 				</div>
 			</diV>
+		</div>
+		<div class="wpContainer wpHidden" id="changeNameContainer">
+			<span>New Name:</span>
+			<input type="text" id="SetNewDevicename" value="%DeviceName%" />
+			<span id="SetDevicename" class="wpButton" onclick="cmdNewDevicename()">save</span>
 		</div>
 		<div class="ulContainer">
 			%Debug%
@@ -336,6 +343,7 @@ function onMessage(event) {
 			console.log(d);
 		}
 	} else {
+		%debugOnMessage%
 		console.log('[d.cmd = undefined]:');
 		console.log(d);
 		WebSerialBox.innerHTML =
@@ -377,6 +385,14 @@ function changeSendRest(e) {
 }
 function cmdHandle(e) {
 	xmlHttp.open("GET", "/setCmd?cmd=" + e.target.id, false);
+	xmlHttp.send(null);
+}
+function changeName() {
+	document.getElementById('changeNameContainer').classList.remove('wpHidden');
+}
+function cmdNewDevicename() {
+	let newName = document.getElementById('SetNewDevicename').value;
+	xmlHttp.open("GET", "/setCmd?cmd=SetDeviceName&newName=" + newName, false);
 	xmlHttp.send(null);
 }
 	</script>

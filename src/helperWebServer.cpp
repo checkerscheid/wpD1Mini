@@ -693,6 +693,13 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd waterEmpty");
 				wpRelais.waterEmptySet = !wpRelais.waterEmptySet;
 			}
+			if(request->getParam("cmd")->value() == "SetDeviceName") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd SetDeviceName");
+				if(request->hasParam("newName")) {
+					wpWebServer.newName = request->getParam("newName")->value();
+					wpWebServer.setCommand(wpWebServer.cmdSetName);
+				}
+			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
 		wpWebServer.setBlink();
@@ -895,6 +902,9 @@ void helperWebServer::doTheCommand() {
 		}
 		if(doCommand == cmdCheckDns) {
 			wpWiFi.checkDns();
+		}
+		if(doCommand == cmdSetName) {
+			wpFZ.SetDeviceName(newName);
 		}
 		doCommand = cmdDoNothing;
 	}
@@ -1151,6 +1161,13 @@ String processor(const String& var) {
 		String returns = "";
 		if(wpWebServer.Debug) {
 			returns = "console.log(event)";
+		}
+		return returns;
+	}
+	if(var == "debugOnMessage") {
+		String returns = "";
+		if(wpWebServer.Debug) {
+			returns = "console.log('[d.cmd = undefined]:'); console.log(d);";
 		}
 		return returns;
 	}
