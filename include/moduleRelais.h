@@ -54,6 +54,7 @@ class moduleRelais {
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
 		String mqttTopicSetWaterEmpty;
+		String mqttTopicStartPumpTest;
 
 		// section to copy
 		void init();
@@ -93,6 +94,8 @@ class moduleRelais {
 		uint8 debugCalcPumpCounter;
 		unsigned long remainPumpTimePause;
 		// }
+		bool startPumpTestActive;
+		unsigned long startPumpTestAt;
 
 		void publishValue();
 		void calc();
@@ -102,6 +105,7 @@ class moduleRelais {
 		void printCalcDebug(String name, int value, float raw);
 		void SendPumpStatus();
 		String getReadableTime(unsigned long time);
+		void StartPumpTest();
 
 		// section to config and copy
 		String ModuleName;
