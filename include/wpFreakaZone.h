@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 195                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 190 2024-08-14 02:34:46Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 195 2024-08-25 15:47:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -146,7 +146,7 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
 	private:
-		String SVNh = "$Rev: 190 $";
+		String SVNh = "$Rev: 195 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;

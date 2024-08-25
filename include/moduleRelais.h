@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 195                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 183 2024-07-29 03:32:26Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 195 2024-08-25 15:47:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -109,7 +109,7 @@ class moduleRelais {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 195 $";
 };
 extern moduleRelais wpRelais;
 
