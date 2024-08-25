@@ -132,6 +132,7 @@ class wpFreakaZone {
 		void SendPumpStatus(String pumpStatus);
 		void pumpCycleFinished();
 		void updateProgress(int percent);
+		void SetDeviceName(String name);
 		void DebugcheckSubscribes(String topic, String value);
 
 		void printStart();
