@@ -385,19 +385,58 @@ void moduleNeoPixel::SetRGB(bool rgb) {
 	strip->clear();
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::isRGB", "Write 'isRGB' to EEPROM");
 }
-void moduleNeoPixel::SetOff() {
+String moduleNeoPixel::SetOn() {
+	wpAnalogOut.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "setNeoPixelWW, restore '" + String(wpAnalogOut.handValueSet) + "'");
+	wpAnalogOut2.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "setNeoPixelCW, restore '" + String(wpAnalogOut2.handValueSet) + "'");
+	InitValueR(EEPROM.read(wpEEPROM.byteNeoPixelValueR));
+	InitValueG(EEPROM.read(wpEEPROM.byteNeoPixelValueG));
+	InitValueB(EEPROM.read(wpEEPROM.byteNeoPixelValueB));
+	InitBrightness(EEPROM.read(wpEEPROM.byteNeoPixelBrightness));
+	StaticEffect();
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Color, R: '" + String(valueR) + "', "
+		"G: '" + String(valueG) + "', B: '" + String(valueB) + "'");
+	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Brightness, '" + String(brightness) + "'");
+	String returns = "{" +
+		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
+		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
+		wpFZ.JsonKeyValue("B", String(valueB)) + "," +
+		wpFZ.JsonKeyValue("Brightness", String(brightness));
+	if(wpModules.useModuleAnalogOut) {
+		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue));
+	}
+	return returns += "}";
+}
+String moduleNeoPixel::SetOff() {
 	wpAnalogOut.handValueSet = 0;
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelWW, '0'");
 	wpAnalogOut2.handValueSet = 0;
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelCW, '0'");
 	uint32_t color = strip->Color(0, 0, 0);
+	brightness = 0;
 	demoMode = false;
 	modeCurrent = ModeStatic;
 	staticIsSet = true;
 	strip->fill(color);
-	strip->setBrightness(0);
+	strip->setBrightness(brightness);
 	strip->show();
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+	String returns = "{" +
+		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
+		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
+		wpFZ.JsonKeyValue("B", String(valueB)) + "," +
+		wpFZ.JsonKeyValue("Brightness", String(brightness));
+	if(wpModules.useModuleAnalogOut) {
+		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue));
+	}
+	return returns += "}";
 }
 void moduleNeoPixel::SetOffBlender(uint8 setSteps) {
 	steps = setSteps;
@@ -844,7 +883,7 @@ uint32_t moduleNeoPixel::Wheel(byte WheelPos) {
 	return strip->Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 void moduleNeoPixel::setBorder(uint32_t c) {
-	String target = "http://172.17.80.97/color/0?"
+	String target = "http://172.17.80.163/color/0?"
 		"red=" + String((uint8_t)(c >> 16)) + "&"
 		"green=" + String((uint8_t)(c >>  8)) + "&"
 		"blue=" + String((uint8_t)(c >>  0)) + "&"
