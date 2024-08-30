@@ -106,7 +106,8 @@ class moduleNeoPixel {
 		String GetModeName(uint actualMode);
 		void SetMode(uint8 newMode);
 		void SetSleep(uint seconds);
-		void SetOff();
+		String SetOn();
+		String SetOff();
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
