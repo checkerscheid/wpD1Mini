@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 197                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 183 2024-07-29 03:32:26Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 197 2024-09-04 03:51:46Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -29,8 +29,10 @@ void helperUpdate::init() {
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
 	
 	twelveHours = 12 * 60 * 60 * 1000;
-	lastUpdateCheck = twelveHours - (12 * 58 * 60 * 1000);
+	lastUpdateCheck = 0;
 	serverVersion = "";
+	newVersion = false;
+	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
 }
 
@@ -45,7 +47,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 197 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -204,7 +206,7 @@ void helperUpdate::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void helperUpdate::doCheckUpdate() {
 	unsigned long m = millis();
-	if(m > lastUpdateCheck + twelveHours) {
+	if((lastUpdateCheck == 0 && m > 2000) || m > lastUpdateCheck + twelveHours) {
 		check();
 	}
 }
