@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 200                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 198 2024-09-05 12:32:25Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 200 2024-09-05 23:43:19Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 198 $";
+	String SVN = "$Rev: 200 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -720,32 +720,32 @@ void helperWebServer::setupWebServer() {
 		wpWebServer.setBlink();
 	});
 	if(wpModules.useModuleCwWw) {
-		webServer.on("/setCwWwEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("effect")) {
-				uint effect = request->getParam("effect")->value().toInt();
-				wpCwWw.SetMode(effect);
+		webServer.on("/setCwWw", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam("turn")) {
+				uint8 t = request->getParam("turn")->value().toInt();
+				if(t == 1) {
+					request->send_P(200, "application/json", wpCwWw.SetOn().c_str());
+				}
+				if(t == 0) {
+					request->send_P(200, "application/json", wpCwWw.SetOff().c_str());
+				}
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setCwWw turn '" + String(t) + "'");
 			}
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setCwWwEffect");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
-			wpWebServer.setBlink();
-		});
-		webServer.on("/setCwWwWW", HTTP_GET, [](AsyncWebServerRequest *request) {
-			byte ww = 0;
 			if(request->hasParam("ww")) {
-				ww = request->getParam("ww")->value().toInt();
-				wpAnalogOut.SetHandValueSet(ww);
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWwWW, '" + String(ww) + "'");
+				byte ww = request->getParam("ww")->value().toInt();
+				request->send_P(200, "application/json", wpCwWw.SetWW(ww).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set WW: '" + String(ww) + "'");
 			}
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			if(request->hasParam("cw")) {
+				byte cw = request->getParam("cw")->value().toInt();
+				request->send_P(200, "application/json", wpCwWw.SetCW(cw).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set CW: '" + String(cw) + "'");
+			}
 			wpWebServer.setBlink();
 		});
-		webServer.on("/setCwWwCW", HTTP_GET, [](AsyncWebServerRequest *request) {
-			byte cw = 0;
-			if(request->hasParam("cw")) {
-				cw = request->getParam("cw")->value().toInt();
-				wpAnalogOut2.SetHandValueSet(cw);
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWwCW, '" + String(cw) + "'");
-			}
+		webServer.on("/setCwWwEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
+			wpCwWw.SetSmooth();
+			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setCwWwEffect");
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
@@ -809,6 +809,16 @@ void helperWebServer::setupWebServer() {
 				b = request->getParam("brightness")->value().toInt();
 				wpNeoPixel.SetBrightness(b);
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBrightness, '" + String(b) + "'");
+			}
+			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpWebServer.setBlink();
+		});
+		webServer.on("/setNeoPixelEffectSpeed", HTTP_GET, [](AsyncWebServerRequest *request) {
+			uint8 effectSpeed = 0;
+			if(request->hasParam("effectSpeed")) {
+				effectSpeed = request->getParam("effectSpeed")->value().toInt();
+				wpNeoPixel.SetEffectSpeed(effectSpeed);
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelEffectSpeed, '" + String(effectSpeed) + "'");
 			}
 			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();

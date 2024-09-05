@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 199                                                     $ #
+//# Revision     : $Rev:: 200                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 199 2024-09-05 12:33:52Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 200 2024-09-05 23:43:19Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -140,68 +140,77 @@ void moduleCwWw::SetSleep(uint seconds) {
 		sleep = seconds;
 		sleepAt = wpFZ.loopStartedAt + (seconds * 1000);
 	}
-	wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
 }
 String moduleCwWw::SetOn() {
-	wpAnalogOut.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOn", "setCwWw-WW, restore '" + String(wpAnalogOut.handValueSet) + "'");
-	wpAnalogOut2.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOn", "setCwWw-CW, restore '" + String(wpAnalogOut2.handValueSet) + "'");
-	StaticEffect();
+	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
+	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
+	calcDuration();
+	modeCurrent = ModeBlender;
 	return "{"
-		"," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue)) +
-		"," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue)) + "}";
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetOff() {
-	wpAnalogOut.handValueSet = 0;
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOff", "setCwWw-WW, '0'");
-	wpAnalogOut2.handValueSet = 0;
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOff", "setCwWw-CW, '0'");
-	StaticEffect();
+	targetWW = 0;
+	targetCW = 0;
+	calcDuration();
+	modeCurrent = ModeBlender;
 	return "{"
-		"," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue)) +
-		"," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue)) + "}";
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-void moduleCwWw::SetOnBlender() {
-	onBlenderTargetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOnBlender", "onBlenderTargetWW, restore '" + String(wpAnalogOut.handValueSet) + "'");
-	onBlenderTargetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOnBlender", "onBlenderTargetCW, restore '" + String(wpAnalogOut2.handValueSet) + "'");
-	modeCurrent = ModeOnBlender;
-	staticIsSet = false;
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOn", "SetOnBlender");
+
+String moduleCwWw::SetWW(uint ww) {
+	targetWW = ww;
+	targetCW = wpAnalogOut2.handValue;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.commit();
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return "{"
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-void moduleCwWw::SetOffBlender() {
-	modeCurrent = ModeOffBlender;
-	staticIsSet = false;
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetOff", "SetOffBlender");
+String moduleCwWw::SetCW(uint cw) {
+	targetWW = wpAnalogOut.handValue;
+	targetCW = cw;
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.commit();
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return "{"
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
+}
+void moduleCwWw::calcDuration() {
+	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
+	uint8 distCW = abs(wpAnalogOut2.handValue - targetCW);
+	uint dist = distWW >= distCW ? distWW : distCW;
+	uint s = (int)(dist / 80.0);
+	steps = s == 0 ? 1 : s;
+}
+void moduleCwWw::SetSmooth() {
+	modeCurrent = ModeSmooth;
 }
 
 String moduleCwWw::GetModeName(uint actualMode) {
 	String returns;
 	switch(actualMode) {
 		case ModeStatic:
-			returns = "ModeStatic";
+			returns = "Mode Static";
 			break;
-		case ModeOnBlender:
-			returns = "ModeOnBlender";
+		case ModeBlender:
+			returns = "Mode Blender";
 			break;
-		case ModeOffBlender:
-			returns = "ModeOffBlender";
+		case ModeSmooth:
+			returns = "Mode Smooth";
 			break;
 		default:
 			returns = String(actualMode);
 			break;
 	}
 	return returns;
-}
-void moduleCwWw::SetMode(uint8 newMode) {
-	modeCurrent = newMode;
-	staticIsSet = false;
-	if(modeCurrent == ModeOnBlender) {
-		SetOnBlender();
-	}
-	wpFZ.DebugWS(wpFZ.strINFO, "CwWw::SetMode", GetModeName(newMode));
 }
 //###################################################################################
 // private
@@ -213,7 +222,7 @@ void moduleCwWw::publishValue() {
 void moduleCwWw::calc() {	
 	if(sleepAt > 0) {
 		if(wpFZ.loopStartedAt > sleepAt) {
-			modeCurrent = ModeOffBlender;
+			SetOff();
 			sleep = 0;
 			sleepAt = 0;
 		} else {
@@ -223,68 +232,103 @@ void moduleCwWw::calc() {
 	if(wpFZ.loopStartedAt - loopPrevious >= loopTime) {        //  Check for expired time
 		loopPrevious = wpFZ.loopStartedAt;                            //  Run current frame
 		switch (modeCurrent) {
-			case ModeOn:
-				SetOn(); // ModeOn
+			case ModeBlender:
+				BlenderEffect(); // ModeOn
 				break;
-			case ModeOff:
-				SetOff(); // ModeOff
-				break;
-			case ModeOnBlender:
-				OnBlenderEffect(); // ModeOnBlender
-				break;
-			case ModeOffBlender:
-				OffBlenderEffect(); // ModeOffBlender
+			case ModeSmooth:
+				SmoothEffect();
 				break;
 			default:
-				if(!staticIsSet) {
-					StaticEffect();
-					wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::calc", "Static is set");
-				}
+				modeCurrent = ModeStatic;
 				break;
 		}
 	}
 }
-void moduleCwWw::OnBlenderEffect() {
-	if(wpAnalogOut.handValueSet + steps <= onBlenderTargetWW) {
-		wpAnalogOut.handValueSet += steps;
-	} else {
-		wpAnalogOut.handValueSet = onBlenderTargetWW;
+
+bool moduleCwWw::BlenderWWEffect() {
+	if(wpAnalogOut.handValueSet != targetWW) {
+		if(wpAnalogOut.handValueSet <= targetWW) {
+			if(wpAnalogOut.handValueSet + steps <= targetWW) {
+				wpAnalogOut.handValueSet += steps;
+			} else {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+			if(wpAnalogOut.handValueSet >= targetWW) {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+		} else {
+			if(wpAnalogOut.handValueSet - steps >= targetWW) {
+				wpAnalogOut.handValueSet -= steps;
+			} else {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+			if(wpAnalogOut.handValueSet <= targetWW) {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+		}
 	}
-	if(wpAnalogOut2.handValueSet + steps <= onBlenderTargetCW) {
-		wpAnalogOut2.handValueSet += steps;
-	} else {
-		wpAnalogOut2.handValueSet = onBlenderTargetCW;
-	}
-	if(wpAnalogOut.handValueSet >= onBlenderTargetWW && wpAnalogOut2.handValueSet >= onBlenderTargetCW) {            //  Loop the pattern from the first LED
-		StaticEffect();
-	}
+	return wpAnalogOut.handValueSet == targetWW;
 }
-void moduleCwWw::OffBlenderEffect() {
-	if(wpAnalogOut.handValueSet >= steps) {
-		wpAnalogOut.handValueSet -= steps;
-	} else {
-		wpAnalogOut.handValueSet = 0;
+bool moduleCwWw::BlenderCWEffect() {
+	if(wpAnalogOut2.handValueSet != targetCW) {
+		if(wpAnalogOut2.handValueSet <= targetCW) {
+			if(wpAnalogOut2.handValueSet + steps <= targetCW) {
+				wpAnalogOut2.handValueSet += steps;
+			} else {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+			if(wpAnalogOut2.handValueSet >= targetCW) {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+		} else {
+			if(wpAnalogOut2.handValueSet - steps >= targetCW) {
+				wpAnalogOut2.handValueSet -= steps;
+			} else {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+			if(wpAnalogOut2.handValueSet <= targetCW) {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+		}
 	}
-	if(wpAnalogOut2.handValueSet >= steps) {
-		wpAnalogOut2.handValueSet -= steps;
-	} else {
-		wpAnalogOut2.handValueSet = 0;
-	}
-	if(wpAnalogOut.handValueSet <= 0 && wpAnalogOut2.handValueSet <= 0) {            //  Loop the pattern from the first LED
-		StaticEffect();
+	return wpAnalogOut2.handValueSet == targetCW;
+}
+void moduleCwWw::BlenderEffect() {
+	bool bwwe = BlenderWWEffect();
+	bool bcwe = BlenderCWEffect();
+	if(bwwe && bcwe) {
+		modeCurrent = ModeStatic;
 	}
 }
 
-void moduleCwWw::StaticEffect() {
-	modeCurrent = ModeStatic;
-	staticIsSet = true;
+void moduleCwWw::SmoothEffect() {
+	if(wpAnalogOut.handValueSet >= 255 ||
+		wpAnalogOut2.handValueSet <= 0) {
+		wpAnalogOut.handValueSet = 255;
+		wpAnalogOut2.handValueSet = 0;
+		smoothDirection = true;
+	}
+	if(wpAnalogOut.handValueSet <= 0 ||
+		wpAnalogOut2.handValueSet >= 255) {
+		wpAnalogOut.handValueSet = 0;
+		wpAnalogOut2.handValueSet = 255;
+		smoothDirection = false;
+	}
+	if(smoothDirection) {
+		wpAnalogOut.handValueSet -= 5;
+		wpAnalogOut2.handValueSet += 5;
+	} else {
+		wpAnalogOut.handValueSet += 5;
+		wpAnalogOut2.handValueSet -= 5;
+	}
 }
+
 
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 199 $";
+	String SVN = "$Rev: 200 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

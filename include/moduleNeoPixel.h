@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 196                                                     $ #
+//# Revision     : $Rev:: 200                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 196 2024-08-30 02:33:26Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 200 2024-09-05 23:43:19Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -55,6 +55,7 @@ class moduleNeoPixel {
 		String mqttTopicBrightness;
 		String mqttTopicDemoMode;
 		String mqttTopicModeName;
+		String mqttTopicEffectSpeed;
 		String mqttTopicSleep;
 		// settings
 		String mqttTopicPixelCount;
@@ -66,6 +67,7 @@ class moduleNeoPixel {
 		String mqttTopicSetBrightness;
 		String mqttTopicSetDemoMode;
 		String mqttTopicSetMode;
+		String mqttTopicSetEffectSpeed;
 		String mqttTopicSetSleep;
 		String mqttTopicSetPixelCount;
 		String mqttTopicSetUseBorder;
@@ -101,6 +103,7 @@ class moduleNeoPixel {
 		void InitBrightness(uint8 bn);
 		uint8 GetBrightness();
 		void SetBrightness(uint8 bn);
+		void SetEffectSpeed(uint8 es);
 		void ComplexEffect(uint pixel, byte r, byte g, byte b);
 		void ComplexEffect(uint pixel, uint32_t color);
 		String GetModeName(uint actualMode);
@@ -137,6 +140,9 @@ class moduleNeoPixel {
 		uint modeCurrent;
 		uint modeCurrentLast;
 		unsigned long publishModeLast;
+		uint8 effectSpeed; // 1 x = 25 ms
+		uint8 effectSpeedLast;
+		unsigned long publishEffectSpeedLast;
 		uint sleep;
 		uint sleepLast;
 		unsigned long publishSleepLast;
@@ -170,7 +176,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 196 $";
+		String SVNh = "$Rev: 200 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

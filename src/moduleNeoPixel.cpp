@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 200                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 198 2024-09-05 12:32:25Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 200 2024-09-05 23:43:19Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -96,6 +96,7 @@ void moduleNeoPixel::init() {
 	mqttTopicBrightness = wpFZ.DeviceName + "/" + ModuleName + "/Brightness";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
+	mqttTopicEffectSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	// settings
 	mqttTopicPixelCount = wpFZ.DeviceName + "/" + ModuleName + "/PixelCount";
@@ -107,6 +108,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSetBrightness = wpFZ.DeviceName + "/settings/" + ModuleName + "/Brightness";
 	mqttTopicSetDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
+	mqttTopicSetEffectSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetEffectSpeed";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 	mqttTopicSetPixelCount = wpFZ.DeviceName + "/settings/" + ModuleName + "/PixelCount";
 	mqttTopicSetUseBorder = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetBorder";
@@ -115,6 +117,7 @@ void moduleNeoPixel::init() {
 	publishValueLast = 0;
 	publishModeLast = 0;
 	lastBorderSend = 0;
+	effectSpeed = 1;
 
 	// section to copy
 	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
@@ -165,6 +168,7 @@ void moduleNeoPixel::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetBrightness.c_str(), String(brightness).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetDemoMode.c_str(), String(demoMode).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetMode.c_str(), String(modeCurrent).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetEffectSpeed.c_str(), String(effectSpeed).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetPixelCount.c_str(), String(pixelCount).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetSleep.c_str(), String(sleep).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetUseBorder.c_str(), String(useBorder).c_str());
@@ -198,6 +202,18 @@ void moduleNeoPixel::publishValues(bool force) {
 		}
 		publishModeLast = wpFZ.loopStartedAt;
 	}
+	if(effectSpeedLast != effectSpeed || wpFZ.CheckQoS(publishEffectSpeedLast)) {
+		effectSpeedLast = effectSpeed;
+		wpMqtt.mqttClient.publish(mqttTopicEffectSpeed.c_str(), String(effectSpeed).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("effectSpeed", String(effectSpeed));
+			wpRest.trySend = true;
+		}
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicEffectSpeed, String(effectSpeed));
+		}
+		publishEffectSpeedLast = wpFZ.loopStartedAt;
+	}
 	if(wpFZ.loopStartedAt > publishSleepLast + (2 * 1000)) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
 			sleepLast = sleep;
@@ -230,6 +246,7 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetBrightness.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetDemoMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetPixelCount.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSleep.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetUseBorder.c_str());
@@ -278,6 +295,13 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 		if(modeCurrent != readSetMode) {
 			modeCurrent = readSetMode;
 			wpFZ.DebugcheckSubscribes(mqttTopicSetMode, String(modeCurrent));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetEffectSpeed.c_str()) == 0) {
+		uint8 readSetEffectSpeed = msg.toInt();
+		if(effectSpeed != readSetEffectSpeed) {
+			SetEffectSpeed(readSetEffectSpeed);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetEffectSpeed, String(effectSpeed));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetPixelCount.c_str()) == 0) {
@@ -355,6 +379,11 @@ void moduleNeoPixel::SetBrightness(uint8 br) {
 	EEPROM.commit();
 	staticIsSet = false;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBrightness", "Write Brightness to EEPROM");
+}
+void moduleNeoPixel::SetEffectSpeed(uint8 es) {
+	if(es > 20) es = 20;
+	if(es < 1) es = 1;
+	effectSpeed = es;
 }
 void moduleNeoPixel::SetSleep(uint seconds) {
 	if(seconds == 0) {
@@ -586,28 +615,28 @@ void moduleNeoPixel::calc() {
 		if(!staticIsSet) strip->setBrightness(brightness);
 		switch (modeCurrent) {
 			case ModeColorWipe:
-				ColorWipeEffect(50); // Red
+				ColorWipeEffect(effectSpeed * 25); // Red
 				break;
 			case ModeTheaterChase:
-				TheaterChaseEffect(50); // White
+				TheaterChaseEffect(effectSpeed * 25); // White
 				break;
 			case ModeRainbow:
-				RainbowEffect(25); // Flowing rainbow cycle along the whole strip
+				RainbowEffect(effectSpeed * 25); // Flowing rainbow cycle along the whole strip
 				break;
 			case ModeWheelRainbow:
-				RainbowWheelEffect(25);
+				RainbowWheelEffect(effectSpeed * 25);
 				break;
 			case ModeRainbowTv:
-				RainbowTvEffect(25);
+				RainbowTvEffect(effectSpeed * 25);
 				break;
 			case ModeTheaterChaseRainbow:
-				TheaterChaseRainbowEffect(50); // Rainbow-enhanced theaterChase variant
+				TheaterChaseRainbowEffect(effectSpeed * 25); // Rainbow-enhanced theaterChase variant
 				break;
 			case ModeRunner:
-				RunnerEffect(50); // Runner Red
+				RunnerEffect(effectSpeed * 25); // Runner Red
 				break;
 			case ModeRandom:
-				RandomEffect(500); // Random
+				RandomEffect(effectSpeed * 25); // Random
 				break;
 			case ModeOffRunner:
 				OffRunnerEffect(25); // ModeOffRunner
@@ -895,7 +924,7 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 198 $";
+	String SVN = "$Rev: 200 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 199                                                     $ #
+//# Revision     : $Rev:: 200                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 199 2024-09-05 12:33:52Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 200 2024-09-05 23:43:19Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -25,10 +25,8 @@ class moduleCwWw {
 		moduleBase* mb;
 		
 		static const uint8 ModeStatic = 0;
-		static const uint8 ModeOn = 1;
-		static const uint8 ModeOff = 2;
-		static const uint8 ModeOnBlender = 97;
-		static const uint8 ModeOffBlender = 98;
+		static const uint8 ModeBlender = 1;
+		static const uint8 ModeSmooth = 4;
 
 		// values
 		String mqttTopicModeName;
@@ -56,15 +54,15 @@ class moduleCwWw {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+
 		String GetModeName(uint actualMode);
-		void SetMode(uint8 newMode);
 		void SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
-		void SetOnBlender();
-		void SetOffBlender();
+		String SetWW(uint ww);
+		String SetCW(uint cw);
+		void SetSmooth();
 	private:
-		bool staticIsSet;
 		unsigned long publishValueLast;
 		uint modeCurrent;
 		uint modeCurrentLast;
@@ -81,15 +79,18 @@ class moduleCwWw {
 		void publishValue();
 		void calc();
 
-		uint8 onBlenderTargetWW;
-		uint8 onBlenderTargetCW;
-		void OnBlenderEffect();
-		void OffBlenderEffect();
-		void StaticEffect();
+		uint8 targetWW;
+		uint8 targetCW;
+		void calcDuration();
+		void BlenderEffect();
+		bool BlenderWWEffect();
+		bool BlenderCWEffect();
+		bool smoothDirection;
+		void SmoothEffect();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 199 $";
+		String SVNh = "$Rev: 200 $";
 };
 extern moduleCwWw wpCwWw;
 
