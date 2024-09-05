@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 192 2024-08-18 01:46:28Z                 $ #
+//# File-ID      : $Id:: helperModules.h 198 2024-09-05 12:32:25Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -28,6 +28,7 @@ class helperModules {
 		bool useModuleLight = false;
 		bool useModuleBM = false;
 		bool useModuleWindow = false;
+		bool useModuleCwWw = false;
 		bool useModuleAnalogOut = false;
 		bool useModuleAnalogOut2 = false;
 		bool useModuleNeoPixel = false;
@@ -48,6 +49,7 @@ class helperModules {
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
 		String mqttTopicUseWindow;
+		String mqttTopicUseCwWw;
 		String mqttTopicUseAnalogOut;
 		String mqttTopicUseAnalogOut2;
 		String mqttTopicUseNeoPixel;
@@ -79,6 +81,7 @@ class helperModules {
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
 		void changeModuleWindow(bool newValue);
+		void changeModuleCwWw(bool newValue);
 		void changeModuleAnalogOut(bool newValue);
 		void changeModuleAnalogOut2(bool newValue);
 		void changeModuleNeoPixel(bool newValue);
@@ -97,7 +100,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 192 $";
+		String SVNh = "$Rev: 198 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;
@@ -110,6 +113,8 @@ class helperModules {
 		uint32 publishUseBMLast;
 		bool useWindowLast;
 		uint32 publishUseWindowLast;
+		bool useCwWwLast;
+		uint32 publishUseCwWwLast;
 		bool useAnalogOutLast;
 		uint32 publishUseAnalogOutLast;
 		bool useAnalogOut2Last;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 192 2024-08-18 01:46:28Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 198 2024-09-05 12:32:25Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -32,7 +32,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 192 $";
+	String SVN = "$Rev: 198 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -151,6 +151,7 @@ void helperEEPROM::readVars() {
 /// bool values: byte 0 - 19
 	bitsModules0 = EEPROM.read(addrBitsModules0);
 	bitsModules1 = EEPROM.read(addrBitsModules1);
+	bitsModules2 = EEPROM.read(addrBitsModules2);
 
 	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
 	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
@@ -158,6 +159,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
 	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
 	wpModules.useModuleWindow = bitRead(bitsModules1, bitUseWindow);
+	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);
 	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
 	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
@@ -216,6 +218,7 @@ void helperEEPROM::readVars() {
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
 	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
+	wpCwWw.Debug(bitRead(bitsDebugModules1, bitDebugCwWw));
 	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
 	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));

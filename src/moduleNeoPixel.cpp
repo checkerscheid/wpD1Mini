@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 196                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 196 2024-08-30 02:33:26Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 198 2024-09-05 12:32:25Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -592,13 +592,13 @@ void moduleNeoPixel::calc() {
 				TheaterChaseEffect(50); // White
 				break;
 			case ModeRainbow:
-				RainbowEffect(10); // Flowing rainbow cycle along the whole strip
+				RainbowEffect(25); // Flowing rainbow cycle along the whole strip
 				break;
 			case ModeWheelRainbow:
-				RainbowWheelEffect(10);
+				RainbowWheelEffect(25);
 				break;
 			case ModeRainbowTv:
-				RainbowTvEffect(10);
+				RainbowTvEffect(25);
 				break;
 			case ModeTheaterChaseRainbow:
 				TheaterChaseRainbowEffect(50); // Rainbow-enhanced theaterChase variant
@@ -610,10 +610,10 @@ void moduleNeoPixel::calc() {
 				RandomEffect(500); // Random
 				break;
 			case ModeOffRunner:
-				OffRunnerEffect(10); // ModeOffRunner
+				OffRunnerEffect(25); // ModeOffRunner
 				break;
 			case ModeOffBlender:
-				OffBlenderEffect(10); // ModeOffBlender
+				OffBlenderEffect(25); // ModeOffBlender
 				break;
 			case ModeComplex:
 				// nothing todo, but save LED state
@@ -895,7 +895,7 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 196 $";
+	String SVN = "$Rev: 198 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

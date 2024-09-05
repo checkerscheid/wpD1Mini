@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 192 2024-08-18 01:46:28Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 198 2024-09-05 12:32:25Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -29,6 +29,7 @@ void helperModules::init() {
 	mqttTopicUseLight = wpFZ.DeviceName + "/settings/useModule/Light";
 	mqttTopicUseBM = wpFZ.DeviceName + "/settings/useModule/BM";
 	mqttTopicUseWindow = wpFZ.DeviceName + "/settings/useModule/Window";
+	mqttTopicUseCwWw = wpFZ.DeviceName + "/settings/useModule/CwWw";
 	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
 	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
 	mqttTopicUseNeoPixel = wpFZ.DeviceName + "/settings/useModule/NeoPixel";
@@ -57,7 +58,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 192 $";
+	String SVN = "$Rev: 198 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -92,6 +93,7 @@ void helperModules::publishValues(bool force) {
 		publishUseLightLast = 0;
 		publishUseBMLast = 0;
 		publishUseWindowLast = 0;
+		publishUseCwWwLast = 0;
 		publishUseAnalogOutLast = 0;
 		publishUseAnalogOut2Last = 0;
 		publishUseNeoPixelLast = 0;
@@ -145,6 +147,13 @@ void helperModules::publishValues(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow.c_str(), String(useModuleWindow).c_str());
 		wpFZ.SendWSModule("useWindow", useModuleWindow);
 		publishUseWindowLast = wpFZ.loopStartedAt;
+	}
+	if(useCwWwLast != useModuleCwWw || publishUseCwWwLast == 0 ||
+		wpFZ.loopStartedAt > publishUseCwWwLast + wpFZ.publishQoS) {
+		useCwWwLast = useModuleCwWw;
+		wpMqtt.mqttClient.publish(mqttTopicUseCwWw.c_str(), String(useModuleCwWw).c_str());
+		wpFZ.SendWSModule("useCwWw", useModuleCwWw);
+		publishUseCwWwLast = wpFZ.loopStartedAt;
 	}
 	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
 		wpFZ.loopStartedAt > publishUseAnalogOutLast + wpFZ.publishQoS) {
@@ -231,6 +240,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseLight.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseBM.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseWindow.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseCwWw.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseNeoPixel.c_str());
@@ -259,6 +269,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseMoisture.c_str()) == 0) {
 		changeModuleMoisture(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseCwWw.c_str()) == 0) {
+		changeModuleCwWw(readUseModule);
 	}
 	if(strcmp(topic, mqttTopicUseAnalogOut.c_str()) == 0) {
 		changeModuleAnalogOut(readUseModule);
@@ -368,6 +381,21 @@ void helperModules::changeModuleWindow(bool newValue) {
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleWindow", useModuleWindow);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow, String(useModuleWindow));
+	}
+}
+void helperModules::changeModuleCwWw(bool newValue) {
+	if(useModuleCwWw != newValue) {
+		useModuleCwWw = newValue;
+		if(newValue) {
+			changeModuleAnalogOut(true);
+			changeModuleAnalogOut2(true);
+		}
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseCwWw, useModuleCwWw);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleCwWw", useModuleCwWw);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseCwWw, String(useModuleCwWw));
 	}
 }
 void helperModules::changeModuleAnalogOut(bool newValue) {
@@ -512,6 +540,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleWindow) {
 		wpWindow.publishSettings(force);
 	}
+	if(wpModules.useModuleCwWw) {
+		wpCwWw.publishSettings(force);
+	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.publishSettings(force);
 	}
@@ -572,6 +603,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleWindow) {
 		wpWindow.publishValues(force);
 	}
+	if(wpModules.useModuleCwWw) {
+		wpCwWw.publishValues(force);
+	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.publishValues(force);
 	}
@@ -628,6 +662,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleWindow) {
 		wpWindow.setSubscribes();
 	}
+	if(wpModules.useModuleCwWw) {
+		wpCwWw.setSubscribes();
+	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.setSubscribes();
 	}
@@ -681,6 +718,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleWindow) {
 		wpWindow.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleCwWw) {
+		wpCwWw.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.checkSubscribes(topic, msg);
