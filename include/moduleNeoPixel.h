@@ -37,6 +37,7 @@ class moduleNeoPixel {
 		static const uint8 ModeRandom = 7;
 		static const uint8 ModeRainbowTv = 8;
 
+		static const uint8 ModeBlender = 90; //CW, WW
 		static const uint8 ModeOffRunner = 97;
 		static const uint8 ModeOffBlender = 98;
 		static const uint8 ModeComplex = 99;
@@ -49,6 +50,7 @@ class moduleNeoPixel {
 		bool useBorder;
 
 		// values
+		String mqttTopicMaxPercent;
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
@@ -111,6 +113,8 @@ class moduleNeoPixel {
 		void SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
+		String SetWW(uint ww);
+		String SetCW(uint cw);
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
@@ -125,6 +129,9 @@ class moduleNeoPixel {
 	private:
 		uint16 pixelCount = 50;
 		uint16 pixelStartForTv = 25;
+		uint maxPercent;
+		uint maxPercentLast;
+		unsigned long publishMaxPercent;
 		uint8 valueR = 255;
 		uint8 valueRLast;
 		uint8 valueG = 75;
@@ -161,6 +168,13 @@ class moduleNeoPixel {
 		void publishValue();
 		void calc();
 		
+		uint8 targetWW;
+		uint8 targetCW;
+		void calcDuration();
+		void BlenderEffect();
+		bool BlenderWWEffect();
+		bool BlenderCWEffect();
+
 		void ColorWipeEffect(int wait);
 		void TheaterChaseEffect(int wait);
 		void RainbowEffect(uint8_t wait);
@@ -173,6 +187,7 @@ class moduleNeoPixel {
 		void OffRunnerEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
+		uint8 GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;

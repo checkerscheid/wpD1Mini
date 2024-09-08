@@ -90,6 +90,7 @@ void moduleNeoPixel::init() {
 	staticIsSet = false;
 
 	// values
+	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicValueR = wpFZ.DeviceName + "/" + ModuleName + "/R";
 	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
@@ -114,6 +115,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSetUseBorder = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetBorder";
 	mqttTopicSetIsRGB = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetRGB";
 
+	maxPercent = 0;
 	publishValueLast = 0;
 	publishModeLast = 0;
 	lastBorderSend = 0;
@@ -183,12 +185,25 @@ void moduleNeoPixel::publishValues() {
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishValueLast = 0;
+		publishMaxPercent = 0;
 		publishModeLast = 0;
 		publishUseBorderLast = 0;
 	}
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightnessLast != brightness ||
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
+	}
+	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
+		maxPercentLast = maxPercent;
+		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
+		if(mb->sendRest) {
+			wpRest.error = wpRest.error | !wpRest.sendRest("maxPercent", String(maxPercent));
+			wpRest.trySend = true;
+		}
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
+		}
+		publishMaxPercent = wpFZ.loopStartedAt;
 	}
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
@@ -467,6 +482,35 @@ String moduleNeoPixel::SetOff() {
 	}
 	return returns += "}";
 }
+String moduleNeoPixel::SetWW(uint ww) {
+	targetWW = ww;
+	//targetCW = wpAnalogOut2.handValue;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.commit();
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return "{"
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
+}
+String moduleNeoPixel::SetCW(uint cw) {
+	//targetWW = wpAnalogOut.handValue;
+	targetCW = cw;
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.commit();
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return "{"
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
+}
+void moduleNeoPixel::calcDuration() {
+	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
+	uint8 distCW = abs(wpAnalogOut2.handValue - targetCW);
+	uint dist = distWW >= distCW ? distWW : distCW;
+	uint s = (int)(dist / 80.0);
+	steps = s == 0 ? 1 : s;
+}
 void moduleNeoPixel::SetOffBlender(uint8 setSteps) {
 	steps = setSteps;
 	demoMode = false;
@@ -647,6 +691,9 @@ void moduleNeoPixel::calc() {
 			case ModeComplex:
 				// nothing todo, but save LED state
 				break;
+			case ModeBlender:
+				BlenderEffect(); // ModeOn
+				break;
 			default:
 				if(!staticIsSet) {
 					StaticEffect();
@@ -655,6 +702,66 @@ void moduleNeoPixel::calc() {
 				}
 				break;
 		}
+	}
+	maxPercent = GetMaxPercent();
+}
+bool moduleNeoPixel::BlenderWWEffect() {
+	if(wpAnalogOut.handValueSet != targetWW) {
+		if(wpAnalogOut.handValueSet <= targetWW) {
+			if(wpAnalogOut.handValueSet + steps <= targetWW) {
+				wpAnalogOut.handValueSet += steps;
+			} else {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+			if(wpAnalogOut.handValueSet >= targetWW) {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+		} else {
+			if(wpAnalogOut.handValueSet - steps >= targetWW) {
+				wpAnalogOut.handValueSet -= steps;
+			} else {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+			if(wpAnalogOut.handValueSet <= targetWW) {
+				wpAnalogOut.handValueSet = targetWW;
+			}
+		}
+	}
+	return wpAnalogOut.handValueSet == targetWW;
+}
+bool moduleNeoPixel::BlenderCWEffect() {
+	if(wpAnalogOut2.handValueSet != targetCW) {
+		if(wpAnalogOut2.handValueSet <= targetCW) {
+			if(wpAnalogOut2.handValueSet + steps <= targetCW) {
+				wpAnalogOut2.handValueSet += steps;
+			} else {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+			if(wpAnalogOut2.handValueSet >= targetCW) {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+		} else {
+			if(wpAnalogOut2.handValueSet - steps >= targetCW) {
+				wpAnalogOut2.handValueSet -= steps;
+			} else {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+			if(wpAnalogOut2.handValueSet <= targetCW) {
+				wpAnalogOut2.handValueSet = targetCW;
+			}
+		}
+	}
+	return wpAnalogOut2.handValueSet == targetCW;
+}
+void moduleNeoPixel::BlenderEffect() {
+	pixelInterval = 25;                   //  Update delay time
+	bool bwwe = BlenderWWEffect();
+	bool bcwe = BlenderCWEffect();
+	if(bwwe && bcwe) {
+		strip->fill(0, 0, 0);
+		strip->setBrightness(0);
+		strip->show();
+		modeCurrent = ModeStatic;
 	}
 }
 
@@ -919,6 +1026,15 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 		"gain=" + String((uint8_t)(round(brightness / 2.55)));
 	wpRest.sendRawRest(target);
 	lastBorderSend = wpFZ.loopStartedAt;
+}
+uint8 moduleNeoPixel::GetMaxPercent() {
+	uint8 returns = 0;
+	returns = brightness > returns ? brightness : returns;
+	if(wpModules.useModuleAnalogOut)
+		returns = wpAnalogOut.handValue > returns ? wpAnalogOut.handValue : returns;
+	if(wpModules.useModuleAnalogOut2)
+		returns = wpAnalogOut2.handValue > returns ? wpAnalogOut2.handValue : returns;
+	return returns;
 }
 //###################################################################################
 // section to copy
