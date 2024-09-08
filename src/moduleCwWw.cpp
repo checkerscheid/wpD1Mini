@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 200                                                     $ #
+//# Revision     : $Rev:: 201                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 200 2024-09-05 23:43:19Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 201 2024-09-08 22:39:09Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -396,7 +396,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 200 $";
+	String SVN = "$Rev: 201 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
