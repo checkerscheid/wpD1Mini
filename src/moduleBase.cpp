@@ -25,11 +25,13 @@ moduleBase::moduleBase(String moduleName) {
 	publishDebugLast = 0;
 	errorLast = false;
 	publishErrorLast = 0;
+	_useSendRest = false;
 	_useUseAvg = false;
 	_useCalcCycle = false;
 	_useError = false;
 }
 void moduleBase::initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest) {
+	_useSendRest = true;
 	_addrSendRest = addrSendRest;
 	_byteSendRest = byteSendRest;
 	_bitSendRest = bitSendRest;
@@ -72,7 +74,9 @@ void moduleBase::changeDebug() {
 
 void moduleBase::publishSettings(bool force) {
 	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		if(_useSendRest) {
+			wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+		}
 		if(_useUseAvg) {
 			wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
 		}
@@ -91,11 +95,13 @@ void moduleBase::publishValues(bool force) {
 		publishDebugLast = 0;
 		publishErrorLast = 0;
 	}
-	if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
-		sendRestLast = sendRest;
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpFZ.SendWSSendRest("sendRest" + _name, sendRest);
-		publishSendRestLast = wpFZ.loopStartedAt;
+	if(_useSendRest) {
+		if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
+			sendRestLast = sendRest;
+			wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
+			wpFZ.SendWSSendRest("sendRest" + _name, sendRest);
+			publishSendRestLast = wpFZ.loopStartedAt;
+		}
 	}
 	if(DebugLast != debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = debug;
@@ -112,7 +118,9 @@ void moduleBase::publishValues(bool force) {
 	}
 }
 void moduleBase::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
+	if(_useSendRest) {
+		wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
+	}
 	if(_useUseAvg) {
 		wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
 	}
