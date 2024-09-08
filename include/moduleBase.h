@@ -58,6 +58,7 @@ class moduleBase {
 		byte _byteDebug;
 		uint8 _bitDebug;
 		uint16 _addrCalcCycle;
+		bool _useSendRest;
 		bool _useUseAvg;
 		bool _useCalcCycle;
 		bool _useError;
