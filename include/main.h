@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 190                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 190 2024-08-14 02:34:46Z                          $ #
+//# File-ID      : $Id:: main.h 198 2024-09-05 12:32:25Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -31,6 +31,7 @@
 #include <moduleLight.h>
 #include <moduleBM.h>
 #include <moduleWindow.h>
+#include <moduleCwWw.h>
 #include <moduleAnalogOut.h>
 #include <moduleAnalogOut2.h>
 #include <moduleNeoPixel.h>
@@ -51,7 +52,7 @@ void BuildChecker(uint16 &v, uint16 moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 190 $";
+String SVNh = "$Rev: 198 $";
 // counter
 uint32 publishForceRssi = 0;
 

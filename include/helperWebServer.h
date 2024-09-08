@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 195                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 195 2024-08-25 15:47:51Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 198 2024-09-05 12:32:25Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -73,11 +73,12 @@ class helperWebServer {
 		const int8 cmdDebugRain = 26;
 		const int8 cmdDebugMoisture = 27;
 		const int8 cmdDebugDistance = 28;
-		const int8 cmdDebugAnalogOut = 29;
-		const int8 cmdDebugAnalogOut2 = 30;
-		const int8 cmdDebugNeoPixel = 31;
-		const int8 cmdDebugRpm = 32;
-		const int8 cmdDebugImpulseCounter = 33;
+		const int8 cmdDebugCwWw = 29;
+		const int8 cmdDebugAnalogOut = 30;
+		const int8 cmdDebugAnalogOut2 = 31;
+		const int8 cmdDebugNeoPixel = 32;
+		const int8 cmdDebugRpm = 33;
+		const int8 cmdDebugImpulseCounter = 34;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -91,11 +92,12 @@ class helperWebServer {
 		const int8 cmdModuleRain = 9;
 		const int8 cmdModuleMoisture = 10;
 		const int8 cmdModuleDistance = 11;
-		const int8 cmdModuleAnalogOut = 12;
-		const int8 cmdModuleAnalogOut2 = 13;
-		const int8 cmdModuleNeoPixel = 14;
-		const int8 cmdModuleRpm = 15;
-		const int8 cmdmoduleImpulseCounter = 16;
+		const int8 cmdModuleCwWw = 12;
+		const int8 cmdModuleAnalogOut = 13;
+		const int8 cmdModuleAnalogOut2 = 14;
+		const int8 cmdModuleNeoPixel = 15;
+		const int8 cmdModuleRpm = 16;
+		const int8 cmdmoduleImpulseCounter = 17;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -131,7 +133,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 195 $";
+		String SVNh = "$Rev: 198 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 189                                                     $ #
+//# Revision     : $Rev:: 198                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 189 2024-08-13 11:58:56Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 198 2024-09-05 12:32:25Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -28,7 +28,7 @@ void moduleAnalogOut::init() {
 
 	pinMode(Pin, OUTPUT);
 	output = 0;
-	hardwareoutMax = 100;
+	hardwareoutMax = 255;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
@@ -258,7 +258,7 @@ void moduleAnalogOut::calc() {
 	if(handValue != handValueSet) {
 		handValue = handValueSet;
 	}
-	if(wpModules.useModuleNeoPixel) { //AnalogOut is used for WW
+	if(wpModules.useModuleNeoPixel || wpModules.useModuleCwWw) { //AnalogOut is used for WW
 		handError = false;
 		output = handValue;
 	} else {
@@ -271,7 +271,7 @@ void moduleAnalogOut::calc() {
 			output = autoValue;
 		}
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
+	uint16 hardwareout = wpFZ.Map(output, 0, 255, 0, hardwareoutMax);
 	analogWrite(Pin, hardwareout);
 }
 
@@ -308,7 +308,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 189 $";
+	String SVN = "$Rev: 198 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
