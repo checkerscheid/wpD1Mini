@@ -25,10 +25,13 @@ class moduleCwWw {
 		moduleBase* mb;
 		
 		static const uint8 ModeStatic = 0;
-		static const uint8 ModeBlender = 1;
 		static const uint8 ModeSmooth = 4;
+		
+		static const uint8 ModeBlender = 90; //CW, WW
 
 		// values
+		String mqttTopicIsAuto;
+		String mqttTopicMaxPercent;
 		String mqttTopicModeName;
 		String mqttTopicSleep;
 		// settings
@@ -55,17 +58,24 @@ class moduleCwWw {
 		bool Debug();
 		bool Debug(bool debug);
 
-		String GetModeName(uint actualMode);
+		String GetModeName(uint8 actualMode);
 		void SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
-		String SetWW(uint ww);
-		String SetCW(uint cw);
+		String SetWwCw(uint8 ww, uint8 cw);
+		String SetWW(uint8 ww);
+		String SetCW(uint8 cw);
+		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
 		void SetSmooth();
 	private:
-		unsigned long publishValueLast;
-		uint modeCurrent;
-		uint modeCurrentLast;
+		bool isAuto;
+		bool isAutoLast;
+		unsigned long publishIsAuto;
+		uint8 maxPercent;
+		uint8 maxPercentLast;
+		unsigned long publishMaxPercent;
+		uint8 modeCurrent;
+		uint8 modeCurrentLast;
 		unsigned long publishModeLast;
 		uint sleep;
 		uint sleepLast;
@@ -87,6 +97,7 @@ class moduleCwWw {
 		bool BlenderCWEffect();
 		bool smoothDirection;
 		void SmoothEffect();
+		uint8 GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;

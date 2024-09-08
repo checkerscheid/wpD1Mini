@@ -31,6 +31,8 @@ void moduleCwWw::init() {
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
+	mqttTopicIsAuto = wpFZ.DeviceName + "/" + ModuleName + "/IsAuto";
+	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
 	// settings
@@ -38,12 +40,13 @@ void moduleCwWw::init() {
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 
-	publishValueLast = 0;
+	isAuto = true;
+	maxPercent = 0;
 	publishModeLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
-	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugNeoPixel);
+	//mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestCwWw);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugCwWw);
 }
 
 // loop() function -- runs repeatedly as long as board is on ---------------
@@ -79,29 +82,54 @@ void moduleCwWw::publishValues() {
 }
 void moduleCwWw::publishValues(bool force) {
 	if(force) {
-		publishValueLast = 0;
+		publishIsAuto = 0;
 		publishModeLast = 0;
+		publishMaxPercent = 0;
+	}
+	if(isAutoLast != isAuto || wpFZ.CheckQoS(publishIsAuto)) {
+		isAutoLast = isAuto;
+		wpMqtt.mqttClient.publish(mqttTopicIsAuto.c_str(), String(isAuto).c_str());
+		// if(mb->sendRest) {
+		// 	wpRest.error = wpRest.error | !wpRest.sendRest("isAuto", String(isAuto));
+		// 	wpRest.trySend = true;
+		// }
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicIsAuto, String(isAuto));
+		}
+		publishIsAuto = wpFZ.loopStartedAt;
+	}
+	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
+		maxPercentLast = maxPercent;
+		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
+		// if(mb->sendRest) {
+		// 	wpRest.error = wpRest.error | !wpRest.sendRest("maxPercent", String(maxPercent));
+		// 	wpRest.trySend = true;
+		// }
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
+		}
+		publishMaxPercent = wpFZ.loopStartedAt;
 	}
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
 		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
-			wpRest.trySend = true;
-		}
+		// if(mb->sendRest) {
+		// 	wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
+		// 	wpRest.trySend = true;
+		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
 		}
 		publishModeLast = wpFZ.loopStartedAt;
 	}
-	if(wpFZ.loopStartedAt > publishSleepLast + (2 * 1000)) {
+	if(wpFZ.loopStartedAt > publishSleepLast + 1000) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
 			sleepLast = sleep;
 			wpMqtt.mqttClient.publish(mqttTopicSleep.c_str(), String(sleep).c_str());
-			if(mb->sendRest) {
-				wpRest.error = wpRest.error | !wpRest.sendRest("sleep", String(sleep));
-				wpRest.trySend = true;
-			}
+			// if(mb->sendRest) {
+			// 	wpRest.error = wpRest.error | !wpRest.sendRest("sleep", String(sleep));
+			// 	wpRest.trySend = true;
+			// }
 			if(wpMqtt.Debug) {
 				mb->printPublishValueDebug(mqttTopicSleep, String(sleep));
 			}
@@ -140,9 +168,12 @@ void moduleCwWw::SetSleep(uint seconds) {
 		sleep = seconds;
 		sleepAt = wpFZ.loopStartedAt + (seconds * 1000);
 	}
-	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
+	if(mb->debug)
+		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
 }
 String moduleCwWw::SetOn() {
+	isAuto = false;
+	SetSleep(0);
 	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
 	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
 	calcDuration();
@@ -152,6 +183,7 @@ String moduleCwWw::SetOn() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetOff() {
+	isAuto = true;
 	targetWW = 0;
 	targetCW = 0;
 	calcDuration();
@@ -160,10 +192,22 @@ String moduleCwWw::SetOff() {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-
-String moduleCwWw::SetWW(uint ww) {
+String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
+	isAuto = false;
+	SetSleep(0);
 	targetWW = ww;
-	targetCW = wpAnalogOut2.handValue;
+	targetCW = cw;
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return "{"
+		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
+}
+String moduleCwWw::SetWW(uint8 ww) {
+	isAuto = false;
+	SetSleep(0);
+	targetWW = ww;
+	//targetCW = wpAnalogOut2.handValue;
 	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
 	EEPROM.commit();
 	calcDuration();
@@ -172,8 +216,10 @@ String moduleCwWw::SetWW(uint ww) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-String moduleCwWw::SetCW(uint cw) {
-	targetWW = wpAnalogOut.handValue;
+String moduleCwWw::SetCW(uint8 cw) {
+	isAuto = false;
+	SetSleep(0);
+	//targetWW = wpAnalogOut.handValue;
 	targetCW = cw;
 	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	EEPROM.commit();
@@ -183,18 +229,36 @@ String moduleCwWw::SetCW(uint cw) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
+String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
+	if(isAuto) {
+		targetWW = ww;
+		targetCW = cw;
+		calcDuration();
+		modeCurrent = ModeBlender;
+		SetSleep(sleep);
+		return "{"
+			+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+			+ wpFZ.JsonKeyValue("CW", String(targetCW)) + ","
+			+ wpFZ.JsonKeyValue("sleep", String(sleep)) + "}";
+	} else {
+		return "{\"erg\":\"S_OK\",\"mode\":\"isManuell\"}";
+	}
+}
 void moduleCwWw::calcDuration() {
 	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
 	uint8 distCW = abs(wpAnalogOut2.handValue - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
-	uint s = (int)(dist / 80.0);
+	uint s = (int)(dist / 50.0);
 	steps = s == 0 ? 1 : s;
+	//if(mb->debug)
+		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
 }
 void moduleCwWw::SetSmooth() {
+	isAuto = false;
 	modeCurrent = ModeSmooth;
 }
 
-String moduleCwWw::GetModeName(uint actualMode) {
+String moduleCwWw::GetModeName(uint8 actualMode) {
 	String returns;
 	switch(actualMode) {
 		case ModeStatic:
@@ -216,7 +280,6 @@ String moduleCwWw::GetModeName(uint actualMode) {
 // private
 //###################################################################################
 void moduleCwWw::publishValue() {
-	publishValueLast = wpFZ.loopStartedAt;
 }
 
 void moduleCwWw::calc() {	
@@ -243,6 +306,7 @@ void moduleCwWw::calc() {
 				break;
 		}
 	}
+	maxPercent = GetMaxPercent();
 }
 
 bool moduleCwWw::BlenderWWEffect() {
@@ -322,8 +386,12 @@ void moduleCwWw::SmoothEffect() {
 		wpAnalogOut2.handValueSet -= 5;
 	}
 }
-
-
+uint8 moduleCwWw::GetMaxPercent() {
+	uint8 returns = 0;
+	returns = wpAnalogOut.handValue > returns ? wpAnalogOut.handValue : returns;
+	returns = wpAnalogOut2.handValue > returns ? wpAnalogOut2.handValue : returns;
+	return returns;
+}
 //###################################################################################
 // section to copy
 //###################################################################################
