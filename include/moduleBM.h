@@ -30,6 +30,7 @@ class moduleBM {
 		uint16 threshold = 500;
 		String lightToTurnOn = "_";
 		String mqttTopicBM;
+		String mqttTopicManual;
 		String mqttTopicThreshold;
 		String mqttTopicLightToTurnOn;
 
@@ -51,9 +52,14 @@ class moduleBM {
 		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+		String SetAuto();
+		String SetManual();
 	private:
 		int bmLast;
 		unsigned long publishBMLast;
+		bool manual;
+		bool manualLast;
+		unsigned long publishManualLast;
 		void publishValue();
 		void calc();
 
