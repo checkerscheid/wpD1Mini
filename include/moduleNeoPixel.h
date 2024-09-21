@@ -39,7 +39,6 @@ class moduleNeoPixel {
 
 		static const uint8 ModeBlender = 90; //CW, WW
 		static const uint8 ModeOffRunner = 97;
-		static const uint8 ModeOffBlender = 98;
 		static const uint8 ModeComplex = 99;
 		uint32_t piasFavColor;
 		uint8_t piasFavColorR;
@@ -55,6 +54,7 @@ class moduleNeoPixel {
 		String mqttTopicValueG;
 		String mqttTopicValueB;
 		String mqttTopicBrightness;
+		String mqttTopicStatus;
 		String mqttTopicDemoMode;
 		String mqttTopicModeName;
 		String mqttTopicEffectSpeed;
@@ -131,7 +131,7 @@ class moduleNeoPixel {
 		uint16 pixelStartForTv = 25;
 		uint maxPercent;
 		uint maxPercentLast;
-		unsigned long publishMaxPercent;
+		unsigned long publishMaxPercentLast;
 		uint8 valueR = 255;
 		uint8 valueRLast;
 		uint8 valueG = 75;
@@ -140,6 +140,9 @@ class moduleNeoPixel {
 		uint8 valueBLast;
 		uint8 brightness = 0;
 		uint8 brightnessLast;
+		String status;
+		String statusLast;
+		unsigned long publishStatusLast;
 		bool useBorderLast;
 		bool staticIsSet;
 		bool isRGB = false;
@@ -168,12 +171,20 @@ class moduleNeoPixel {
 		void publishValue();
 		void calc();
 		
+		uint8 targetR;
+		uint8 targetG;
+		uint8 targetB;
+		uint8 targetBr;
 		uint8 targetWW;
 		uint8 targetCW;
 		void calcDuration();
 		void BlenderEffect();
 		bool BlenderWWEffect();
 		bool BlenderCWEffect();
+		bool BlenderREffect();
+		bool BlenderGEffect();
+		bool BlenderBEffect();
+		bool BlenderBrightnessEffect();
 
 		void ColorWipeEffect(int wait);
 		void TheaterChaseEffect(int wait);
@@ -183,7 +194,6 @@ class moduleNeoPixel {
 		void TheaterChaseRainbowEffect(uint8_t wait);
 		void RunnerEffect(uint wait);
 		void RandomEffect(uint wait);
-		void OffBlenderEffect(uint wait);
 		void OffRunnerEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);

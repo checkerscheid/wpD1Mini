@@ -95,6 +95,7 @@ void moduleNeoPixel::init() {
 	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
 	mqttTopicBrightness = wpFZ.DeviceName + "/" + ModuleName + "/Brightness";
+	mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
 	mqttTopicEffectSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
@@ -185,7 +186,8 @@ void moduleNeoPixel::publishValues() {
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishValueLast = 0;
-		publishMaxPercent = 0;
+		publishStatusLast = 0;
+		publishMaxPercentLast = 0;
 		publishModeLast = 0;
 		publishUseBorderLast = 0;
 	}
@@ -193,7 +195,13 @@ void moduleNeoPixel::publishValues(bool force) {
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
 	}
-	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
+	//if(statusLast != getStripStatus() || wpFZ.CheckQoS(publishStatusLast)) {
+	if(publishStatusLast + 10000 > wpFZ.loopStartedAt) {
+		//statusLast = getStripStatus();
+		wpMqtt.mqttClient.publish(mqttTopicStatus.c_str(), status.c_str());
+		publishStatusLast = wpFZ.loopStartedAt;
+	}
+	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercentLast)) {
 		maxPercentLast = maxPercent;
 		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
 		if(mb->sendRest) {
@@ -203,7 +211,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
 		}
-		publishMaxPercent = wpFZ.loopStartedAt;
+		publishMaxPercentLast = wpFZ.loopStartedAt;
 	}
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
@@ -353,10 +361,11 @@ void moduleNeoPixel::InitValueR(uint8 r) {
 }
 uint8 moduleNeoPixel::GetValueR() { return valueR; }
 void moduleNeoPixel::SetValueR(uint8 r) {
-	valueR = r;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueR, valueR);
+	targetR = r;
+	EEPROM.write(wpEEPROM.byteNeoPixelValueR, r);
 	EEPROM.commit();
 	staticIsSet = false;
+	modeCurrent = ModeBlender;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetRed", "Write Red to EEPROM");
 }
 void moduleNeoPixel::InitValueG(uint8 g) {
@@ -365,10 +374,11 @@ void moduleNeoPixel::InitValueG(uint8 g) {
 }
 uint8 moduleNeoPixel::GetValueG() { return valueG; }
 void moduleNeoPixel::SetValueG(uint8 g) {
-	valueG = g;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueG, valueG);
+	targetG = g;
+	EEPROM.write(wpEEPROM.byteNeoPixelValueG, g);
 	EEPROM.commit();
 	staticIsSet = false;
+	modeCurrent = ModeBlender;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetGreen", "Write Green to EEPROM");
 }
 void moduleNeoPixel::InitValueB(uint8 b) {
@@ -377,10 +387,11 @@ void moduleNeoPixel::InitValueB(uint8 b) {
 }
 uint8 moduleNeoPixel::GetValueB() { return valueB; }
 void moduleNeoPixel::SetValueB(uint8 b) {
-	valueB = b;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueB, valueB);
+	targetB = b;
+	EEPROM.write(wpEEPROM.byteNeoPixelValueB, b);
 	EEPROM.commit();
 	staticIsSet = false;
+	modeCurrent = ModeBlender;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBlue", "Write Blue to EEPROM");
 }
 void moduleNeoPixel::InitBrightness(uint8 br) {
@@ -389,10 +400,11 @@ void moduleNeoPixel::InitBrightness(uint8 br) {
 }
 uint8 moduleNeoPixel::GetBrightness() { return brightness; }
 void moduleNeoPixel::SetBrightness(uint8 br) {
-	brightness = br;
-	EEPROM.write(wpEEPROM.byteNeoPixelBrightness, brightness);
+	targetBr = br;
+	EEPROM.write(wpEEPROM.byteNeoPixelBrightness, br);
 	EEPROM.commit();
 	staticIsSet = false;
+	modeCurrent = ModeBlender;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBrightness", "Write Brightness to EEPROM");
 }
 void moduleNeoPixel::SetEffectSpeed(uint8 es) {
@@ -430,18 +442,15 @@ void moduleNeoPixel::SetRGB(bool rgb) {
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::isRGB", "Write 'isRGB' to EEPROM");
 }
 String moduleNeoPixel::SetOn() {
-	wpAnalogOut.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "setNeoPixelWW, restore '" + String(wpAnalogOut.handValueSet) + "'");
-	wpAnalogOut2.handValueSet = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "setNeoPixelCW, restore '" + String(wpAnalogOut2.handValueSet) + "'");
-	InitValueR(EEPROM.read(wpEEPROM.byteNeoPixelValueR));
-	InitValueG(EEPROM.read(wpEEPROM.byteNeoPixelValueG));
-	InitValueB(EEPROM.read(wpEEPROM.byteNeoPixelValueB));
-	InitBrightness(EEPROM.read(wpEEPROM.byteNeoPixelBrightness));
-	StaticEffect();
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Color, R: '" + String(valueR) + "', "
-		"G: '" + String(valueG) + "', B: '" + String(valueB) + "'");
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOn", "Brightness, '" + String(brightness) + "'");
+	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
+	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
+	targetR = EEPROM.read(wpEEPROM.byteNeoPixelValueR);
+	targetG = EEPROM.read(wpEEPROM.byteNeoPixelValueG);
+	targetB = EEPROM.read(wpEEPROM.byteNeoPixelValueB);
+	targetBr = EEPROM.read(wpEEPROM.byteNeoPixelBrightness);
+	demoMode = false;
+	modeCurrent = ModeBlender;
+	staticIsSet = false;
 	String returns = "{" +
 		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
@@ -456,19 +465,15 @@ String moduleNeoPixel::SetOn() {
 	return returns += "}";
 }
 String moduleNeoPixel::SetOff() {
-	wpAnalogOut.handValueSet = 0;
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelWW, '0'");
-	wpAnalogOut2.handValueSet = 0;
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "setNeoPixelCW, '0'");
-	uint32_t color = strip->Color(0, 0, 0);
-	brightness = 0;
+	targetWW = 0;
+	targetCW = 0;
+	targetR = 0;
+	targetG = 0;
+	targetB = 0;
+	targetBr = 0;
 	demoMode = false;
-	modeCurrent = ModeStatic;
-	staticIsSet = true;
-	strip->fill(color);
-	strip->setBrightness(brightness);
-	strip->show();
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+	modeCurrent = ModeBlender;
+	staticIsSet = false;
 	String returns = "{" +
 		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
@@ -488,7 +493,9 @@ String moduleNeoPixel::SetWW(uint ww) {
 	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
 	EEPROM.commit();
 	calcDuration();
+	demoMode = false;
 	modeCurrent = ModeBlender;
+	staticIsSet = false;
 	return "{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
@@ -499,7 +506,9 @@ String moduleNeoPixel::SetCW(uint cw) {
 	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	EEPROM.commit();
 	calcDuration();
+	demoMode = false;
 	modeCurrent = ModeBlender;
+	staticIsSet = false;
 	return "{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
@@ -510,13 +519,6 @@ void moduleNeoPixel::calcDuration() {
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
-}
-void moduleNeoPixel::SetOffBlender(uint8 setSteps) {
-	steps = setSteps;
-	demoMode = false;
-	modeCurrent = ModeOffBlender;
-	staticIsSet = true;
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
 }
 void moduleNeoPixel::SetOffRunner(uint8 setSteps) {
 	steps = setSteps;
@@ -572,8 +574,8 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 		case ModeOffRunner:
 			returns = "ModeOffRunner";
 			break;
-		case ModeOffBlender:
-			returns = "ModeOffBlender";
+		case ModeBlender:
+			returns = "ModeBlender";
 			break;
 		default:
 			returns = String(actualMode);
@@ -586,30 +588,30 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 	staticIsSet = false;
 }
 String moduleNeoPixel::getStripStatus() {
-	String returns = "{";
+	status = "{";
 	for(uint i = 0; i < pixelCount; i++) {
-		returns.concat("\"p");
-		returns.concat(i);
+		status.concat("\"p");
+		status.concat(i);
 		uint32_t c = strip->getPixelColor(i);
 		uint8_t r = c >> 16;
-		returns.concat("\":{\"r\":");
-		returns.concat(r);
+		status.concat("\":{\"r\":");
+		status.concat(r);
 		uint8_t g = c >> 8;
-		returns.concat(",\"g\":");
-		returns.concat(g);
+		status.concat(",\"g\":");
+		status.concat(g);
 		uint8_t b = c;
-		returns.concat(",\"b\":");
-		returns.concat(b);
-		returns.concat("},");
+		status.concat(",\"b\":");
+		status.concat(b);
+		status.concat("},");
 	}
-	returns.concat("\"ww\":");
-	returns.concat(wpAnalogOut.output);
-	returns.concat(",\"cw\":");
-	returns.concat(wpAnalogOut2.output);
-	returns.concat(",\"b\":");
-	returns.concat(strip->getBrightness());
-	returns.concat("}");
-	return returns;
+	status.concat("\"ww\":");
+	status.concat(wpAnalogOut.output);
+	status.concat(",\"cw\":");
+	status.concat(wpAnalogOut2.output);
+	status.concat(",\"b\":");
+	status.concat(strip->getBrightness());
+	status.concat("}");
+	return status;
 }
 //###################################################################################
 // private
@@ -640,7 +642,7 @@ void moduleNeoPixel::calc() {
 	if(sleepAt > 0) {
 		if(wpFZ.loopStartedAt > sleepAt) {
 			demoMode = false;
-			modeCurrent = ModeOffBlender;
+			modeCurrent = ModeBlender;
 			sleep = 0;
 			sleepAt = 0;
 		} else {
@@ -685,9 +687,6 @@ void moduleNeoPixel::calc() {
 			case ModeOffRunner:
 				OffRunnerEffect(25); // ModeOffRunner
 				break;
-			case ModeOffBlender:
-				OffBlenderEffect(25); // ModeOffBlender
-				break;
 			case ModeComplex:
 				// nothing todo, but save LED state
 				break;
@@ -704,6 +703,21 @@ void moduleNeoPixel::calc() {
 		}
 	}
 	maxPercent = GetMaxPercent();
+}
+void moduleNeoPixel::BlenderEffect() {
+	pixelInterval = 25;                   //  Update delay time
+	bool bre = BlenderREffect();
+	bool bge = BlenderGEffect();
+	bool bbe = BlenderBEffect();
+	bool bbre = BlenderBrightnessEffect();
+	bool bwwe = BlenderWWEffect();
+	bool bcwe = BlenderCWEffect();
+	strip->fill(strip->Color(valueR, valueG, valueB));
+	strip->setBrightness(brightness);
+	strip->show();
+	if(bre && bge && bbe && bbre && bwwe && bcwe) {
+		modeCurrent = ModeStatic;
+	}
 }
 bool moduleNeoPixel::BlenderWWEffect() {
 	if(wpAnalogOut.handValueSet != targetWW) {
@@ -753,18 +767,102 @@ bool moduleNeoPixel::BlenderCWEffect() {
 	}
 	return wpAnalogOut2.handValueSet == targetCW;
 }
-void moduleNeoPixel::BlenderEffect() {
-	pixelInterval = 25;                   //  Update delay time
-	bool bwwe = BlenderWWEffect();
-	bool bcwe = BlenderCWEffect();
-	if(bwwe && bcwe) {
-		strip->fill(0, 0, 0);
-		strip->setBrightness(0);
-		strip->show();
-		modeCurrent = ModeStatic;
+bool moduleNeoPixel::BlenderREffect() {
+	if(valueR != targetR) {
+		if(valueR <= targetR) {
+			if(valueR + steps <= targetR) {
+				valueR += steps;
+			} else {
+				valueR = targetR;
+			}
+			if(valueR >= targetR) {
+				valueR = targetR;
+			}
+		} else {
+			if(valueR - steps >= targetR) {
+				valueR -= steps;
+			} else {
+				valueR = targetR;
+			}
+			if(valueR <= targetR) {
+				valueR = targetR;
+			}
+		}
 	}
+	return valueR == targetR;
 }
-
+bool moduleNeoPixel::BlenderGEffect() {
+	if(valueG != targetG) {
+		if(valueG <= targetG) {
+			if(valueG + steps <= targetG) {
+				valueG += steps;
+			} else {
+				valueG = targetG;
+			}
+			if(valueG >= targetG) {
+				valueG = targetG;
+			}
+		} else {
+			if(valueG - steps >= targetG) {
+				valueG -= steps;
+			} else {
+				valueG = targetG;
+			}
+			if(valueG <= targetG) {
+				valueG = targetG;
+			}
+		}
+	}
+	return valueG == targetG;
+}
+bool moduleNeoPixel::BlenderBEffect() {
+	if(valueB != targetB) {
+		if(valueB <= targetB) {
+			if(valueB + steps <= targetB) {
+				valueB += steps;
+			} else {
+				valueB = targetB;
+			}
+			if(valueB >= targetB) {
+				valueB = targetB;
+			}
+		} else {
+			if(valueB - steps >= targetB) {
+				valueB -= steps;
+			} else {
+				valueB = targetB;
+			}
+			if(valueB <= targetB) {
+				valueB = targetB;
+			}
+		}
+	}
+	return valueB == targetB;
+}
+bool moduleNeoPixel::BlenderBrightnessEffect() {
+	if(brightness != targetBr) {
+		if(brightness <= targetBr) {
+			if(brightness + steps <= targetBr) {
+				brightness += steps;
+			} else {
+				brightness = targetBr;
+			}
+			if(brightness >= targetBr) {
+				brightness = targetBr;
+			}
+		} else {
+			if(brightness - steps >= targetBr) {
+				brightness -= steps;
+			} else {
+				brightness = targetBr;
+			}
+			if(brightness <= targetBr) {
+				brightness = targetBr;
+			}
+		}
+	}
+	return brightness == targetBr;
+}
 // Some functions of our own for creating animated effects -----------------
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
@@ -926,37 +1024,6 @@ void moduleNeoPixel::OffRunnerEffect(uint wait) {
 	if(pixelInterval != wait)
 		pixelInterval = wait;                         //  Update delay time
 	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
-	strip->show();                                //  Update strip to match
-	if(wpModules.useModuleAnalogOut) {
-		if(wpAnalogOut.handValueSet >= steps) {
-			wpAnalogOut.handValueSet -= steps;
-		} else {
-			wpAnalogOut.handValueSet = 0;
-		}
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		if(wpAnalogOut2.handValueSet >= steps) {
-			wpAnalogOut2.handValueSet -= steps;
-		} else {
-			wpAnalogOut2.handValueSet = 0;
-		}
-	}
-	if(brightness <= 0 &&
-		(wpModules.useModuleAnalogOut && wpAnalogOut.handValueSet <= 0) &&
-		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.handValueSet <= 0)) {            //  Loop the pattern from the first LED
-		staticIsSet = true;
-		modeCurrent = ModeStatic;
-	}
-}
-void moduleNeoPixel::OffBlenderEffect(uint wait) {
-	if(pixelInterval != wait)
-		pixelInterval = wait;                         //  Update delay time
-	if(brightness >= steps) {
-		brightness -= steps;
-	} else {
-		brightness = 0;
-	}
-	strip->setBrightness(brightness);
 	strip->show();                                //  Update strip to match
 	if(wpModules.useModuleAnalogOut) {
 		if(wpAnalogOut.handValueSet >= steps) {
