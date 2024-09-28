@@ -10,20 +10,12 @@
 //#                                                                                 #
 //# Revision     : $Rev:: 183                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.h 183 2024-07-29 03:32:26Z                      $ #
+//# File-ID      : $Id:: moduleBM.cpp 183 2024-07-29 03:32:26Z                    $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef wpDatapoint_h
-#define wpDatapoint_h
-#include <Arduino.h>
-#include <wpFreakaZone.h>
+#include <wpDatapoint.h>
 
-class wpDatapoint {
-	public:
-		wpDatapoint(String& name);
-	private:
-		String _name;
-		String _topic;
-};
-
-#endif
+wpDatapoint::wpDatapoint(String& name) {
+	_name = name;
+	_topic = wpFZ.DeviceName + "/" + name;
+}
