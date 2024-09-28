@@ -41,6 +41,7 @@
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
 #include <moduleImpulseCounter.h>
+#include <moduleUnderfloor.h>
 #include <wpFreakaZone.h>
 
 uint16 getVersion();

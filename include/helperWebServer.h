@@ -79,6 +79,10 @@ class helperWebServer {
 		const int8 cmdDebugNeoPixel = 32;
 		const int8 cmdDebugRpm = 33;
 		const int8 cmdDebugImpulseCounter = 34;
+		const int8 cmdDebugUnderfloor1 = 35;
+		const int8 cmdDebugUnderfloor2 = 36;
+		const int8 cmdDebugUnderfloor3 = 37;
+		const int8 cmdDebugUnderfloor4 = 38;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -98,6 +102,10 @@ class helperWebServer {
 		const int8 cmdModuleNeoPixel = 15;
 		const int8 cmdModuleRpm = 16;
 		const int8 cmdmoduleImpulseCounter = 17;
+		const int8 cmdmoduleUnderfloor1 = 18;
+		const int8 cmdmoduleUnderfloor2 = 19;
+		const int8 cmdmoduleUnderfloor3 = 20;
+		const int8 cmdmoduleUnderfloor4 = 21;
 		int8 doModuleChange;
 
 		int8 doBlink;

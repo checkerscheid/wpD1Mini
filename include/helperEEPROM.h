@@ -49,6 +49,10 @@ class helperEEPROM {
 		const uint16 addrBitsModules2 = 2;
 		byte bitsModules2;
 		const uint8 bitUseCwWw = 0; // include in bitsModules2
+		const uint8 bitUseUnderfloor1 = 1; // include in bitsModules2
+		const uint8 bitUseUnderfloor2 = 2; // include in bitsModules2
+		const uint8 bitUseUnderfloor3 = 3; // include in bitsModules2
+		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
 
 //###################################################################################
 
@@ -121,6 +125,10 @@ class helperEEPROM {
 		
 		const uint16 addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
+		const uint8 bitDebugUnderfloor1 = 0; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -143,6 +151,14 @@ class helperEEPROM {
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
+		const uint8 bitUnderfloor1Hand = 0; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor2Hand = 1; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor3Hand = 2; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor4Hand = 3; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor1HandValue = 4; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor2HandValue = 5; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor3HandValue = 6; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor4HandValue = 7; // include in bitsSettingsModules2
 		
 //###################################################################################
 /// byte values: byte 20 - 49

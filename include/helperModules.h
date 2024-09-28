@@ -39,7 +39,10 @@ class helperModules {
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
 		bool useModuleImpulseCounter = false;
-
+		bool useModuleUnderfloor1 = false;
+		bool useModuleUnderfloor2 = false;
+		bool useModuleUnderfloor3 = false;
+		bool useModuleUnderfloor4 = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -60,6 +63,10 @@ class helperModules {
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
 		String mqttTopicUseImpulseCounter;
+		String mqttTopicUseUnderfloor1;
+		String mqttTopicUseUnderfloor2;
+		String mqttTopicUseUnderfloor3;
+		String mqttTopicUseUnderfloor4;
 
 		helperModules();
 		void init();
@@ -92,6 +99,10 @@ class helperModules {
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
+		void changemoduleUnderfloor1(bool newValue);
+		void changemoduleUnderfloor2(bool newValue);
+		void changemoduleUnderfloor3(bool newValue);
+		void changemoduleUnderfloor4(bool newValue);
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -135,6 +146,15 @@ class helperModules {
 		uint32 publishUseDistanceLast;
 		bool useImpulseCounterLast;
 		uint32 publishUseImpulseCounterLast;
+		bool useUnderfloor1Last;
+		uint32 publishUseUnderfloor1Last;
+		bool useUnderfloor2Last;
+		uint32 publishUseUnderfloor2Last;
+		bool useUnderfloor3Last;
+		uint32 publishUseUnderfloor3Last;
+		bool useUnderfloor4Last;
+		uint32 publishUseUnderfloor4Last;
+
 		bool DebugLast;
 		uint32 publishDebugLast;
 };

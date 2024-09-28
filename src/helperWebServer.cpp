@@ -274,7 +274,26 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue("UpKWh", String(wpImpulseCounter.UpKWh)) + "," +
 				wpFZ.JsonKeyValue("Silver", String(wpImpulseCounter.counterSilver)) + "," +
 				wpFZ.JsonKeyValue("Red", String(wpImpulseCounter.counterRed)) +
-
+				"},";
+		}
+		if(wpModules.useModuleUnderfloor1) {
+			message += "\"Underfloor1\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpUnderfloor1.Pin])) +
+				"},";
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			message += "\"Underfloor2\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpUnderfloor2.Pin])) +
+				"},";
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			message += "\"Underfloor3\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpUnderfloor3.Pin])) +
+				"},";
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			message += "\"Underfloor4\":{" +
+				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpUnderfloor4.Pin])) +
 				"},";
 		}
 		message += "\"Debug\":{" +
@@ -331,6 +350,18 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleImpulseCounter) {
 			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor1) {
+			message += "," + wpFZ.JsonKeyValue("Underfloor1", wpUnderfloor1.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			message += "," + wpFZ.JsonKeyValue("Underfloor2", wpUnderfloor2.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			message += "," + wpFZ.JsonKeyValue("Underfloor3", wpUnderfloor3.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			message += "," + wpFZ.JsonKeyValue("Underfloor4", wpUnderfloor4.Debug() ? "true" : "false");
 		}
 		message += "},\"SendRest\":{" +
 			wpFZ.JsonKeyValue("WiFi", wpWiFi.sendRest ? "true" : "false");
@@ -393,7 +424,11 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + "," +
 			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.useModuleImpulseCounter ? "true" : "false") +
+			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.useModuleImpulseCounter ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Underfloor1", wpModules.useModuleUnderfloor1 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Underfloor2", wpModules.useModuleUnderfloor2 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Underfloor3", wpModules.useModuleUnderfloor3 ? "true" : "false") + "," +
+			wpFZ.JsonKeyValue("Underfloor4", wpModules.useModuleUnderfloor4 ? "true" : "false") +
 			"}}}";
 		request->send(200, "application/json", message.c_str());
 	});
@@ -472,6 +507,22 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Module")->value() == "useImpulseCounter") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useImpulseCounter");
 				wpWebServer.setModuleChange(wpWebServer.cmdmoduleImpulseCounter);
+			}
+			if(request->getParam("Module")->value() == "useUnderfloor1") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useUnderfloor1");
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor1);
+			}
+			if(request->getParam("Module")->value() == "useUnderfloor2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useUnderfloor2");
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor2);
+			}
+			if(request->getParam("Module")->value() == "useUnderfloor3") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useUnderfloor3");
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor3);
+			}
+			if(request->getParam("Module")->value() == "useUnderfloor4") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useUnderfloor4");
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor4);
 			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -652,6 +703,22 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam("Debug")->value() == "DebugImpulseCounter") {
 				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugImpulseCounter");
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugImpulseCounter);
+			}
+			if(request->getParam("Debug")->value() == "DebugUnderfloor1") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugUnderfloor1");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor1);
+			}
+			if(request->getParam("Debug")->value() == "DebugUnderfloor2") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugUnderfloor2");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor2);
+			}
+			if(request->getParam("Debug")->value() == "DebugUnderfloor3") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugUnderfloor3");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor3);
+			}
+			if(request->getParam("Debug")->value() == "DebugUnderfloor4") {
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugUnderfloor4");
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor4);
 			}
 		}
 		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
@@ -936,6 +1003,46 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 	}
+	if(wpModules.useModuleUnderfloor1) {
+		webServer.on("/setTopicTempUnderfloor1", HTTP_GET, [](AsyncWebServerRequest *request) {
+			String topic = "_";
+			if(request->hasParam("topic")) {
+				topic = request->getParam("topic")->value();
+			}
+			request->send_P(200, "application/json", wpUnderfloor1.SetTopicTemp(topic).c_str());
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor2) {
+		webServer.on("/setTopicTempUnderfloor2", HTTP_GET, [](AsyncWebServerRequest *request) {
+			String topic = "_";
+			if(request->hasParam("topic")) {
+				topic = request->getParam("topic")->value();
+			}
+			request->send_P(200, "application/json", wpUnderfloor2.SetTopicTemp(topic).c_str());
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor3) {
+		webServer.on("/setTopicTempUnderfloor3", HTTP_GET, [](AsyncWebServerRequest *request) {
+			String topic = "_";
+			if(request->hasParam("topic")) {
+				topic = request->getParam("topic")->value();
+			}
+			request->send_P(200, "application/json", wpUnderfloor3.SetTopicTemp(topic).c_str());
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor4) {
+		webServer.on("/setTopicTempUnderfloor4", HTTP_GET, [](AsyncWebServerRequest *request) {
+			String topic = "_";
+			if(request->hasParam("topic")) {
+				topic = request->getParam("topic")->value();
+			}
+			request->send_P(200, "application/json", wpUnderfloor4.SetTopicTemp(topic).c_str());
+			wpWebServer.setBlink();
+		});
+	}
 	webServer.begin();
 }
 
@@ -1018,6 +1125,10 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleMoisture) wpModules.changeModuleMoisture(!wpModules.useModuleMoisture);
 		if(doModuleChange == cmdModuleDistance) wpModules.changeModuleDistance(!wpModules.useModuleDistance);
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
+		if(doModuleChange == cmdmoduleUnderfloor1) wpModules.changemoduleUnderfloor1(!wpModules.useModuleUnderfloor1);
+		if(doModuleChange == cmdmoduleUnderfloor2) wpModules.changemoduleUnderfloor2(!wpModules.useModuleUnderfloor2);
+		if(doModuleChange == cmdmoduleUnderfloor3) wpModules.changemoduleUnderfloor3(!wpModules.useModuleUnderfloor3);
+		if(doModuleChange == cmdmoduleUnderfloor4) wpModules.changemoduleUnderfloor4(!wpModules.useModuleUnderfloor4);
 		doModuleChange = cmdDoNothing;
 	}
 }
@@ -1067,6 +1178,10 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor1) wpUnderfloor1.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor2) wpUnderfloor2.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor3) wpUnderfloor3.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor4) wpUnderfloor4.changeDebug();
 		doDebugChange = cmdDoNothing;
 	}
 }
@@ -1133,7 +1248,11 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
 			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
 			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
-			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter);
+			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter) +
+			wpWebServer.getchangeModule("useUnderfloor1", "wpUnderfloor1", wpModules.useModuleUnderfloor1) +
+			wpWebServer.getchangeModule("useUnderfloor2", "wpUnderfloor2", wpModules.useModuleUnderfloor2) +
+			wpWebServer.getchangeModule("useUnderfloor3", "wpUnderfloor3", wpModules.useModuleUnderfloor3) +
+			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4);
 		return returns += "</ul>";
 	}
 //###################################################################################
@@ -1198,6 +1317,18 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleImpulseCounter) {
 			returns += wpWebServer.getChangeDebug("DebugImpulseCounter", "ImpulseCounter", wpImpulseCounter.Debug());
+		}
+		if(wpModules.useModuleUnderfloor1) {
+			returns += wpWebServer.getChangeDebug("DebugUnderfloor1", "Underfloor1", wpUnderfloor1.Debug());
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			returns += wpWebServer.getChangeDebug("DebugUnderfloor2", "Underfloor2", wpUnderfloor2.Debug());
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			returns += wpWebServer.getChangeDebug("DebugUnderfloor3", "Underfloor3", wpUnderfloor3.Debug());
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			returns += wpWebServer.getChangeDebug("DebugUnderfloor4", "Underfloor4", wpUnderfloor4.Debug());
 		}
 		return returns += "</ul>";
 	}

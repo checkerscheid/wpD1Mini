@@ -56,6 +56,15 @@ void helperEEPROM::readStringsFromEEPROM() {
 	wpBM.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = byteStartForString + 1 + wpBM.lightToTurnOn.length();
 	wpWindow.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpWindow.lightToTurnOn);
+
+	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTemp.length();
+	wpUnderfloor1.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor2.mqttTopicTemp.length();
+	wpUnderfloor2.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTemp.length();
+	wpUnderfloor3.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor4.mqttTopicTemp.length();
+	wpUnderfloor4.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
@@ -64,6 +73,10 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
 void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
@@ -170,6 +183,10 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
 	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
+	wpModules.useModuleUnderfloor1 = bitRead(bitsModules2, bitUseUnderfloor1);
+	wpModules.useModuleUnderfloor2 = bitRead(bitsModules2, bitUseUnderfloor2);
+	wpModules.useModuleUnderfloor3 = bitRead(bitsModules2, bitUseUnderfloor3);
+	wpModules.useModuleUnderfloor4 = bitRead(bitsModules2, bitUseUnderfloor4);
 
 //###################################################################################
 
@@ -213,6 +230,7 @@ void helperEEPROM::readVars() {
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
 	bitsDebugModules1 = EEPROM.read(addrBitsDebugModules1);
+	bitsDebugModules2 = EEPROM.read(addrBitsDebugModules2);
 	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
 	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
@@ -228,11 +246,16 @@ void helperEEPROM::readVars() {
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
 	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
 	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
+	wpUnderfloor1.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor1));
+	wpUnderfloor2.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor2));
+	wpUnderfloor3.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor3));
+	wpUnderfloor4.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor4));
 
 //###################################################################################
 
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
 	bitsSettingsModules1 = EEPROM.read(addrBitsSettingsModules1);
+	bitsSettingsModules2 = EEPROM.read(addrBitsSettingsModules2);
 	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
 	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
 	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
@@ -243,6 +266,15 @@ void helperEEPROM::readVars() {
 	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg));
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
+	wpUnderfloor1.handSet = bitRead(bitsSettingsModules2, bitUnderfloor1Hand);
+	wpUnderfloor2.handSet = bitRead(bitsSettingsModules2, bitUnderfloor2Hand);
+	wpUnderfloor3.handSet = bitRead(bitsSettingsModules2, bitUnderfloor3Hand);
+	wpUnderfloor4.handSet = bitRead(bitsSettingsModules2, bitUnderfloor4Hand);
+	wpUnderfloor1.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor1HandValue);
+	wpUnderfloor2.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor2HandValue);
+	wpUnderfloor3.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor3HandValue);
+	wpUnderfloor4.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor4HandValue);
+
 
 //###################################################################################
 /// byte values: byte 20 - 49
