@@ -17,9 +17,19 @@
 
 helperEEPROM wpEEPROM;
 
-helperEEPROM::helperEEPROM() {}
-void helperEEPROM::init() {
+helperEEPROM::helperEEPROM() {
 	EEPROM.begin(4095);
+	if(false) {
+		EEPROM.write(addrBitsModules0, 0);
+		EEPROM.write(addrBitsModules1, 0);
+		EEPROM.write(addrBitsModules2, 0);
+		EEPROM.write(addrBitsSendRestModules0, 0);
+		EEPROM.write(addrBitsSendRestModules1, 0);
+		EEPROM.write(addrBitsSendRestModules2, 0);
+		EEPROM.commit();
+	}
+}
+void helperEEPROM::init() {
 	readVars();
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/EEPROM";
 }

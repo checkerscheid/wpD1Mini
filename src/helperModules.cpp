@@ -563,8 +563,8 @@ void helperModules::changemoduleImpulseCounter(bool newValue) {
 void helperModules::changemoduleUnderfloor1(bool newValue) {
 	if(useModuleUnderfloor1 != newValue) {
 		useModuleUnderfloor1 = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseUnderfloor1, useModuleUnderfloor1);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor1, useModuleUnderfloor1);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor1", useModuleUnderfloor1);
@@ -574,8 +574,8 @@ void helperModules::changemoduleUnderfloor1(bool newValue) {
 void helperModules::changemoduleUnderfloor2(bool newValue) {
 	if(useModuleUnderfloor2 != newValue) {
 		useModuleUnderfloor2 = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseUnderfloor2, useModuleUnderfloor2);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor2, useModuleUnderfloor2);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor2", useModuleUnderfloor2);
@@ -585,8 +585,8 @@ void helperModules::changemoduleUnderfloor2(bool newValue) {
 void helperModules::changemoduleUnderfloor3(bool newValue) {
 	if(useModuleUnderfloor3 != newValue) {
 		useModuleUnderfloor3 = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseUnderfloor3, useModuleUnderfloor3);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor3, useModuleUnderfloor3);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor3", useModuleUnderfloor3);
@@ -596,8 +596,8 @@ void helperModules::changemoduleUnderfloor3(bool newValue) {
 void helperModules::changemoduleUnderfloor4(bool newValue) {
 	if(useModuleUnderfloor4 != newValue) {
 		useModuleUnderfloor4 = newValue;
-		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseUnderfloor4, useModuleUnderfloor4);
-		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor4, useModuleUnderfloor4);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor4", useModuleUnderfloor4);
