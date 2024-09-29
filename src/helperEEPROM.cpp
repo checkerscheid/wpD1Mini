@@ -40,9 +40,7 @@ uint16 helperEEPROM::getVersion() {
 
 void helperEEPROM::changeDebug() {
 	Debug = !Debug;
-	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
-	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
-	EEPROM.commit();
+	saveBool(addrBitsDebugBasis0, bitsDebugBasis0, bitDebugEEPROM, Debug);
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
 	wpFZ.blink();
 }
@@ -66,8 +64,8 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
 }
 
-void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
-	bitWrite(by, bi, v);
+void helperEEPROM::saveBool(uint16 addr, byte by, uint8 bi, bool v) {
+	bitWrite(by, bi, !v);
 	EEPROM.write(addr, by);
 	EEPROM.commit();
 }
@@ -102,9 +100,7 @@ void helperEEPROM::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugEEPROM, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-			EEPROM.commit();
+			saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugEEPROM, Debug);
 			wpFZ.SendWSDebug("DebugEEPROM", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
@@ -153,96 +149,96 @@ void helperEEPROM::readVars() {
 	bitsModules1 = EEPROM.read(addrBitsModules1);
 	bitsModules2 = EEPROM.read(addrBitsModules2);
 
-	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
-	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
-	wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
-	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight);
-	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM);
-	wpModules.useModuleWindow = bitRead(bitsModules1, bitUseWindow);
-	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);
-	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
-	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
-	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
-	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais);
-	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield);
-	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
-	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
-	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
-	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
-	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
+	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11) == false;
+	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22) == false;
+	wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR) == false;
+	wpModules.useModuleLight = bitRead(bitsModules0, bitUseLight) == false;
+	wpModules.useModuleBM = bitRead(bitsModules0, bitUseBM) == false;
+	wpModules.useModuleWindow = bitRead(bitsModules1, bitUseWindow) == false;
+	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw) == false;
+	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut) == false;
+	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2) == false;
+	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel) == false;
+	wpModules.useModuleRelais = bitRead(bitsModules0, bitUseRelais) == false;
+	wpModules.useModuleRelaisShield = bitRead(bitsModules0, bitUseRelaisShield) == false;
+	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm) == false;
+	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain) == false;
+	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture) == false;
+	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance) == false;
+	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter) == false;
 
 //###################################################################################
 
 	bitsSendRestBasis0 = EEPROM.read(addrBitsSendRestBasis0);
-	wpWiFi.sendRest = bitRead(bitSendRestRssi, bitsSendRestBasis0);
+	wpWiFi.sendRest = !bitRead(bitSendRestRssi, bitsSendRestBasis0);
 
 //###################################################################################
 
 	bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
 	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
-	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
-	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder);
-	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
-	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt);
-	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler);
-	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
-	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate);
-	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
-	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
+	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM) == false;
+	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder) == false;
+	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules) == false;
+	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt) == false;
+	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler) == false;
+	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest) == false;
+	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate) == false;
+	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer) == false;
+	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi) == false;
 
 //###################################################################################
 
 	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
 	bitsSendRestModules1 = EEPROM.read(addrBitsSendRestModules1);
-	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
-	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
-	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
-	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
-	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
-	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
-	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2));
-	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel));
-	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
-	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm));
-	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
-	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
-	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
-	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter));
+	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT) == false);
+	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR) == false);
+	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight) == false);
+	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM) == false);
+	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow) == false);
+	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut) == false);
+	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2) == false);
+	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel) == false);
+	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais) == false);
+	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm) == false);
+	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain) == false);
+	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture) == false);
+	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance) == false);
+	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter) == false);
 
 //###################################################################################
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
 	bitsDebugModules1 = EEPROM.read(addrBitsDebugModules1);
-	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
-	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
-	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
-	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
-	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
-	wpCwWw.Debug(bitRead(bitsDebugModules1, bitDebugCwWw));
-	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
-	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
-	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));
-	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
-	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
-	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
-	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
-	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance));
-	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
+	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT) == false);
+	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR) == false);
+	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight) == false);
+	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM) == false);
+	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow) == false);
+	wpCwWw.Debug(bitRead(bitsDebugModules1, bitDebugCwWw) == false);
+	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut) == false);
+	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2) == false);
+	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel) == false);
+	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais) == false);
+	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm) == false);
+	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain) == false);
+	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture) == false);
+	wpDistance.Debug(bitRead(bitsDebugModules0, bitDebugDistance) == false);
+	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter) == false);
 
 //###################################################################################
 
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
 	bitsSettingsModules1 = EEPROM.read(addrBitsSettingsModules1);
-	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
-	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
-	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
-	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
-	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
-	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue);
-	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty);
-	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg));
-	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
-	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
+	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg) == false);
+	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg) == false);
+	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand) == false;
+	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand) == false;
+	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand) == false;
+	wpRelais.handValueSet = bitRead(bitsSettingsModules0, bitRelaisHandValue) == false;
+	wpRelais.waterEmptySet = bitRead(bitsSettingsModules0, bitRelaisWaterEmpty) == false;
+	wpRain.UseAvg(bitRead(bitsSettingsModules0, bitUseRainAvg) == false);
+	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg) == false);
+	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB) == false);
 
 //###################################################################################
 /// byte values: byte 20 - 49

@@ -418,9 +418,7 @@ bool moduleNeoPixel::GetRGB() {
 }
 void moduleNeoPixel::SetRGB(bool rgb) {
 	isRGB = rgb;
-	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
-	EEPROM.write(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1);
-	EEPROM.commit();
+	wpEEPROM.saveBool(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
 	if(isRGB) {
 		strip->updateType(NEO_RGB + NEO_KHZ800);
 	} else {
