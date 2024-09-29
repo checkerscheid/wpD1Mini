@@ -148,6 +148,15 @@ void helperEEPROM::readVars() {
 	bitsModules0 = EEPROM.read(addrBitsModules0);
 	bitsModules1 = EEPROM.read(addrBitsModules1);
 	bitsModules2 = EEPROM.read(addrBitsModules2);
+	if(bitsModules0 == 255 && bitsModules1 == 255 && bitsModules2 == 255) {
+		// first boot
+		EEPROM.write(bitsModules0, 0);
+		EEPROM.write(bitsModules1, 0);
+		EEPROM.write(bitsModules2, 0);
+		bitsModules0 = 0;
+		bitsModules1 = 0;
+		bitsModules2 = 0;
+	}
 
 	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11) == false;
 	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22) == false;
