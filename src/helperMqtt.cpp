@@ -62,9 +62,7 @@ uint16 helperMqtt::getVersion() {
 
 void helperMqtt::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	EEPROM.commit();
+	wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
 	wpFZ.SendWSDebug("DebugMqtt", Debug);
 	wpFZ.blink();
 }
@@ -158,9 +156,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			bool readDebug = msg.toInt();
 			if(wpMqtt.Debug != readDebug) {
 				wpMqtt.Debug = readDebug;
-				bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
-				EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-				EEPROM.commit();
+				wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
 				wpFZ.SendWSDebug("DebugMqtt", wpMqtt.Debug);
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebug, String(wpMqtt.Debug));
 			}

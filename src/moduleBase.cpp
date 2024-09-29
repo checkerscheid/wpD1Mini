@@ -165,21 +165,15 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 }
 
 void moduleBase::writeEEPROMsendRest() {
-	bitWrite(_byteSendRest, _bitSendRest, sendRest);
-	EEPROM.write(_addrSendRest, _byteSendRest);
-	EEPROM.commit();
+	wpEEPROM.saveBool(_addrSendRest, _byteSendRest, _bitSendRest, sendRest);
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " sendRest: " + String(sendRest));
 }
 void moduleBase::writeEEPROMuseAvg() {
-	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
-	EEPROM.write(_addrUseAvg, _byteUseAvg);
-	EEPROM.commit();
+	wpEEPROM.saveBool(_addrUseAvg, _byteUseAvg, _bitUseAvg, useAvg);
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " useAvg: " + String(useAvg));
 }
 void moduleBase::writeEEPROMdebug() {
-	bitWrite(_byteDebug, _bitDebug, debug);
-	EEPROM.write(_addrDebug, _byteDebug);
-	EEPROM.commit();
+	wpEEPROM.saveBool(_addrDebug, _byteDebug, _bitDebug, debug);
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " debug: " + String(debug));
 }
 void moduleBase::writeEEPROMCalcCycle() {
