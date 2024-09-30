@@ -205,7 +205,7 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
-		void saveBool(uint16 addr, byte by, uint8 bi, bool v);
+		void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
 
 		void publishSettings();
 		void publishSettings(bool force);

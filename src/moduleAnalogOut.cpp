@@ -175,7 +175,9 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		if(handSet != readSetHand) {
 			resetPID();
 			handSet = readSetHand;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitAnalogOutHand, handSet);
+			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitAnalogOutHand, handSet);
+			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
+			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
 	}
