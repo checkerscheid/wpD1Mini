@@ -40,11 +40,13 @@ class moduleUnderfloor {
 		String mqttTopicErrorHand;
 		// settings
 		String mqttTopicSetPoint;
-		String mqttTopicTempURL = "_";
+		String mqttTopicTempUrl;
+		String mqttTopicTemp = "_";
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
-		String mqttTopicSetTempURL;
+		String mqttTopicSetSetPoint;
+		String mqttTopicSetTempUrl;
 
 		// section to copy
 		void init();
@@ -60,7 +62,7 @@ class moduleUnderfloor {
 		void changeDebug();
 		void InitSetPoint(uint8 setpoint);
 		void SetSetPoint(uint8 setpoint);
-		String SetTopicTempURL(String topic);
+		String SetTopicTempUrl(String topic);
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -76,6 +78,8 @@ class moduleUnderfloor {
 		unsigned long publishHandErrorLast;
 		uint8 setPointLast;
 		unsigned long publishSetPointLast;
+		String tempUrlLast;
+		unsigned long publishTempUrlLast;
 
 		void publishValue();
 		void calc();

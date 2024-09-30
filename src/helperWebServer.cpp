@@ -1005,7 +1005,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor1.SetTopicTempURL(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor1.SetTopicTempUrl(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1015,7 +1015,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor2.SetTopicTempURL(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor2.SetTopicTempUrl(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1025,7 +1025,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor3.SetTopicTempURL(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor3.SetTopicTempUrl(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1035,7 +1035,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor4.SetTopicTempURL(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor4.SetTopicTempUrl(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1248,8 +1248,9 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule("useUnderfloor1", "wpUnderfloor1", wpModules.useModuleUnderfloor1) +
 			wpWebServer.getchangeModule("useUnderfloor2", "wpUnderfloor2", wpModules.useModuleUnderfloor2) +
 			wpWebServer.getchangeModule("useUnderfloor3", "wpUnderfloor3", wpModules.useModuleUnderfloor3) +
-			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4);
-		return returns += "</ul>";
+			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4) +
+			"</ul>";
+		return returns;
 	}
 //###################################################################################
 	if(var == "Debug") {

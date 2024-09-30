@@ -65,13 +65,13 @@ void helperEEPROM::readStringsFromEEPROM() {
 	byteStartForString = byteStartForString + 1 + wpBM.lightToTurnOn.length();
 	wpWindow.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpWindow.lightToTurnOn);
 	byteStartForString = byteStartForString + 1 + wpWindow.lightToTurnOn.length();
-	wpUnderfloor1.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTempURL);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTempURL.length();
-	wpUnderfloor2.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTempURL);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor2.mqttTopicTempURL.length();
-	wpUnderfloor3.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTempURL);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTempURL.length();
-	wpUnderfloor4.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTempURL);
+	wpUnderfloor1.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTemp.length();
+	wpUnderfloor2.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor2.mqttTopicTemp.length();
+	wpUnderfloor3.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTemp.length();
+	wpUnderfloor4.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
@@ -80,10 +80,10 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTempURL);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTempURL);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTempURL);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTempURL);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
 void helperEEPROM::saveBool(uint16 addr, byte &by, uint8 bi, bool v) {
