@@ -22,8 +22,7 @@ moduleUnderfloor wpUnderfloor4(4);
 
 moduleUnderfloor::moduleUnderfloor(uint8 no) {
 	// section to config and copy
-	valve = no;
-	ModuleName = "Underfloor" + String(valve);
+	ModuleName = "Underfloor" + String(no);
 	mb = new moduleBase(ModuleName);
 	switch(no) {
 		case 1:
@@ -31,24 +30,28 @@ moduleUnderfloor::moduleUnderfloor(uint8 no) {
 			bitDebug = wpEEPROM.bitDebugUnderfloor1;
 			bitHand = wpEEPROM.bitUnderfloor1Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor1HandValue;
+			byteSetpoint = wpEEPROM.byteUnderfloor1Setpoint;
 			break;
 		case 2:
 			Pin = D2;
 			bitDebug = wpEEPROM.bitDebugUnderfloor2;
 			bitHand = wpEEPROM.bitUnderfloor2Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor2HandValue;
+			byteSetpoint = wpEEPROM.byteUnderfloor2Setpoint;
 			break;
 		case 3:
 			Pin = D6;
 			bitDebug = wpEEPROM.bitDebugUnderfloor3;
 			bitHand = wpEEPROM.bitUnderfloor3Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor3HandValue;
+			byteSetpoint = wpEEPROM.byteUnderfloor3Setpoint;
 			break;
 		case 4:
 			Pin = D7;
 			bitDebug = wpEEPROM.bitDebugUnderfloor4;
 			bitHand = wpEEPROM.bitUnderfloor4Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor4HandValue;
+			byteSetpoint = wpEEPROM.byteUnderfloor4Setpoint;
 			break;
 	}
 }
@@ -69,6 +72,7 @@ void moduleUnderfloor::init() {
 	// commands
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
+	mqttTopicSetTempURL = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetTempURL";
 
 	outputLast = false;
 	publishOutputLast = 0;
@@ -103,6 +107,7 @@ void moduleUnderfloor::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
+		//wpMqtt.mqttClient.publish(mqttTopicSetTempURL.c_str(), mqttTopicTempURL.c_str());
 	}
 	mb->publishSettings(force);
 }
@@ -116,7 +121,6 @@ void moduleUnderfloor::publishValues(bool force) {
 		publishAutoValueLast = 0;
 		publishHandValueLast = 0;
 		publishHandErrorLast = 0;
-		publishSetPointLast = 0;
 	}
 	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
@@ -145,21 +149,18 @@ void moduleUnderfloor::publishValues(bool force) {
 		}
 		publishHandErrorLast = wpFZ.loopStartedAt;
 	}
-	if(setPointLast != setPoint || wpFZ.CheckQoS(publishSetPointLast)) {
-		setPointLast = setPoint;
-		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10).c_str());
-		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug(ModuleName + " setPoint", String(setPoint / 10));
-		}
-		publishSetPointLast = wpFZ.loopStartedAt;
-	}
 	mb->publishValues(force);
 }
 
 void moduleUnderfloor::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetPoint.c_str());
+	if(mqttTopicTempURL != "_") {
+		wpFZ.DebugWS(wpFZ.strDEBUG, "setSubscribes", ModuleName + " subscribe: " + mqttTopicTempURL);
+		wpMqtt.mqttClient.subscribe(mqttTopicTempURL.c_str());
+	}
+	wpMqtt.mqttClient.subscribe(mqttTopicSetTempURL.c_str());
 	mb->setSubscribes();
 }
 
@@ -181,9 +182,20 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
-	if(strcmp(topic, mqttTopicTemp.c_str()) == 0) {
+	if(strcmp(topic, mqttTopicSetPoint.c_str()) == 0) {
+		uint8 readSetPoint = (uint8)(msg.toDouble() * 10);
+		if(setPoint != readSetPoint) {
+			SetSetPoint(readSetPoint);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetPoint, String(readSetPoint));
+		}
+	}
+	if(strcmp(topic, mqttTopicTempURL.c_str()) == 0) {
 		temp = (uint8)msg.toDouble() * 10;
-		wpFZ.DebugcheckSubscribes(mqttTopicTemp, String(temp));
+		wpFZ.DebugcheckSubscribes(mqttTopicTempURL, String(temp));
+	}
+	if(strcmp(topic, mqttTopicSetTempURL.c_str()) == 0) {
+		SetTopicTempURL(msg);
+		wpFZ.DebugcheckSubscribes(mqttTopicSetTempURL, String(mqttTopicTempURL));
 	}
 	mb->checkSubscribes(topic, msg);
 }
@@ -192,12 +204,21 @@ void moduleUnderfloor::SetHandValueSet(bool val) {
 	bitWrite(wpEEPROM.bitsSettingsModules2, bitHandValue, handValueSet);
 	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
 	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'module" + ModuleName + "::handValueSet' = " + String(handValueSet));
+	wpFZ.DebugWS(wpFZ.strINFO, "SetHandValueSet", "save to EEPROM: 'module" + ModuleName + "::handValueSet' = " + String(handValueSet));
 }
-String moduleUnderfloor::SetTopicTemp(String topic) {
-	mqttTopicTemp = topic;
+void moduleUnderfloor::InitSetPoint(uint8 setpoint) {
+	setPoint = setpoint;
+}
+void moduleUnderfloor::SetSetPoint(uint8 setpoint) {
+	setPoint = setpoint;
+	EEPROM.write(byteSetpoint, setPoint);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint", "save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPoint));
+}
+String moduleUnderfloor::SetTopicTempURL(String topic) {
+	mqttTopicTempURL = topic;
 	wpEEPROM.writeStringsToEEPROM();
-	wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicTempURL.c_str());
 	return "{\"erg\":\"S_OK\"}";
 }
 

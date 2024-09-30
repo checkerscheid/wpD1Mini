@@ -188,6 +188,7 @@ class helperEEPROM {
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
 
+
 //###################################################################################
 /// byte values: 2byte 50 - 79
 		const uint16 byteLightCorrection = 50; // int
@@ -209,6 +210,12 @@ class helperEEPROM {
 /// byte values: 4byte 80 - 99
 
 		const uint16 byteImpulseCounterKWh = 80;
+// kein Platz mehr gehabt...
+		const uint16 byteUnderfloor1Setpoint = 90;
+		const uint16 byteUnderfloor2Setpoint = 91;
+		const uint16 byteUnderfloor3Setpoint = 92;
+		const uint16 byteUnderfloor4Setpoint = 93;
+// **********
 
 		uint16 byteStartForString;
 
@@ -221,7 +228,7 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
-		void saveBool(uint16 addr, byte by, uint8 bi, bool v);
+		void saveBool(uint16 addr, byte &by, uint8 bi, bool v);
 
 		void publishSettings();
 		void publishSettings(bool force);

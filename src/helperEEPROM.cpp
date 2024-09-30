@@ -64,15 +64,14 @@ void helperEEPROM::readStringsFromEEPROM() {
 	wpBM.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = byteStartForString + 1 + wpBM.lightToTurnOn.length();
 	wpWindow.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpWindow.lightToTurnOn);
-
-	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTemp.length();
-	wpUnderfloor1.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor2.mqttTopicTemp.length();
-	wpUnderfloor2.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTemp.length();
-	wpUnderfloor3.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
-	byteStartForString = byteStartForString + 1 + wpUnderfloor4.mqttTopicTemp.length();
-	wpUnderfloor4.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpWindow.lightToTurnOn.length();
+	wpUnderfloor1.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTempURL);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTempURL.length();
+	wpUnderfloor2.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTempURL);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor2.mqttTopicTempURL.length();
+	wpUnderfloor3.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTempURL);
+	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTempURL.length();
+	wpUnderfloor4.mqttTopicTempURL = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTempURL);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
@@ -81,14 +80,14 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTempURL);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTempURL);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTempURL);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTempURL);
 }
 
-void helperEEPROM::saveBool(uint16 addr, byte by, uint8 bi, bool v) {
-	bitWrite(by, bi, !v);
+void helperEEPROM::saveBool(uint16 addr, byte &by, uint8 bi, bool v) {
+	bitWrite(by, bi, v);
 	EEPROM.write(addr, by);
 	EEPROM.commit();
 }
@@ -206,40 +205,40 @@ void helperEEPROM::readVars() {
 //###################################################################################
 
 	bitsSendRestBasis0 = EEPROM.read(addrBitsSendRestBasis0);
-	wpWiFi.sendRest = !bitRead(bitSendRestRssi, bitsSendRestBasis0);
+	wpWiFi.sendRest = bitRead(bitSendRestRssi, bitsSendRestBasis0);
 
 //###################################################################################
 
 	bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
 	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
-	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM) == false;
-	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder) == false;
-	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules) == false;
-	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt) == false;
-	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler) == false;
-	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest) == false;
-	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate) == false;
-	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer) == false;
-	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi) == false;
+	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
+	wpFinder.Debug = bitRead(bitsDebugBasis0, bitDebugFinder);
+	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
+	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt);
+	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler);
+	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
+	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate);
+	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
+	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
 
 //###################################################################################
 
 	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
 	bitsSendRestModules1 = EEPROM.read(addrBitsSendRestModules1);
-	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT) == false);
-	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR) == false);
-	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight) == false);
-	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM) == false);
-	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow) == false);
-	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut) == false);
-	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2) == false);
-	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel) == false);
-	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais) == false);
-	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm) == false);
-	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain) == false);
-	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture) == false);
-	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance) == false);
-	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter) == false);
+	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
+	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
+	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
+	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
+	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
+	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
+	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2));
+	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel));
+	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
+	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm));
+	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
+	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
+	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
+	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter));
 
 //###################################################################################
 
@@ -317,6 +316,10 @@ void helperEEPROM::readVars() {
 	wpDistance.height = EEPROM.read(byteHeight);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
 	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
+	wpUnderfloor1.InitSetPoint(EEPROM.read(byteUnderfloor1Setpoint));
+	wpUnderfloor2.InitSetPoint(EEPROM.read(byteUnderfloor2Setpoint));
+	wpUnderfloor3.InitSetPoint(EEPROM.read(byteUnderfloor3Setpoint));
+	wpUnderfloor4.InitSetPoint(EEPROM.read(byteUnderfloor4Setpoint));
 
 //###################################################################################
 /// byte values: 2byte 50 - 79

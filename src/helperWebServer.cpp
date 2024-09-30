@@ -1005,7 +1005,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor1.SetTopicTemp(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor1.SetTopicTempURL(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1015,7 +1015,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor2.SetTopicTemp(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor2.SetTopicTempURL(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1025,7 +1025,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor3.SetTopicTemp(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor3.SetTopicTempURL(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}
@@ -1035,7 +1035,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam("topic")) {
 				topic = request->getParam("topic")->value();
 			}
-			request->send_P(200, "application/json", wpUnderfloor4.SetTopicTemp(topic).c_str());
+			request->send_P(200, "application/json", wpUnderfloor4.SetTopicTempURL(topic).c_str());
 			wpWebServer.setBlink();
 		});
 	}

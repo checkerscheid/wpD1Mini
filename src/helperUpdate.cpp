@@ -202,7 +202,7 @@ void helperUpdate::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void helperUpdate::doCheckUpdate() {
 	unsigned long m = millis();
-	if((lastUpdateCheck == 0 && m > 2000) || m > lastUpdateCheck + twelveHours) {
+	if((lastUpdateCheck == 0 && m > 60000) || m > lastUpdateCheck + twelveHours) {
 		check();
 	}
 }

@@ -58,9 +58,6 @@ class helperWiFi {
 		bool sendRestLast;
 		unsigned long publishSendRestLast;
 		unsigned long publishRssiLast;
-		uint16 addrSendRest;
-		byte byteSendRest;
-		uint8 bitSendRest;
 		String printEncryptionType(int thisType);
 };
 extern helperWiFi wpWiFi;

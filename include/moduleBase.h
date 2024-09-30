@@ -32,9 +32,9 @@ class moduleBase {
 		String mqttTopicDebug;
 		String mqttTopicError;
 		String mqttTopicCalcCycle;
-		void initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest);
-		void initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg);
-		void initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug);
+		void initRest(uint16 addrSendRest, byte& byteSendRest, uint8 bitSendRest);
+		void initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg);
+		void initDebug(uint16 addrDebug, byte& byteDebug, uint8 bitDebug);
 		void initError();
 		void initCalcCycle(uint16 addrCalcCycle);
 		void changeSendRest();

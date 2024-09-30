@@ -30,21 +30,21 @@ moduleBase::moduleBase(String moduleName) {
 	_useCalcCycle = false;
 	_useError = false;
 }
-void moduleBase::initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest) {
+void moduleBase::initRest(uint16 addrSendRest, byte& byteSendRest, uint8 bitSendRest) {
 	_useSendRest = true;
 	_addrSendRest = addrSendRest;
 	_byteSendRest = byteSendRest;
 	_bitSendRest = bitSendRest;
 	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + _name;
 }
-void moduleBase::initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg) {
+void moduleBase::initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg) {
 	_useUseAvg = true;
 	_addrUseAvg = addrUseAvg;
 	_byteUseAvg = byteUseAvg;
 	_bitUseAvg = bitUseAvg;
 	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + _name + "/useAvg";
 }
-void moduleBase::initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug) {
+void moduleBase::initDebug(uint16 addrDebug, byte& byteDebug, uint8 bitDebug) {
 	_addrDebug = addrDebug;
 	_byteDebug = byteDebug;
 	_bitDebug = bitDebug;

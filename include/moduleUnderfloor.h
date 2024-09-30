@@ -32,7 +32,6 @@ class moduleUnderfloor {
 		bool handError;
 		bool handSet = false;
 		bool handValueSet = false;
-		uint8 SetPoint = 190;
 
 		// values
 		String mqttTopicOut;
@@ -41,10 +40,11 @@ class moduleUnderfloor {
 		String mqttTopicErrorHand;
 		// settings
 		String mqttTopicSetPoint;
-		String mqttTopicTemp = "_";
+		String mqttTopicTempURL = "_";
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
+		String mqttTopicSetTempURL;
 
 		// section to copy
 		void init();
@@ -59,13 +59,13 @@ class moduleUnderfloor {
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
 		void InitSetPoint(uint8 setpoint);
-		String SetTopicTemp(String topic);
+		void SetSetPoint(uint8 setpoint);
+		String SetTopicTempURL(String topic);
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
 		void SetHandValueSet(bool val);
 	private:
-		uint8 valve;
 		bool outputLast;
 		unsigned long publishOutputLast;
 		bool autoValueLast;
@@ -88,6 +88,7 @@ class moduleUnderfloor {
 		uint8 bitDebug;
 		uint8 bitHand;
 		uint8 bitHandValue;
+		uint16 byteSetpoint;
 		uint8 setPoint;
 		uint8 temp;
 };

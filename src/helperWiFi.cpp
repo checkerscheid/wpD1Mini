@@ -19,9 +19,6 @@ helperWiFi wpWiFi;
 
 helperWiFi::helperWiFi() {}
 void helperWiFi::init() {
-	addrSendRest = wpEEPROM.addrBitsSendRestBasis0;
-	byteSendRest = wpEEPROM.bitsSendRestBasis0;
-	bitSendRest = wpEEPROM.bitSendRestRssi;
 	// values
 	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
 	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
@@ -60,7 +57,9 @@ uint16 helperWiFi::getVersion() {
 
 void helperWiFi::changeSendRest() {
 	sendRest = !sendRest;
-	wpEEPROM.saveBool(addrSendRest, byteSendRest, bitSendRest, sendRest);
+	wpEEPROM.saveBool(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+	wpFZ.SendWSSendRest("sendRestWiFi", sendRest);
+	wpFZ.DebugWS(wpFZ.strINFO, "WiFi::changeSendRest", "WiFi sendRest: " + sendRest ? "True" : "False");
 	wpFZ.blink();
 }
 void helperWiFi::changeDebug() {
@@ -182,7 +181,7 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readSendRest = msg.toInt();
 		if(sendRest != readSendRest) {
 			sendRest = readSendRest;
-			wpEEPROM.saveBool(addrSendRest, byteSendRest, bitSendRest, sendRest);
+			wpEEPROM.saveBool(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
 			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
 		}
 	}
