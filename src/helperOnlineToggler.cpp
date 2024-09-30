@@ -50,7 +50,9 @@ uint16 helperOnlineToggler::getVersion() {
 
 void helperOnlineToggler::changeDebug() {
 	Debug = !Debug;
-	wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
+	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
 	wpFZ.blink();
 }
@@ -102,7 +104,9 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
+			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

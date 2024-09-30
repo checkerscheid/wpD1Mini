@@ -40,7 +40,9 @@ uint16 helperFinder::getVersion() {
 
 void helperFinder::changeDebug() {
 	Debug = !Debug;
-	wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
+	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugFinder", Debug);
 	wpFZ.blink();
 }
@@ -74,7 +76,9 @@ void helperFinder::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
+			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugFinder", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

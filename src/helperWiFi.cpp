@@ -57,14 +57,18 @@ uint16 helperWiFi::getVersion() {
 
 void helperWiFi::changeSendRest() {
 	sendRest = !sendRest;
-	wpEEPROM.saveBool(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+	bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+	EEPROM.write(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0);
+	EEPROM.commit();
 	wpFZ.SendWSSendRest("sendRestWiFi", sendRest);
 	wpFZ.DebugWS(wpFZ.strINFO, "WiFi::changeSendRest", "WiFi sendRest: " + sendRest ? "True" : "False");
 	wpFZ.blink();
 }
 void helperWiFi::changeDebug() {
 	Debug = !Debug;
-	wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
+	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugWiFi", Debug);
 	wpFZ.blink();
 }
@@ -181,7 +185,9 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readSendRest = msg.toInt();
 		if(sendRest != readSendRest) {
 			sendRest = readSendRest;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+			bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsSendRestBasis0);
+			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
 		}
 	}
@@ -189,7 +195,9 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+			bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
+			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugWiFi", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

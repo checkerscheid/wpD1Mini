@@ -49,7 +49,9 @@ uint16 helperRest::getVersion() {
 
 void helperRest::changeDebug() {
 	Debug = !Debug;
-	wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugRest", Debug);
 	wpFZ.blink();
 }
@@ -151,7 +153,9 @@ void helperRest::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			wpEEPROM.saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugRest, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugRest", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

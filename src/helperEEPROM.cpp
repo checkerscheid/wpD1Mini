@@ -50,7 +50,9 @@ uint16 helperEEPROM::getVersion() {
 
 void helperEEPROM::changeDebug() {
 	Debug = !Debug;
-	saveBool(addrBitsDebugBasis0, bitsDebugBasis0, bitDebugEEPROM, Debug);
+	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
+	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
+	EEPROM.commit();
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
 	wpFZ.blink();
 }
@@ -86,7 +88,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
-void helperEEPROM::saveBool(uint16 addr, byte &by, uint8 bi, bool v) {
+void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
 	bitWrite(by, bi, v);
 	EEPROM.write(addr, by);
 	EEPROM.commit();
@@ -122,7 +124,9 @@ void helperEEPROM::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			saveBool(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugEEPROM, Debug);
+			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugEEPROM, Debug);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+			EEPROM.commit();
 			wpFZ.SendWSDebug("DebugEEPROM", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
@@ -170,15 +174,6 @@ void helperEEPROM::readVars() {
 	bitsModules0 = EEPROM.read(addrBitsModules0);
 	bitsModules1 = EEPROM.read(addrBitsModules1);
 	bitsModules2 = EEPROM.read(addrBitsModules2);
-	if(bitsModules0 == 255 && bitsModules1 == 255 && bitsModules2 == 255) {
-		// first boot
-		EEPROM.write(bitsModules0, 0);
-		EEPROM.write(bitsModules1, 0);
-		EEPROM.write(bitsModules2, 0);
-		bitsModules0 = 0;
-		bitsModules1 = 0;
-		bitsModules2 = 0;
-	}
 
 	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
 	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
@@ -288,7 +283,6 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor2HandValue);
 	wpUnderfloor3.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor3HandValue);
 	wpUnderfloor4.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor4HandValue);
-
 
 //###################################################################################
 /// byte values: byte 20 - 49
