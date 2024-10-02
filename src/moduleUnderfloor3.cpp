@@ -13,49 +13,17 @@
 //# File-ID      : $Id:: moduleAnalogOut2.cpp 198 2024-09-05 12:32:25Z            $ #
 //#                                                                                 #
 //###################################################################################
-#include <moduleUnderfloor.h>
+#include <moduleUnderfloor3.h>
 
-moduleUnderfloor wpUnderfloor1(1);
-moduleUnderfloor wpUnderfloor2(2);
-moduleUnderfloor wpUnderfloor3(3);
-moduleUnderfloor wpUnderfloor4(4);
+moduleUnderfloor3 wpUnderfloor3;
 
-moduleUnderfloor::moduleUnderfloor(uint8 no) {
+moduleUnderfloor3::moduleUnderfloor3() {
 	// section to config and copy
-	ModuleName = "Underfloor" + String(no);
+	ModuleName = "Underfloor3";
 	mb = new moduleBase(ModuleName);
-	switch(no) {
-		case 1:
-			Pin = D1;
-			bitDebug = wpEEPROM.bitDebugUnderfloor1;
-			bitHand = wpEEPROM.bitUnderfloor1Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor1HandValue;
-			byteSetpoint = wpEEPROM.byteUnderfloor1Setpoint;
-			break;
-		case 2:
-			Pin = D2;
-			bitDebug = wpEEPROM.bitDebugUnderfloor2;
-			bitHand = wpEEPROM.bitUnderfloor2Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor2HandValue;
-			byteSetpoint = wpEEPROM.byteUnderfloor2Setpoint;
-			break;
-		case 3:
-			Pin = D6;
-			bitDebug = wpEEPROM.bitDebugUnderfloor3;
-			bitHand = wpEEPROM.bitUnderfloor3Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor3HandValue;
-			byteSetpoint = wpEEPROM.byteUnderfloor3Setpoint;
-			break;
-		case 4:
-			Pin = D7;
-			bitDebug = wpEEPROM.bitDebugUnderfloor4;
-			bitHand = wpEEPROM.bitUnderfloor4Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor4HandValue;
-			byteSetpoint = wpEEPROM.byteUnderfloor4Setpoint;
-			break;
-	}
+	Pin = D6;
 }
-void moduleUnderfloor::init() {
+void moduleUnderfloor3::init() {
 	pinMode(Pin, OUTPUT);
 	output = false;
 	autoValue = false;
@@ -90,37 +58,39 @@ void moduleUnderfloor::init() {
 	publishTempUrlLast = 0;
 
 	// section to copy
-	mb->initDebug(wpEEPROM.addrBitsDebugModules2, wpEEPROM.bitsDebugModules2, bitDebug);
+	mb->initDebug(wpEEPROM.addrBitsDebugModules2, wpEEPROM.bitsDebugModules2, wpEEPROM.bitDebugUnderfloor3);
+	mb->initCalcCycle(wpEEPROM.byteCalcCycleUnderfloor3);
 }
 
 //###################################################################################
 // public
 //###################################################################################
-void moduleUnderfloor::cycle() {
-	if(wpFZ.calcValues) {
+void moduleUnderfloor3::cycle() {
+	if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 		calcOutput();
 		calc();
+		mb->calcLast = wpFZ.loopStartedAt;
 	}
 	publishValues();
 }
 
-void moduleUnderfloor::publishSettings() {
+void moduleUnderfloor3::publishSettings() {
 	publishSettings(false);
 }
-void moduleUnderfloor::publishSettings(bool force) {
+void moduleUnderfloor3::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicSetSetPoint.c_str(), String(setPoint).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicSetTempUrl.c_str(), mqttTopicTemp.c_str());
+		//wpMqtt.mqttClient.publish(mqttTopicSetSetPoint.c_str(), String(setPoint).c_str());
+		//wpMqtt.mqttClient.publish(mqttTopicSetTempUrl.c_str(), mqttTopicTemp.c_str());
 	}
 	mb->publishSettings(force);
 }
 
-void moduleUnderfloor::publishValues() {
+void moduleUnderfloor3::publishValues() {
 	publishValues(false);
 }
-void moduleUnderfloor::publishValues(bool force) {
+void moduleUnderfloor3::publishValues(bool force) {
 	if(force) {
 		publishOutputLast = 0;
 		publishAutoValueLast = 0;
@@ -158,7 +128,7 @@ void moduleUnderfloor::publishValues(bool force) {
 	}
 	if(setPointLast != setPoint || wpFZ.CheckQoS(publishSetPointLast)) {
 		setPointLast = setPoint;
-		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(ModuleName + " setPoint", String(setPoint));
 		}
@@ -175,7 +145,7 @@ void moduleUnderfloor::publishValues(bool force) {
 	mb->publishValues(force);
 }
 
-void moduleUnderfloor::setSubscribes() {
+void moduleUnderfloor3::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSetPoint.c_str());
@@ -187,12 +157,12 @@ void moduleUnderfloor::setSubscribes() {
 	mb->setSubscribes();
 }
 
-void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
+void moduleUnderfloor3::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetHand.c_str()) == 0) {
 		bool readSetHand = msg.toInt();
 		if(handSet != readSetHand) {
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsSettingsModules2, bitHand, handSet);
+			bitWrite(wpEEPROM.bitsSettingsModules2, wpEEPROM.bitUnderfloor3Hand, handSet);
 			EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
@@ -222,23 +192,23 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleUnderfloor::SetHandValueSet(bool val) {
+void moduleUnderfloor3::SetHandValueSet(bool val) {
 	handValueSet = val;
-	bitWrite(wpEEPROM.bitsSettingsModules2, bitHandValue, handValueSet);
+	bitWrite(wpEEPROM.bitsSettingsModules2, wpEEPROM.bitUnderfloor3HandValue, handValueSet);
 	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "SetHandValueSet", "save to EEPROM: 'module" + ModuleName + "::handValueSet' = " + String(handValueSet));
 }
-void moduleUnderfloor::InitSetPoint(uint8 setpoint) {
+void moduleUnderfloor3::InitSetPoint(uint8 setpoint) {
 	setPoint = setpoint;
 }
-void moduleUnderfloor::SetSetPoint(uint8 setpoint) {
+void moduleUnderfloor3::SetSetPoint(uint8 setpoint) {
 	setPoint = setpoint;
-	EEPROM.write(byteSetpoint, setPoint);
+	EEPROM.write(wpEEPROM.byteUnderfloor3Setpoint, setPoint);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint", "save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPoint));
 }
-String moduleUnderfloor::SetTopicTempUrl(String topic) {
+String moduleUnderfloor3::SetTopicTempUrl(String topic) {
 	mqttTopicTemp = topic;
 	wpEEPROM.writeStringsToEEPROM();
 	//wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
@@ -249,7 +219,7 @@ String moduleUnderfloor::SetTopicTempUrl(String topic) {
 //###################################################################################
 // private
 //###################################################################################
-void moduleUnderfloor::publishValue() {
+void moduleUnderfloor3::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
 	outputLast = output;
 	if(wpMqtt.Debug) {
@@ -258,7 +228,7 @@ void moduleUnderfloor::publishValue() {
 	publishOutputLast = wpFZ.loopStartedAt;
 }
 
-void moduleUnderfloor::calc() {
+void moduleUnderfloor3::calc() {
 	if(handValue != handValueSet) {
 		handValue = handValueSet;
 	}
@@ -272,7 +242,7 @@ void moduleUnderfloor::calc() {
 	}
 	digitalWrite(Pin, output);
 }
-void moduleUnderfloor::calcOutput() {
+void moduleUnderfloor3::calcOutput() {
 	if(setPoint < temp) {
 		autoValue = false;
 	}
@@ -284,20 +254,27 @@ void moduleUnderfloor::calcOutput() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleUnderfloor::getVersion() {
+uint16 moduleUnderfloor3::getVersion() {
 	String SVN = "$Rev: 198 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleUnderfloor::changeDebug() {
+void moduleUnderfloor3::changeDebug() {
 	mb->changeDebug();
 }
-bool moduleUnderfloor::Debug() {
+bool moduleUnderfloor3::Debug() {
 	return mb->debug;
 }
-bool moduleUnderfloor::Debug(bool debug) {
+bool moduleUnderfloor3::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
+}
+uint32 moduleUnderfloor3::CalcCycle(){
+	return mb->calcCycle;
+}
+uint32 moduleUnderfloor3::CalcCycle(uint32 calcCycle){
+	mb->calcCycle = calcCycle;
+	return 0;
 }

@@ -108,11 +108,61 @@ void helperWebServer::setupWebServer() {
 	});
 
 	webServer.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-		request->send(200, "application/json", "{\"this\":{\"is\":{\"a\":{\"FreakaZone\":{\"member\":true}}}}}");
+		request->send_P(200, "application/json", "{\"this\":{\"is\":{\"a\":{\"FreakaZone\":{\"member\":true}}}}}");
 	});
 
 	webServer.on("/print", HTTP_GET, [](AsyncWebServerRequest *request) {
 		request->send_P(200, "text/html", index_html, processor);
+	});
+	webServer.on("/CompiledWith", HTTP_GET, [](AsyncWebServerRequest *request) {
+		String ret = "<li><span class='bold'>Modules:</span></li><li><hr /></li>" +
+			wpWebServer.getchangeModule("useDHT11", "wpDHT11", wpModules.useModuleDHT11) +
+			wpWebServer.getchangeModule("useDHT22", "wpDHT22", wpModules.useModuleDHT22) +
+			wpWebServer.getchangeModule("useLDR", "wpLDR", wpModules.useModuleLDR) +
+			wpWebServer.getchangeModule("useLight", "wpLight", wpModules.useModuleLight) +
+			wpWebServer.getchangeModule("useBM", "wpBM", wpModules.useModuleBM) +
+			wpWebServer.getchangeModule("useWindow", "wpWindow", wpModules.useModuleWindow) +
+			wpWebServer.getchangeModule("useCwWw", "wpCwWw", wpModules.useModuleCwWw) +
+			wpWebServer.getchangeModule("useAnalogOut", "wpAnalogOut", wpModules.useModuleAnalogOut) +
+			wpWebServer.getchangeModule("useAnalogOut2", "wpAnalogOut2", wpModules.useModuleAnalogOut2) +
+			wpWebServer.getchangeModule("useNeoPixel", "wpNeoPixel", wpModules.useModuleNeoPixel) +
+			wpWebServer.getchangeModule("useRelais", "wpRelais", wpModules.useModuleRelais) +
+			wpWebServer.getchangeModule("useRelaisShield", "wpRelaisShield", wpModules.useModuleRelaisShield) +
+			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
+			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
+			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
+			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
+			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter) +
+			wpWebServer.getchangeModule("useUnderfloor1", "wpUnderfloor1", wpModules.useModuleUnderfloor1) +
+			wpWebServer.getchangeModule("useUnderfloor2", "wpUnderfloor2", wpModules.useModuleUnderfloor2) +
+			wpWebServer.getchangeModule("useUnderfloor3", "wpUnderfloor3", wpModules.useModuleUnderfloor3) +
+			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4);
+		request->send_P(200, "text/html", ret.c_str());
+	});
+	webServer.on("/CompiledWith", HTTP_GET, [](AsyncWebServerRequest *request) {
+		String ret = "<li><span class='bold'>Modules:</span></li><li><hr /></li>" +
+			wpWebServer.getchangeModule("useDHT11", "wpDHT11", wpModules.useModuleDHT11) +
+			wpWebServer.getchangeModule("useDHT22", "wpDHT22", wpModules.useModuleDHT22) +
+			wpWebServer.getchangeModule("useLDR", "wpLDR", wpModules.useModuleLDR) +
+			wpWebServer.getchangeModule("useLight", "wpLight", wpModules.useModuleLight) +
+			wpWebServer.getchangeModule("useBM", "wpBM", wpModules.useModuleBM) +
+			wpWebServer.getchangeModule("useWindow", "wpWindow", wpModules.useModuleWindow) +
+			wpWebServer.getchangeModule("useCwWw", "wpCwWw", wpModules.useModuleCwWw) +
+			wpWebServer.getchangeModule("useAnalogOut", "wpAnalogOut", wpModules.useModuleAnalogOut) +
+			wpWebServer.getchangeModule("useAnalogOut2", "wpAnalogOut2", wpModules.useModuleAnalogOut2) +
+			wpWebServer.getchangeModule("useNeoPixel", "wpNeoPixel", wpModules.useModuleNeoPixel) +
+			wpWebServer.getchangeModule("useRelais", "wpRelais", wpModules.useModuleRelais) +
+			wpWebServer.getchangeModule("useRelaisShield", "wpRelaisShield", wpModules.useModuleRelaisShield) +
+			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
+			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
+			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
+			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
+			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter) +
+			wpWebServer.getchangeModule("useUnderfloor1", "wpUnderfloor1", wpModules.useModuleUnderfloor1) +
+			wpWebServer.getchangeModule("useUnderfloor2", "wpUnderfloor2", wpModules.useModuleUnderfloor2) +
+			wpWebServer.getchangeModule("useUnderfloor3", "wpUnderfloor3", wpModules.useModuleUnderfloor3) +
+			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4);
+		request->send_P(200, "text/html", ret.c_str());
 	});
 
 //###################################################################################
@@ -1229,33 +1279,6 @@ String processor(const String& var) {
 //###################################################################################
 	if(var == "Version")
 		return wpFZ.Version;
-//###################################################################################
-	if(var == "CompiledWith") {
-		returns = "<ul class='wpContainer'><li><span class='bold'>Modules:</span></li><li><hr /></li>" +
-			wpWebServer.getchangeModule("useDHT11", "wpDHT11", wpModules.useModuleDHT11) +
-			wpWebServer.getchangeModule("useDHT22", "wpDHT22", wpModules.useModuleDHT22) +
-			wpWebServer.getchangeModule("useLDR", "wpLDR", wpModules.useModuleLDR) +
-			wpWebServer.getchangeModule("useLight", "wpLight", wpModules.useModuleLight) +
-			wpWebServer.getchangeModule("useBM", "wpBM", wpModules.useModuleBM) +
-			wpWebServer.getchangeModule("useWindow", "wpWindow", wpModules.useModuleWindow) +
-			wpWebServer.getchangeModule("useCwWw", "wpCwWw", wpModules.useModuleCwWw) +
-			wpWebServer.getchangeModule("useAnalogOut", "wpAnalogOut", wpModules.useModuleAnalogOut) +
-			wpWebServer.getchangeModule("useAnalogOut2", "wpAnalogOut2", wpModules.useModuleAnalogOut2) +
-			wpWebServer.getchangeModule("useNeoPixel", "wpNeoPixel", wpModules.useModuleNeoPixel) +
-			wpWebServer.getchangeModule("useRelais", "wpRelais", wpModules.useModuleRelais) +
-			wpWebServer.getchangeModule("useRelaisShield", "wpRelaisShield", wpModules.useModuleRelaisShield) +
-			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
-			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
-			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
-			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
-			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter) +
-			wpWebServer.getchangeModule("useUnderfloor1", "wpUnderfloor1", wpModules.useModuleUnderfloor1) +
-			wpWebServer.getchangeModule("useUnderfloor2", "wpUnderfloor2", wpModules.useModuleUnderfloor2) +
-			wpWebServer.getchangeModule("useUnderfloor3", "wpUnderfloor3", wpModules.useModuleUnderfloor3) +
-			wpWebServer.getchangeModule("useUnderfloor4", "wpUnderfloor4", wpModules.useModuleUnderfloor4) +
-			"</ul>";
-		return returns;
-	}
 //###################################################################################
 	if(var == "Debug") {
 		returns = "<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>" +

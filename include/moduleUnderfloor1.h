@@ -13,15 +13,15 @@
 //# File-ID      : $Id:: moduleAnalogOut2.h 189 2024-08-13 11:58:56Z              $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleUnderfloor_h
-#define moduleUnderfloor_h
+#ifndef moduleUnderfloor1_h
+#define moduleUnderfloor1_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleUnderfloor {
+class moduleUnderfloor1 {
 	public:
-		moduleUnderfloor(uint8 no);
+		moduleUnderfloor1();
 		moduleBase* mb;
 		uint8 Pin;
 
@@ -66,6 +66,8 @@ class moduleUnderfloor {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
+		uint32 CalcCycle();
+		uint32 CalcCycle(uint32 calcCycle);
 		void SetHandValueSet(bool val);
 	private:
 		bool outputLast;
@@ -89,16 +91,9 @@ class moduleUnderfloor {
 		String ModuleName;
 		String SVNh = "$Rev: 189 $";
 
-		uint8 bitDebug;
-		uint8 bitHand;
-		uint8 bitHandValue;
-		uint16 byteSetpoint;
 		uint8 setPoint;
 		uint8 temp;
 };
-extern moduleUnderfloor wpUnderfloor1;
-extern moduleUnderfloor wpUnderfloor2;
-extern moduleUnderfloor wpUnderfloor3;
-extern moduleUnderfloor wpUnderfloor4;
+extern moduleUnderfloor1 wpUnderfloor1;
 
 #endif

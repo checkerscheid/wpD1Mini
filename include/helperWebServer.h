@@ -221,8 +221,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="ulContainer">
 			%Debug%
-			%SendRest%
-			%CompiledWith%
+			<ul class="wpContainer" id="CompiledWith">
+			</ul>
 			<ul class="wpContainer">
 				<li><span class='bold'>Device:</span></li><li><hr /></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
@@ -261,6 +261,17 @@ function onLoad(event) {
 	xmlHttp = new XMLHttpRequest();
 	WebSerialBox = document.getElementById('WebSerialBox');
 	setInterval(checkConnection, 5000);
+	getModules();
+}
+function getModules() {
+	var loadModules = new XMLHttpRequest();
+	loadModules.onreadystatechange = function () {
+		if(loadModules.readyState == 4 && loadModules.status == 200) {
+			document.getElementById('CompiledWith').innerHTML = loadModules.response;
+		}
+	};
+	loadModules.open("GET", "/CompiledWith", true);
+	loadModules.send();
 }
 function initWebSocket() {
 	console.log('Trying to open a WebSocket connection...');

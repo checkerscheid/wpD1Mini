@@ -88,11 +88,11 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
 }
 
-void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
-	bitWrite(by, bi, v);
-	EEPROM.write(addr, by);
-	EEPROM.commit();
-}
+// void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
+// 	bitWrite(by, bi, v);
+// 	EEPROM.write(addr, by);
+// 	EEPROM.commit();
+// }
 
 void helperEEPROM::publishSettings() {
 	publishSettings(false);
@@ -314,6 +314,10 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.InitSetPoint(EEPROM.read(byteUnderfloor2Setpoint));
 	wpUnderfloor3.InitSetPoint(EEPROM.read(byteUnderfloor3Setpoint));
 	wpUnderfloor4.InitSetPoint(EEPROM.read(byteUnderfloor4Setpoint));
+	wpUnderfloor1.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor1));
+	wpUnderfloor2.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor2));
+	wpUnderfloor3.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor3));
+	wpUnderfloor4.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor4));
 
 //###################################################################################
 /// byte values: 2byte 50 - 79

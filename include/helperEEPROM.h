@@ -215,6 +215,10 @@ class helperEEPROM {
 		const uint16 byteUnderfloor2Setpoint = 91;
 		const uint16 byteUnderfloor3Setpoint = 92;
 		const uint16 byteUnderfloor4Setpoint = 93;
+		const uint16 byteCalcCycleUnderfloor1 = 94;
+		const uint16 byteCalcCycleUnderfloor2 = 95;
+		const uint16 byteCalcCycleUnderfloor3 = 96;
+		const uint16 byteCalcCycleUnderfloor4 = 97;
 // **********
 
 		uint16 byteStartForString;
@@ -228,7 +232,7 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
-		void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
+		//void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
 
 		void publishSettings();
 		void publishSettings(bool force);
