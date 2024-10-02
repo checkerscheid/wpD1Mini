@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 202                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 198 2024-09-05 12:32:25Z                 $ #
+//# File-ID      : $Id:: helperModules.h 202 2024-10-02 05:34:20Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -111,7 +111,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 202 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;
