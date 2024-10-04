@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 202 2024-10-02 05:34:20Z                 $ #
+//# File-ID      : $Id:: helperModules.h 203 2024-10-04 07:32:26Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -28,16 +28,17 @@ class helperModules {
 		bool useModuleLight = false;
 		bool useModuleBM = false;
 		bool useModuleWindow = false;
-		bool useModuleCwWw = false;
-		bool useModuleAnalogOut = false;
-		bool useModuleAnalogOut2 = false;
-		bool useModuleNeoPixel = false;
 		bool useModuleRelais = false;
 		bool useModuleRelaisShield = false;
-		bool useModuleRpm = false;
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
+		
+		bool useModuleCwWw = false;
+		bool useModuleNeoPixel = false;
+		bool useModuleAnalogOut = false;
+		bool useModuleAnalogOut2 = false;
+		bool useModuleRpm = false;
 		bool useModuleImpulseCounter = false;
 		bool useModuleUnderfloor1 = false;
 		bool useModuleUnderfloor2 = false;
@@ -52,21 +53,27 @@ class helperModules {
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
 		String mqttTopicUseWindow;
-		String mqttTopicUseCwWw;
-		String mqttTopicUseAnalogOut;
-		String mqttTopicUseAnalogOut2;
-		String mqttTopicUseNeoPixel;
 		String mqttTopicUseRelais;
 		String mqttTopicUseRelaisShield;
-		String mqttTopicUseRpm;
 		String mqttTopicUseRain;
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
+		#if BUILDWITH == 1
+		String mqttTopicUseCwWw;
+		String mqttTopicUseNeoPixel;
+		String mqttTopicUseAnalogOut;
+		String mqttTopicUseAnalogOut2;
+		#endif
+		#if BUILDWITH == 2
+		String mqttTopicUseRpm;
 		String mqttTopicUseImpulseCounter;
+		#endif
+		#if BUILDWITH == 3
 		String mqttTopicUseUnderfloor1;
 		String mqttTopicUseUnderfloor2;
 		String mqttTopicUseUnderfloor3;
 		String mqttTopicUseUnderfloor4;
+		#endif
 
 		helperModules();
 		void init();
@@ -88,21 +95,27 @@ class helperModules {
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
 		void changeModuleWindow(bool newValue);
-		void changeModuleCwWw(bool newValue);
-		void changeModuleAnalogOut(bool newValue);
-		void changeModuleAnalogOut2(bool newValue);
-		void changeModuleNeoPixel(bool newValue);
 		void changeModuleRelais(bool newValue);
 		void changeModuleRelaisShield(bool newValue);
-		void changeModuleRpm(bool newValue);
 		void changeModuleRain(bool newValue);
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
+		#if BUILDWITH == 1
+		void changeModuleCwWw(bool newValue);
+		void changeModuleNeoPixel(bool newValue);
+		void changeModuleAnalogOut(bool newValue);
+		void changeModuleAnalogOut2(bool newValue);
+		#endif
+		#if BUILDWITH == 2
+		void changeModuleRpm(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
+		#endif
+		#if BUILDWITH == 3
 		void changemoduleUnderfloor1(bool newValue);
 		void changemoduleUnderfloor2(bool newValue);
 		void changemoduleUnderfloor3(bool newValue);
 		void changemoduleUnderfloor4(bool newValue);
+		#endif
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -111,7 +124,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 202 $";
+		String SVNh = "$Rev: 203 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;
@@ -154,6 +167,12 @@ class helperModules {
 		uint32 publishUseUnderfloor3Last;
 		bool useUnderfloor4Last;
 		uint32 publishUseUnderfloor4Last;
+		#if BUILDWITH == 1
+		#endif
+		#if BUILDWITH == 2
+		#endif
+		#if BUILDWITH == 3
+		#endif
 
 		bool DebugLast;
 		uint32 publishDebugLast;

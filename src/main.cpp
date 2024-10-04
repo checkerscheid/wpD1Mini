@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 202 2024-10-02 05:34:20Z                        $ #
+//# File-ID      : $Id:: main.cpp 203 2024-10-04 07:32:26Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -51,23 +51,8 @@ void setup() {
 	if(wpModules.useModuleWindow) {
 		wpWindow.init();
 	}
-	if(wpModules.useModuleCwWw) {
-		wpCwWw.init();
-	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.init();
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.init();
-	}
-	if(wpModules.useModuleNeoPixel) {
-		wpNeoPixel.init();
-	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
-	}
-	if(wpModules.useModuleRpm) {
-		wpRpm.init();
 	}
 	if(wpModules.useModuleRain) {
 		wpRain.init();
@@ -78,9 +63,29 @@ void setup() {
 	if(wpModules.useModuleDistance) {
 		wpDistance.init();
 	}
+	#if BUILDWITH == 1
+	if(wpModules.useModuleCwWw) {
+		wpCwWw.init();
+	}
+	if(wpModules.useModuleNeoPixel) {
+		wpNeoPixel.init();
+	}
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.init();
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.init();
+	}
+	#endif
+	#if BUILDWITH == 2
+	if(wpModules.useModuleRpm) {
+		wpRpm.init();
+	}
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.init();
 	}
+	#endif
+	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
 		wpUnderfloor1.init();
 	}
@@ -93,6 +98,7 @@ void setup() {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.init();
 	}
+	#endif
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
@@ -130,20 +136,8 @@ void loop() {
 		if(wpModules.useModuleWindow) {
 			wpWindow.cycle();
 		}
-		if(wpModules.useModuleCwWw) {
-			wpCwWw.cycle();
-		}
-		if(wpModules.useModuleAnalogOut) {
-			wpAnalogOut.cycle();
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			wpAnalogOut2.cycle();
-		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
-		}
-		if(wpModules.useModuleRpm) {
-			wpRpm.cycle();
 		}
 		if(wpModules.useModuleRain) {
 			wpRain.cycle();
@@ -154,9 +148,29 @@ void loop() {
 		if(wpModules.useModuleDistance) {
 			wpDistance.cycle();
 		}
+		#if BUILDWITH == 1
+		if(wpModules.useModuleCwWw) {
+			wpCwWw.cycle();
+		}
+		if(wpModules.useModuleNeoPixel) {
+			wpNeoPixel.cycle();
+		}
+		if(wpModules.useModuleAnalogOut) {
+			wpAnalogOut.cycle();
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			wpAnalogOut2.cycle();
+		}
+		#endif
+		#if BUILDWITH == 2
+		if(wpModules.useModuleRpm) {
+			wpRpm.cycle();
+		}
 		if(wpModules.useModuleImpulseCounter) {
 			wpImpulseCounter.cycle();
 		}
+		#endif
+		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
 			wpUnderfloor1.cycle();
 		}
@@ -169,9 +183,7 @@ void loop() {
 		if(wpModules.useModuleUnderfloor4) {
 			wpUnderfloor4.cycle();
 		}
-		if(wpModules.useModuleNeoPixel) {
-			wpNeoPixel.cycle();
-		}
+		#endif
 	}
 	wpRest.cycle();
 	//delay(100);
@@ -181,7 +193,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 202 $";
+	String SVN = "$Rev: 203 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -215,20 +227,26 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpLight.getVersion());
 	buildChecker(v, wpBM.getVersion());
 	buildChecker(v, wpWindow.getVersion());
-	buildChecker(v, wpCwWw.getVersion());
-	buildChecker(v, wpAnalogOut.getVersion());
-	buildChecker(v, wpAnalogOut2.getVersion());
-	buildChecker(v, wpNeoPixel.getVersion());
 	buildChecker(v, wpRelais.getVersion());
-	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
+	#if BUILDWITH == 1
+	buildChecker(v, wpCwWw.getVersion());
+	buildChecker(v, wpNeoPixel.getVersion());
+	buildChecker(v, wpAnalogOut.getVersion());
+	buildChecker(v, wpAnalogOut2.getVersion());
+	#endif
+	#if BUILDWITH == 2
+	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
+	#endif
+	#if BUILDWITH == 3
 	buildChecker(v, wpUnderfloor1.getVersion());
 	buildChecker(v, wpUnderfloor2.getVersion());
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
+	#endif
 	return v;
 }
 void buildChecker(uint16 &v, uint16 moduleBuild) {

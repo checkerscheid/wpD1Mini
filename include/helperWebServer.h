@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 202 2024-10-02 05:34:20Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 203 2024-10-04 07:32:26Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -141,7 +141,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 202 $";
+		String SVNh = "$Rev: 203 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -221,8 +221,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="ulContainer">
 			%Debug%
-			<ul class="wpContainer" id="CompiledWith">
-			</ul>
+			%CompiledWith%
 			<ul class="wpContainer">
 				<li><span class='bold'>Device:</span></li><li><hr /></li>
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
@@ -261,17 +260,6 @@ function onLoad(event) {
 	xmlHttp = new XMLHttpRequest();
 	WebSerialBox = document.getElementById('WebSerialBox');
 	setInterval(checkConnection, 5000);
-	getModules();
-}
-function getModules() {
-	var loadModules = new XMLHttpRequest();
-	loadModules.onreadystatechange = function () {
-		if(loadModules.readyState == 4 && loadModules.status == 200) {
-			document.getElementById('CompiledWith').innerHTML = loadModules.response;
-		}
-	};
-	loadModules.open("GET", "/CompiledWith", true);
-	loadModules.send();
 }
 function initWebSocket() {
 	console.log('Trying to open a WebSocket connection...');

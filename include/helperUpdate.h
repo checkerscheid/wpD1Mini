@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 197                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.h 197 2024-09-04 03:51:46Z                  $ #
+//# File-ID      : $Id:: helperUpdate.h 203 2024-10-04 07:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperUpdate_h
@@ -48,7 +48,6 @@ class helperUpdate {
 		bool setupOta();
 		void check();
 		void start();
-		void start(String file);
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -57,12 +56,13 @@ class helperUpdate {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 197 $";
+		String SVNh = "$Rev: 203 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		bool newVersionLast;
 		unsigned long publishNewVersionLast;
 		unsigned long twelveHours;
+		String file;
 		void doCheckUpdate();
 		static void started();
 		static void finished();

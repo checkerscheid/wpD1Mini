@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 202 2024-10-02 05:34:20Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 203 2024-10-04 07:32:26Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -28,25 +28,24 @@
 #include <helperWebServer.h>
 #include <helperWiFi.h>
 #include <moduleBase.h>
+
 #include <moduleDHT.h>
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
 #include <moduleWindow.h>
-#include <moduleCwWw.h>
-#include <moduleAnalogOut.h>
-#include <moduleAnalogOut2.h>
-#include <moduleNeoPixel.h>
 #include <moduleRelais.h>
-#include <moduleRpm.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
+#include <moduleCwWw.h>
+#include <moduleNeoPixel.h>
+#include <moduleAnalogOut.h>
+#include <moduleAnalogOut2.h>
 #include <moduleImpulseCounter.h>
-#include <moduleUnderfloor1.h>
-#include <moduleUnderfloor2.h>
-#include <moduleUnderfloor3.h>
-#include <moduleUnderfloor4.h>
+#include <moduleRpm.h>
+#include <moduleUnderfloor.h>
+
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -151,7 +150,7 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
 	private:
-		String SVNh = "$Rev: 202 $";
+		String SVNh = "$Rev: 203 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
