@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 204                                                     $ #
+//# Revision     : $Rev:: 205                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.h 204 2024-10-04 07:33:17Z              $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 205 2024-10-04 09:53:16Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleUnderfloor1_h
@@ -37,6 +37,7 @@ class moduleUnderfloor {
 		String mqttTopicOut;
 		String mqttTopicAutoValue;
 		String mqttTopicHandValue;
+		String mqttTopicReadedTemp;
 		String mqttTopicErrorHand;
 		// settings
 		String mqttTopicSetPoint;
@@ -79,6 +80,8 @@ class moduleUnderfloor {
 		unsigned long publishAutoValueLast;
 		bool handValueLast;
 		unsigned long publishHandValueLast;
+		int readedTempLast;
+		unsigned long publishReadedTempLast;
 		bool handErrorLast;
 		unsigned long publishHandErrorLast;
 		uint8 setPointLast;
@@ -92,7 +95,7 @@ class moduleUnderfloor {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 204 $";
+		String SVNh = "$Rev: 205 $";
 
 		uint8 bitDebug;
 		uint8 bitHand;
@@ -100,7 +103,7 @@ class moduleUnderfloor {
 		uint16 byteSetpoint;
 		uint16 byteCalcCycle;
 		uint8 setPoint;
-		uint8 temp;
+		int temp;
 };
 extern moduleUnderfloor wpUnderfloor1;
 extern moduleUnderfloor wpUnderfloor2;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 204                                                     $ #
+//# Revision     : $Rev:: 206                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 204 2024-10-04 07:33:17Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 206 2024-10-06 19:10:09Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -74,6 +74,7 @@ void moduleUnderfloor::init() {
 	mqttTopicOut = wpFZ.DeviceName + "/" + ModuleName + "/Output";
 	mqttTopicAutoValue = wpFZ.DeviceName + "/" + ModuleName + "/Auto";
 	mqttTopicHandValue = wpFZ.DeviceName + "/" + ModuleName + "/Hand";
+	mqttTopicReadedTemp = wpFZ.DeviceName + "/" + ModuleName + "/ReadedTemp";
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
 	// settings
 	mqttTopicSetPoint = wpFZ.DeviceName + "/" + ModuleName + "/SetPoint";
@@ -90,6 +91,8 @@ void moduleUnderfloor::init() {
 	publishAutoValueLast = 0;
 	handValueLast = false;
 	publishHandValueLast = 0;
+	readedTempLast = 0;
+	publishReadedTempLast = 0;
 	handErrorLast = false;
 	publishHandErrorLast = 0;
 	setPointLast = 0;
@@ -135,6 +138,7 @@ void moduleUnderfloor::publishValues(bool force) {
 		publishOutputLast = 0;
 		publishAutoValueLast = 0;
 		publishHandValueLast = 0;
+		publishReadedTempLast = 0;
 		publishHandErrorLast = 0;
 		publishSetPointLast = 0;
 		publishTempUrlLast = 0;
@@ -158,6 +162,14 @@ void moduleUnderfloor::publishValues(bool force) {
 		}
 		publishHandValueLast = wpFZ.loopStartedAt;
 	}
+	if(readedTempLast != temp || wpFZ.CheckQoS(publishReadedTempLast)) {
+		readedTempLast = temp;
+		wpMqtt.mqttClient.publish(mqttTopicReadedTemp.c_str(), String(temp / 10.0).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(ModuleName + " readedTemp", String(temp));
+		}
+		publishReadedTempLast = wpFZ.loopStartedAt;
+	}
 	if(handErrorLast != handError || wpFZ.CheckQoS(publishHandErrorLast)) {
 		handErrorLast = handError;
 		wpMqtt.mqttClient.publish(mqttTopicErrorHand.c_str(), String(handError).c_str());
@@ -168,7 +180,7 @@ void moduleUnderfloor::publishValues(bool force) {
 	}
 	if(setPointLast != setPoint || wpFZ.CheckQoS(publishSetPointLast)) {
 		setPointLast = setPoint;
-		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10.0).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(ModuleName + " setPoint", String(setPoint));
 		}
@@ -213,14 +225,14 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetSetPoint.c_str()) == 0) {
-		uint8 readSetPoint = (uint8)(msg.toDouble() * 10);
+		uint8 readSetPoint = (uint8)(msg.toDouble() * 10.0);
 		if(setPoint != readSetPoint) {
 			SetSetPoint(readSetPoint);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetSetPoint, String(setPoint));
 		}
 	}
 	if(strcmp(topic, mqttTopicTemp.c_str()) == 0) {
-		temp = (uint8)msg.toDouble() * 10;
+		temp = (int)(msg.toDouble() * 10.0);
 		wpFZ.DebugcheckSubscribes(mqttTopicTemp, String(temp));
 	}
 	if(strcmp(topic, mqttTopicSetTempUrl.c_str()) == 0) {
@@ -305,7 +317,7 @@ void moduleUnderfloor::calcOutput() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 204 $";
+	String SVN = "$Rev: 206 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

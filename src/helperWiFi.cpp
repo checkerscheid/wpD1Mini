@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 206                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 202 2024-10-02 05:34:20Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 206 2024-10-06 19:10:09Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -49,7 +49,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 202 $";
+	String SVN = "$Rev: 206 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -80,7 +80,8 @@ void helperWiFi::setupWiFi() {
 	Serial.print(wpFZ.funcToString("setupWiFi"));
 	Serial.print("Connecting to ");
 	Serial.println(wpFZ.ssid);
-
+	
+	WiFi.disconnect();
 	WiFi.setHostname(wpFZ.DeviceName.c_str());
 	WiFi.begin(wpFZ.ssid, wpFZ.password);
 
@@ -91,6 +92,7 @@ void helperWiFi::setupWiFi() {
 	while(WiFi.status() != WL_CONNECTED) {
 		delay(500);
 		Serial.print(".");
+		wpFZ.blink();
 	}
 	Serial.println();
 
