@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 202                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 198 2024-09-05 12:32:25Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 202 2024-10-02 05:34:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -49,6 +49,10 @@ class helperEEPROM {
 		const uint16 addrBitsModules2 = 2;
 		byte bitsModules2;
 		const uint8 bitUseCwWw = 0; // include in bitsModules2
+		const uint8 bitUseUnderfloor1 = 1; // include in bitsModules2
+		const uint8 bitUseUnderfloor2 = 2; // include in bitsModules2
+		const uint8 bitUseUnderfloor3 = 3; // include in bitsModules2
+		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
 
 //###################################################################################
 
@@ -121,6 +125,10 @@ class helperEEPROM {
 		
 		const uint16 addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
+		const uint8 bitDebugUnderfloor1 = 0; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
+		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -143,6 +151,14 @@ class helperEEPROM {
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
+		const uint8 bitUnderfloor1Hand = 0; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor2Hand = 1; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor3Hand = 2; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor4Hand = 3; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor1HandValue = 4; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor2HandValue = 5; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor3HandValue = 6; // include in bitsSettingsModules2
+		const uint8 bitUnderfloor4HandValue = 7; // include in bitsSettingsModules2
 		
 //###################################################################################
 /// byte values: byte 20 - 49
@@ -172,6 +188,7 @@ class helperEEPROM {
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
 
+
 //###################################################################################
 /// byte values: 2byte 50 - 79
 		const uint16 byteLightCorrection = 50; // int
@@ -193,6 +210,16 @@ class helperEEPROM {
 /// byte values: 4byte 80 - 99
 
 		const uint16 byteImpulseCounterKWh = 80;
+// kein Platz mehr gehabt...
+		const uint16 byteUnderfloor1Setpoint = 90;
+		const uint16 byteUnderfloor2Setpoint = 91;
+		const uint16 byteUnderfloor3Setpoint = 92;
+		const uint16 byteUnderfloor4Setpoint = 93;
+		const uint16 byteCalcCycleUnderfloor1 = 94;
+		const uint16 byteCalcCycleUnderfloor2 = 95;
+		const uint16 byteCalcCycleUnderfloor3 = 96;
+		const uint16 byteCalcCycleUnderfloor4 = 97;
+// **********
 
 		uint16 byteStartForString;
 
@@ -205,7 +232,7 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
-		void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
+		//void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -214,7 +241,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 202 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

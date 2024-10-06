@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 201 2024-09-08 22:39:09Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 203 2024-10-04 07:32:26Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 201 $";
+	String SVN = "$Rev: 203 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -52,7 +52,7 @@ void helperWebServer::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
-	wpFZ.SendWSDebug("DebugWebServer", Debug);
+	wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
 	wpFZ.blink();
 }
 
@@ -74,7 +74,7 @@ void helperWebServer::publishValues(bool force) {
 		wpFZ.loopStartedAt > publishDebugLast + wpFZ.publishQoS) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
-		wpFZ.SendWSDebug("Debug WebServer", Debug);
+		wpFZ.SendWSDebug(F("Debug WebServer"), Debug);
 		publishDebugLast = wpFZ.loopStartedAt;
 	}
 }
@@ -90,7 +90,7 @@ void helperWebServer::checkSubscribes(char* topic, String msg) {
 			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 			EEPROM.commit();
-			wpFZ.SendWSDebug("DebugWebServer", Debug);
+			wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
@@ -98,21 +98,21 @@ void helperWebServer::checkSubscribes(char* topic, String msg) {
 void helperWebServer::setupWebServer() {
 	webServer.addHandler(&webSocket);
 	webServer.onNotFound([](AsyncWebServerRequest *request){ 
-		request->send(404, "text/plain", "Link was not found!");  
+		request->send(404, F("text/plain"), F("Link was not found!"));  
 	});
 
 	webServer.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-		AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon, sizeof(favicon));
-		response->addHeader("Content-Encoding", "gzip");
+		AsyncWebServerResponse *response = request->beginResponse_P(200, F("image/x-icon"), favicon, sizeof(favicon));
+		response->addHeader(F("Content-Encoding"), F("gzip"));
 		request->send(response);
 	});
 
 	webServer.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-		request->send(200, "application/json", "{\"this\":{\"is\":{\"a\":{\"FreakaZone\":{\"member\":true}}}}}");
+		request->send(200, F("application/json"), F("{\"this\":{\"is\":{\"a\":{\"FreakaZone\":{\"member\":true}}}}}"));
 	});
 
 	webServer.on("/print", HTTP_GET, [](AsyncWebServerRequest *request) {
-		request->send_P(200, "text/html", index_html, processor);
+		request->send_P(200, F("text/html"), index_html, processor);
 	});
 
 //###################################################################################
@@ -123,279 +123,354 @@ void helperWebServer::setupWebServer() {
 		String minimac = WiFi.macAddress();
 		minimac.replace(":", "");
 		minimac.toLowerCase();
-		String message = "{\"FreakaZoneDevice\":{" +
-			wpFZ.JsonKeyString("DeviceName", wpFZ.DeviceName) + "," +
-			wpFZ.JsonKeyString("DeviceDescription", wpFZ.DeviceDescription) + "," +
-			wpFZ.JsonKeyString("Version", wpFZ.Version) + "," +
-			wpFZ.JsonKeyValue("newVersion", wpUpdate.newVersion ? "true" : "false") + "," +
-			wpFZ.JsonKeyString("MAC", WiFi.macAddress()) + "," +
-			wpFZ.JsonKeyString("miniMAC", minimac) + "," +
-			wpFZ.JsonKeyString("IP", WiFi.localIP().toString()) + "," +
-			wpFZ.JsonKeyValue("UpdateMode", wpUpdate.UpdateFW ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("calcValues", wpFZ.calcValues ? "true" : "false") + ",";
+		String message = F("{\"FreakaZoneDevice\":{") +
+			wpFZ.JsonKeyString(F("DeviceName"), wpFZ.DeviceName) + F(",") +
+			wpFZ.JsonKeyString(F("DeviceDescription"), wpFZ.DeviceDescription) + F(",") +
+			wpFZ.JsonKeyString(F("Version"), wpFZ.Version) + F(",") +
+			wpFZ.JsonKeyValue(F("newVersion"), wpUpdate.newVersion ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyString(F("MAC"), WiFi.macAddress()) + F(",") +
+			wpFZ.JsonKeyString(F("miniMAC"), minimac) + F(",") +
+			wpFZ.JsonKeyString(F("IP"), WiFi.localIP().toString()) + F(",") +
+			wpFZ.JsonKeyValue(F("UpdateMode"), wpUpdate.UpdateFW ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("calcValues"), wpFZ.calcValues ? "true" : "false") + F(",");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			message += "\"DHT\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpDHT.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpDHT.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("TemperatureCorrection", String(float(wpDHT.temperatureCorrection / 10.0))) + "," +
-				wpFZ.JsonKeyValue("HumidityCorrection", String(float(wpDHT.humidityCorrection / 10.0))) +
-				"},";
+			message += F("\"DHT\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDHT.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDHT.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("TemperatureCorrection"), String(float(wpDHT.temperatureCorrection / 10.0))) + F(",") +
+				wpFZ.JsonKeyValue(F("HumidityCorrection"), String(float(wpDHT.humidityCorrection / 10.0))) +
+				F("},");
 		}
 		if(wpModules.useModuleLDR) {
-			message += "\"LDR\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpLDR.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpLDR.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("useAvg", wpLDR.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("Correction", String(wpLDR.correction)) +
-				"},";
+			message += F("\"LDR\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpLDR.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpLDR.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpLDR.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpLDR.correction)) +
+				F("},");
 		}
 		if(wpModules.useModuleLight) {
-			message += "\"Light\":{" +
-				wpFZ.JsonKeyString("PinSCL", String(wpFZ.Pins[wpLight.PinSCL])) + "," +
-				wpFZ.JsonKeyString("PinSDA", String(wpFZ.Pins[wpLight.PinSDA])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpLight.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("useAvg", wpLight.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("Correction", String(wpLight.correction)) +
-				"},";
+			message += F("\"Light\":{") +
+				wpFZ.JsonKeyString(F("PinSCL"), String(wpFZ.Pins[wpLight.PinSCL])) + F(",") +
+				wpFZ.JsonKeyString(F("PinSDA"), String(wpFZ.Pins[wpLight.PinSDA])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpLight.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpLight.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpLight.correction)) +
+				F("},");
 		}
 		if(wpModules.useModuleBM) {
-			message += "\"BM\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpBM.Pin]));
+			message += F("\"BM\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpBM.Pin]));
 			if(wpModules.useModuleLDR) {
 				message += ",\"LDR\":{" +
-					wpFZ.JsonKeyValue("Threshold", String(wpBM.threshold)) + "," +
-					wpFZ.JsonKeyString("LightToTurnOn", wpBM.lightToTurnOn) +
+					wpFZ.JsonKeyValue(F("Threshold"), String(wpBM.threshold)) + F(",") +
+					wpFZ.JsonKeyString(F("LightToTurnOn"), wpBM.lightToTurnOn) +
 					"}";
 			}
-			message += "},";
+			message += F("},");
 		}
 		if(wpModules.useModuleWindow) {
-			message += "\"Window\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpWindow.Pin]));
+			message += F("\"Window\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow.Pin]));
 			if(wpModules.useModuleLDR) {
-				message += ",\"LDR\":{" +
-					wpFZ.JsonKeyValue("Threshold", String(wpWindow.threshold)) + "," +
-					wpFZ.JsonKeyString("LightToTurnOn", wpWindow.lightToTurnOn) +
+				message += F(",\"LDR\":{") +
+					wpFZ.JsonKeyValue(F("Threshold"), String(wpWindow.threshold)) + F(",") +
+					wpFZ.JsonKeyString(F("LightToTurnOn"), wpWindow.lightToTurnOn) +
 					"}";
 			}
-			message += "},";
+			message += F("},");
 		}
+		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+			message += F("\"Relais\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRelais.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("Hand"), wpRelais.handError ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), wpRelais.handValue ? "true" : "false");
+			if(wpModules.useModuleMoisture) {
+				message += F(",\"Moisture\":{") +
+					wpFZ.JsonKeyValue(F("waterEmpty"), wpRelais.waterEmptySet ? "true" : "false") + F(",") +
+					wpFZ.JsonKeyValue(F("pumpActive"), String(wpRelais.pumpActive)) + F(",") +
+					wpFZ.JsonKeyValue(F("pumpPause"), String(wpRelais.pumpPause / 60)) +
+					"}";
+			}
+			message += F("},");
+		}
+		if(wpModules.useModuleRain) {
+			message += F("\"Rain\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRain.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRain.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpRain.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpRain.correction)) +
+				F("},");
+		}
+		if(wpModules.useModuleMoisture) {
+			message += F("\"Moisture\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpMoisture.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpMoisture.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpMoisture.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Min"), String(wpMoisture.minValue)) + F(",") +
+				wpFZ.JsonKeyValue(F("Dry"), String(wpMoisture.dry)) + F(",") +
+				wpFZ.JsonKeyValue(F("Wet"), String(wpMoisture.wet)) +
+				F("},");
+		}
+		if(wpModules.useModuleDistance) {
+			message += F("\"Distance\":{") +
+				wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[wpDistance.PinTrig])) + F(",") +
+				wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[wpDistance.PinEcho])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDistance.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpDistance.correction)) + F(",") +
+				wpFZ.JsonKeyValue(F("maxVolume"), String(wpDistance.maxVolume)) + F(",") +
+				wpFZ.JsonKeyValue(F("height"), String(wpDistance.height)) +
+				F("},");
+		}
+		#if BUILDWITH == 1
 		if(wpModules.useModuleCwWw) {
-			message += "\"CwWw\":{},";
+			message += F("\"CwWw\":{},");
+		}
+		if(wpModules.useModuleNeoPixel) {
+			message += F("\"NeoPixel\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpNeoPixel.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("ValueR"), String(wpNeoPixel.GetValueR())) + F(",") +
+				wpFZ.JsonKeyValue(F("ValueG"), String(wpNeoPixel.GetValueG())) + F(",") +
+				wpFZ.JsonKeyValue(F("ValueB"), String(wpNeoPixel.GetValueB())) + F(",") +
+				wpFZ.JsonKeyValue(F("Brightness"), String(wpNeoPixel.GetBrightness())) + F(",") +
+				wpFZ.JsonKeyValue(F("PixelCount"), String(wpNeoPixel.GetPixelCount())) + F(",") +
+				wpFZ.JsonKeyValue(F("isRGB"), wpNeoPixel.GetRGB() ? "true" : "false") +
+				F("},");
 		}
 		if(wpModules.useModuleAnalogOut) {
-			message += "\"AnalogOut\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut.Pin])) + ",";
+			message += F("\"AnalogOut\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",");
 			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 				message +=
-					wpFZ.JsonKeyValue("CalcCycle", String(wpAnalogOut.CalcCycle())) + "," +
-					wpFZ.JsonKeyValue("Kp", String(wpAnalogOut.Kp)) + "," +
-					wpFZ.JsonKeyValue("Tv", String(wpAnalogOut.Tv)) + "," +
-					wpFZ.JsonKeyValue("Tn", String(wpAnalogOut.Tn)) + "," +
-					wpFZ.JsonKeyValue("SetPoint", String(wpAnalogOut.SetPoint)) + ",";
+					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
+					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.Kp)) + F(",") +
+					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.Tv)) + F(",") +
+					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.Tn)) + F(",") +
+					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.SetPoint)) + F(",");
 			}
 			message +=
-				wpFZ.JsonKeyValue("Hand", wpAnalogOut.handError ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut.handValue)) +
-				"},";
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.handError ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.handValue)) +
+				F("},");
 		}
 		if(wpModules.useModuleAnalogOut2) {
-			message += "\"AnalogOut2\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpAnalogOut2.Pin])) + "," +
-				wpFZ.JsonKeyValue("Hand", wpAnalogOut2.handError ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("HandValue", String(wpAnalogOut2.handValue)) +
-				"},";
+			message += F("\"AnalogOut2\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.handError ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.handValue)) +
+				F("},");
 		}
-		if(wpModules.useModuleNeoPixel) {
-			message += "\"NeoPixel\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpNeoPixel.Pin])) + "," +
-				wpFZ.JsonKeyValue("ValueR", String(wpNeoPixel.GetValueR())) + "," +
-				wpFZ.JsonKeyValue("ValueG", String(wpNeoPixel.GetValueG())) + "," +
-				wpFZ.JsonKeyValue("ValueB", String(wpNeoPixel.GetValueB())) + "," +
-				wpFZ.JsonKeyValue("Brightness", String(wpNeoPixel.GetBrightness())) + "," +
-				wpFZ.JsonKeyValue("PixelCount", String(wpNeoPixel.GetPixelCount())) + "," +
-				wpFZ.JsonKeyValue("isRGB", wpNeoPixel.GetRGB() ? "true" : "false") +
-				"},";
-		}
-		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			message += "\"Relais\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRelais.Pin])) + "," +
-				wpFZ.JsonKeyValue("Hand", wpRelais.handError ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("HandValue", wpRelais.handValue ? "true" : "false");
-			if(wpModules.useModuleMoisture) {
-				message += ",\"Moisture\":{" +
-					wpFZ.JsonKeyValue("waterEmpty", wpRelais.waterEmptySet ? "true" : "false") + "," +
-					wpFZ.JsonKeyValue("pumpActive", String(wpRelais.pumpActive)) + "," +
-					wpFZ.JsonKeyValue("pumpPause", String(wpRelais.pumpPause / 60)) +
-					"}";
-			}
-			message += "},";
-		}
+		#endif
+		#if BUILDWITH == 2
 		if(wpModules.useModuleRpm) {
-			message += "\"Rpm\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRpm.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpRpm.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("useAvg", wpRain.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("Correction", String(wpRain.correction)) +
-				"},";
-		}
-		if(wpModules.useModuleRain) {
-			message += "\"Rain\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpRain.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpRain.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("useAvg", wpRain.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("Correction", String(wpRain.correction)) +
-				"},";
-		}
-		if(wpModules.useModuleMoisture) {
-			message += "\"Moisture\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpMoisture.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpMoisture.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("useAvg", wpMoisture.UseAvg() ? "true" : "false") + "," +
-				wpFZ.JsonKeyValue("Min", String(wpMoisture.minValue)) + "," +
-				wpFZ.JsonKeyValue("Dry", String(wpMoisture.dry)) + "," +
-				wpFZ.JsonKeyValue("Wet", String(wpMoisture.wet)) +
-				"},";
-		}
-		if(wpModules.useModuleDistance) {
-			message += "\"Distance\":{" +
-				wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[wpDistance.PinTrig])) + "," +
-				wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[wpDistance.PinEcho])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpDistance.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("Correction", String(wpDistance.correction)) + "," +
-				wpFZ.JsonKeyValue("maxVolume", String(wpDistance.maxVolume)) + "," +
-				wpFZ.JsonKeyValue("height", String(wpDistance.height)) +
-				"},";
+			message += F("\"Rpm\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRpm.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRpm.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpRain.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpRain.correction)) +
+				F("},");
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			message += "\"ImpulseCounter\":{" +
-				wpFZ.JsonKeyString("Pin", String(wpFZ.Pins[wpImpulseCounter.Pin])) + "," +
-				wpFZ.JsonKeyValue("CalcCycle", String(wpImpulseCounter.CalcCycle())) + "," +
-				wpFZ.JsonKeyValue("UpKWh", String(wpImpulseCounter.UpKWh)) + "," +
-				wpFZ.JsonKeyValue("Silver", String(wpImpulseCounter.counterSilver)) + "," +
-				wpFZ.JsonKeyValue("Red", String(wpImpulseCounter.counterRed)) +
-
-				"},";
+			message += F("\"ImpulseCounter\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpImpulseCounter.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpImpulseCounter.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("UpKWh"), String(wpImpulseCounter.UpKWh)) + F(",") +
+				wpFZ.JsonKeyValue(F("Silver"), String(wpImpulseCounter.counterSilver)) + F(",") +
+				wpFZ.JsonKeyValue(F("Red"), String(wpImpulseCounter.counterRed)) +
+				F("},");
 		}
-		message += "\"Debug\":{" +
-			wpFZ.JsonKeyValue("EEPROM", wpEEPROM.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Finder", wpFinder.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Modules", wpModules.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("MQTT", wpMqtt.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("OnlineToggler", wpOnlineToggler.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Rest", wpRest.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Update", wpUpdate.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("WebServer", wpWebServer.Debug ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("WiFi", wpWiFi.Debug ? "true" : "false");
+		#endif
+		#if BUILDWITH == 3
+		if(wpModules.useModuleUnderfloor1) {
+			message += F("\"Underfloor1\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor1.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor1.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor1.GetSetPoint())) + F(",") +
+				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor1.mqttTopicTemp)) +
+				F("},");
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			message += F("\"Underfloor2\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor2.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor2.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor2.GetSetPoint())) + F(",") +
+				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor2.mqttTopicTemp)) +
+				F("},");
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			message += F("\"Underfloor3\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor3.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor3.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor3.GetSetPoint())) + F(",") +
+				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor3.mqttTopicTemp)) +
+				F("},");
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			message += F("\"Underfloor4\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor4.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor4.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor4.GetSetPoint())) + F(",") +
+				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor4.mqttTopicTemp)) +
+				F("},");
+		}
+		#endif
+		message += F("\"Debug\":{") +
+			wpFZ.JsonKeyValue(F("EEPROM"), wpEEPROM.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("Finder"), wpFinder.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("Modules"), wpModules.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("MQTT"), wpMqtt.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("OnlineToggler"), wpOnlineToggler.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("Rest"), wpRest.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("Update"), wpUpdate.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("WebServer"), wpWebServer.Debug ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("WiFi"), wpWiFi.Debug ? "true" : "false");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			message += "," + wpFZ.JsonKeyValue("DHT", wpDHT.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("DHT"), wpDHT.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleLDR) {
-			message += "," + wpFZ.JsonKeyValue("LDR", wpLDR.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("LDR"), wpLDR.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleLight) {
-			message += "," + wpFZ.JsonKeyValue("Light", wpLight.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Light"), wpLight.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleBM) {
-			message += "," + wpFZ.JsonKeyValue("BM", wpBM.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("BM"), wpBM.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleWindow) {
-			message += "," + wpFZ.JsonKeyValue("Window", wpWindow.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Window"), wpWindow.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Relais"), wpRelais.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleRain) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Rain"), wpRain.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleMoisture) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Moisture"), wpMoisture.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleDistance) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Distance"), wpDistance.Debug() ? "true" : "false");
+		}
+		#if BUILDWITH == 1
 		if(wpModules.useModuleCwWw) {
-			message += "," + wpFZ.JsonKeyValue("CwWw", wpCwWw.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut) {
-			message += "," + wpFZ.JsonKeyValue("AnalogOut", wpAnalogOut.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			message += "," + wpFZ.JsonKeyValue("AnalogOut2", wpAnalogOut2.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("CwWw"), wpCwWw.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleNeoPixel) {
-			message += "," + wpFZ.JsonKeyValue("NeoPixel", wpNeoPixel.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("NeoPixel"), wpNeoPixel.Debug() ? "true" : "false");
 		}
-		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.Debug() ? "true" : "false");
+		if(wpModules.useModuleAnalogOut) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpAnalogOut.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpAnalogOut2.Debug() ? "true" : "false");
+		}
+		#endif
+		#if BUILDWITH == 2
 		if(wpModules.useModuleRpm) {
-			message += "," + wpFZ.JsonKeyValue("Rpm", wpRpm.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleRain) {
-			message += "," + wpFZ.JsonKeyValue("Rain", wpRain.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleMoisture) {
-			message += "," + wpFZ.JsonKeyValue("Moisture", wpMoisture.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleDistance) {
-			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpRpm.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpImpulseCounter.Debug() ? "true" : "false");
 		}
-		message += "},\"SendRest\":{" +
-			wpFZ.JsonKeyValue("WiFi", wpWiFi.sendRest ? "true" : "false");
+		#endif
+		#if BUILDWITH == 3
+		if(wpModules.useModuleUnderfloor1) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Underfloor1"), wpUnderfloor1.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Underfloor2"), wpUnderfloor2.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Underfloor3"), wpUnderfloor3.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpUnderfloor4.Debug() ? "true" : "false");
+		}
+		#endif
+		message += F("},\"SendRest\":{") +
+			wpFZ.JsonKeyValue(F("WiFi"), wpWiFi.sendRest ? "true" : "false");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			message += "," + wpFZ.JsonKeyValue("DHT", wpDHT.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("DHT"), wpDHT.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleLDR) {
-			message += "," + wpFZ.JsonKeyValue("LDR", wpLDR.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("LDR"), wpLDR.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleLight) {
-			message += "," + wpFZ.JsonKeyValue("Light", wpLight.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Light"), wpLight.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleBM) {
-			message += "," + wpFZ.JsonKeyValue("BM", wpBM.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("BM"), wpBM.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleWindow) {
-			message += "," + wpFZ.JsonKeyValue("Window", wpWindow.SendRest() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut) {
-			message += "," + wpFZ.JsonKeyValue("AnalogOut", wpAnalogOut.SendRest() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			message += "," + wpFZ.JsonKeyValue("AnalogOut2", wpAnalogOut2.SendRest() ? "true" : "false");
-		}
-		if(wpModules.useModuleNeoPixel) {
-			message += "," + wpFZ.JsonKeyValue("NeoPixel", wpAnalogOut.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Window"), wpWindow.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			message += "," + wpFZ.JsonKeyValue("Relais", wpRelais.SendRest() ? "true" : "false");
-		}
-		if(wpModules.useModuleRpm) {
-			message += "," + wpFZ.JsonKeyValue("Rpm", wpRpm.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Relais"), wpRelais.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleRain) {
-			message += "," + wpFZ.JsonKeyValue("Rain", wpRain.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Rain"), wpRain.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleMoisture) {
-			message += "," + wpFZ.JsonKeyValue("Moisture", wpMoisture.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Moisture"), wpMoisture.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleDistance) {
-			message += "," + wpFZ.JsonKeyValue("Distance", wpDistance.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Distance"), wpDistance.SendRest() ? "true" : "false");
+		}
+		#if BUILDWITH == 1
+		if(wpModules.useModuleNeoPixel) {
+			message += F(",") + wpFZ.JsonKeyValue(F("NeoPixel"), wpAnalogOut.SendRest() ? "true" : "false");
+		}
+		if(wpModules.useModuleAnalogOut) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpAnalogOut.SendRest() ? "true" : "false");
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpAnalogOut2.SendRest() ? "true" : "false");
+		}
+		#endif
+		#if BUILDWITH == 2
+		if(wpModules.useModuleRpm) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpRpm.SendRest() ? "true" : "false");
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			message += "," + wpFZ.JsonKeyValue("ImpulseCounter", wpImpulseCounter.SendRest() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpImpulseCounter.SendRest() ? "true" : "false");
 		}
-		message += "},\"useModul\":{" +
-			wpFZ.JsonKeyValue("DHT11", wpModules.useModuleDHT11 ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("DHT22", wpModules.useModuleDHT22 ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("LDR", wpModules.useModuleLDR ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Light", wpModules.useModuleLight ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("BM", wpModules.useModuleBM ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Window", wpModules.useModuleWindow ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("CwWw", wpModules.useModuleCwWw ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("AnalogOut", wpModules.useModuleAnalogOut ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("AnalogOut2", wpModules.useModuleAnalogOut2 ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("NeoPixel", wpModules.useModuleNeoPixel ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Relais", wpModules.useModuleRelais ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("RelaisShield", wpModules.useModuleRelaisShield ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Rpm", wpModules.useModuleRpm ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Rain", wpModules.useModuleRain ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Moisture", wpModules.useModuleMoisture ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("Distance", wpModules.useModuleDistance ? "true" : "false") + "," +
-			wpFZ.JsonKeyValue("ImpulseCounter", wpModules.useModuleImpulseCounter ? "true" : "false") +
-			"}}}";
-		request->send(200, "application/json", message.c_str());
+		#endif
+		#if BUILDWITH == 3
+		#endif
+		message += F("},\"useModul\":{") +
+			wpFZ.JsonKeyValue(F("DHT11"), wpModules.useModuleDHT11 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("DHT22"), wpModules.useModuleDHT22 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("LDR"), wpModules.useModuleLDR ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Light"), wpModules.useModuleLight ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("BM"), wpModules.useModuleBM ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Window"), wpModules.useModuleWindow ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Relais"), wpModules.useModuleRelais ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("RelaisShield"), wpModules.useModuleRelaisShield ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Rain"), wpModules.useModuleRain ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Moisture"), wpModules.useModuleMoisture ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Distance"), wpModules.useModuleDistance ? "true" : "false");
+		#if BUILDWITH == 1
+		message += 
+			F(",") + wpFZ.JsonKeyValue(F("CwWw"), wpModules.useModuleCwWw ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("NeoPixel"), wpModules.useModuleNeoPixel ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false");
+		#endif
+		#if BUILDWITH == 2
+		message += 
+			F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpModules.useModuleRpm ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
+		#endif
+		#if BUILDWITH == 3
+		message += 
+			F(",") + wpFZ.JsonKeyValue(F("Underfloor1"), wpModules.useModuleUnderfloor1 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Underfloor2"), wpModules.useModuleUnderfloor2 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Underfloor3"), wpModules.useModuleUnderfloor3 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpModules.useModuleUnderfloor4 ? "true" : "false");
+		#endif
+		message += 
+			F("}}}");
+		request->send(200, F("application/json"), message.c_str());
 	});
 
 //###################################################################################
@@ -403,78 +478,100 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 
 	webServer.on("/setModule", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setModule");
-		if(request->hasParam("Module")) {
-			if(request->getParam("Module")->value() == "useDHT11") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useDHT11");
+		wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setModule"));
+		if(request->hasParam(F("Module"))) {
+			if(request->getParam(F("Module"))->value() == F("useDHT11")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useDHT11"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDHT11);
 			}
-			if(request->getParam("Module")->value() == "useDHT22") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useDHT22");
+			if(request->getParam(F("Module"))->value() == F("useDHT22")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useDHT22"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDHT22);
 			}
-			if(request->getParam("Module")->value() == "useLDR") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useLDR");
+			if(request->getParam(F("Module"))->value() == F("useLDR")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useLDR"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleLDR);
 			}
-			if(request->getParam("Module")->value() == "useLight") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useLight");
+			if(request->getParam(F("Module"))->value() == F("useLight")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useLight"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleLight);
 			}
-			if(request->getParam("Module")->value() == "useBM") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useBM");
+			if(request->getParam(F("Module"))->value() == F("useBM")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useBM"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleBM);
 			}
-			if(request->getParam("Module")->value() == "useWindow") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useWindow");
+			if(request->getParam(F("Module"))->value() == F("useWindow")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useWindow"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleWindow);
 			}
-			if(request->getParam("Module")->value() == "useCwWw") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useCwWw");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleCwWw);
-			}
-			if(request->getParam("Module")->value() == "useAnalogOut") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useAnalogOut");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut);
-			}
-			if(request->getParam("Module")->value() == "useAnalogOut2") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useAnalogOut2");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut2);
-			}
-			if(request->getParam("Module")->value() == "useNeoPixel") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useNeoPixel");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleNeoPixel);
-			}
-			if(request->getParam("Module")->value() == "useRelais") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRelais");
+			if(request->getParam(F("Module"))->value() == F("useRelais")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRelais"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleRelais);
 			}
-			if(request->getParam("Module")->value() == "useRelaisShield") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRelaisShield");
+			if(request->getParam(F("Module"))->value() == F("useRelaisShield")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRelaisShield"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleRelaisShield);
 			}
-			if(request->getParam("Module")->value() == "useRpm") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRpm");
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleRpm);
-			}
-			if(request->getParam("Module")->value() == "useRain") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useRain");
+			if(request->getParam(F("Module"))->value() == F("useRain")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRain"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleRain);
 			}
-			if(request->getParam("Module")->value() == "useMoisture") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useMoisture");
+			if(request->getParam(F("Module"))->value() == F("useMoisture")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useMoisture"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleMoisture);
 			}
-			if(request->getParam("Module")->value() == "useDistance") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useDistance");
+			if(request->getParam(F("Module"))->value() == F("useDistance")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useDistance"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDistance);
 			}
-			if(request->getParam("Module")->value() == "useImpulseCounter") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found useImpulseCounter");
+			#if BUILDWITH == 1
+			if(request->getParam(F("Module"))->value() == F("useCwWw")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useCwWw"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleCwWw);
+			}
+			if(request->getParam(F("Module"))->value() == F("useNeoPixel")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useNeoPixel"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleNeoPixel);
+			}
+			if(request->getParam(F("Module"))->value() == F("useAnalogOut")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut);
+			}
+			if(request->getParam(F("Module"))->value() == F("useAnalogOut2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut2"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut2);
+			}
+			#endif
+			#if BUILDWITH == 2
+			if(request->getParam(F("Module"))->value() == F("useRpm")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRpm"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleRpm);
+			}
+			if(request->getParam(F("Module"))->value() == F("useImpulseCounter")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useImpulseCounter"));
 				wpWebServer.setModuleChange(wpWebServer.cmdmoduleImpulseCounter);
 			}
+			#endif
+			#if BUILDWITH == 3
+			if(request->getParam(F("Module"))->value() == F("useUnderfloor1")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useUnderfloor1"));
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor1);
+			}
+			if(request->getParam(F("Module"))->value() == F("useUnderfloor2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useUnderfloor2"));
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor2);
+			}
+			if(request->getParam(F("Module"))->value() == F("useUnderfloor3")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useUnderfloor3"));
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor3);
+			}
+			if(request->getParam(F("Module"))->value() == F("useUnderfloor4")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useUnderfloor4"));
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor4);
+			}
+			#endif
 		}
-		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
+		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 		wpWebServer.setBlink();
 	});
 
@@ -483,70 +580,76 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 
 	webServer.on("/setSendRest", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setSendRest");
-		if(request->hasParam("sendRest")) {
-			if(request->getParam("sendRest")->value() == "sendRestWiFi") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestWiFi");
+		wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setSendRest"));
+		if(request->hasParam(F("sendRest"))) {
+			if(request->getParam(F("sendRest"))->value() == F("sendRestWiFi")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestWiFi"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestWiFi);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestDHT") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestDHT");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestDHT")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestDHT"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestDHT);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestLDR") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestLDR");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestLDR")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestLDR"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestLDR);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestLight") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestLight");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestLight")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestLight"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestLight);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestBM") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestBM");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestBM")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestBM"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestBM);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestWindow") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestWindow");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestWindow")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestWindow"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestWindow);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestAnalogOut") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestAnalogOut");
-				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut);
-			}
-			if(request->getParam("sendRest")->value() == "sendRestAnalogOut2") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestAnalogOut2");
-				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut2);
-			}
-			if(request->getParam("sendRest")->value() == "sendRestNeoPixel") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestNeoPixel");
-				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestNeoPixel);
-			}
-			if(request->getParam("sendRest")->value() == "sendRestRelais") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRelais");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestRelais")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestRelais"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestRelais);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestRpm") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRpm");
-				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestRpm);
-			}
-			if(request->getParam("sendRest")->value() == "sendRestRain") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestRain");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestRain")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestRain"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestRain);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestMoisture") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestMoisture");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestMoisture")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestMoisture"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestMoisture);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestDistance") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestDistance");
+			if(request->getParam(F("sendRest"))->value() == F("sendRestDistance")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestDistance"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestDistance);
 			}
-			if(request->getParam("sendRest")->value() == "sendRestImpulseCounter") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found sendRestImpulseCounter");
+			#if BUILDWITH == 1
+			if(request->getParam(F("sendRest"))->value() == F("sendRestNeoPixel")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestNeoPixel"));
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestNeoPixel);
+			}
+			if(request->getParam(F("sendRest"))->value() == F("sendRestAnalogOut")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestAnalogOut"));
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut);
+			}
+			if(request->getParam(F("sendRest"))->value() == F("sendRestAnalogOut2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestAnalogOut2"));
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestAnalogOut2);
+			}
+			#endif
+			#if BUILDWITH == 2
+			if(request->getParam(F("sendRest"))->value() == F("sendRestRpm")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestRpm"));
+				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestRpm);
+			}
+			if(request->getParam(F("sendRest"))->value() == F("sendRestImpulseCounter")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found sendRestImpulseCounter"));
 				wpWebServer.setSendRestChange(wpWebServer.cmdSendRestImpulseCounter);
 			}
+			#endif
+			#if BUILDWITH == 3
+			#endif
 		}
-		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
+		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 		wpWebServer.setBlink();
 	});
 
@@ -555,106 +658,128 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 
 	webServer.on("/setDebug", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setDebug");
-		if(request->hasParam("Debug")) {
-			if(request->getParam("Debug")->value() == "DebugEEPROM") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugEEPROM");
+		wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setDebug"));
+		if(request->hasParam(F("Debug"))) {
+			if(request->getParam(F("Debug"))->value() == F("DebugEEPROM")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugEEPROM"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugEEPROM);
 			}
-			if(request->getParam("Debug")->value() == "DebugFinder") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugFinder");
+			if(request->getParam(F("Debug"))->value() == F("DebugFinder")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugFinder"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugFinder);
 			}
-			if(request->getParam("Debug")->value() == "DebugModules") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugModules");
+			if(request->getParam(F("Debug"))->value() == F("DebugModules")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugModules"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugModules);
 			}
-			if(request->getParam("Debug")->value() == "DebugMqtt") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugMqtt");
+			if(request->getParam(F("Debug"))->value() == F("DebugMqtt")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugMqtt"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugMqtt);
 			}
-			if(request->getParam("Debug")->value() == "DebugOnlineToggler") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugOnlineToggler");
+			if(request->getParam(F("Debug"))->value() == F("DebugOnlineToggler")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugOnlineToggler"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugOnlineToggler);
 			}
-			if(request->getParam("Debug")->value() == "DebugRest") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRest");
+			if(request->getParam(F("Debug"))->value() == F("DebugRest")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRest"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRest);
 			}
-			if(request->getParam("Debug")->value() == "DebugUpdate") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugUpdate");
+			if(request->getParam(F("Debug"))->value() == F("DebugUpdate")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUpdate"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugUpdate);
 			}
-			if(request->getParam("Debug")->value() == "DebugWebServer") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugWebServer");
+			if(request->getParam(F("Debug"))->value() == F("DebugWebServer")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWebServer"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugWebServer);
 			}
-			if(request->getParam("Debug")->value() == "DebugWiFi") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugWiFi");
+			if(request->getParam(F("Debug"))->value() == F("DebugWiFi")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWiFi"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugWiFi);
 			}
-			if(request->getParam("Debug")->value() == "DebugDHT") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugDHT");
+			if(request->getParam(F("Debug"))->value() == F("DebugDHT")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugDHT"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugDHT);
 			}
-			if(request->getParam("Debug")->value() == "DebugLDR") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLDR");
+			if(request->getParam(F("Debug"))->value() == F("DebugLDR")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugLDR"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugLDR);
 			}
-			if(request->getParam("Debug")->value() == "DebugLight") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugLight");
+			if(request->getParam(F("Debug"))->value() == F("DebugLight")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugLight"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugLight);
 			}
-			if(request->getParam("Debug")->value() == "DebugBM") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugBM");
+			if(request->getParam(F("Debug"))->value() == F("DebugBM")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugBM"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugBM);
 			}
-			if(request->getParam("Debug")->value() == "DebugWindow") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugWindow");
+			if(request->getParam(F("Debug"))->value() == F("DebugWindow")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWindow"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugWindow);
 			}
-			if(request->getParam("Debug")->value() == "DebugCwWw") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugCwWw");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugCwWw);
-			}
-			if(request->getParam("Debug")->value() == "DebugAnalogOut") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugAnalogOut");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut);
-			}
-			if(request->getParam("Debug")->value() == "DebugAnalogOut2") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugAnalogOut2");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut2);
-			}
-			if(request->getParam("Debug")->value() == "DebugNeoPixel") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugNeoPixel");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugNeoPixel);
-			}
-			if(request->getParam("Debug")->value() == "DebugRelais") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRelais");
+			if(request->getParam(F("Debug"))->value() == F("DebugRelais")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRelais"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRelais);
 			}
-			if(request->getParam("Debug")->value() == "DebugRpm") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRpm");
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugRpm);
-			}
-			if(request->getParam("Debug")->value() == "DebugRain") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugRain");
+			if(request->getParam(F("Debug"))->value() == F("DebugRain")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRain"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRain);
 			}
-			if(request->getParam("Debug")->value() == "DebugMoisture") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugMoisture");
+			if(request->getParam(F("Debug"))->value() == F("DebugMoisture")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugMoisture"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugMoisture);
 			}
-			if(request->getParam("Debug")->value() == "DebugDistance") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugDistance");
+			if(request->getParam(F("Debug"))->value() == F("DebugDistance")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugDistance"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugDistance);
 			}
-			if(request->getParam("Debug")->value() == "DebugImpulseCounter") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found DebugImpulseCounter");
+			#if BUILDWITH == 1
+			if(request->getParam(F("Debug"))->value() == F("DebugCwWw")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugCwWw"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugCwWw);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugNeoPixel")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugNeoPixel"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugNeoPixel);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut2"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut2);
+			}
+			#endif
+			#if BUILDWITH == 2
+			if(request->getParam(F("Debug"))->value() == F("DebugRpm")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRpm"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugRpm);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugImpulseCounter")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugImpulseCounter"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugImpulseCounter);
 			}
+			#endif
+			#if BUILDWITH == 3
+			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor1")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUnderfloor1"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor1);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUnderfloor2"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor2);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor3")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUnderfloor3"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor3);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor4")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUnderfloor4"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor4);
+			}
+			#endif
 		}
-		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
+		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 		wpWebServer.setBlink();
 	});
 
@@ -663,203 +788,204 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 
 	webServer.on("/setCmd", HTTP_GET, [](AsyncWebServerRequest *request) {
-		wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCmd");
-		if(request->hasParam("cmd")) {
-			if(request->getParam("cmd")->value() == "ForceMqttUpdate") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ForceMqttUpdate");
+		wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCmd"));
+		if(request->hasParam(F("cmd"))) {
+			if(request->getParam(F("cmd"))->value() == F("ForceMqttUpdate")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found ForceMqttUpdate"));
 				wpWebServer.setCommand(wpWebServer.cmdForceMqttUpdate);
 			}
-			if(request->getParam("cmd")->value() == "ForceRenewValue") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ForceRenewValue");
+			if(request->getParam(F("cmd"))->value() == F("ForceRenewValue")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found ForceRenewValue"));
 				wpWebServer.setCommand(wpWebServer.cmdForceRenewValue);
 			}
-			if(request->getParam("cmd")->value() == "UpdateFW") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateFW");
+			if(request->getParam(F("cmd"))->value() == F("UpdateFW")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found UpdateFW"));
 				wpWebServer.setCommand(wpWebServer.cmdUpdateFW);
 			}
-			if(request->getParam("cmd")->value() == "UpdateCheck") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateCheck");
+			if(request->getParam(F("cmd"))->value() == F("UpdateCheck")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found UpdateCheck"));
 				wpWebServer.setCommand(wpWebServer.cmdUpdateCheck);
 			}
-			if(request->getParam("cmd")->value() == "UpdateHTTP") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found UpdateHTTP");
+			if(request->getParam(F("cmd"))->value() == F("UpdateHTTP")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found UpdateHTTP"));
 				wpWebServer.setCommand(wpWebServer.cmdUpdateHTTP);
 			}
-			if(request->getParam("cmd")->value() == "RestartDevice") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found RestartDevice");
+			if(request->getParam(F("cmd"))->value() == F("RestartDevice")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found RestartDevice"));
 				wpWebServer.setCommand(wpWebServer.cmdRestartESP);
 			}
-			if(request->getParam("cmd")->value() == "ScanWiFi") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found ScanWiFi");
+			if(request->getParam(F("cmd"))->value() == F("ScanWiFi")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found ScanWiFi"));
 				wpWebServer.setCommand(wpWebServer.cmdScanWiFi);
 			}
-			if(request->getParam("cmd")->value() == "CheckDns") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found CheckDns");
+			if(request->getParam(F("cmd"))->value() == F("CheckDns")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found CheckDns"));
 				wpWebServer.setCommand(wpWebServer.cmdCheckDns);
 			}
-			if(request->getParam("cmd")->value() == "calcValues") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd calcValues");
+			if(request->getParam(F("cmd"))->value() == F("calcValues")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd calcValues"));
 				wpFZ.calcValues = !wpFZ.calcValues;
 			}
-			if(request->getParam("cmd")->value() == "Blink") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found Blink");
+			if(request->getParam(F("cmd"))->value() == F("Blink")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Blink"));
 			}
-			if(request->getParam("cmd")->value() == "waterEmpty") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd waterEmpty");
+			if(request->getParam(F("cmd"))->value() == F("waterEmpty")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd waterEmpty"));
 				wpRelais.waterEmptySet = !wpRelais.waterEmptySet;
 			}
-			if(request->getParam("cmd")->value() == "SetDeviceName") {
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found cmd SetDeviceName");
-				if(request->hasParam("newName")) {
-					wpWebServer.newName = request->getParam("newName")->value();
+			if(request->getParam(F("cmd"))->value() == F("SetDeviceName")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd SetDeviceName"));
+				if(request->hasParam(F("newName"))) {
+					wpWebServer.newName = request->getParam(F("newName"))->value();
 					wpWebServer.setCommand(wpWebServer.cmdSetName);
 				}
 			}
 		}
-		request->send(200, "application/json", "{\"erg\":\"S_OK\"}");
+		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 		wpWebServer.setBlink();
 	});
+	#if BUILDWITH == 1
 	if(wpModules.useModuleCwWw) {
 		webServer.on("/setCwWwAuto", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("ww") && request->hasParam("cw") && request->hasParam("sleep")) {
-				byte ww = request->getParam("ww")->value().toInt();
-				byte cw = request->getParam("cw")->value().toInt();
-				uint sleep = request->getParam("sleep")->value().toInt();
-				request->send_P(200, "application/json", wpCwWw.SetWwCwAuto(ww, cw, sleep).c_str());
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set WwCw: '" + String(ww) + "'");
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set Sleep: '" + String(sleep) + "'");
+			if(request->hasParam(F("ww")) && request->hasParam(F("cw")) && request->hasParam(F("sleep"))) {
+				byte ww = request->getParam(F("ww"))->value().toInt();
+				byte cw = request->getParam(F("cw"))->value().toInt();
+				uint sleep = request->getParam(F("sleep"))->value().toInt();
+				request->send(200, F("application/json"), wpCwWw.SetWwCwAuto(ww, cw, sleep).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WwCw: '" + String(ww) + "'");
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set Sleep: '" + String(sleep) + "'");
 			}
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setCwWw", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("turn")) {
-				uint8 t = request->getParam("turn")->value().toInt();
+			if(request->hasParam(F("turn"))) {
+				uint8 t = request->getParam(F("turn"))->value().toInt();
 				if(t == 1) {
-					request->send_P(200, "application/json", wpCwWw.SetOn().c_str());
+					request->send(200, F("application/json"), wpCwWw.SetOn().c_str());
 				}
 				if(t == 0) {
-					request->send_P(200, "application/json", wpCwWw.SetOff().c_str());
+					request->send(200, F("application/json"), wpCwWw.SetOff().c_str());
 				}
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setCwWw turn '" + String(t) + "'");
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), "Found setCwWw turn '" + String(t) + "'");
 			}
-			if(request->hasParam("sleep")) {
-				uint sleep = request->getParam("sleep")->value().toInt();
+			if(request->hasParam(F("sleep"))) {
+				uint sleep = request->getParam(F("sleep"))->value().toInt();
 				wpCwWw.SetSleep(sleep);
-				request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set Sleep: '" + String(sleep) + "'");
+				request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set Sleep: '" + String(sleep) + "'");
 			}
-			if(request->hasParam("ww") && request->hasParam("cw") && request->hasParam("sleep")) {
-				byte ww = request->getParam("ww")->value().toInt();
-				byte cw = request->getParam("cw")->value().toInt();
-				request->send_P(200, "application/json", wpCwWw.SetWwCw(ww, cw).c_str());
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set WwCw: '" + String(ww) + "'");
+			if(request->hasParam(F("ww")) && request->hasParam(F("cw")) && request->hasParam(F("sleep"))) {
+				byte ww = request->getParam(F("ww"))->value().toInt();
+				byte cw = request->getParam(F("cw"))->value().toInt();
+				request->send(200, F("application/json"), wpCwWw.SetWwCw(ww, cw).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WwCw: '" + String(ww) + "'");
 			} else {
-				if(request->hasParam("ww")) {
-					byte ww = request->getParam("ww")->value().toInt();
-					request->send_P(200, "application/json", wpCwWw.SetWW(ww).c_str());
-					wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set WW: '" + String(ww) + "'");
+				if(request->hasParam(F("ww"))) {
+					byte ww = request->getParam(F("ww"))->value().toInt();
+					request->send(200, F("application/json"), wpCwWw.SetWW(ww).c_str());
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WW: '" + String(ww) + "'");
 				}
-				if(request->hasParam("cw")) {
-					byte cw = request->getParam("cw")->value().toInt();
-					request->send_P(200, "application/json", wpCwWw.SetCW(cw).c_str());
-					wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWw, set CW: '" + String(cw) + "'");
+				if(request->hasParam(F("cw"))) {
+					byte cw = request->getParam(F("cw"))->value().toInt();
+					request->send(200, F("application/json"), wpCwWw.SetCW(cw).c_str());
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set CW: '" + String(cw) + "'");
 				}
 			}
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setCwWwEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpCwWw.SetSmooth();
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setCwWwEffect");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setCwWwEffect"));
+			request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setCwWwSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint seconds = 0;
-			if(request->hasParam("sleep")) {
-				seconds = request->getParam("sleep")->value().toInt();
+			if(request->hasParam(F("sleep"))) {
+				seconds = request->getParam(F("sleep"))->value().toInt();
 			}
 			wpCwWw.SetSleep(seconds);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setCwWwSleep");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWwSleep"));
+			request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 			wpWebServer.setBlink();
 		});
 	}
 	if(wpModules.useModuleNeoPixel) {
 		webServer.on("/setNeoPixelDemo", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("demo")) {
+			if(request->hasParam(F("demo"))) {
 				wpNeoPixel.demoMode = !wpNeoPixel.demoMode;
 			}
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setNeoPixelDemo");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setNeoPixelDemo"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("effect")) {
-				uint effect = request->getParam("effect")->value().toInt();
+			if(request->hasParam(F("effect"))) {
+				uint effect = request->getParam(F("effect"))->value().toInt();
 				wpNeoPixel.demoMode = false;
 				wpNeoPixel.SetMode(effect);
 			}
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebServer", "Found setNeoPixelEffect");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setNeoPixelEffect"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelColor", HTTP_GET, [](AsyncWebServerRequest *request) {
 			byte r = 0;
 			byte g = 0;
 			byte b = 0;
-			if(request->hasParam("r")) {
-				r = request->getParam("r")->value().toInt();
+			if(request->hasParam(F("r"))) {
+				r = request->getParam(F("r"))->value().toInt();
 			}
-			if(request->hasParam("g")) {
-				g = request->getParam("g")->value().toInt();
+			if(request->hasParam(F("g"))) {
+				g = request->getParam(F("g"))->value().toInt();
 			}
-			if(request->hasParam("b")) {
-				b = request->getParam("b")->value().toInt();
+			if(request->hasParam(F("b"))) {
+				b = request->getParam(F("b"))->value().toInt();
 			}
 			wpNeoPixel.SetValueR(r);
 			wpNeoPixel.SetValueG(g);
 			wpNeoPixel.SetValueB(b);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelColor: "
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelColor: "
 				"r: '" + String(r) + "', "
 				"g: '" + String(g) + "', "
 				"b: '" + String(b) + "'");
 			
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelBrightness", HTTP_GET, [](AsyncWebServerRequest *request) {
 			byte b = 0;
-			if(request->hasParam("brightness")) {
-				b = request->getParam("brightness")->value().toInt();
+			if(request->hasParam(F("brightness"))) {
+				b = request->getParam(F("brightness"))->value().toInt();
 				wpNeoPixel.SetBrightness(b);
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBrightness, '" + String(b) + "'");
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelBrightness, '" + String(b) + "'");
 			}
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelEffectSpeed", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint8 effectSpeed = 0;
-			if(request->hasParam("effectSpeed")) {
-				effectSpeed = request->getParam("effectSpeed")->value().toInt();
+			if(request->hasParam(F("effectSpeed"))) {
+				effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
 				wpNeoPixel.SetEffectSpeed(effectSpeed);
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelEffectSpeed, '" + String(effectSpeed) + "'");
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelEffectSpeed, '" + String(effectSpeed) + "'");
 			}
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelWW", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("ww")) {
-				byte ww = request->getParam("ww")->value().toInt();
-				request->send_P(200, "application/json", wpNeoPixel.SetWW(ww).c_str());
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelWW, '" + String(ww) + "'");
+			if(request->hasParam(F("ww"))) {
+				byte ww = request->getParam(F("ww"))->value().toInt();
+				request->send(200, F("application/json"), wpNeoPixel.SetWW(ww).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelWW, '" + String(ww) + "'");
 			}
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelCW", HTTP_GET, [](AsyncWebServerRequest *request) {
-			if(request->hasParam("cw")) {
-				byte cw = request->getParam("cw")->value().toInt();
-				request->send_P(200, "application/json", wpNeoPixel.SetCW(cw).c_str());
-				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelCW, '" + String(cw) + "'");
+			if(request->hasParam(F("cw"))) {
+				byte cw = request->getParam(F("cw"))->value().toInt();
+				request->send(200, F("application/json"), wpNeoPixel.SetCW(cw).c_str());
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelCW, '" + String(cw) + "'");
 			}
 			wpWebServer.setBlink();
 		});
@@ -868,74 +994,161 @@ void helperWebServer::setupWebServer() {
 			byte r = 0;
 			byte g = 0;
 			byte b = 0;
-			if(request->hasParam("pixel")) {
-				pixel = request->getParam("pixel")->value().toInt();
+			if(request->hasParam(F("pixel"))) {
+				pixel = request->getParam(F("pixel"))->value().toInt();
 			}
-			if(request->hasParam("r")) {
-				r = request->getParam("r")->value().toInt();
+			if(request->hasParam(F("r"))) {
+				r = request->getParam(F("r"))->value().toInt();
 			}
-			if(request->hasParam("g")) {
-				g = request->getParam("g")->value().toInt();
+			if(request->hasParam(F("g"))) {
+				g = request->getParam(F("g"))->value().toInt();
 			}
-			if(request->hasParam("b")) {
-				b = request->getParam("b")->value().toInt();
+			if(request->hasParam(F("b"))) {
+				b = request->getParam(F("b"))->value().toInt();
 			}
 			wpNeoPixel.ComplexEffect(pixel, r, g, b);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixel");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixel"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint seconds = 0;
-			if(request->hasParam("sleep")) {
-				seconds = request->getParam("sleep")->value().toInt();
+			if(request->hasParam(F("sleep"))) {
+				seconds = request->getParam(F("sleep"))->value().toInt();
 			}
 			wpNeoPixel.SetSleep(seconds);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelSleep");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelSleep"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelOn", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOn");
-			request->send_P(200, "application/json", wpNeoPixel.SetOn().c_str());
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOn"));
+			request->send(200, F("application/json"), wpNeoPixel.SetOn().c_str());
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelOff", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
-			request->send_P(200, "application/json", wpNeoPixel.SetOff().c_str());
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOff"));
+			request->send(200, F("application/json"), wpNeoPixel.SetOff().c_str());
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelOffRunner", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint8 steps = 5;
-			if(request->hasParam("steps")) {
-				steps = request->getParam("steps")->value().toInt();
+			if(request->hasParam(F("steps"))) {
+				steps = request->getParam(F("steps"))->value().toInt();
 			}
 			wpNeoPixel.SetOffRunner(steps);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOffRunner");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOffRunner"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelOffBlender", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint8 steps = 5;
-			if(request->hasParam("steps")) {
-				steps = request->getParam("steps")->value().toInt();
+			if(request->hasParam(F("steps"))) {
+				steps = request->getParam(F("steps"))->value().toInt();
 			}
 			wpNeoPixel.SetOffBlender(steps);
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelOff");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOff"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
-			wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setNeoPixelBorder");
-			request->send_P(200, "application/json", "{\"erg\":\"S_OK\"}");
+			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelBorder"));
+			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
 		webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
-			request->send_P(200, "application/json", wpNeoPixel.getStripStatus().c_str());
+			request->send(200, F("application/json"), wpNeoPixel.getStripStatus().c_str());
 			wpWebServer.setBlink();
 		});
 	}
+	#endif
+	#if BUILDWITH == 3
+	if(wpModules.useModuleUnderfloor1) {
+		webServer.on("/setUnderfloor1", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam(F("hand"))) {
+				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor1.SetHand(hand == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("handValue"))) {
+				uint8 handValue = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor1.SetHandValue(handValue == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("setPoint"))) {
+				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor1.SetSetPoint(setPoint).c_str());
+			}
+			if(request->hasParam(F("topic"))) {
+				String topic = request->getParam(F("topic"))->value();
+				request->send(200, F("application/json"), wpUnderfloor1.SetTopicTempUrl(topic).c_str());
+			}
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor2) {
+		webServer.on("/setUnderfloor2", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam(F("hand"))) {
+				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor2.SetHand(hand == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("handValue"))) {
+				uint8 handValue = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor2.SetHandValue(handValue == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("setPoint"))) {
+				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor2.SetSetPoint(setPoint).c_str());
+			}
+			if(request->hasParam(F("topic"))) {
+				String topic = request->getParam(F("topic"))->value();
+				request->send(200, F("application/json"), wpUnderfloor2.SetTopicTempUrl(topic).c_str());
+			}
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor3) {
+		webServer.on("/setUnderfloor3", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam(F("hand"))) {
+				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor3.SetHand(hand == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("handValue"))) {
+				uint8 handValue = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor3.SetHandValue(handValue == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("setPoint"))) {
+				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor3.SetSetPoint(setPoint).c_str());
+			}
+			if(request->hasParam(F("topic"))) {
+				String topic = request->getParam(F("topic"))->value();
+				request->send(200, F("application/json"), wpUnderfloor3.SetTopicTempUrl(topic).c_str());
+			}
+			wpWebServer.setBlink();
+		});
+	}
+	if(wpModules.useModuleUnderfloor4) {
+		webServer.on("/setUnderfloor4", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam(F("hand"))) {
+				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor4.SetHand(hand == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("handValue"))) {
+				uint8 handValue = request->getParam(F("hand"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor4.SetHandValue(handValue == 0 ? false : true).c_str());
+			}
+			if(request->hasParam(F("setPoint"))) {
+				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				request->send(200, F("application/json"), wpUnderfloor4.SetSetPoint(setPoint).c_str());
+			}
+			if(request->hasParam(F("topic"))) {
+				String topic = request->getParam(F("topic"))->value();
+				request->send(200, F("application/json"), wpUnderfloor4.SetTopicTempUrl(topic).c_str());
+			}
+			wpWebServer.setBlink();
+		});
+	}
+	#endif
 	webServer.begin();
 }
 
@@ -1007,17 +1220,27 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleLight) wpModules.changeModuleLight(!wpModules.useModuleLight);
 		if(doModuleChange == cmdModuleBM) wpModules.changeModuleBM(!wpModules.useModuleBM);
 		if(doModuleChange == cmdModuleWindow) wpModules.changeModuleWindow(!wpModules.useModuleWindow);
-		if(doModuleChange == cmdModuleCwWw) wpModules.changeModuleCwWw(!wpModules.useModuleCwWw);
-		if(doModuleChange == cmdModuleAnalogOut) wpModules.changeModuleAnalogOut(!wpModules.useModuleAnalogOut);
-		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
-		if(doModuleChange == cmdModuleNeoPixel) wpModules.changeModuleNeoPixel(!wpModules.useModuleNeoPixel);
 		if(doModuleChange == cmdModuleRelais) wpModules.changeModuleRelais(!wpModules.useModuleRelais);
 		if(doModuleChange == cmdModuleRelaisShield) wpModules.changeModuleRelaisShield(!wpModules.useModuleRelaisShield);
-		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
 		if(doModuleChange == cmdModuleRain) wpModules.changeModuleRain(!wpModules.useModuleRain);
 		if(doModuleChange == cmdModuleMoisture) wpModules.changeModuleMoisture(!wpModules.useModuleMoisture);
 		if(doModuleChange == cmdModuleDistance) wpModules.changeModuleDistance(!wpModules.useModuleDistance);
+		#if BUILDWITH == 1
+		if(doModuleChange == cmdModuleCwWw) wpModules.changeModuleCwWw(!wpModules.useModuleCwWw);
+		if(doModuleChange == cmdModuleNeoPixel) wpModules.changeModuleNeoPixel(!wpModules.useModuleNeoPixel);
+		if(doModuleChange == cmdModuleAnalogOut) wpModules.changeModuleAnalogOut(!wpModules.useModuleAnalogOut);
+		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
+		#endif
+		#if BUILDWITH == 2
+		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
+		#endif
+		#if BUILDWITH == 3
+		if(doModuleChange == cmdmoduleUnderfloor1) wpModules.changemoduleUnderfloor1(!wpModules.useModuleUnderfloor1);
+		if(doModuleChange == cmdmoduleUnderfloor2) wpModules.changemoduleUnderfloor2(!wpModules.useModuleUnderfloor2);
+		if(doModuleChange == cmdmoduleUnderfloor3) wpModules.changemoduleUnderfloor3(!wpModules.useModuleUnderfloor3);
+		if(doModuleChange == cmdmoduleUnderfloor4) wpModules.changemoduleUnderfloor4(!wpModules.useModuleUnderfloor4);
+		#endif
 		doModuleChange = cmdDoNothing;
 	}
 }
@@ -1030,15 +1253,21 @@ void helperWebServer::doTheSendRestChange() {
 		if(doSendRestChange == cmdSendRestLight) wpLight.changeSendRest();
 		if(doSendRestChange == cmdSendRestBM) wpBM.changeSendRest();
 		if(doSendRestChange == cmdSendRestWindow) wpWindow.changeSendRest();
-		if(doSendRestChange == cmdSendRestAnalogOut) wpAnalogOut.changeSendRest();
-		if(doSendRestChange == cmdSendRestAnalogOut2) wpAnalogOut2.changeSendRest();
-		if(doSendRestChange == cmdSendRestNeoPixel) wpNeoPixel.changeSendRest();
 		if(doSendRestChange == cmdSendRestRelais) wpRelais.changeSendRest();
-		if(doSendRestChange == cmdSendRestRpm) wpRpm.changeSendRest();
 		if(doSendRestChange == cmdSendRestRain) wpRain.changeSendRest();
 		if(doSendRestChange == cmdSendRestMoisture) wpMoisture.changeSendRest();
 		if(doSendRestChange == cmdSendRestDistance) wpDistance.changeSendRest();
+		#if BUILDWITH == 1
+		if(doSendRestChange == cmdSendRestNeoPixel) wpNeoPixel.changeSendRest();
+		if(doSendRestChange == cmdSendRestAnalogOut) wpAnalogOut.changeSendRest();
+		if(doSendRestChange == cmdSendRestAnalogOut2) wpAnalogOut2.changeSendRest();
+		#endif
+		#if BUILDWITH == 2
+		if(doSendRestChange == cmdSendRestRpm) wpRpm.changeSendRest();
 		if(doSendRestChange == cmdSendRestImpulseCounter) wpImpulseCounter.changeSendRest();
+		#endif
+		#if BUILDWITH == 3
+		#endif
 		doSendRestChange = cmdDoNothing;
 	}
 }
@@ -1059,14 +1288,24 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugLight) wpLight.changeDebug();
 		if(doDebugChange == cmdDebugBM) wpBM.changeDebug();
 		if(doDebugChange == cmdDebugWindow) wpWindow.changeDebug();
-		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
-		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
-		if(doDebugChange == cmdDebugNeoPixel) wpNeoPixel.changeDebug();
 		if(doDebugChange == cmdDebugRelais) wpRelais.changeDebug();
-		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
+		#if BUILDWITH == 1
+		if(doDebugChange == cmdDebugNeoPixel) wpNeoPixel.changeDebug();
+		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
+		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
+		#endif
+		#if BUILDWITH == 2
+		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
+		#endif
+		#if BUILDWITH == 3
+		if(doDebugChange == cmdDebugUnderfloor1) wpUnderfloor1.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor2) wpUnderfloor2.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor3) wpUnderfloor3.changeDebug();
+		if(doDebugChange == cmdDebugUnderfloor4) wpUnderfloor4.changeDebug();
+		#endif
 		doDebugChange = cmdDoNothing;
 	}
 }
@@ -1078,21 +1317,21 @@ void helperWebServer::doTheBlink() {
 	}
 }
 String helperWebServer::getchangeModule(String id, String name, bool state) {
-	String returns = "<li class='setChange' onclick='changeModule(event)'>"
-		"<span id='" + id + "' class='" + (state ? "color-ok" : "") + "'>" + name + "</span>"
-	"</li>";
+	String returns = F("<li class='setChange' onclick='changeModule(event)'>");
+	returns += F("<span id='") + id + F("' class='") + (state ? "color-ok" : "") + F("'>") + name + F("</span>");
+	returns += F("</li>");
 	return returns;
 }
 String helperWebServer::getChangeDebug(String id, String name, bool state) {
-	String returns = "<li class='setChange' onclick='changeDebug(event)'>"
-		"<span id='" + id + "' class='" + (state ? "color-ok" : "") + "'>" + name + "</span>"
-	"</li>";
+	String returns = F("<li class='setChange' onclick='changeDebug(event)'>");
+	returns += F("<span id='") + id + F("' class='") + (state ? "color-ok" : "") + F("'>") + name + F("</span>");
+	returns += F("</li>");
 	return returns;
 }
 String helperWebServer::getChangeRest(String id, String name, bool state) {
-	String returns = "<li class='setChange' onclick='changeSendRest(event)'>"
-		"<span id='" + id + "' class='" + (state ? "color-ok" : "") + "'>" + name + "</span>"
-	"</li>";
+	String returns = F("<li class='setChange' onclick='changeSendRest(event)'>");
+	returns += F("<span id='") + id + F("' class='") + (state ? "color-ok" : "") + F("'>") + name + F("</span>");
+	returns += F("</li>");
 	return returns;
 }
 
@@ -1103,165 +1342,204 @@ String helperWebServer::getChangeRest(String id, String name, bool state) {
 String processor(const String& var) {
 	String returns;
 //###################################################################################
-	if(var == "IPADRESS")
+	if(var == F("IPADRESS"))
 		return WiFi.localIP().toString();
 //###################################################################################
-	if(var == "DeviceName")
+	if(var == F("DeviceName"))
 		return wpFZ.DeviceName;
 //###################################################################################
-	if(var == "DeviceDescription")
+	if(var == F("DeviceDescription"))
 		return wpFZ.DeviceDescription;
 //###################################################################################
-	if(var == "Version")
+	if(var == F("Version"))
 		return wpFZ.Version;
 //###################################################################################
 	if(var == "CompiledWith") {
 		returns = "<ul class='wpContainer'><li><span class='bold'>Modules:</span></li><li><hr /></li>" +
-			wpWebServer.getchangeModule("useDHT11", "wpDHT11", wpModules.useModuleDHT11) +
-			wpWebServer.getchangeModule("useDHT22", "wpDHT22", wpModules.useModuleDHT22) +
-			wpWebServer.getchangeModule("useLDR", "wpLDR", wpModules.useModuleLDR) +
-			wpWebServer.getchangeModule("useLight", "wpLight", wpModules.useModuleLight) +
-			wpWebServer.getchangeModule("useBM", "wpBM", wpModules.useModuleBM) +
-			wpWebServer.getchangeModule("useWindow", "wpWindow", wpModules.useModuleWindow) +
-			wpWebServer.getchangeModule("useCwWw", "wpCwWw", wpModules.useModuleCwWw) +
-			wpWebServer.getchangeModule("useAnalogOut", "wpAnalogOut", wpModules.useModuleAnalogOut) +
-			wpWebServer.getchangeModule("useAnalogOut2", "wpAnalogOut2", wpModules.useModuleAnalogOut2) +
-			wpWebServer.getchangeModule("useNeoPixel", "wpNeoPixel", wpModules.useModuleNeoPixel) +
-			wpWebServer.getchangeModule("useRelais", "wpRelais", wpModules.useModuleRelais) +
-			wpWebServer.getchangeModule("useRelaisShield", "wpRelaisShield", wpModules.useModuleRelaisShield) +
-			wpWebServer.getchangeModule("useRpm", "wpRpm", wpModules.useModuleRpm) +
-			wpWebServer.getchangeModule("useRain", "wpRain", wpModules.useModuleRain) +
-			wpWebServer.getchangeModule("useMoisture", "wpMoisture", wpModules.useModuleMoisture) +
-			wpWebServer.getchangeModule("useDistance", "wpDistance", wpModules.useModuleDistance) +
-			wpWebServer.getchangeModule("useImpulseCounter", "wpImpulseCounter", wpModules.useModuleImpulseCounter);
-		return returns += "</ul>";
+			wpWebServer.getchangeModule(F("useDHT11"), F("wpDHT11"), wpModules.useModuleDHT11) +
+			wpWebServer.getchangeModule(F("useDHT22"), F("wpDHT22"), wpModules.useModuleDHT22) +
+			wpWebServer.getchangeModule(F("useLDR"), F("wpLDR"), wpModules.useModuleLDR) +
+			wpWebServer.getchangeModule(F("useLight"), F("wpLight"), wpModules.useModuleLight) +
+			wpWebServer.getchangeModule(F("useBM"), F("wpBM"), wpModules.useModuleBM) +
+			wpWebServer.getchangeModule(F("useWindow"), F("wpWindow"), wpModules.useModuleWindow) +
+			wpWebServer.getchangeModule(F("useRelais"), F("wpRelais"), wpModules.useModuleRelais) +
+			wpWebServer.getchangeModule(F("useRelaisShield"), F("wpRelaisShield"), wpModules.useModuleRelaisShield) +
+			wpWebServer.getchangeModule(F("useRain"), F("wpRain"), wpModules.useModuleRain) +
+			wpWebServer.getchangeModule(F("useMoisture"), F("wpMoisture"), wpModules.useModuleMoisture) +
+			wpWebServer.getchangeModule(F("useDistance"), F("wpDistance"), wpModules.useModuleDistance);
+		#if BUILDWITH == 1
+		returns +=
+			wpWebServer.getchangeModule(F("useCwWw"), F("wpCwWw"), wpModules.useModuleCwWw) +
+			wpWebServer.getchangeModule(F("useNeoPixel"), F("wpNeoPixel"), wpModules.useModuleNeoPixel) +
+			wpWebServer.getchangeModule(F("useAnalogOut"), F("wpAnalogOut"), wpModules.useModuleAnalogOut) +
+			wpWebServer.getchangeModule(F("useAnalogOut2"), F("wpAnalogOut2"), wpModules.useModuleAnalogOut2);
+		#endif
+		#if BUILDWITH == 2
+		returns +=
+			wpWebServer.getchangeModule(F("useRpm"), F("wpRpm"), wpModules.useModuleRpm) +
+			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter);
+		#endif
+		#if BUILDWITH == 3
+		returns +=
+			wpWebServer.getchangeModule(F("useUnderfloor1"), F("wpUnderfloor1"), wpModules.useModuleUnderfloor1) +
+			wpWebServer.getchangeModule(F("useUnderfloor2"), F("wpUnderfloor2"), wpModules.useModuleUnderfloor2) +
+			wpWebServer.getchangeModule(F("useUnderfloor3"), F("wpUnderfloor3"), wpModules.useModuleUnderfloor3) +
+			wpWebServer.getchangeModule(F("useUnderfloor4"), F("wpUnderfloor4"), wpModules.useModuleUnderfloor4);
+		#endif
+		returns +=
+			"</ul>";
+		return returns;
 	}
 //###################################################################################
-	if(var == "Debug") {
-		returns = "<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>" +
-			wpWebServer.getChangeDebug("calcValues", "calc Values", wpFZ.calcValues);
+	if(var == F("Debug")) {
+		returns = F("<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>") +
+			wpWebServer.getChangeDebug(F("calcValues"), F("calc Values"), wpFZ.calcValues);
 		if((wpModules.useModuleRelais || wpModules.useModuleRelaisShield) && wpModules.useModuleMoisture) {
-			returns += wpWebServer.getChangeDebug("waterEmpty", "waterEmpty", wpRelais.waterEmptySet);
+			returns += wpWebServer.getChangeDebug(F("waterEmpty"), F("waterEmpty"), wpRelais.waterEmptySet);
 		}
-		returns += "<li><span class='bold'>Debug:</span></li><li><hr /></li>" +
-			wpWebServer.getChangeDebug("DebugEEPROM", "Eprom", wpEEPROM.Debug) +
-			wpWebServer.getChangeDebug("DebugFinder", "Modules", wpFinder.Debug) +
-			wpWebServer.getChangeDebug("DebugModules", "Finder", wpModules.Debug) +
-			wpWebServer.getChangeDebug("DebugMqtt", "Mqtt", wpMqtt.Debug) +
-			wpWebServer.getChangeDebug("DebugOnlineToggler", "OnlineToggler", wpOnlineToggler.Debug) +
-			wpWebServer.getChangeDebug("DebugRest", "Rest", wpRest.Debug) +
-			wpWebServer.getChangeDebug("DebugUpdate", "WebServer", wpUpdate.Debug) +
-			wpWebServer.getChangeDebug("DebugWebServer", "Update", wpWebServer.Debug) +
-			wpWebServer.getChangeDebug("DebugWiFi", "WiFi", wpWiFi.Debug) +
-			"<li><hr /></li>";
+		returns += F("<li><span class='bold'>Debug:</span></li><li><hr /></li>") +
+			wpWebServer.getChangeDebug(F("DebugEEPROM"), F("Eprom"), wpEEPROM.Debug) +
+			wpWebServer.getChangeDebug(F("DebugFinder"), F("Modules"), wpFinder.Debug) +
+			wpWebServer.getChangeDebug(F("DebugModules"), F("Finder"), wpModules.Debug) +
+			wpWebServer.getChangeDebug(F("DebugMqtt"), F("Mqtt"), wpMqtt.Debug) +
+			wpWebServer.getChangeDebug(F("DebugOnlineToggler"), F("OnlineToggler"), wpOnlineToggler.Debug) +
+			wpWebServer.getChangeDebug(F("DebugRest"), F("Rest"), wpRest.Debug) +
+			wpWebServer.getChangeDebug(F("DebugUpdate"), F("WebServer"), wpUpdate.Debug) +
+			wpWebServer.getChangeDebug(F("DebugWebServer"), F("Update"), wpWebServer.Debug) +
+			wpWebServer.getChangeDebug(F("DebugWiFi"), F("WiFi"), wpWiFi.Debug) +
+			F("<li><hr /></li>");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			returns += wpWebServer.getChangeDebug("DebugDHT", "DHT", wpDHT.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugDHT"), F("DHT"), wpDHT.Debug());
 		}
 		if(wpModules.useModuleLDR) {
-			returns += wpWebServer.getChangeDebug("DebugLDR", "LDR", wpLDR.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugLDR"), F("LDR"), wpLDR.Debug());
 		}
 		if(wpModules.useModuleLight) {
-			returns += wpWebServer.getChangeDebug("DebugLight", "Light", wpLight.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugLight"), F("Light"), wpLight.Debug());
 		}
 		if(wpModules.useModuleBM) {
-			returns += wpWebServer.getChangeDebug("DebugBM", "BM", wpBM.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugBM"), F("BM"), wpBM.Debug());
 		}
 		if(wpModules.useModuleWindow) {
-			returns += wpWebServer.getChangeDebug("DebugWindow", "Window", wpWindow.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugWindow"), F("Window"), wpWindow.Debug());
 		}
+		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
+			returns += wpWebServer.getChangeDebug(F("DebugRelais"), F("Relais"), wpRelais.Debug());
+		}
+		if(wpModules.useModuleRain) {
+			returns += wpWebServer.getChangeDebug(F("DebugRain"), F("Rain"), wpRain.Debug());
+		}
+		if(wpModules.useModuleMoisture) {
+			returns += wpWebServer.getChangeDebug(F("DebugMoisture"), F("Moisture"), wpMoisture.Debug());
+		}
+		if(wpModules.useModuleDistance) {
+			returns += wpWebServer.getChangeDebug(F("DebugDistance"), F("Distance"), wpDistance.Debug());
+		}
+		#if BUILDWITH == 1
 		if(wpModules.useModuleCwWw) {
-			returns += wpWebServer.getChangeDebug("DebugCwWw", "CwWw", wpCwWw.Debug());
-		}
-		if(wpModules.useModuleAnalogOut) {
-			returns += wpWebServer.getChangeDebug("DebugAnalogOut", "AnalogOut", wpAnalogOut.Debug());
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			returns += wpWebServer.getChangeDebug("DebugAnalogOut2", "AnalogOut2", wpAnalogOut2.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugCwWw"), F("CwWw"), wpCwWw.Debug());
 		}
 		if(wpModules.useModuleNeoPixel) {
-			returns += wpWebServer.getChangeDebug("DebugNeoPixel", "NeoPixel", wpNeoPixel.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugNeoPixel"), F("NeoPixel"), wpNeoPixel.Debug());
 		}
-		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			returns += wpWebServer.getChangeDebug("DebugRelais", "Relais", wpRelais.Debug());
+		if(wpModules.useModuleAnalogOut) {
+			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut"), F("AnalogOut"), wpAnalogOut.Debug());
 		}
+		if(wpModules.useModuleAnalogOut2) {
+			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut2"), F("AnalogOut2"), wpAnalogOut2.Debug());
+		}
+		#endif
+		#if BUILDWITH == 2
 		if(wpModules.useModuleRpm) {
-			returns += wpWebServer.getChangeDebug("DebugRpm", "Rpm", wpRpm.Debug());
-		}
-		if(wpModules.useModuleRain) {
-			returns += wpWebServer.getChangeDebug("DebugRain", "Rain", wpRain.Debug());
-		}
-		if(wpModules.useModuleMoisture) {
-			returns += wpWebServer.getChangeDebug("DebugMoisture", "Moisture", wpMoisture.Debug());
-		}
-		if(wpModules.useModuleDistance) {
-			returns += wpWebServer.getChangeDebug("DebugDistance", "Distance", wpDistance.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugRpm"), F("Rpm"), wpRpm.Debug());
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			returns += wpWebServer.getChangeDebug("DebugImpulseCounter", "ImpulseCounter", wpImpulseCounter.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugImpulseCounter"), F("ImpulseCounter"), wpImpulseCounter.Debug());
 		}
-		return returns += "</ul>";
+		#endif
+		#if BUILDWITH == 3
+		if(wpModules.useModuleUnderfloor1) {
+			returns += wpWebServer.getChangeDebug(F("DebugUnderfloor1"), F("Underfloor1"), wpUnderfloor1.Debug());
+		}
+		if(wpModules.useModuleUnderfloor2) {
+			returns += wpWebServer.getChangeDebug(F("DebugUnderfloor2"), F("Underfloor2"), wpUnderfloor2.Debug());
+		}
+		if(wpModules.useModuleUnderfloor3) {
+			returns += wpWebServer.getChangeDebug(F("DebugUnderfloor3"), F("Underfloor3"), wpUnderfloor3.Debug());
+		}
+		if(wpModules.useModuleUnderfloor4) {
+			returns += wpWebServer.getChangeDebug(F("DebugUnderfloor4"), F("Underfloor4"), wpUnderfloor4.Debug());
+		}
+		#endif
+		return returns += F("</ul>");
 	}
 //###################################################################################
-	if(var == "SendRest") {
-		returns = "<ul class='wpContainer'><li><span class='bold'>SendRest:</span></li><li><hr /></li>" +
-			wpWebServer.getChangeRest("sendRestWiFi", "WiFi", wpWiFi.sendRest) +
-			"<li><hr /></li>";
+	if(var == F("SendRest")) {
+		returns = F("<ul class='wpContainer'><li><span class='bold'>SendRest:</span></li><li><hr /></li>") +
+			wpWebServer.getChangeRest(F("sendRestWiFi"), F("WiFi"), wpWiFi.sendRest) +
+			F("<li><hr /></li>");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			returns += wpWebServer.getChangeRest("sendRestDHT", "DHT", wpDHT.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestDHT"), F("DHT"), wpDHT.SendRest());
 		}
 		if(wpModules.useModuleLDR) {
-			returns += wpWebServer.getChangeRest("sendRestLDR", "LDR", wpLDR.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestLDR"), F("LDR"), wpLDR.SendRest());
 		}
 		if(wpModules.useModuleLight) {
-			returns += wpWebServer.getChangeRest("sendRestLight", "Light", wpLight.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestLight"), F("Light"), wpLight.SendRest());
 		}
 		if(wpModules.useModuleBM) {
-			returns += wpWebServer.getChangeRest("sendRestBM", "BM", wpBM.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestBM"), F("BM"), wpBM.SendRest());
 		}
 		if(wpModules.useModuleWindow) {
-			returns += wpWebServer.getChangeRest("sendRestWindow", "Window", wpWindow.SendRest());
-		}
-		if(wpModules.useModuleAnalogOut) {
-			returns += wpWebServer.getChangeRest("sendRestAnalogOut", "AnalogOut", wpAnalogOut.SendRest());
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			returns += wpWebServer.getChangeRest("sendRestAnalogOut2", "AnalogOut2", wpAnalogOut2.SendRest());
-		}
-		if(wpModules.useModuleNeoPixel) {
-			returns += wpWebServer.getChangeRest("sendRestNeoPixel", "NeoPixel", wpNeoPixel.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestWindow"), F("Window"), wpWindow.SendRest());
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			returns += wpWebServer.getChangeRest("sendRestRelais", "Relais", wpRelais.SendRest());
-		}
-		if(wpModules.useModuleRpm) {
-			returns += wpWebServer.getChangeRest("sendRestRpm", "Rpm", wpRpm.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestRelais"), F("Relais"), wpRelais.SendRest());
 		}
 		if(wpModules.useModuleRain) {
-			returns += wpWebServer.getChangeRest("sendRestRain", "Rain", wpRain.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestRain"), F("Rain"), wpRain.SendRest());
 		}
 		if(wpModules.useModuleMoisture) {
-			returns += wpWebServer.getChangeRest("sendRestMoisture", "Moisture", wpMoisture.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestMoisture"), F("Moisture"), wpMoisture.SendRest());
 		}
 		if(wpModules.useModuleDistance) {
-			returns += wpWebServer.getChangeRest("sendRestDistance", "Distance", wpDistance.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestDistance"), F("Distance"), wpDistance.SendRest());
+		}
+		#if BUILDWITH == 1
+		if(wpModules.useModuleNeoPixel) {
+			returns += wpWebServer.getChangeRest(F("sendRestNeoPixel"), F("NeoPixel"), wpNeoPixel.SendRest());
+		}
+		if(wpModules.useModuleAnalogOut) {
+			returns += wpWebServer.getChangeRest(F("sendRestAnalogOut"), F("AnalogOut"), wpAnalogOut.SendRest());
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			returns += wpWebServer.getChangeRest(F("sendRestAnalogOut2"), F("AnalogOut2"), wpAnalogOut2.SendRest());
+		}
+		#endif
+		#if BUILDWITH == 2
+		if(wpModules.useModuleRpm) {
+			returns += wpWebServer.getChangeRest(F("sendRestRpm"), F("Rpm"), wpRpm.SendRest());
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			returns += wpWebServer.getChangeRest("sendRestImpulseCounter", "ImpulseCounter", wpImpulseCounter.SendRest());
+			returns += wpWebServer.getChangeRest(F("sendRestImpulseCounter"), F("ImpulseCounter"), wpImpulseCounter.SendRest());
 		}
-		return returns += "</ul>";
+		#endif
+		#if BUILDWITH == 3
+		#endif
+		return returns += F("</ul>");
 	}
 //###################################################################################
-	if(var == "debugWebServer") {
-		String returns = "";
+	if(var == F("debugWebServer")) {
+		String returns = F("");
 		if(wpWebServer.Debug) {
-			returns = "console.log(event)";
+			returns = F("console.log(event)");
 		}
 		return returns;
 	}
-	if(var == "debugOnMessage") {
-		String returns = "";
+	if(var == F("debugOnMessage")) {
+		String returns = F("");
 		if(wpWebServer.Debug) {
-			returns = "console.log('[d.cmd = undefined]:'); console.log(d);";
+			returns = F("console.log('[d.cmd = undefined]:'); console.log(d);");
 		}
 		return returns;
 	}

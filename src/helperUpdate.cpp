@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 197                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 197 2024-09-04 03:51:46Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 203 2024-10-04 07:32:26Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -32,6 +32,16 @@ void helperUpdate::init() {
 	lastUpdateCheck = 0;
 	serverVersion = "";
 	newVersion = false;
+	file = "firmware.bin";
+	#if BUILDWITH == 1
+		file = "firmwarelight.bin";
+	#endif
+	#if BUILDWITH == 2
+		file = "firmwareio.bin";
+	#endif
+	#if BUILDWITH == 3
+		file = "firmwareheating.bin";
+	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
 }
@@ -47,7 +57,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 197 $";
+	String SVN = "$Rev: 203 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -115,9 +125,6 @@ void helperUpdate::check() {
 	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {
-	start("firmware.bin");
-}
-void helperUpdate::start(String file) {
 	WiFiClient client;
 	ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
@@ -134,7 +141,7 @@ void helperUpdate::start(String file) {
 	
 	//const String urlfile = "http://" + String(wpFZ.updateServer) + "/" + file;
 	//t_httpUpdate_return ret = ESPhttpUpdate.update(client, urlfile);
-	
+	wpFZ.DebugWS(wpFZ.strINFO, "Update::start", "Start Update with: '" + file + "'");
 	t_httpUpdate_return ret = ESPhttpUpdate.update(client, String(wpFZ.updateServer), 80, "/" + file);
 
 	switch (ret) {
@@ -206,7 +213,7 @@ void helperUpdate::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void helperUpdate::doCheckUpdate() {
 	unsigned long m = millis();
-	if((lastUpdateCheck == 0 && m > 2000) || m > lastUpdateCheck + twelveHours) {
+	if((lastUpdateCheck == 0 && m > 60000) || m > lastUpdateCheck + twelveHours) {
 		check();
 	}
 }

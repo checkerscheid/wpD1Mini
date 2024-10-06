@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 203                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 198 2024-09-05 12:32:25Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 203 2024-10-04 07:32:26Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -79,6 +79,10 @@ class helperWebServer {
 		const int8 cmdDebugNeoPixel = 32;
 		const int8 cmdDebugRpm = 33;
 		const int8 cmdDebugImpulseCounter = 34;
+		const int8 cmdDebugUnderfloor1 = 35;
+		const int8 cmdDebugUnderfloor2 = 36;
+		const int8 cmdDebugUnderfloor3 = 37;
+		const int8 cmdDebugUnderfloor4 = 38;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -98,6 +102,10 @@ class helperWebServer {
 		const int8 cmdModuleNeoPixel = 15;
 		const int8 cmdModuleRpm = 16;
 		const int8 cmdmoduleImpulseCounter = 17;
+		const int8 cmdmoduleUnderfloor1 = 18;
+		const int8 cmdmoduleUnderfloor2 = 19;
+		const int8 cmdmoduleUnderfloor3 = 20;
+		const int8 cmdmoduleUnderfloor4 = 21;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -133,7 +141,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 203 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -213,7 +221,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="ulContainer">
 			%Debug%
-			%SendRest%
 			%CompiledWith%
 			<ul class="wpContainer">
 				<li><span class='bold'>Device:</span></li><li><hr /></li>

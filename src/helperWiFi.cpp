@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 206                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 183 2024-07-29 03:32:26Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 206 2024-10-06 19:10:09Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -19,9 +19,6 @@ helperWiFi wpWiFi;
 
 helperWiFi::helperWiFi() {}
 void helperWiFi::init() {
-	addrSendRest = wpEEPROM.addrBitsSendRestBasis0;
-	byteSendRest = wpEEPROM.bitsSendRestBasis0;
-	bitSendRest = wpEEPROM.bitSendRestRssi;
 	// values
 	mqttTopicRssi = wpFZ.DeviceName + "/info/WiFi/RSSI";
 	mqttTopicWiFiSince = wpFZ.DeviceName + "/info/WiFi/Since";
@@ -52,7 +49,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 206 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -60,9 +57,11 @@ uint16 helperWiFi::getVersion() {
 
 void helperWiFi::changeSendRest() {
 	sendRest = !sendRest;
-	bitWrite(byteSendRest, bitSendRest, sendRest);
-	EEPROM.write(addrSendRest, byteSendRest);
+	bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+	EEPROM.write(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0);
 	EEPROM.commit();
+	wpFZ.SendWSSendRest("sendRestWiFi", sendRest);
+	wpFZ.DebugWS(wpFZ.strINFO, "WiFi::changeSendRest", "WiFi sendRest: " + sendRest ? "True" : "False");
 	wpFZ.blink();
 }
 void helperWiFi::changeDebug() {
@@ -81,7 +80,8 @@ void helperWiFi::setupWiFi() {
 	Serial.print(wpFZ.funcToString("setupWiFi"));
 	Serial.print("Connecting to ");
 	Serial.println(wpFZ.ssid);
-
+	
+	WiFi.disconnect();
 	WiFi.setHostname(wpFZ.DeviceName.c_str());
 	WiFi.begin(wpFZ.ssid, wpFZ.password);
 
@@ -92,6 +92,7 @@ void helperWiFi::setupWiFi() {
 	while(WiFi.status() != WL_CONNECTED) {
 		delay(500);
 		Serial.print(".");
+		wpFZ.blink();
 	}
 	Serial.println();
 
@@ -186,8 +187,8 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readSendRest = msg.toInt();
 		if(sendRest != readSendRest) {
 			sendRest = readSendRest;
-			bitWrite(byteSendRest, bitSendRest, sendRest);
-			EEPROM.write(addrSendRest, byteSendRest);
+			bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
+			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsSendRestBasis0);
 			EEPROM.commit();
 			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
 		}

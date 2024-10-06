@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 202                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 201 2024-09-08 22:39:09Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 202 2024-10-02 05:34:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h
@@ -32,9 +32,9 @@ class moduleBase {
 		String mqttTopicDebug;
 		String mqttTopicError;
 		String mqttTopicCalcCycle;
-		void initRest(uint16 addrSendRest, byte byteSendRest, uint8 bitSendRest);
-		void initUseAvg(uint16 addrUseAvg, byte byteUseAvg, uint8 bitUseAvg);
-		void initDebug(uint16 addrDebug, byte byteDebug, uint8 bitDebug);
+		void initRest(uint16 addrSendRest, byte& byteSendRest, uint8 bitSendRest);
+		void initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg);
+		void initDebug(uint16 addrDebug, byte& byteDebug, uint8 bitDebug);
 		void initError();
 		void initCalcCycle(uint16 addrCalcCycle);
 		void changeSendRest();
