@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 208                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 207 2024-10-07 12:59:22Z                        $ #
+//# File-ID      : $Id:: main.cpp 208 2024-10-07 21:20:42Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -77,6 +77,12 @@ void setup() {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.init();
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.init();
+	}
 	if(wpModules.useModuleRpm) {
 		wpRpm.init();
 	}
@@ -160,6 +166,12 @@ void loop() {
 		}
 		#endif
 		#if BUILDWITH == 2
+		if(wpModules.useModuleAnalogOut) {
+			wpAnalogOut.cycle();
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			wpAnalogOut2.cycle();
+		}
 		if(wpModules.useModuleRpm) {
 			wpRpm.cycle();
 		}
@@ -189,7 +201,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 208 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -233,6 +245,8 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpAnalogOut2.getVersion());
 	#endif
 	#if BUILDWITH == 2
+	buildChecker(v, wpAnalogOut.getVersion());
+	buildChecker(v, wpAnalogOut2.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
 	#endif

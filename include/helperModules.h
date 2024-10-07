@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 208                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 203 2024-10-04 07:32:26Z                 $ #
+//# File-ID      : $Id:: helperModules.h 208 2024-10-07 21:20:42Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -65,6 +65,8 @@ class helperModules {
 		String mqttTopicUseAnalogOut2;
 		#endif
 		#if BUILDWITH == 2
+		String mqttTopicUseAnalogOut;
+		String mqttTopicUseAnalogOut2;
 		String mqttTopicUseRpm;
 		String mqttTopicUseImpulseCounter;
 		#endif
@@ -107,6 +109,8 @@ class helperModules {
 		void changeModuleAnalogOut2(bool newValue);
 		#endif
 		#if BUILDWITH == 2
+		void changeModuleAnalogOut(bool newValue);
+		void changeModuleAnalogOut2(bool newValue);
 		void changeModuleRpm(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
 		#endif
@@ -124,7 +128,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 203 $";
+		String SVNh = "$Rev: 208 $";
 		bool useDHT11Last;
 		uint32 publishUseDHT11Last;
 		bool useDHT22Last;

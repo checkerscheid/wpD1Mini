@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 208                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 207 2024-10-07 12:59:22Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 208 2024-10-07 21:20:42Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 208 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -261,6 +261,29 @@ void helperWebServer::setupWebServer() {
 		}
 		#endif
 		#if BUILDWITH == 2
+		if(wpModules.useModuleAnalogOut) {
+			message += F("\"AnalogOut\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",");
+			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+				message +=
+					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
+					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.Kp)) + F(",") +
+					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.Tv)) + F(",") +
+					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.Tn)) + F(",") +
+					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.SetPoint)) + F(",");
+			}
+			message +=
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.handError ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.handValue)) +
+				F("},");
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += F("\"AnalogOut2\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.handError ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.handValue)) +
+				F("},");
+		}
 		if(wpModules.useModuleRpm) {
 			message += F("\"Rpm\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRpm.Pin])) + F(",") +
@@ -364,6 +387,12 @@ void helperWebServer::setupWebServer() {
 		}
 		#endif
 		#if BUILDWITH == 2
+		if(wpModules.useModuleAnalogOut) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpAnalogOut.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpAnalogOut2.Debug() ? "true" : "false");
+		}
 		if(wpModules.useModuleRpm) {
 			message += F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpRpm.Debug() ? "true" : "false");
 		}
@@ -406,8 +435,10 @@ void helperWebServer::setupWebServer() {
 		#endif
 		#if BUILDWITH == 2
 		message += 
+			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpModules.useModuleRpm ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false");
 		#endif
 		#if BUILDWITH == 3
 		message += 
@@ -491,6 +522,14 @@ void helperWebServer::setupWebServer() {
 			}
 			#endif
 			#if BUILDWITH == 2
+			if(request->getParam(F("Module"))->value() == F("useAnalogOut")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut);
+			}
+			if(request->getParam(F("Module"))->value() == F("useAnalogOut2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut2"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut2);
+			}
 			if(request->getParam(F("Module"))->value() == F("useRpm")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRpm"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleRpm);
@@ -617,6 +656,14 @@ void helperWebServer::setupWebServer() {
 			}
 			#endif
 			#if BUILDWITH == 2
+			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut2"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut2);
+			}
 			if(request->getParam(F("Debug"))->value() == F("DebugRpm")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRpm"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRpm);
@@ -1101,6 +1148,8 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
 		#endif
 		#if BUILDWITH == 2
+		if(doModuleChange == cmdModuleAnalogOut) wpModules.changeModuleAnalogOut(!wpModules.useModuleAnalogOut);
+		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
 		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
 		#endif
@@ -1138,6 +1187,8 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
 		#endif
 		#if BUILDWITH == 2
+		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
+		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
 		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
 		#endif
@@ -1211,6 +1262,8 @@ String processor(const String& var) {
 		#endif
 		#if BUILDWITH == 2
 		returns +=
+			wpWebServer.getchangeModule(F("useAnalogOut"), F("wpAnalogOut"), wpModules.useModuleAnalogOut) +
+			wpWebServer.getchangeModule(F("useAnalogOut2"), F("wpAnalogOut2"), wpModules.useModuleAnalogOut2) +
 			wpWebServer.getchangeModule(F("useRpm"), F("wpRpm"), wpModules.useModuleRpm) +
 			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter);
 		#endif
@@ -1284,6 +1337,12 @@ String processor(const String& var) {
 		}
 		#endif
 		#if BUILDWITH == 2
+		if(wpModules.useModuleAnalogOut) {
+			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut"), F("AnalogOut"), wpAnalogOut.Debug());
+		}
+		if(wpModules.useModuleAnalogOut2) {
+			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut2"), F("AnalogOut2"), wpAnalogOut2.Debug());
+		}
 		if(wpModules.useModuleRpm) {
 			returns += wpWebServer.getChangeDebug(F("DebugRpm"), F("Rpm"), wpRpm.Debug());
 		}

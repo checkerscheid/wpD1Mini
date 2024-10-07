@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 208                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 207 2024-10-07 12:59:22Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 208 2024-10-07 21:20:42Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 208 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -189,6 +189,8 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 #endif
 #if BUILDWITH == 2
+	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
+	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
 	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
 #endif
@@ -233,6 +235,8 @@ void helperEEPROM::readVars() {
 	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 #endif
 #if BUILDWITH == 2
+	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
+	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
 	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
 #endif
@@ -261,6 +265,8 @@ void helperEEPROM::readVars() {
 	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
 #endif
 #if BUILDWITH == 2
+	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
+	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.handSet = bitRead(bitsSettingsModules2, bitUnderfloor1Hand);
@@ -299,6 +305,9 @@ void helperEEPROM::readVars() {
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 #endif
 #if BUILDWITH == 2
+	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
+	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut));
+	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
 	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
@@ -341,6 +350,18 @@ void helperEEPROM::readVars() {
 	wpAnalogOut.InitSetPoint(outSetPoint);
 #endif
 #if BUILDWITH == 2
+	short outKp;
+	EEPROM.get(byteAnalogOutKp, outKp);
+	wpAnalogOut.InitKp(outKp);
+	short outTv;
+	EEPROM.get(byteAnalogOutTv, outTv);
+	wpAnalogOut.InitTv(outTv);
+	short outTn;
+	EEPROM.get(byteAnalogOutTn, outTn);
+	wpAnalogOut.InitTn(outTn);
+	short outSetPoint;
+	EEPROM.get(byteAnalogOutSetPoint, outSetPoint);
+	wpAnalogOut.InitSetPoint(outSetPoint);
 	EEPROM.get(byteImpulseCounterKWh, wpImpulseCounter.KWh);
 	EEPROM.get(byteImpulseCounterSilver, wpImpulseCounter.counterSilver);
 	EEPROM.get(byteImpulseCounterRed, wpImpulseCounter.counterRed);

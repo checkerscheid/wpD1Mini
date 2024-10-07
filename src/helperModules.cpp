@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 208                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 207 2024-10-07 12:59:22Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 208 2024-10-07 21:20:42Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -41,6 +41,8 @@ void helperModules::init() {
 	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
 	#endif
 	#if BUILDWITH == 2
+	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
+	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
 	mqttTopicUseRpm = wpFZ.DeviceName + "/settings/useModule/Rpm";
 	mqttTopicUseImpulseCounter = wpFZ.DeviceName + "/settings/useModule/ImpulseCounter";
 	#endif
@@ -68,7 +70,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 208 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -115,6 +117,8 @@ void helperModules::publishValues(bool force) {
 		publishUseAnalogOut2Last = 0;
 		#endif
 		#if BUILDWITH == 2
+		publishUseAnalogOutLast = 0;
+		publishUseAnalogOut2Last = 0;
 		publishUseRpmLast = 0;
 		publishUseImpulseCounterLast = 0;
 		#endif
@@ -234,6 +238,20 @@ void helperModules::publishValues(bool force) {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
+		wpFZ.loopStartedAt > publishUseAnalogOutLast + wpFZ.publishQoS) {
+		useAnalogOutLast = useModuleAnalogOut;
+		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
+		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
+		publishUseAnalogOutLast = wpFZ.loopStartedAt;
+	}
+	if(useAnalogOut2Last != useModuleAnalogOut2 || publishUseAnalogOut2Last == 0 ||
+		wpFZ.loopStartedAt > publishUseAnalogOut2Last + wpFZ.publishQoS) {
+		useAnalogOut2Last = useModuleAnalogOut2;
+		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut2.c_str(), String(useModuleAnalogOut2).c_str());
+		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
+		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
+	}
 	if(useRpmLast != useModuleRpm || publishUseRpmLast == 0 ||
 		wpFZ.loopStartedAt > publishUseRpmLast + wpFZ.publishQoS) {
 		useRpmLast = useModuleRpm;
@@ -306,6 +324,8 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
 	#endif
 	#if BUILDWITH == 2
+	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRpm.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseImpulseCounter.c_str());
 	#endif
@@ -367,6 +387,12 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(strcmp(topic, mqttTopicUseAnalogOut.c_str()) == 0) {
+		changeModuleAnalogOut(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseAnalogOut2.c_str()) == 0) {
+		changeModuleAnalogOut2(readUseModule);
+	}
 	if(strcmp(topic, mqttTopicUseRpm.c_str()) == 0) {
 		changeModuleRpm(readUseModule);
 	}
@@ -571,6 +597,28 @@ void helperModules::changeModuleAnalogOut2(bool newValue) {
 }
 #endif
 #if BUILDWITH == 2
+void helperModules::changeModuleAnalogOut(bool newValue) {
+	if(useModuleAnalogOut != newValue) {
+		useModuleAnalogOut = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut, useModuleAnalogOut);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleAnalogOut", useModuleAnalogOut);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut, String(useModuleAnalogOut));
+	}
+}
+void helperModules::changeModuleAnalogOut2(bool newValue) {
+	if(useModuleAnalogOut2 != newValue) {
+		useModuleAnalogOut2 = newValue;
+		bitWrite(wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut2, useModuleAnalogOut2);
+		EEPROM.write(wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleAnalogOut2", useModuleAnalogOut2);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut2, String(useModuleAnalogOut2));
+	}
+}
 void helperModules::changeModuleRpm(bool newValue) {
 	if(useModuleRpm != newValue) {
 		useModuleRpm = newValue;
@@ -687,17 +735,23 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleCwWw) {
 		wpCwWw.publishSettings(force);
 	}
+	if(wpModules.useModuleNeoPixel) {
+		wpNeoPixel.publishSettings(force);
+	}
 	if(wpModules.useModuleAnalogOut) {
 		wpAnalogOut.publishSettings(force);
 	}
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.publishSettings(force);
 	}
-	if(wpModules.useModuleNeoPixel) {
-		wpNeoPixel.publishSettings(force);
-	}
 	#endif
 	#if BUILDWITH == 2
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.publishSettings(force);
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.publishSettings(force);
+	}
 	if(wpModules.useModuleRpm) {
 		wpRpm.publishSettings(force);
 	}
@@ -778,6 +832,12 @@ void helperModules::publishAllValues(bool force) {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.publishValues(force);
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.publishValues(force);
+	}
 	if(wpModules.useModuleRpm) {
 		wpRpm.publishValues(force);
 	}
@@ -854,6 +914,12 @@ void helperModules::setAllSubscribes() {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.setSubscribes();
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.setSubscribes();
+	}
 	if(wpModules.useModuleRpm) {
 		wpRpm.setSubscribes();
 	}
@@ -928,6 +994,12 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	#endif
 	#if BUILDWITH == 2
+	if(wpModules.useModuleAnalogOut) {
+		wpAnalogOut.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleAnalogOut2) {
+		wpAnalogOut2.checkSubscribes(topic, msg);
+	}
 	if(wpModules.useModuleRpm) {
 		wpRpm.checkSubscribes(topic, msg);
 	}
