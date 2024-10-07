@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 203 2024-10-04 07:32:26Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 207 2024-10-07 12:59:22Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -68,7 +68,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 203 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -652,7 +652,6 @@ void helperModules::publishAllSettings(bool force) {
 	wpModules.publishSettings(force);
 	wpMqtt.publishSettings(force);
 	wpOnlineToggler.publishSettings(force);
-	wpRest.publishSettings(force);
 	wpUpdate.publishSettings(force);
 	wpWebServer.publishSettings(force);
 	wpWiFi.publishSettings(force);
@@ -733,7 +732,6 @@ void helperModules::publishAllValues(bool force) {
 	wpModules.publishValues(force);
 	wpMqtt.publishValues(force);
 	wpOnlineToggler.publishValues(force);
-	wpRest.publishValues(force);
 	wpUpdate.publishValues(force);
 	wpWebServer.publishValues(force);
 	wpWiFi.publishValues(force);
@@ -810,7 +808,6 @@ void helperModules::setAllSubscribes() {
 	wpModules.setSubscribes();
 	wpMqtt.setSubscribes();
 	wpOnlineToggler.setSubscribes();
-	wpRest.setSubscribes();
 	wpUpdate.setSubscribes();
 	wpWebServer.setSubscribes();
 	wpWiFi.setSubscribes();
@@ -885,7 +882,6 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	wpFinder.checkSubscribes(topic, msg);
 	wpModules.checkSubscribes(topic, msg);
 	wpOnlineToggler.checkSubscribes(topic, msg);
-	wpRest.checkSubscribes(topic, msg);
 	wpUpdate.checkSubscribes(topic, msg);
 	wpWebServer.checkSubscribes(topic, msg);
 	wpWiFi.checkSubscribes(topic, msg);

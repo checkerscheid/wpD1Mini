@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 184 2024-08-01 00:19:53Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -36,7 +36,6 @@ void moduleWindow::init() {
 
 	// section to copy
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestWindow);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugWindow);
 
 }
@@ -100,18 +99,13 @@ void moduleWindow::checkSubscribes(char* topic, String msg) {
 }
 void moduleWindow::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("window", bm ? "true" : "false");
-		wpRest.trySend = true;
-	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
 		if(bm && wpLDR.ldr <= threshold) {
 			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
-					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
-					wpRest.trySend = true;
+					wpFZ.sendRawRest(lightToTurnOn);
 					lm += ", send REST '" + lightToTurnOn + "'";
 				} else {
 					wpMqtt.mqttClient.publish(lightToTurnOn.c_str(), String("on").c_str());
@@ -145,28 +139,18 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleWindow::SendRest() {
-	return mb->sendRest;
-}
-bool moduleWindow::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
-}
 bool moduleWindow::Debug() {
 	return mb->debug;
 }
 bool moduleWindow::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
-}
-void moduleWindow::changeSendRest() {
-	mb->changeSendRest();
 }
 void moduleWindow::changeDebug() {
 	mb->changeDebug();

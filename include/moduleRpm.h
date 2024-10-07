@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.h 182 2024-07-28 02:12:39Z                     $ #
+//# File-ID      : $Id:: moduleRpm.h 207 2024-10-07 12:59:22Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRpm_h
@@ -45,11 +45,8 @@ class moduleRpm {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool UseAvg();
 		bool UseAvg(bool useAvg);
 		bool Debug();
@@ -68,7 +65,7 @@ class moduleRpm {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 182 $";
+		String SVNh = "$Rev: 207 $";
 };
 extern moduleRpm wpRpm;
 

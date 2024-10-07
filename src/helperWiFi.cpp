@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 206                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 206 2024-10-06 19:10:09Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -26,7 +26,6 @@ void helperWiFi::init() {
 	mqttTopicSsid = wpFZ.DeviceName + "/info/WiFi/SSID";
 	mqttTopicIp = wpFZ.DeviceName + "/info/WiFi/Ip";
 	mqttTopicMac = wpFZ.DeviceName + "/info/WiFi/Mac";
-	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/WiFi";
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
@@ -49,21 +48,12 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 206 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void helperWiFi::changeSendRest() {
-	sendRest = !sendRest;
-	bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
-	EEPROM.write(wpEEPROM.addrBitsSendRestBasis0, wpEEPROM.bitsSendRestBasis0);
-	EEPROM.commit();
-	wpFZ.SendWSSendRest("sendRestWiFi", sendRest);
-	wpFZ.DebugWS(wpFZ.strINFO, "WiFi::changeSendRest", "WiFi sendRest: " + sendRest ? "True" : "False");
-	wpFZ.blink();
-}
 void helperWiFi::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
@@ -144,7 +134,6 @@ void helperWiFi::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicIp.c_str(), WiFi.localIP().toString().c_str());
 	wpMqtt.mqttClient.publish(mqttTopicMac.c_str(), WiFi.macAddress().c_str());
 	if(force) {
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
@@ -154,14 +143,7 @@ void helperWiFi::publishValues() {
 }
 void helperWiFi::publishValues(bool force) {
 	if(force) {
-		publishSendRestLast = 0;
 		publishDebugLast = 0;
-	}
-	if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
-		sendRestLast = sendRest;
-		wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		wpFZ.SendWSSendRest("SendRestWiFi", sendRest);
-		publishSendRestLast = wpFZ.loopStartedAt;
 	}
 	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
@@ -170,29 +152,14 @@ void helperWiFi::publishValues(bool force) {
 	}
 	if(wpFZ.loopStartedAt > publishRssiLast + wpFZ.minute2) {
 		wpMqtt.mqttClient.publish(mqttTopicRssi.c_str(), String(WiFi.RSSI()).c_str());
-		if(sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("rssi", String(WiFi.RSSI()));
-			wpRest.trySend = true;
-		}
 		publishRssiLast = wpFZ.loopStartedAt;
 	}
 }
 
 void helperWiFi::setSubscribes() {
-	wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperWiFi::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
-		bool readSendRest = msg.toInt();
-		if(sendRest != readSendRest) {
-			sendRest = readSendRest;
-			bitWrite(wpEEPROM.bitsSendRestBasis0, wpEEPROM.bitSendRestRssi, sendRest);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsSendRestBasis0);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
-		}
-	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -214,12 +181,6 @@ void helperWiFi::checkDns() {
 		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + " is " + r.toString());
 	} else {
 		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.mqttServer) + ": " + String(returns));
-	}
-	returns = WiFi.hostByName(wpFZ.restServer, r);
-	if(returns == 1) {
-		wpFZ.DebugWS(wpFZ.strINFO, "checkDNS", "IP Address for " + String(wpFZ.restServer) + " is " + r.toString());
-	} else {
-		wpFZ.DebugWS(wpFZ.strERRROR, "checkDNS", "IP Address for " + String(wpFZ.restServer) + ": " + String(returns));
 	}
 	returns = WiFi.hostByName(wpFZ.updateServer, r);
 	if(returns == 1) {

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 203 2024-10-04 07:32:26Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -23,9 +23,6 @@ helperEEPROM::helperEEPROM() {
 		EEPROM.write(addrBitsModules0, 0);
 		EEPROM.write(addrBitsModules1, 0);
 		EEPROM.write(addrBitsModules2, 0);
-		EEPROM.write(addrBitsSendRestModules0, 0);
-		EEPROM.write(addrBitsSendRestModules1, 0);
-		EEPROM.write(addrBitsSendRestModules2, 0);
 		EEPROM.commit();
 	}
 }
@@ -42,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 203 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -204,11 +201,6 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 
-	bitsSendRestBasis0 = EEPROM.read(addrBitsSendRestBasis0);
-	wpWiFi.sendRest = bitRead(bitSendRestRssi, bitsSendRestBasis0);
-
-//###################################################################################
-
 	bitsDebugBasis0 = EEPROM.read(addrBitsDebugBasis0);
 	bitsDebugBasis1 = EEPROM.read(addrBitsDebugBasis1);
 	Debug = bitRead(bitsDebugBasis0, bitDebugEEPROM);
@@ -216,35 +208,9 @@ void helperEEPROM::readVars() {
 	wpModules.Debug = bitRead(bitsDebugBasis0, bitDebugModules);
 	wpMqtt.Debug = bitRead(bitsDebugBasis0, bitDebugMqtt);
 	wpOnlineToggler.Debug = bitRead(bitsDebugBasis0, bitDebugOnlineToggler);
-	wpRest.Debug = bitRead(bitsDebugBasis0, bitDebugRest);
 	wpUpdate.Debug = bitRead(bitsDebugBasis0, bitDebugUpdate);
 	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
 	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
-
-//###################################################################################
-
-	bitsSendRestModules0 = EEPROM.read(addrBitsSendRestModules0);
-	bitsSendRestModules1 = EEPROM.read(addrBitsSendRestModules1);
-	wpDHT.SendRest(bitRead(bitsSendRestModules0, bitSendRestDHT));
-	wpLDR.SendRest(bitRead(bitsSendRestModules0, bitSendRestLDR));
-	wpLight.SendRest(bitRead(bitsSendRestModules0, bitSendRestLight));
-	wpBM.SendRest(bitRead(bitsSendRestModules0, bitSendRestBM));
-	wpWindow.SendRest(bitRead(bitsSendRestModules1, bitSendRestWindow));
-	wpRelais.SendRest(bitRead(bitsSendRestModules0, bitSendRestRelais));
-	wpRain.SendRest(bitRead(bitsSendRestModules0, bitSendRestRain));
-	wpMoisture.SendRest(bitRead(bitsSendRestModules0, bitSendRestMoisture));
-	wpDistance.SendRest(bitRead(bitsSendRestModules0, bitSendRestDistance));
-#if BUILDWITH == 1
-	wpNeoPixel.SendRest(bitRead(bitsSendRestModules1, bitSendRestNeoPixel));
-	wpAnalogOut.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut));
-	wpAnalogOut2.SendRest(bitRead(bitsSendRestModules1, bitSendRestAnalogOut2));
-#endif
-#if BUILDWITH == 2
-	wpRpm.SendRest(bitRead(bitsSendRestModules1, bitSendRestRpm));
-	wpImpulseCounter.SendRest(bitRead(bitsSendRestModules1, bitSendRestImpulseCounter));
-#endif
-#if BUILDWITH == 3
-#endif
 
 //###################################################################################
 

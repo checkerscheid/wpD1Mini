@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 203 2024-10-04 07:32:26Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -24,23 +24,29 @@ void helperUpdate::init() {
 	mqttTopicNewVersion = wpFZ.DeviceName + "/ERROR/NewVersion";
 	// settings
 	mqttTopicServer = wpFZ.DeviceName + "/info/Update/Server";
+	mqttTopicUpdateChanel = wpFZ.DeviceName + "/info/UpdateChanel";
 	// commands
 	mqttTopicUpdateFW = wpFZ.DeviceName + "/UpdateFW";
+	mqttTopicSetUpdateChanel = wpFZ.DeviceName + "/settings/UpdateChanel";
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/Update";
 	
 	twelveHours = 12 * 60 * 60 * 1000;
 	lastUpdateCheck = 0;
 	serverVersion = "";
 	newVersion = false;
-	file = "firmware.bin";
+	updateChanel = 0;
+	file = F("firmware.bin");
 	#if BUILDWITH == 1
-		file = "firmwarelight.bin";
+		file = F("firmwarelight.bin");
+		updateChanel = 1;
 	#endif
 	#if BUILDWITH == 2
-		file = "firmwareio.bin";
+		file = F("firmwareio.bin");
+		updateChanel = 2;
 	#endif
 	#if BUILDWITH == 3
-		file = "firmwareheating.bin";
+		file = F("firmwareheating.bin");
+		updateChanel = 3;
 	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
@@ -57,7 +63,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 203 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -166,6 +172,7 @@ void helperUpdate::publishSettings() {
 }
 void helperUpdate::publishSettings(bool force) {
 	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicUpdateChanel.c_str(), GetUpdateChanel().c_str());
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 	}
 }
@@ -192,9 +199,17 @@ void helperUpdate::publishValues(bool force) {
 }
 
 void helperUpdate::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSetUpdateChanel.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
 void helperUpdate::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSetUpdateChanel.c_str()) == 0) {
+		uint8 readUpdateChanel = msg.toInt();
+		if(updateChanel != readUpdateChanel) {
+			SetUpdateChanel(updateChanel);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetUpdateChanel, GetUpdateChanel());
+		}
+	}
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
@@ -216,6 +231,43 @@ void helperUpdate::doCheckUpdate() {
 	if((lastUpdateCheck == 0 && m > 60000) || m > lastUpdateCheck + twelveHours) {
 		check();
 	}
+}
+String helperUpdate::GetUpdateChanel() {
+	switch(updateChanel) {
+		case 1:
+			return F("light");
+			break;
+		case 2:
+			return F("io");
+			break;
+		case 3:
+			return F("heating");
+			break;
+		default:
+			return F("firmware");
+			break;
+	}
+}
+void helperUpdate::SetUpdateChanel(uint8 uc) {
+	switch(uc) {
+		case 1:
+			file = F("firmwarelight.bin");
+			updateChanel = 1;
+			break;
+		case 2:
+			file = F("firmwareio.bin");
+			updateChanel = 2;
+			break;
+		case 3:
+			file = F("firmwareheating.bin");
+			updateChanel = 3;
+			break;
+		default:
+			file = F("firmware.bin");
+			updateChanel = 0;
+			break;
+	}
+	wpMqtt.mqttClient.publish(mqttTopicUpdateChanel.c_str(), GetUpdateChanel().c_str());
 }
 void helperUpdate::started() {
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");

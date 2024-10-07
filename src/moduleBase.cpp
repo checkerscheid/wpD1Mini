@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 202 2024-10-02 05:34:20Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -19,23 +19,13 @@
 moduleBase::moduleBase(String moduleName) {
 	_name = moduleName;
 
-	sendRestLast = false;
-	publishSendRestLast = 0;
 	DebugLast = false;
 	publishDebugLast = 0;
 	errorLast = false;
 	publishErrorLast = 0;
-	_useSendRest = false;
 	_useUseAvg = false;
 	_useCalcCycle = false;
 	_useError = false;
-}
-void moduleBase::initRest(uint16 addrSendRest, byte& byteSendRest, uint8 bitSendRest) {
-	_useSendRest = true;
-	_addrSendRest = addrSendRest;
-	_byteSendRest = byteSendRest;
-	_bitSendRest = bitSendRest;
-	mqttTopicSendRest = wpFZ.DeviceName + "/settings/SendRest/" + _name;
 }
 void moduleBase::initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg) {
 	_useUseAvg = true;
@@ -59,12 +49,6 @@ void moduleBase::initCalcCycle(uint16 addrCalcCycle) {
 	_addrCalcCycle = addrCalcCycle;
 	mqttTopicCalcCycle = wpFZ.DeviceName + "/settings/" + _name + "/CalcCycle";
 }
-void moduleBase::changeSendRest() {
-	sendRest = !sendRest;
-	writeEEPROMsendRest();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "changeSendRest", "new value " + _name + ": sendRest = " + String(sendRest));
-	wpFZ.blink();
-}
 void moduleBase::changeDebug() {
 	debug = !debug;
 	writeEEPROMdebug();
@@ -74,9 +58,6 @@ void moduleBase::changeDebug() {
 
 void moduleBase::publishSettings(bool force) {
 	if(force) {
-		if(_useSendRest) {
-			wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-		}
 		if(_useUseAvg) {
 			wpMqtt.mqttClient.publish(mqttTopicUseAvg.c_str(), String(useAvg).c_str());
 		}
@@ -91,17 +72,8 @@ void moduleBase::publishSettings(bool force) {
 }
 void moduleBase::publishValues(bool force) {
 	if(force) {
-		publishSendRestLast = 0;
 		publishDebugLast = 0;
 		publishErrorLast = 0;
-	}
-	if(_useSendRest) {
-		if(sendRestLast != sendRest || wpFZ.CheckQoS(publishSendRestLast)) {
-			sendRestLast = sendRest;
-			wpMqtt.mqttClient.publish(mqttTopicSendRest.c_str(), String(sendRest).c_str());
-			wpFZ.SendWSSendRest("sendRest" + _name, sendRest);
-			publishSendRestLast = wpFZ.loopStartedAt;
-		}
 	}
 	if(DebugLast != debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = debug;
@@ -118,9 +90,6 @@ void moduleBase::publishValues(bool force) {
 	}
 }
 void moduleBase::setSubscribes() {
-	if(_useSendRest) {
-		wpMqtt.mqttClient.subscribe(mqttTopicSendRest.c_str());
-	}
 	if(_useUseAvg) {
 		wpMqtt.mqttClient.subscribe(mqttTopicUseAvg.c_str());
 	}
@@ -130,14 +99,6 @@ void moduleBase::setSubscribes() {
 	}
 }
 void moduleBase::checkSubscribes(char* topic, String msg) {
-	if(strcmp(topic, mqttTopicSendRest.c_str()) == 0) {
-		bool readSendRest = msg.toInt();
-		if(sendRest != readSendRest) {
-			sendRest = readSendRest;
-			writeEEPROMsendRest();
-			wpFZ.DebugcheckSubscribes(mqttTopicSendRest, String(sendRest));
-		}
-	}
 	if(strcmp(topic, mqttTopicUseAvg.c_str()) == 0) {
 		bool readUseAvg = msg.toInt();
 		if(useAvg != readUseAvg) {
@@ -164,12 +125,6 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 	}
 }
 
-void moduleBase::writeEEPROMsendRest() {
-	bitWrite(_byteSendRest, _bitSendRest, sendRest);
-	EEPROM.write(_addrSendRest, _byteSendRest);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " sendRest: " + String(sendRest));
-}
 void moduleBase::writeEEPROMuseAvg() {
 	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
 	EEPROM.write(_addrUseAvg, _byteUseAvg);
