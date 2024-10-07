@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 203 2024-10-04 07:32:26Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -23,7 +23,6 @@
 #include <helperModules.h>
 #include <helperMqtt.h>
 #include <helperOnlineToggler.h>
-#include <helperRest.h>
 #include <helperUpdate.h>
 #include <helperWebServer.h>
 #include <helperWiFi.h>
@@ -59,8 +58,6 @@ class wpFreakaZone {
 
 		const char* mqttServer = "mqtt.freakazone.com";
 		const uint16 mqttServerPort = 1883;
-		const char* restServer = "light.freakazone.com";
-		const uint16 restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16 finderListenPort = 51346;
 		const uint32 minute10  = 1000 * 60 * 10;
@@ -128,7 +125,6 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		//void SendWS(String msg);
 		void SendWSModule(String htmlId, bool value);
-		void SendWSSendRest(String htmlId, bool value);
 		void SendWSDebug(String htmlId, bool value);
 		void SendRestartRequired(String msg);
 		void SendNewVersion(bool isnew);
@@ -149,8 +145,9 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
+		bool sendRawRest(String target);
 	private:
-		String SVNh = "$Rev: 203 $";
+		String SVNh = "$Rev: 207 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;

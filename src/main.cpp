@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 203 2024-10-04 07:32:26Z                        $ #
+//# File-ID      : $Id:: main.cpp 207 2024-10-07 12:59:22Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -32,7 +32,6 @@ void setup() {
 	wpModules.init();
 	wpOnlineToggler.init();
 	wpFinder.init();
-	wpRest.init();
 	wpUpdate.init();
 	wpWebServer.init();
 
@@ -109,8 +108,6 @@ void setup() {
 //###################################################################################
 void loop() {
 	wpFZ.loopStartedAt = millis();
-	wpRest.trySend = false;
-	wpRest.error = false;
 	wpFZ.cycle();
 	wpEEPROM.cycle();
 	wpWiFi.cycle();
@@ -185,7 +182,6 @@ void loop() {
 		}
 		#endif
 	}
-	wpRest.cycle();
 	//delay(100);
 }
 
@@ -193,7 +189,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 203 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -216,7 +212,6 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpModules.getVersion());
 	buildChecker(v, wpMqtt.getVersion());
 	buildChecker(v, wpOnlineToggler.getVersion());
-	buildChecker(v, wpRest.getVersion());
 	buildChecker(v, wpUpdate.getVersion());
 	buildChecker(v, wpWebServer.getVersion());
 	buildChecker(v, wpWiFi.getVersion());

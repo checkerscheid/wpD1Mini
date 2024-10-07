@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 183 2024-07-29 03:32:26Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 207 2024-10-07 12:59:22Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -42,7 +42,6 @@ void moduleMoisture::init() {
 	publishErrorMinLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestMoisture);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugMoisture);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseMoistureAvg);
 	mb->initError();
@@ -140,10 +139,6 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleMoisture::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicMoisture.c_str(), String(moisture).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("moisture", String(moisture));
-		wpRest.trySend = true;
-	}
 	moistureLast = moisture;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Moisture", String(moisture));
@@ -208,24 +203,14 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleMoisture::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleMoisture::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleMoisture::SendRest() {
-	return mb->sendRest;
-}
-bool moduleMoisture::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleMoisture::UseAvg() {
 	return mb->useAvg;

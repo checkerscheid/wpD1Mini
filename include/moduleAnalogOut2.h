@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 189                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 189 2024-08-13 11:58:56Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 207 2024-10-07 12:59:22Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -55,11 +55,8 @@ class moduleAnalogOut2 {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 		void SetHandValueSet(uint8 val);
@@ -78,7 +75,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 189 $";
+		String SVNh = "$Rev: 207 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 

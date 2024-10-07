@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 202                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.h 202 2024-10-02 05:34:20Z                    $ #
+//# File-ID      : $Id:: helperWiFi.h 207 2024-10-07 12:59:22Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWiFi_h
@@ -21,7 +21,6 @@
 class helperWiFi {
 	public:
 		bool Debug = false;
-		bool sendRest = false;
 		// values
 		String mqttTopicRssi;
 		String mqttTopicWiFiSince;
@@ -31,7 +30,6 @@ class helperWiFi {
 		String mqttTopicMac;
 		// commands
 		String mqttTopicDebug;
-		String mqttTopicSendRest;
 
 		String WiFiSince;
 
@@ -40,7 +38,6 @@ class helperWiFi {
 		void cycle();
 		uint16 getVersion();
 		void changeDebug();
-		void changeSendRest();
 		void setupWiFi();
 		void scanWiFi();
 		
@@ -52,11 +49,9 @@ class helperWiFi {
 		void checkSubscribes(char* topic, String msg);
 		void checkDns();
 	private:
-		String SVNh = "$Rev: 202 $";
+		String SVNh = "$Rev: 207 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
-		bool sendRestLast;
-		unsigned long publishSendRestLast;
 		unsigned long publishRssiLast;
 		String printEncryptionType(int thisType);
 };

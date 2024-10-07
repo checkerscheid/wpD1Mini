@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.h 183 2024-07-29 03:32:26Z                  $ #
+//# File-ID      : $Id:: moduleWindow.h 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWindow_h
@@ -44,11 +44,8 @@ class moduleWindow {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 	private:
@@ -59,7 +56,7 @@ class moduleWindow {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 207 $";
 
 };
 extern moduleWindow wpWindow;

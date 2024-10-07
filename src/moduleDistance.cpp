@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 183 2024-07-29 03:32:26Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 207 2024-10-07 12:59:22Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -47,7 +47,6 @@ void moduleDistance::init() {
 	distanceAvgLast = 0;
 	publishDistanceAvgLast = 0;
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDistance);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDistance);
 	mb->initError();
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleDistance);
@@ -140,10 +139,6 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleDistance::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicVolume.c_str(), String(volume).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("vol", String(volume));
-		wpRest.trySend = true;
-	}
 	volumeLast = volume;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Volume", String(volume));
@@ -220,24 +215,14 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleDistance::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleDistance::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleDistance::SendRest() {
-	return mb->sendRest;
-}
-bool moduleDistance::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleDistance::Debug() {
 	return mb->debug;

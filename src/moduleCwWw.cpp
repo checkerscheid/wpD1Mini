@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 201 2024-09-08 22:39:09Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -45,7 +45,6 @@ void moduleCwWw::init() {
 	publishModeLast = 0;
 
 	// section to copy
-	//mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestCwWw);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugCwWw);
 }
 
@@ -89,10 +88,6 @@ void moduleCwWw::publishValues(bool force) {
 	if(isAutoLast != isAuto || wpFZ.CheckQoS(publishIsAuto)) {
 		isAutoLast = isAuto;
 		wpMqtt.mqttClient.publish(mqttTopicIsAuto.c_str(), String(isAuto).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("isAuto", String(isAuto));
-		// 	wpRest.trySend = true;
-		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicIsAuto, String(isAuto));
 		}
@@ -101,10 +96,6 @@ void moduleCwWw::publishValues(bool force) {
 	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
 		maxPercentLast = maxPercent;
 		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("maxPercent", String(maxPercent));
-		// 	wpRest.trySend = true;
-		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
 		}
@@ -113,10 +104,6 @@ void moduleCwWw::publishValues(bool force) {
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
 		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
-		// 	wpRest.trySend = true;
-		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
 		}
@@ -126,10 +113,6 @@ void moduleCwWw::publishValues(bool force) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
 			sleepLast = sleep;
 			wpMqtt.mqttClient.publish(mqttTopicSleep.c_str(), String(sleep).c_str());
-			// if(mb->sendRest) {
-			// 	wpRest.error = wpRest.error | !wpRest.sendRest("sleep", String(sleep));
-			// 	wpRest.trySend = true;
-			// }
 			if(wpMqtt.Debug) {
 				mb->printPublishValueDebug(mqttTopicSleep, String(sleep));
 			}
@@ -396,24 +379,14 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 201 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleCwWw::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleCwWw::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleCwWw::SendRest() {
-	return mb->sendRest;
-}
-bool moduleCwWw::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleCwWw::Debug() {
 	return mb->debug;

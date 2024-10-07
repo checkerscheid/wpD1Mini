@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 203 2024-10-04 07:32:26Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -53,7 +53,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 203 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -256,6 +256,29 @@ bool wpFreakaZone::CheckQoS(unsigned long lastSend) {
 	return false;
 }
 
+// return true on success
+bool wpFreakaZone::sendRawRest(String target) {
+	bool returns = false;
+	WiFiClient client;
+	HTTPClient http;
+	String logmessage = "HTTP: '" + target + "'";
+	wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
+	http.begin(client, target.c_str());
+	int httpResponseCode = http.GET();
+	if (httpResponseCode > 0) {
+		String payload = http.getString();
+		payload.replace("\"", "'");
+		String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
+		wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
+		returns = true;
+	} else {
+		String logmessage = "HTTP Response (" + String(httpResponseCode) + ")";
+		wpFZ.DebugWS(wpFZ.strERRROR, "sendRawRest", logmessage);
+	}
+	http.end();
+	return returns;
+}
+
 //###################################################################################
 // Debug Messages
 //###################################################################################
@@ -277,10 +300,6 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 void wpFreakaZone::SendWSModule(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
-}
-void wpFreakaZone::SendWSSendRest(String htmlId, bool value) {
-	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
-	wpWebServer.webSocket.textAll("{\"cmd\":\"setSendRest\",\"msg\":" + msg + "}");
 }
 void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
