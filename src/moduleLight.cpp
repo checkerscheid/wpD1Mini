@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 184 2024-08-01 00:19:53Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 207 2024-10-07 12:59:22Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -40,7 +40,6 @@ void moduleLight::init() {
 	publishLightLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLight);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLight);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLightAvg);
 	mb->initError();
@@ -104,10 +103,6 @@ void moduleLight::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleLight::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicLight.c_str(), String(light).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("light", String(light));
-		wpRest.trySend = true;
-	}
 	lightLast = light;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Light", String(light));
@@ -158,24 +153,14 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleLight::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleLight::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleLight::SendRest() {
-	return mb->sendRest;
-}
-bool moduleLight::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleLight::UseAvg() {
 	return mb->useAvg;

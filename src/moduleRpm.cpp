@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 183 2024-07-29 03:32:26Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 207 2024-10-07 12:59:22Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -36,7 +36,6 @@ void moduleRpm::init() {
 	publishRpmLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestRpm);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugRpm);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitUseRpmAvg);
 	mb->initError();
@@ -100,10 +99,6 @@ void moduleRpm::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleRpm::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicRpm.c_str(), String(rpm).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("rpm", String(rpm));
-		wpRest.trySend = true;
-	}
 	rpmLast = rpm;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Rpm", String(rpm));
@@ -155,24 +150,14 @@ uint16 moduleRpm::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleRpm::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleRpm::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleRpm::SendRest() {
-	return mb->sendRest;
-}
-bool moduleRpm::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleRpm::UseAvg() {
 	return mb->useAvg;

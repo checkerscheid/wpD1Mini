@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 195                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 195 2024-08-25 15:47:51Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -72,7 +72,6 @@ void moduleRelais::init() {
 	// }
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestRelais);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugRelais);
 }
 
@@ -236,10 +235,6 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 void moduleRelais::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("relais", output ? "true" : "false");
-		wpRest.trySend = true;
-	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Relais", String(output));
@@ -370,24 +365,14 @@ String moduleRelais::getReadableTime(unsigned long time) {
 // section to copy
 //###################################################################################
 uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 195 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleRelais::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleRelais::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleRelais::SendRest() {
-	return mb->sendRest;
-}
-bool moduleRelais::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleRelais::Debug() {
 	return mb->debug;

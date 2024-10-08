@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 201 2024-09-08 22:39:09Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 207 2024-10-07 12:59:22Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -122,7 +122,6 @@ void moduleNeoPixel::init() {
 	effectSpeed = 1;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestNeoPixel);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugNeoPixel);
 
 	// setup() function -- runs once at startup --------------------------------
@@ -196,10 +195,6 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
 		maxPercentLast = maxPercent;
 		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("maxPercent", String(maxPercent));
-			wpRest.trySend = true;
-		}
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
 		}
@@ -208,10 +203,6 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
 		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
-			wpRest.trySend = true;
-		}
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
 		}
@@ -220,10 +211,6 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(effectSpeedLast != effectSpeed || wpFZ.CheckQoS(publishEffectSpeedLast)) {
 		effectSpeedLast = effectSpeed;
 		wpMqtt.mqttClient.publish(mqttTopicEffectSpeed.c_str(), String(effectSpeed).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("effectSpeed", String(effectSpeed));
-			wpRest.trySend = true;
-		}
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicEffectSpeed, String(effectSpeed));
 		}
@@ -233,10 +220,6 @@ void moduleNeoPixel::publishValues(bool force) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
 			sleepLast = sleep;
 			wpMqtt.mqttClient.publish(mqttTopicSleep.c_str(), String(sleep).c_str());
-			if(mb->sendRest) {
-				wpRest.error = wpRest.error | !wpRest.sendRest("sleep", String(sleep));
-				wpRest.trySend = true;
-			}
 			if(wpMqtt.Debug) {
 				mb->printPublishValueDebug(mqttTopicSleep, String(sleep));
 			}
@@ -623,10 +606,6 @@ void moduleNeoPixel::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicValueG.c_str(), String(valueG).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueB.c_str(), String(valueB).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicBrightness.c_str(), String(brightness).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRestRGB(valueR, valueG, valueB, brightness);
-		wpRest.trySend = true;
-	}
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug(mqttTopicValueR, String(valueR));
 		mb->printPublishValueDebug(mqttTopicValueG, String(valueG));
@@ -1024,7 +1003,7 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 		"green=" + String((uint8_t)(c >>  8)) + "&"
 		"blue=" + String((uint8_t)(c >>  0)) + "&"
 		"gain=" + String((uint8_t)(round(brightness / 2.55)));
-	wpRest.sendRawRest(target);
+	wpFZ.sendRawRest(target);
 	lastBorderSend = wpFZ.loopStartedAt;
 }
 uint8 moduleNeoPixel::GetMaxPercent() {
@@ -1040,24 +1019,14 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 201 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleNeoPixel::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleNeoPixel::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleNeoPixel::SendRest() {
-	return mb->sendRest;
-}
-bool moduleNeoPixel::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleNeoPixel::Debug() {
 	return mb->debug;

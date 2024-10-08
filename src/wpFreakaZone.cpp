@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 195                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 195 2024-08-25 15:47:51Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -53,7 +53,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 195 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -141,7 +141,7 @@ void wpFreakaZone::blink() {
 
 long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
 	if(inMax - inMin == 0) {
-		DebugWS(strERRROR, "Map", "risky math operation: 'inMax - inMin == 0'");
+		DebugWS(strERRROR, "Map", F("risky math operation: 'inMax - inMin == 0'"));
 		return 0;
 	}
 	long returns = map(in, inMin, inMax, outMin, outMax);
@@ -195,19 +195,19 @@ void wpFreakaZone::publishValues(bool force) {
 		loopStartedAt > publishCalcValuesLast + publishQoS) {
 		calcValuesLast = calcValues;
 		wpMqtt.mqttClient.publish(mqttTopicCalcValues.c_str(), String(calcValues).c_str());
-		wpFZ.SendWSDebug("CalcValues", wpFZ.calcValues);
+		wpFZ.SendWSDebug(F("CalcValues"), wpFZ.calcValues);
 		publishCalcValuesLast = loopStartedAt;
 	}
 	if(restartRequired) {
 		if(!restartRequiredLast) {
 			wpMqtt.mqttClient.publish(mqttTopicRestartRequired.c_str(), String(restartRequired).c_str());
 			wpMqtt.mqttClient.publish(wpFZ.mqttTopicRestartDevice.c_str(), String(0).c_str());
-			SendRestartRequired("true");
+			SendRestartRequired(F("true"));
 			restartRequiredLast = restartRequired;
 		}
 		if(restartRequiredLast && loopStartedAt > publishRestartRequiredLast + sekunde10) {
 			wpMqtt.mqttClient.publish(mqttTopicRestartRequired.c_str(), String(restartRequired).c_str());
-			SendRestartRequired("true");
+			SendRestartRequired(F("true"));
 			publishRestartRequiredLast = loopStartedAt;
 		}
 	}
@@ -256,6 +256,29 @@ bool wpFreakaZone::CheckQoS(unsigned long lastSend) {
 	return false;
 }
 
+// return true on success
+bool wpFreakaZone::sendRawRest(String target) {
+	bool returns = false;
+	WiFiClient client;
+	HTTPClient http;
+	String logmessage = "HTTP: '" + target + "'";
+	wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
+	http.begin(client, target.c_str());
+	int httpResponseCode = http.GET();
+	if (httpResponseCode > 0) {
+		String payload = http.getString();
+		payload.replace("\"", "'");
+		String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
+		wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
+		returns = true;
+	} else {
+		String logmessage = "HTTP Response (" + String(httpResponseCode) + ")";
+		wpFZ.DebugWS(wpFZ.strERRROR, "sendRawRest", logmessage);
+	}
+	http.end();
+	return returns;
+}
+
 //###################################################################################
 // Debug Messages
 //###################################################################################
@@ -277,10 +300,6 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 void wpFreakaZone::SendWSModule(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
-}
-void wpFreakaZone::SendWSSendRest(String htmlId, bool value) {
-	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
-	wpWebServer.webSocket.textAll("{\"cmd\":\"setSendRest\",\"msg\":" + msg + "}");
 }
 void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
@@ -304,14 +323,14 @@ void wpFreakaZone::SendPumpStatus(String pumpStatus) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpStatus\",\"msg\":{" + pumpStatus + "}}");
 }
 void wpFreakaZone::pumpCycleFinished() {
-	wpWebServer.webSocket.textAll("{\"cmd\":\"pumpCycleFinished\"}");
+	wpWebServer.webSocket.textAll(F("{\"cmd\":\"pumpCycleFinished\"}"));
 }
 void wpFreakaZone::updateProgress(int percent) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"updateProgress\",\"percent\":\"" + String(percent) + " %\"}");
 }
 void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
-	wpFZ.DebugWS(wpFZ.strINFO, "checkSubscripes", logmessage);
+	wpFZ.DebugWS(wpFZ.strINFO, F("checkSubscripes"), logmessage);
 	wpFZ.blink();
 }
 
@@ -328,9 +347,9 @@ void wpFreakaZone::printStart() {
 	Serial.print(getOnlineTime());
 	Serial.print(strINFO);
 	Serial.print(funcToString("StartDevice"));
-	Serial.print("Startet as: '");
+	Serial.print(F("Startet as: '"));
 	Serial.print(DeviceName);
-	Serial.println("'");
+	Serial.println(F("'"));
 }
 
 void wpFreakaZone::printRestored() {
@@ -338,9 +357,9 @@ void wpFreakaZone::printRestored() {
 	Serial.print(getOnlineTime());
 	Serial.print(strINFO);
 	Serial.print(funcToString("StartDevice"));
-	Serial.print("Restored as: '");
+	Serial.print(F("Restored as: '"));
 	Serial.print(DeviceName);
-	Serial.println("'");
+	Serial.println(F("'"));
 	Serial.print(getTime());
 	Serial.print(getOnlineTime());
 	Serial.print(strINFO);

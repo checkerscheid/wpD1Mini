@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 182                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 182 2024-07-28 02:12:39Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 207 2024-10-07 12:59:22Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -51,11 +51,8 @@ class moduleDHT {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
@@ -74,7 +71,7 @@ class moduleDHT {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 182 $";
+		String SVNh = "$Rev: 207 $";
 };
 extern moduleDHT wpDHT;
 

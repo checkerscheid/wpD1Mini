@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 184                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 184 2024-08-01 00:19:53Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 207 2024-10-07 12:59:22Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -35,7 +35,6 @@ void moduleLDR::init() {
 	publishLdrLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestLDR);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugLDR);
 	mb->initUseAvg(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitUseLdrAvg);
 	mb->initError();
@@ -100,10 +99,6 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 void moduleLDR::publishValue() {
 	if(wpFZ.loopStartedAt > publishLdrLast + publishLdrMin) {
 		wpMqtt.mqttClient.publish(mqttTopicLdr.c_str(), String(ldr).c_str());
-		if(mb->sendRest) {
-			wpRest.error = wpRest.error | !wpRest.sendRest("ldr", String(ldr));
-			wpRest.trySend = true;
-		}
 		ldrLast = ldr;
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug("LDR", String(ldr));
@@ -158,24 +153,14 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 184 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleLDR::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleLDR::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleLDR::SendRest() {
-	return mb->sendRest;
-}
-bool moduleLDR::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleLDR::UseAvg() {
 	return mb->useAvg;

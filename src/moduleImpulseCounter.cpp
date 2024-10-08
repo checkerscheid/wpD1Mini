@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.cpp 192 2024-08-18 01:46:28Z        $ #
+//# File-ID      : $Id:: moduleImpulseCounter.cpp 207 2024-10-07 12:59:22Z        $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleImpulseCounter.h>
@@ -37,7 +37,6 @@ void moduleImpulseCounter::init() {
 
 	// section to copy
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestImpulseCounter);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugImpulseCounter);
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleImpulseCounter);
 }
@@ -122,10 +121,6 @@ void moduleImpulseCounter::publishValue() {
 	KWhLast = KWh;
 	wpMqtt.mqttClient.publish(mqttTopicCounter.c_str(), String(impulseCounter).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicKWh.c_str(), String(KWh).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("KWh", String(KWh));
-		wpRest.trySend = true;
-	}
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("ImpulseCounter", String(impulseCounter));
 	}
@@ -163,28 +158,18 @@ void moduleImpulseCounter::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleImpulseCounter::getVersion() {
-	String SVN = "$Rev: 192 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleImpulseCounter::SendRest() {
-	return mb->sendRest;
-}
-bool moduleImpulseCounter::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
-}
 bool moduleImpulseCounter::Debug() {
 	return mb->debug;
 }
 bool moduleImpulseCounter::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
-}
-void moduleImpulseCounter::changeSendRest() {
-	mb->changeSendRest();
 }
 void moduleImpulseCounter::changeDebug() {
 	mb->changeDebug();
