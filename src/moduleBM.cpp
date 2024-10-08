@@ -29,7 +29,7 @@ void moduleBM::init() {
 	digitalWrite(Pin, HIGH);
 	bm = true;
 	manual = false;
-	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
+	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName + "/Output";
 	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
@@ -75,7 +75,7 @@ void moduleBM::publishValues(bool force) {
 		manualLast = manual;
 		wpMqtt.mqttClient.publish(mqttTopicManual.c_str(), String(manual).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("BM manual", String(manual));
+			mb->printPublishValueDebug(mqttTopicManual, String(manual));
 		}
 		publishManualLast = wpFZ.loopStartedAt;
 	}

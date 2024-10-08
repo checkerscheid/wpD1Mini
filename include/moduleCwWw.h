@@ -30,7 +30,7 @@ class moduleCwWw {
 		static const uint8 ModeBlender = 90; //CW, WW
 
 		// values
-		String mqttTopicIsAuto;
+		String mqttTopicManual;
 		String mqttTopicMaxPercent;
 		String mqttTopicModeName;
 		String mqttTopicSleep;
@@ -65,9 +65,9 @@ class moduleCwWw {
 		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
 		void SetSmooth();
 	private:
-		bool isAuto;
-		bool isAutoLast;
-		unsigned long publishIsAuto;
+		bool manual;
+		bool manualLast;
+		unsigned long publishManualLast;
 		uint8 maxPercent;
 		uint8 maxPercentLast;
 		unsigned long publishMaxPercent;
