@@ -763,6 +763,22 @@ void helperWebServer::setupWebServer() {
 		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
 		wpWebServer.setBlink();
 	});
+	if(wpModules.useModuleBM) {
+		webServer.on("/setBM", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam("mode")) {
+				// /setBM?mode=auto
+				if(request->getParam("mode")->value() == "auto") {
+					request->send_P(200, "application/json", wpBM.SetAuto().c_str());
+				}
+				// /setBM?mode=manual
+				if(request->getParam("mode")->value() == "manual") {
+					request->send_P(200, "application/json", wpBM.SetManual().c_str());
+				}
+				wpFZ.DebugWS(wpFZ.strINFO, "AsyncWebserver", "Found setBM, set mode: '" + request->getParam("mode")->value() + "'");
+			}
+			wpWebServer.setBlink();
+		});
+	}
 	#if BUILDWITH == 1
 	if(wpModules.useModuleCwWw) {
 		webServer.on("/setCwWwAuto", HTTP_GET, [](AsyncWebServerRequest *request) {

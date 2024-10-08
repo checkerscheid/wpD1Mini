@@ -28,7 +28,9 @@ void moduleBM::init() {
 	pinMode(Pin, INPUT_PULLUP);
 	digitalWrite(Pin, HIGH);
 	bm = true;
-	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
+	manual = false;
+	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName + "/Output";
+	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
@@ -64,9 +66,18 @@ void moduleBM::publishValues() {
 void moduleBM::publishValues(bool force) {
 	if(force) {
 		publishBMLast = 0;
+		publishManualLast = 0;
 	}
 	if(bmLast != bm || wpFZ.CheckQoS(publishBMLast)) {
 		publishValue();
+	}
+	if(manualLast != manual || wpFZ.CheckQoS(publishManualLast)) {
+		manualLast = manual;
+		wpMqtt.mqttClient.publish(mqttTopicManual.c_str(), String(manual).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicManual, String(manual));
+		}
+		publishManualLast = wpFZ.loopStartedAt;
 	}
 	mb->publishValues(force);
 }
@@ -102,7 +113,7 @@ void moduleBM::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.ldr <= threshold) {
+		if(bm && wpLDR.ldr <= threshold && !manual) {
 			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
@@ -135,6 +146,14 @@ void moduleBM::calc() {
 	}
 }
 
+String moduleBM::SetAuto() {
+	manual = false;
+	return "{\"erg\":\"S_OK\",\"mode\":\"auto\"}";
+}
+String moduleBM::SetManual() {
+	manual = true;
+	return "{\"erg\":\"S_OK\",\"mode\":\"manual\"}";
+}
 
 //###################################################################################
 // section to copy

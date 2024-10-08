@@ -31,7 +31,7 @@ void moduleCwWw::init() {
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
-	mqttTopicIsAuto = wpFZ.DeviceName + "/" + ModuleName + "/IsAuto";
+	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
@@ -40,7 +40,7 @@ void moduleCwWw::init() {
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 
-	isAuto = true;
+	manual = false;
 	maxPercent = 0;
 	publishModeLast = 0;
 
@@ -81,17 +81,17 @@ void moduleCwWw::publishValues() {
 }
 void moduleCwWw::publishValues(bool force) {
 	if(force) {
-		publishIsAuto = 0;
+		publishManualLast = 0;
 		publishModeLast = 0;
 		publishMaxPercent = 0;
 	}
-	if(isAutoLast != isAuto || wpFZ.CheckQoS(publishIsAuto)) {
-		isAutoLast = isAuto;
-		wpMqtt.mqttClient.publish(mqttTopicIsAuto.c_str(), String(isAuto).c_str());
+	if(manualLast != manual || wpFZ.CheckQoS(publishManualLast)) {
+		manualLast = manual;
+		wpMqtt.mqttClient.publish(mqttTopicManual.c_str(), String(manual).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug(mqttTopicIsAuto, String(isAuto));
+			mb->printPublishValueDebug(mqttTopicManual, String(manual));
 		}
-		publishIsAuto = wpFZ.loopStartedAt;
+		publishManualLast = wpFZ.loopStartedAt;
 	}
 	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
 		maxPercentLast = maxPercent;
@@ -155,7 +155,7 @@ void moduleCwWw::SetSleep(uint seconds) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
 }
 String moduleCwWw::SetOn() {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
 	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
@@ -166,7 +166,7 @@ String moduleCwWw::SetOn() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetOff() {
-	isAuto = true;
+	manual = false;
 	targetWW = 0;
 	targetCW = 0;
 	calcDuration();
@@ -176,7 +176,7 @@ String moduleCwWw::SetOff() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = ww;
 	targetCW = cw;
@@ -187,7 +187,7 @@ String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWW(uint8 ww) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = ww;
 	//targetCW = wpAnalogOut2.handValue;
@@ -200,7 +200,7 @@ String moduleCwWw::SetWW(uint8 ww) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetCW(uint8 cw) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	//targetWW = wpAnalogOut.handValue;
 	targetCW = cw;
@@ -213,7 +213,7 @@ String moduleCwWw::SetCW(uint8 cw) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
-	if(isAuto) {
+	if(!manual) {
 		targetWW = ww;
 		targetCW = cw;
 		calcDuration();
@@ -237,7 +237,7 @@ void moduleCwWw::calcDuration() {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
 }
 void moduleCwWw::SetSmooth() {
-	isAuto = false;
+	manual = true;
 	modeCurrent = ModeSmooth;
 }
 
