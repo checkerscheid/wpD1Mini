@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 208                                                     $ #
+//# Revision     : $Rev:: 210                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 208 2024-10-07 21:20:42Z                 $ #
+//# File-ID      : $Id:: helperModules.h 210 2024-10-11 05:56:25Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -128,49 +128,49 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 208 $";
+		String SVNh = "$Rev: 210 $";
 		bool useDHT11Last;
-		uint32 publishUseDHT11Last;
+		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
-		uint32 publishUseDHT22Last;
+		unsigned long publishUseDHT22Last;
 		bool useLDRLast;
-		uint32 publishUseLDRLast;
+		unsigned long publishUseLDRLast;
 		bool useLightLast;
-		uint32 publishUseLightLast;
+		unsigned long publishUseLightLast;
 		bool useBMLast;
-		uint32 publishUseBMLast;
+		unsigned long publishUseBMLast;
 		bool useWindowLast;
-		uint32 publishUseWindowLast;
+		unsigned long publishUseWindowLast;
 		bool useCwWwLast;
-		uint32 publishUseCwWwLast;
+		unsigned long publishUseCwWwLast;
 		bool useAnalogOutLast;
-		uint32 publishUseAnalogOutLast;
+		unsigned long publishUseAnalogOutLast;
 		bool useAnalogOut2Last;
-		uint32 publishUseAnalogOut2Last;
+		unsigned long publishUseAnalogOut2Last;
 		bool useNeoPixelLast;
-		uint32 publishUseNeoPixelLast;
+		unsigned long publishUseNeoPixelLast;
 		bool useRelaisLast;
-		uint32 publishUseRelaisLast;
+		unsigned long publishUseRelaisLast;
 		bool useRelaisShieldLast;
-		uint32 publishUseRelaisShieldLast;
+		unsigned long publishUseRelaisShieldLast;
 		bool useRpmLast;
-		uint32 publishUseRpmLast;
+		unsigned long publishUseRpmLast;
 		bool useRainLast;
-		uint32 publishUseRainLast;
+		unsigned long publishUseRainLast;
 		bool useMoistureLast;
-		uint32 publishUseMoistureLast;
+		unsigned long publishUseMoistureLast;
 		bool useDistanceLast;
-		uint32 publishUseDistanceLast;
+		unsigned long publishUseDistanceLast;
 		bool useImpulseCounterLast;
-		uint32 publishUseImpulseCounterLast;
+		unsigned long publishUseImpulseCounterLast;
 		bool useUnderfloor1Last;
-		uint32 publishUseUnderfloor1Last;
+		unsigned long publishUseUnderfloor1Last;
 		bool useUnderfloor2Last;
-		uint32 publishUseUnderfloor2Last;
+		unsigned long publishUseUnderfloor2Last;
 		bool useUnderfloor3Last;
-		uint32 publishUseUnderfloor3Last;
+		unsigned long publishUseUnderfloor3Last;
 		bool useUnderfloor4Last;
-		uint32 publishUseUnderfloor4Last;
+		unsigned long publishUseUnderfloor4Last;
 		#if BUILDWITH == 1
 		#endif
 		#if BUILDWITH == 2
@@ -179,7 +179,7 @@ class helperModules {
 		#endif
 
 		bool DebugLast;
-		uint32 publishDebugLast;
+		unsigned long publishDebugLast;
 };
 extern helperModules wpModules;
 #endif

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 210                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 207 2024-10-07 12:59:22Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 210 2024-10-11 05:56:25Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h
@@ -56,9 +56,9 @@ class moduleBase {
 		bool _useError;
 
 		bool DebugLast;
-		uint32 publishDebugLast;
+		unsigned long publishDebugLast;
 		bool errorLast;
-		uint32 publishErrorLast;
+		unsigned long publishErrorLast;
 
 		void writeEEPROMuseAvg();
 		void writeEEPROMdebug();
