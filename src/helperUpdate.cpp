@@ -122,12 +122,12 @@ void helperUpdate::check() {
 	String payload = http.getString();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	deserializeJson(doc, payload);
-	serverVersion = String(doc["wpFreakaZone"]["Version"]);
+	serverVersion = doc["wpFreakaZone"]["Version"].as<String>();
 	newVersion = !(serverVersion == installedVersion);
 	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + serverVersion);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + String(doc["wpFreakaZone"]["date"]));
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + String(doc["wpFreakaZone"]["filename"]));
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"]["date"].as<String>());
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"]["filename"].as<String>());
 	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {

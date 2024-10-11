@@ -72,7 +72,7 @@ void helperWiFi::setupWiFi() {
 	Serial.println(wpFZ.ssid);
 	
 	WiFi.disconnect();
-	WiFi.setHostname(wpFZ.DeviceName.c_str());
+	WiFi.hostname(wpFZ.DeviceName.c_str());
 	WiFi.begin(wpFZ.ssid, wpFZ.password);
 
 	Serial.print(wpFZ.getTime());
