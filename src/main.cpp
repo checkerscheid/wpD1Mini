@@ -89,6 +89,9 @@ void setup() {
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.init();
 	}
+	if(wpModules.useModuleSML) {
+		wpSML.init();
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -178,6 +181,9 @@ void loop() {
 		if(wpModules.useModuleImpulseCounter) {
 			wpImpulseCounter.cycle();
 		}
+		if(wpModules.useModuleSML) {
+			wpSML.cycle();
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -249,6 +255,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpAnalogOut2.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
+	buildChecker(v, wpSML.getVersion());
 	#endif
 	#if BUILDWITH == 3
 	buildChecker(v, wpUnderfloor1.getVersion());

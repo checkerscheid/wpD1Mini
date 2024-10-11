@@ -53,6 +53,7 @@ class helperEEPROM {
 		const uint8 bitUseUnderfloor2 = 2; // include in bitsModules2
 		const uint8 bitUseUnderfloor3 = 3; // include in bitsModules2
 		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
+		const uint8 bitUseSML = 5; // include in bitsModules2
 
 //###################################################################################
 
@@ -99,6 +100,7 @@ class helperEEPROM {
 		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
+		const uint8 bitDebugSML = 4; // include in bitsDebugModules2
 
 //###################################################################################
 

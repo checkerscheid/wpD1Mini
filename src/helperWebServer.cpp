@@ -301,6 +301,9 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue(F("Red"), String(wpImpulseCounter.counterRed)) +
 				F("},");
 		}
+		if(wpModules.useModuleSML) {
+			message += F("\"SML\":{},");
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -399,6 +402,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleImpulseCounter) {
 			message += F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpImpulseCounter.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleSML) {
+			message += F(",") + wpFZ.JsonKeyValue(F("SML"), wpSML.Debug() ? "true" : "false");
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -438,7 +444,8 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpModules.useModuleRpm ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false");
+			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("SML"), wpModules.useModuleSML ? "true" : "false");
 		#endif
 		#if BUILDWITH == 3
 		message += 
@@ -537,6 +544,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Module"))->value() == F("useImpulseCounter")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useImpulseCounter"));
 				wpWebServer.setModuleChange(wpWebServer.cmdmoduleImpulseCounter);
+			}
+			if(request->getParam(F("Module"))->value() == F("useSML")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useSML"));
+				wpWebServer.setModuleChange(wpWebServer.cmdmoduleSML);
 			}
 			#endif
 			#if BUILDWITH == 3
@@ -671,6 +682,10 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Debug"))->value() == F("DebugImpulseCounter")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugImpulseCounter"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugImpulseCounter);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugSML")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugSML"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugSML);
 			}
 			#endif
 			#if BUILDWITH == 3
@@ -1168,6 +1183,7 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
 		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
+		if(doModuleChange == cmdmoduleSML) wpModules.changemoduleSML(!wpModules.useModuleSML);
 		#endif
 		#if BUILDWITH == 3
 		if(doModuleChange == cmdmoduleUnderfloor1) wpModules.changemoduleUnderfloor1(!wpModules.useModuleUnderfloor1);
@@ -1207,6 +1223,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
 		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
+		if(doDebugChange == cmdDebugSML) wpSML.changeDebug();
 		#endif
 		#if BUILDWITH == 3
 		if(doDebugChange == cmdDebugUnderfloor1) wpUnderfloor1.changeDebug();
@@ -1281,7 +1298,8 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule(F("useAnalogOut"), F("wpAnalogOut"), wpModules.useModuleAnalogOut) +
 			wpWebServer.getchangeModule(F("useAnalogOut2"), F("wpAnalogOut2"), wpModules.useModuleAnalogOut2) +
 			wpWebServer.getchangeModule(F("useRpm"), F("wpRpm"), wpModules.useModuleRpm) +
-			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter);
+			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter) +
+			wpWebServer.getchangeModule(F("useSML"), F("wpSML"), wpModules.useModuleSML);
 		#endif
 		#if BUILDWITH == 3
 		returns +=
@@ -1364,6 +1382,9 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleImpulseCounter) {
 			returns += wpWebServer.getChangeDebug(F("DebugImpulseCounter"), F("ImpulseCounter"), wpImpulseCounter.Debug());
+		}
+		if(wpModules.useModuleSML) {
+			returns += wpWebServer.getChangeDebug(F("DebugSML"), F("SML"), wpSML.Debug());
 		}
 		#endif
 		#if BUILDWITH == 3

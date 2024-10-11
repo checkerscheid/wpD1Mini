@@ -193,6 +193,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
 	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
+	wpModules.useModuleSML = bitRead(bitsModules2, bitUseSML);
 #endif
 #if BUILDWITH == 3
 	wpModules.useModuleUnderfloor1 = bitRead(bitsModules2, bitUseUnderfloor1);
@@ -239,6 +240,7 @@ void helperEEPROM::readVars() {
 	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
 	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
+	wpSML.Debug(bitRead(bitsDebugModules2, bitDebugSML));
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor1));

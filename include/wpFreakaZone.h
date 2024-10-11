@@ -44,6 +44,7 @@
 #include <moduleImpulseCounter.h>
 #include <moduleRpm.h>
 #include <moduleUnderfloor.h>
+#include <moduleSML.h>
 
 
 #define NTP_SERVER "172.17.1.1"

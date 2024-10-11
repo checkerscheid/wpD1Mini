@@ -45,6 +45,7 @@ void helperModules::init() {
 	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
 	mqttTopicUseRpm = wpFZ.DeviceName + "/settings/useModule/Rpm";
 	mqttTopicUseImpulseCounter = wpFZ.DeviceName + "/settings/useModule/ImpulseCounter";
+	mqttTopicUseSML = wpFZ.DeviceName + "/settings/useModule/SML";
 	#endif
 	#if BUILDWITH == 3
 	mqttTopicUseUnderfloor1 = wpFZ.DeviceName + "/settings/useModule/Underfloor1";
@@ -121,6 +122,7 @@ void helperModules::publishValues(bool force) {
 		publishUseAnalogOut2Last = 0;
 		publishUseRpmLast = 0;
 		publishUseImpulseCounterLast = 0;
+		publishUseSMLLast = 0;
 		#endif
 		#if BUILDWITH == 3
 		publishUseUnderfloor1Last = 0;
@@ -266,6 +268,13 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useImpulseCounter", useModuleImpulseCounter);
 		publishUseImpulseCounterLast = wpFZ.loopStartedAt;
 	}
+	if(useSMLLast != useModuleSML || publishUseSMLLast == 0 ||
+		wpFZ.loopStartedAt > publishUseSMLLast + wpFZ.publishQoS) {
+		useSMLLast = useModuleSML;
+		wpMqtt.mqttClient.publish(mqttTopicUseSML.c_str(), String(useModuleSML).c_str());
+		wpFZ.SendWSModule("useSML", useModuleSML);
+		publishUseSMLLast = wpFZ.loopStartedAt;
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(useUnderfloor1Last != useModuleUnderfloor1 || publishUseUnderfloor1Last == 0 ||
@@ -328,6 +337,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRpm.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseImpulseCounter.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseSML.c_str());
 	#endif
 	#if BUILDWITH == 3
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor1.c_str());
@@ -398,6 +408,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseImpulseCounter.c_str()) == 0) {
 		changemoduleImpulseCounter(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseSML.c_str()) == 0) {
+		changemoduleSML(readUseModule);
 	}
 	#endif
 	#if BUILDWITH == 3
@@ -641,6 +654,17 @@ void helperModules::changemoduleImpulseCounter(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseImpulseCounter, String(useModuleImpulseCounter));
 	}
 }
+void helperModules::changemoduleSML(bool newValue) {
+	if(useModuleSML != newValue) {
+		useModuleSML = newValue;
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseSML, useModuleSML);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleSML", useModuleSML);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseSML, String(useModuleSML));
+	}
+}
 #endif
 #if BUILDWITH == 3
 void helperModules::changemoduleUnderfloor1(bool newValue) {
@@ -758,6 +782,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.publishSettings(force);
 	}
+	if(wpModules.useModuleSML) {
+		wpSML.publishSettings(force);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -844,6 +871,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.publishValues(force);
 	}
+	if(wpModules.useModuleSML) {
+		wpSML.publishValues(force);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -926,6 +956,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.setSubscribes();
 	}
+	if(wpModules.useModuleSML) {
+		wpSML.setSubscribes();
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -1005,6 +1038,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleSML) {
+		wpSML.checkSubscribes(topic, msg);
 	}
 	#endif
 	#if BUILDWITH == 3
