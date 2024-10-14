@@ -981,26 +981,16 @@ void helperWebServer::setupWebServer() {
 			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
-		webServer.on("/setNeoPixelOffBlender", HTTP_GET, [](AsyncWebServerRequest *request) {
-			uint8 steps = 5;
-			if(request->hasParam(F("steps"))) {
-				steps = request->getParam(F("steps"))->value().toInt();
-			}
-			wpNeoPixel.SetOffBlender(steps);
-			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOff"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
-			wpWebServer.setBlink();
-		});
 		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelBorder"));
 			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
 			wpWebServer.setBlink();
 		});
-		webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
-			request->send(200, F("application/json"), wpNeoPixel.getStripStatus().c_str());
-			wpWebServer.setBlink();
-		});
+		// webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
+		// 	request->send_P(200, "application/json", wpNeoPixel.getStripStatus().c_str());
+		// 	wpWebServer.setBlink();
+		// });
 	}
 	#endif
 	#if BUILDWITH == 3
