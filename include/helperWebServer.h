@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 198 2024-09-05 12:32:25Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 207 2024-10-07 12:59:22Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -37,29 +37,11 @@ class helperWebServer {
 		const int8 cmdSetName = 10;
 		int8 doCommand;
 
-		const int8 cmdSendRestWiFi = 1;
-		const int8 cmdSendRestDHT = 2;
-		const int8 cmdSendRestLDR = 3;
-		const int8 cmdSendRestLight = 4;
-		const int8 cmdSendRestBM = 5;
-		const int8 cmdSendRestWindow = 6;
-		const int8 cmdSendRestRelais = 7;
-		const int8 cmdSendRestRain = 8;
-		const int8 cmdSendRestMoisture = 9;
-		const int8 cmdSendRestDistance = 10;
-		const int8 cmdSendRestAnalogOut = 11;
-		const int8 cmdSendRestAnalogOut2 = 12;
-		const int8 cmdSendRestNeoPixel = 13;
-		const int8 cmdSendRestRpm = 14;
-		const int8 cmdSendRestImpulseCounter = 15;
-		int8 doSendRestChange;
-
 		const int8 cmdDebugEEPROM = 1;
 		const int8 cmdDebugFinder = 2;
 		const int8 cmdDebugModules = 3;
 		const int8 cmdDebugMqtt = 4;
 		const int8 cmdDebugOnlineToggler = 5;
-		const int8 cmdDebugRest = 6;
 		const int8 cmdDebugUpdate = 7;
 		const int8 cmdDebugWebServer = 8;
 		const int8 cmdDebugWiFi = 9;
@@ -79,6 +61,10 @@ class helperWebServer {
 		const int8 cmdDebugNeoPixel = 32;
 		const int8 cmdDebugRpm = 33;
 		const int8 cmdDebugImpulseCounter = 34;
+		const int8 cmdDebugUnderfloor1 = 35;
+		const int8 cmdDebugUnderfloor2 = 36;
+		const int8 cmdDebugUnderfloor3 = 37;
+		const int8 cmdDebugUnderfloor4 = 38;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -98,6 +84,10 @@ class helperWebServer {
 		const int8 cmdModuleNeoPixel = 15;
 		const int8 cmdModuleRpm = 16;
 		const int8 cmdmoduleImpulseCounter = 17;
+		const int8 cmdmoduleUnderfloor1 = 18;
+		const int8 cmdmoduleUnderfloor2 = 19;
+		const int8 cmdmoduleUnderfloor3 = 20;
+		const int8 cmdmoduleUnderfloor4 = 21;
 		int8 doModuleChange;
 
 		int8 doBlink;
@@ -114,12 +104,10 @@ class helperWebServer {
 		void setupWebServer();
 		void setCommand(int8 command);
 		void setModuleChange(int8 modul);
-		void setSendRestChange(int8 sendRest);
 		void setDebugChange(int8 debug);
 		void setBlink();
 		void doTheCommand();
 		void doTheModuleChange();
-		void doTheSendRestChange();
 		void doTheDebugChange();
 		void doTheBlink();
 		
@@ -131,9 +119,8 @@ class helperWebServer {
 		void checkSubscribes(char* topic, String msg);
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
-		String getChangeRest(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 207 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -213,7 +200,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="ulContainer">
 			%Debug%
-			%SendRest%
 			%CompiledWith%
 			<ul class="wpContainer">
 				<li><span class='bold'>Device:</span></li><li><hr /></li>
@@ -286,10 +272,6 @@ function onMessage(event) {
 	if(typeof d.cmd != 'undefined') {
 		if(d.cmd == 'setDebug') {
 			console.log('setDebug:');
-			console.log(d);
-			changeBoolValue(d.msg.id, d.msg.value);
-		} else if(d.cmd == 'setSendRest') {
-			console.log('setSendRest:');
 			console.log(d);
 			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'setModule') {
@@ -379,10 +361,6 @@ function changeModule(e) {
 }
 function changeDebug(e) {
 	xmlHttp.open("GET", "/setDebug?Debug=" + e.target.id, false);
-	xmlHttp.send(null);
-}
-function changeSendRest(e) {
-	xmlHttp.open("GET", "/setSendRest?sendRest=" + e.target.id, false);
 	xmlHttp.send(null);
 }
 function cmdHandle(e) {

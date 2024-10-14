@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 209                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 183 2024-07-29 03:32:26Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 209 2024-10-08 06:10:11Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -28,7 +28,9 @@ void moduleBM::init() {
 	pinMode(Pin, INPUT_PULLUP);
 	digitalWrite(Pin, HIGH);
 	bm = true;
-	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
+	manual = false;
+	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName + "/Output";
+	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
 	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
@@ -37,7 +39,6 @@ void moduleBM::init() {
 
 	// section to copy
 
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestBM);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugBM);
 
 }
@@ -65,9 +66,18 @@ void moduleBM::publishValues() {
 void moduleBM::publishValues(bool force) {
 	if(force) {
 		publishBMLast = 0;
+		publishManualLast = 0;
 	}
 	if(bmLast != bm || wpFZ.CheckQoS(publishBMLast)) {
 		publishValue();
+	}
+	if(manualLast != manual || wpFZ.CheckQoS(publishManualLast)) {
+		manualLast = manual;
+		wpMqtt.mqttClient.publish(mqttTopicManual.c_str(), String(manual).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicManual, String(manual));
+		}
+		publishManualLast = wpFZ.loopStartedAt;
 	}
 	mb->publishValues(force);
 }
@@ -101,18 +111,13 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 }
 void moduleBM::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("bm", bm ? "true" : "false");
-		wpRest.trySend = true;
-	}
 	bmLast = bm;
 	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.ldr <= threshold) {
+		if(bm && wpLDR.ldr <= threshold && !manual) {
 			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
 			if(!lightToTurnOn.startsWith("_")) {
 				if(lightToTurnOn.startsWith("http://")) {
-					wpRest.error = wpRest.error | !wpRest.sendRawRest(lightToTurnOn);
-					wpRest.trySend = true;
+					wpFZ.sendRawRest(lightToTurnOn);
 					lm += ", send REST '" + lightToTurnOn + "'";
 				} else {
 					wpMqtt.mqttClient.publish(lightToTurnOn.c_str(), String("on").c_str());
@@ -141,33 +146,31 @@ void moduleBM::calc() {
 	}
 }
 
+String moduleBM::SetAuto() {
+	manual = false;
+	return "{\"erg\":\"S_OK\",\"mode\":\"auto\"}";
+}
+String moduleBM::SetManual() {
+	manual = true;
+	return "{\"erg\":\"S_OK\",\"mode\":\"manual\"}";
+}
 
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 209 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-bool moduleBM::SendRest() {
-	return mb->sendRest;
-}
-bool moduleBM::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
-}
 bool moduleBM::Debug() {
 	return mb->debug;
 }
 bool moduleBM::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
-}
-void moduleBM::changeSendRest() {
-	mb->changeSendRest();
 }
 void moduleBM::changeDebug() {
 	mb->changeDebug();

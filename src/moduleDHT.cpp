@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 183 2024-07-29 03:32:26Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 207 2024-10-07 12:59:22Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -43,7 +43,6 @@ void moduleDHT::init() {
 	dht->begin();
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules0, wpEEPROM.bitsSendRestModules0, wpEEPROM.bitSendRestDHT);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules0, wpEEPROM.bitsDebugModules0, wpEEPROM.bitDebugDHT);
 	mb->initError();
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleDHT);
@@ -122,10 +121,6 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 void moduleDHT::publishValueTemp() {
 	String sendTemperature = String(float(temperature / 100.0));
 	wpMqtt.mqttClient.publish(mqttTopicTemperature.c_str(), sendTemperature.c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("temp", sendTemperature);
-		wpRest.trySend = true;
-	}
 	temperatureLast = temperature;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Temperature", sendTemperature);
@@ -136,10 +131,6 @@ void moduleDHT::publishValueTemp() {
 void moduleDHT::publishValueHum() {
 	String sendHumidity = String(float(humidity / 100.0));
 	wpMqtt.mqttClient.publish(mqttTopicHumidity.c_str(), sendHumidity.c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("hum", sendHumidity);
-		wpRest.trySend = true;
-	}
 	humidityLast = humidity;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("Humidity", sendHumidity);
@@ -189,24 +180,14 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleDHT::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleDHT::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleDHT::SendRest() {
-	return mb->sendRest;
-}
-bool moduleDHT::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleDHT::Debug() {
 	return mb->debug;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 198 2024-09-05 12:32:25Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 207 2024-10-07 12:59:22Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -53,7 +53,6 @@ void moduleAnalogOut2::init() {
 	publishHandErrorLast = 0;
 
 	// section to copy
-	mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestAnalogOut2);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut2);
 }
 
@@ -156,10 +155,6 @@ void moduleAnalogOut2::SetHandValueSet(uint8 val) {
 //###################################################################################
 void moduleAnalogOut2::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
-	if(mb->sendRest) {
-		wpRest.error = wpRest.error | !wpRest.sendRest("analogout2", String(output));
-		wpRest.trySend = true;
-	}
 	outputLast = output;
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug("AnalogOut2", String(output));
@@ -192,24 +187,14 @@ void moduleAnalogOut2::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 198 $";
+	String SVN = "$Rev: 207 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleAnalogOut2::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleAnalogOut2::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleAnalogOut2::SendRest() {
-	return mb->sendRest;
-}
-bool moduleAnalogOut2::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleAnalogOut2::Debug() {
 	return mb->debug;

@@ -6,22 +6,22 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 02.06.2024                                                       #
+//# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 205                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 205 2024-10-04 09:53:16Z              $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleRelais_h
-#define moduleRelais_h
+#ifndef moduleUnderfloor1_h
+#define moduleUnderfloor1_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleRelais {
+class moduleUnderfloor {
 	public:
-		moduleRelais();
+		moduleUnderfloor(uint8 n);
 		moduleBase* mb;
 		uint8 Pin;
 
@@ -32,29 +32,22 @@ class moduleRelais {
 		bool handError;
 		bool handSet = false;
 		bool handValueSet = false;
-		// wpModules.useModuleMoisture {
-		bool waterEmptySet = false;
-		bool waterEmptyError;
-		uint8 pumpActive; // in seconds
-		uint16 pumpPause; // show in minutes, save in seconds
-		// }
 
 		// values
 		String mqttTopicOut;
 		String mqttTopicAutoValue;
 		String mqttTopicHandValue;
+		String mqttTopicReadedTemp;
 		String mqttTopicErrorHand;
-		String mqttTopicErrorWaterEmpty;
 		// settings
-		// wpModules.useModuleMoisture {
-		String mqttTopicPumpActive;
-		String mqttTopicPumpPause;
-		// }
+		String mqttTopicSetPoint;
+		String mqttTopicTempUrl;
+		String mqttTopicTemp = "_";
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
-		String mqttTopicSetWaterEmpty;
-		String mqttTopicStartPumpTest;
+		String mqttTopicSetSetPoint;
+		String mqttTopicSetTempUrl;
 
 		// section to copy
 		void init();
@@ -68,46 +61,53 @@ class moduleRelais {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		void InitSetPoint(uint8 setpoint);
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
+		uint32 CalcCycle();
+		uint32 CalcCycle(uint32 calcCycle);
+		uint8 GetSetPoint();
+		String SetHand(bool val);
+		String SetHandValue(bool val);
+		String SetSetPoint(uint8 setpoint);
+		String SetTopicTempUrl(String topic);
 	private:
+		uint8 no;
 		bool outputLast;
 		unsigned long publishOutputLast;
 		bool autoValueLast;
 		unsigned long publishAutoValueLast;
 		bool handValueLast;
 		unsigned long publishHandValueLast;
+		int readedTempLast;
+		unsigned long publishReadedTempLast;
 		bool handErrorLast;
 		unsigned long publishHandErrorLast;
-		unsigned long publishWaterEmptyErrorLast;
-		// if wpModules.useMoisture
-		bool pumpCycleActive;
-		bool pumpStarted;
-		bool pumpInPause;
-		unsigned long pumpTimeStart;
-		unsigned long pumpTimePause;
-
-		uint8 debugCalcPumpCounter;
-		unsigned long remainPumpTimePause;
-		// }
-		bool startPumpTestActive;
-		unsigned long startPumpTestAt;
+		uint8 setPointLast;
+		unsigned long publishSetPointLast;
+		String tempUrlLast;
+		unsigned long publishTempUrlLast;
 
 		void publishValue();
 		void calc();
-		// if wpModules.useMoisture
-		void calcPump();
-		// }
-		void printCalcDebug(String name, int value, float raw);
-		void SendPumpStatus();
-		String getReadableTime(unsigned long time);
-		void StartPumpTest();
+		void calcOutput();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 205 $";
+
+		uint8 bitDebug;
+		uint8 bitHand;
+		uint8 bitHandValue;
+		uint16 byteSetpoint;
+		uint16 byteCalcCycle;
+		uint8 setPoint;
+		int temp;
 };
-extern moduleRelais wpRelais;
+extern moduleUnderfloor wpUnderfloor1;
+extern moduleUnderfloor wpUnderfloor2;
+extern moduleUnderfloor wpUnderfloor3;
+extern moduleUnderfloor wpUnderfloor4;
 
 #endif

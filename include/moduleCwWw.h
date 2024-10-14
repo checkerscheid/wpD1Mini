@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 209                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 201 2024-09-08 22:39:09Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 209 2024-10-08 06:10:11Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -30,7 +30,7 @@ class moduleCwWw {
 		static const uint8 ModeBlender = 90; //CW, WW
 
 		// values
-		String mqttTopicIsAuto;
+		String mqttTopicManual;
 		String mqttTopicMaxPercent;
 		String mqttTopicModeName;
 		String mqttTopicSleep;
@@ -50,11 +50,8 @@ class moduleCwWw {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 
@@ -68,9 +65,9 @@ class moduleCwWw {
 		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
 		void SetSmooth();
 	private:
-		bool isAuto;
-		bool isAutoLast;
-		unsigned long publishIsAuto;
+		bool manual;
+		bool manualLast;
+		unsigned long publishManualLast;
 		uint8 maxPercent;
 		uint8 maxPercentLast;
 		unsigned long publishMaxPercent;
@@ -101,7 +98,7 @@ class moduleCwWw {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 201 $";
+		String SVNh = "$Rev: 209 $";
 };
 extern moduleCwWw wpCwWw;
 

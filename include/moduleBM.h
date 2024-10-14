@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 209                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.h 183 2024-07-29 03:32:26Z                      $ #
+//# File-ID      : $Id:: moduleBM.h 209 2024-10-08 06:10:11Z                      $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBM_h
@@ -30,6 +30,7 @@ class moduleBM {
 		uint16 threshold = 500;
 		String lightToTurnOn = "_";
 		String mqttTopicBM;
+		String mqttTopicManual;
 		String mqttTopicThreshold;
 		String mqttTopicLightToTurnOn;
 
@@ -44,22 +45,24 @@ class moduleBM {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
+		String SetAuto();
+		String SetManual();
 	private:
 		int bmLast;
 		unsigned long publishBMLast;
+		bool manual;
+		bool manualLast;
+		unsigned long publishManualLast;
 		void publishValue();
 		void calc();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 183 $";
+		String SVNh = "$Rev: 209 $";
 
 };
 extern moduleBM wpBM;

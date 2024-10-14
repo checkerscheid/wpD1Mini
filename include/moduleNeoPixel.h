@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 201 2024-09-08 22:39:09Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 207 2024-10-07 12:59:22Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -86,11 +86,8 @@ class moduleNeoPixel {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 		void InitValueR(uint8 r);
@@ -201,7 +198,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 201 $";
+		String SVNh = "$Rev: 207 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

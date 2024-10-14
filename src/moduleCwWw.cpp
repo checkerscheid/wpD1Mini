@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 201                                                     $ #
+//# Revision     : $Rev:: 209                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 201 2024-09-08 22:39:09Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 209 2024-10-08 06:10:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -31,7 +31,7 @@ void moduleCwWw::init() {
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
-	mqttTopicIsAuto = wpFZ.DeviceName + "/" + ModuleName + "/IsAuto";
+	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
@@ -40,12 +40,11 @@ void moduleCwWw::init() {
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 
-	isAuto = true;
+	manual = false;
 	maxPercent = 0;
 	publishModeLast = 0;
 
 	// section to copy
-	//mb->initRest(wpEEPROM.addrBitsSendRestModules1, wpEEPROM.bitsSendRestModules1, wpEEPROM.bitSendRestCwWw);
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugCwWw);
 }
 
@@ -82,29 +81,21 @@ void moduleCwWw::publishValues() {
 }
 void moduleCwWw::publishValues(bool force) {
 	if(force) {
-		publishIsAuto = 0;
+		publishManualLast = 0;
 		publishModeLast = 0;
 		publishMaxPercent = 0;
 	}
-	if(isAutoLast != isAuto || wpFZ.CheckQoS(publishIsAuto)) {
-		isAutoLast = isAuto;
-		wpMqtt.mqttClient.publish(mqttTopicIsAuto.c_str(), String(isAuto).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("isAuto", String(isAuto));
-		// 	wpRest.trySend = true;
-		// }
+	if(manualLast != manual || wpFZ.CheckQoS(publishManualLast)) {
+		manualLast = manual;
+		wpMqtt.mqttClient.publish(mqttTopicManual.c_str(), String(manual).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug(mqttTopicIsAuto, String(isAuto));
+			mb->printPublishValueDebug(mqttTopicManual, String(manual));
 		}
-		publishIsAuto = wpFZ.loopStartedAt;
+		publishManualLast = wpFZ.loopStartedAt;
 	}
 	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercent)) {
 		maxPercentLast = maxPercent;
 		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("maxPercent", String(maxPercent));
-		// 	wpRest.trySend = true;
-		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicMaxPercent, String(maxPercent));
 		}
@@ -113,10 +104,6 @@ void moduleCwWw::publishValues(bool force) {
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
 		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
-		// if(mb->sendRest) {
-		// 	wpRest.error = wpRest.error | !wpRest.sendRest("modeCurrent", GetModeName(modeCurrent));
-		// 	wpRest.trySend = true;
-		// }
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
 		}
@@ -126,10 +113,6 @@ void moduleCwWw::publishValues(bool force) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
 			sleepLast = sleep;
 			wpMqtt.mqttClient.publish(mqttTopicSleep.c_str(), String(sleep).c_str());
-			// if(mb->sendRest) {
-			// 	wpRest.error = wpRest.error | !wpRest.sendRest("sleep", String(sleep));
-			// 	wpRest.trySend = true;
-			// }
 			if(wpMqtt.Debug) {
 				mb->printPublishValueDebug(mqttTopicSleep, String(sleep));
 			}
@@ -172,7 +155,7 @@ void moduleCwWw::SetSleep(uint seconds) {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
 }
 String moduleCwWw::SetOn() {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
 	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
@@ -183,7 +166,7 @@ String moduleCwWw::SetOn() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetOff() {
-	isAuto = true;
+	manual = false;
 	targetWW = 0;
 	targetCW = 0;
 	calcDuration();
@@ -193,7 +176,7 @@ String moduleCwWw::SetOff() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = ww;
 	targetCW = cw;
@@ -204,7 +187,7 @@ String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWW(uint8 ww) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	targetWW = ww;
 	//targetCW = wpAnalogOut2.handValue;
@@ -217,7 +200,7 @@ String moduleCwWw::SetWW(uint8 ww) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetCW(uint8 cw) {
-	isAuto = false;
+	manual = true;
 	SetSleep(0);
 	//targetWW = wpAnalogOut.handValue;
 	targetCW = cw;
@@ -230,7 +213,7 @@ String moduleCwWw::SetCW(uint8 cw) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
-	if(isAuto) {
+	if(!manual) {
 		targetWW = ww;
 		targetCW = cw;
 		calcDuration();
@@ -254,7 +237,7 @@ void moduleCwWw::calcDuration() {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
 }
 void moduleCwWw::SetSmooth() {
-	isAuto = false;
+	manual = true;
 	modeCurrent = ModeSmooth;
 }
 
@@ -396,24 +379,14 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 201 $";
+	String SVN = "$Rev: 209 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-void moduleCwWw::changeSendRest() {
-	mb->changeSendRest();
-}
 void moduleCwWw::changeDebug() {
 	mb->changeDebug();
-}
-bool moduleCwWw::SendRest() {
-	return mb->sendRest;
-}
-bool moduleCwWw::SendRest(bool sendRest) {
-	mb->sendRest = sendRest;
-	return true;
 }
 bool moduleCwWw::Debug() {
 	return mb->debug;

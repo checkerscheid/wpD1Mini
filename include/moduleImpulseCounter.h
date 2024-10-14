@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 192                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.h 192 2024-08-18 01:46:28Z          $ #
+//# File-ID      : $Id:: moduleImpulseCounter.h 207 2024-10-07 12:59:22Z          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleImpulseCounter_h
@@ -51,11 +51,8 @@ class moduleImpulseCounter {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void changeSendRest();
 		void changeDebug();
 		// getter / setter
-		bool SendRest();
-		bool SendRest(bool sendRest);
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
@@ -71,7 +68,7 @@ class moduleImpulseCounter {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 192 $";
+		String SVNh = "$Rev: 207 $";
 
 };
 extern moduleImpulseCounter wpImpulseCounter;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 210                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 198 2024-09-05 12:32:25Z                 $ #
+//# File-ID      : $Id:: helperModules.h 210 2024-10-11 05:56:25Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -28,18 +28,22 @@ class helperModules {
 		bool useModuleLight = false;
 		bool useModuleBM = false;
 		bool useModuleWindow = false;
-		bool useModuleCwWw = false;
-		bool useModuleAnalogOut = false;
-		bool useModuleAnalogOut2 = false;
-		bool useModuleNeoPixel = false;
 		bool useModuleRelais = false;
 		bool useModuleRelaisShield = false;
-		bool useModuleRpm = false;
 		bool useModuleRain = false;
 		bool useModuleMoisture = false;
 		bool useModuleDistance = false;
+		
+		bool useModuleCwWw = false;
+		bool useModuleNeoPixel = false;
+		bool useModuleAnalogOut = false;
+		bool useModuleAnalogOut2 = false;
+		bool useModuleRpm = false;
 		bool useModuleImpulseCounter = false;
-
+		bool useModuleUnderfloor1 = false;
+		bool useModuleUnderfloor2 = false;
+		bool useModuleUnderfloor3 = false;
+		bool useModuleUnderfloor4 = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -49,17 +53,29 @@ class helperModules {
 		String mqttTopicUseLight;
 		String mqttTopicUseBM;
 		String mqttTopicUseWindow;
-		String mqttTopicUseCwWw;
-		String mqttTopicUseAnalogOut;
-		String mqttTopicUseAnalogOut2;
-		String mqttTopicUseNeoPixel;
 		String mqttTopicUseRelais;
 		String mqttTopicUseRelaisShield;
-		String mqttTopicUseRpm;
 		String mqttTopicUseRain;
 		String mqttTopicUseMoisture;
 		String mqttTopicUseDistance;
+		#if BUILDWITH == 1
+		String mqttTopicUseCwWw;
+		String mqttTopicUseNeoPixel;
+		String mqttTopicUseAnalogOut;
+		String mqttTopicUseAnalogOut2;
+		#endif
+		#if BUILDWITH == 2
+		String mqttTopicUseAnalogOut;
+		String mqttTopicUseAnalogOut2;
+		String mqttTopicUseRpm;
 		String mqttTopicUseImpulseCounter;
+		#endif
+		#if BUILDWITH == 3
+		String mqttTopicUseUnderfloor1;
+		String mqttTopicUseUnderfloor2;
+		String mqttTopicUseUnderfloor3;
+		String mqttTopicUseUnderfloor4;
+		#endif
 
 		helperModules();
 		void init();
@@ -81,17 +97,29 @@ class helperModules {
 		void changeModuleLight(bool newValue);
 		void changeModuleBM(bool newValue);
 		void changeModuleWindow(bool newValue);
-		void changeModuleCwWw(bool newValue);
-		void changeModuleAnalogOut(bool newValue);
-		void changeModuleAnalogOut2(bool newValue);
-		void changeModuleNeoPixel(bool newValue);
 		void changeModuleRelais(bool newValue);
 		void changeModuleRelaisShield(bool newValue);
-		void changeModuleRpm(bool newValue);
 		void changeModuleRain(bool newValue);
 		void changeModuleMoisture(bool newValue);
 		void changeModuleDistance(bool newValue);
+		#if BUILDWITH == 1
+		void changeModuleCwWw(bool newValue);
+		void changeModuleNeoPixel(bool newValue);
+		void changeModuleAnalogOut(bool newValue);
+		void changeModuleAnalogOut2(bool newValue);
+		#endif
+		#if BUILDWITH == 2
+		void changeModuleAnalogOut(bool newValue);
+		void changeModuleAnalogOut2(bool newValue);
+		void changeModuleRpm(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
+		#endif
+		#if BUILDWITH == 3
+		void changemoduleUnderfloor1(bool newValue);
+		void changemoduleUnderfloor2(bool newValue);
+		void changemoduleUnderfloor3(bool newValue);
+		void changemoduleUnderfloor4(bool newValue);
+		#endif
 
 		void publishAllSettings();
 		void publishAllSettings(bool force);
@@ -100,43 +128,58 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 210 $";
 		bool useDHT11Last;
-		uint32 publishUseDHT11Last;
+		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
-		uint32 publishUseDHT22Last;
+		unsigned long publishUseDHT22Last;
 		bool useLDRLast;
-		uint32 publishUseLDRLast;
+		unsigned long publishUseLDRLast;
 		bool useLightLast;
-		uint32 publishUseLightLast;
+		unsigned long publishUseLightLast;
 		bool useBMLast;
-		uint32 publishUseBMLast;
+		unsigned long publishUseBMLast;
 		bool useWindowLast;
-		uint32 publishUseWindowLast;
+		unsigned long publishUseWindowLast;
 		bool useCwWwLast;
-		uint32 publishUseCwWwLast;
+		unsigned long publishUseCwWwLast;
 		bool useAnalogOutLast;
-		uint32 publishUseAnalogOutLast;
+		unsigned long publishUseAnalogOutLast;
 		bool useAnalogOut2Last;
-		uint32 publishUseAnalogOut2Last;
+		unsigned long publishUseAnalogOut2Last;
 		bool useNeoPixelLast;
-		uint32 publishUseNeoPixelLast;
+		unsigned long publishUseNeoPixelLast;
 		bool useRelaisLast;
-		uint32 publishUseRelaisLast;
+		unsigned long publishUseRelaisLast;
 		bool useRelaisShieldLast;
-		uint32 publishUseRelaisShieldLast;
+		unsigned long publishUseRelaisShieldLast;
 		bool useRpmLast;
-		uint32 publishUseRpmLast;
+		unsigned long publishUseRpmLast;
 		bool useRainLast;
-		uint32 publishUseRainLast;
+		unsigned long publishUseRainLast;
 		bool useMoistureLast;
-		uint32 publishUseMoistureLast;
+		unsigned long publishUseMoistureLast;
 		bool useDistanceLast;
-		uint32 publishUseDistanceLast;
+		unsigned long publishUseDistanceLast;
 		bool useImpulseCounterLast;
-		uint32 publishUseImpulseCounterLast;
+		unsigned long publishUseImpulseCounterLast;
+		bool useUnderfloor1Last;
+		unsigned long publishUseUnderfloor1Last;
+		bool useUnderfloor2Last;
+		unsigned long publishUseUnderfloor2Last;
+		bool useUnderfloor3Last;
+		unsigned long publishUseUnderfloor3Last;
+		bool useUnderfloor4Last;
+		unsigned long publishUseUnderfloor4Last;
+		#if BUILDWITH == 1
+		#endif
+		#if BUILDWITH == 2
+		#endif
+		#if BUILDWITH == 3
+		#endif
+
 		bool DebugLast;
-		uint32 publishDebugLast;
+		unsigned long publishDebugLast;
 };
 extern helperModules wpModules;
 #endif

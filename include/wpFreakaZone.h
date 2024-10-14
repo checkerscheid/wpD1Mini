@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 198                                                     $ #
+//# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 198 2024-09-05 12:32:25Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 207 2024-10-07 12:59:22Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -23,26 +23,28 @@
 #include <helperModules.h>
 #include <helperMqtt.h>
 #include <helperOnlineToggler.h>
-#include <helperRest.h>
 #include <helperUpdate.h>
 #include <helperWebServer.h>
 #include <helperWiFi.h>
 #include <moduleBase.h>
+
 #include <moduleDHT.h>
 #include <moduleLDR.h>
 #include <moduleLight.h>
 #include <moduleBM.h>
 #include <moduleWindow.h>
-#include <moduleCwWw.h>
-#include <moduleAnalogOut.h>
-#include <moduleAnalogOut2.h>
-#include <moduleNeoPixel.h>
 #include <moduleRelais.h>
-#include <moduleRpm.h>
 #include <moduleRain.h>
 #include <moduleMoisture.h>
 #include <moduleDistance.h>
+#include <moduleCwWw.h>
+#include <moduleNeoPixel.h>
+#include <moduleAnalogOut.h>
+#include <moduleAnalogOut2.h>
 #include <moduleImpulseCounter.h>
+#include <moduleRpm.h>
+#include <moduleUnderfloor.h>
+
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -56,8 +58,6 @@ class wpFreakaZone {
 
 		const char* mqttServer = "mqtt.freakazone.com";
 		const uint16 mqttServerPort = 1883;
-		const char* restServer = "light.freakazone.com";
-		const uint16 restServerPort = 255;
 		const char* updateServer = "d1miniupdate.freakazone.com";
 		const uint16 finderListenPort = 51346;
 		const uint32 minute10  = 1000 * 60 * 10;
@@ -125,7 +125,6 @@ class wpFreakaZone {
 		void DebugWS(String typ, String func, String msg);
 		//void SendWS(String msg);
 		void SendWSModule(String htmlId, bool value);
-		void SendWSSendRest(String htmlId, bool value);
 		void SendWSDebug(String htmlId, bool value);
 		void SendRestartRequired(String msg);
 		void SendNewVersion(bool isnew);
@@ -146,13 +145,20 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
+		bool sendRawRest(String target);
+		void InitBootCounter(uint32 bc);
+		void BootCount();
+		uint32 GetBootCounter();
+		void ResetBootCounter();
 	private:
-		String SVNh = "$Rev: 198 $";
+		String SVNh = "$Rev: 207 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
 		bool restartRequiredLast;
 		unsigned long publishRestartRequiredLast;
+		uint32 bootCounter;
+		void WriteBootCounter();
 };
 extern wpFreakaZone wpFZ;
 
