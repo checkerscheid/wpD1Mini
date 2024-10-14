@@ -146,6 +146,10 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
 		bool sendRawRest(String target);
+		void InitBootCounter(uint32 bc);
+		void BootCount();
+		uint32 GetBootCounter();
+		void ResetBootCounter();
 	private:
 		String SVNh = "$Rev: 207 $";
 		unsigned long publishOnDurationLast;
@@ -153,6 +157,8 @@ class wpFreakaZone {
 		unsigned long publishCalcValuesLast;
 		bool restartRequiredLast;
 		unsigned long publishRestartRequiredLast;
+		uint32 bootCounter;
+		void WriteBootCounter();
 };
 extern wpFreakaZone wpFZ;
 

@@ -131,7 +131,8 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyString(F("miniMAC"), minimac) + F(",") +
 			wpFZ.JsonKeyString(F("IP"), WiFi.localIP().toString()) + F(",") +
 			wpFZ.JsonKeyValue(F("UpdateMode"), wpUpdate.UpdateFW ? "true" : "false") + F(",") +
-			wpFZ.JsonKeyValue(F("calcValues"), wpFZ.calcValues ? "true" : "false") + F(",");
+			wpFZ.JsonKeyValue(F("calcValues"), wpFZ.calcValues ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("BootCounter"), String(wpFZ.GetBootCounter())) + F(",");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += F("\"DHT\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDHT.Pin])) + F(",") +
@@ -758,6 +759,10 @@ void helperWebServer::setupWebServer() {
 				if(request->hasParam(F("newUpdateChanel"))) {
 					wpUpdate.SetUpdateChanel(request->getParam(F("newUpdateChanel"))->value().toInt());
 				}
+			}
+			if(request->getParam(F("cmd"))->value() == F("ResetBootCounter")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd ResetBootCounter"));
+				wpFZ.ResetBootCounter();
 			}
 		}
 		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));

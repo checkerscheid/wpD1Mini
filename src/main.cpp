@@ -107,6 +107,8 @@ void setup() {
 	wpModules.publishAllValues();
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
+
+	wpFZ.BootCount();
 }
 
 //###################################################################################

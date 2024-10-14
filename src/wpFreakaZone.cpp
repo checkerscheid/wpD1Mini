@@ -366,6 +366,24 @@ void wpFreakaZone::printRestored() {
 	Serial.print(funcToString("StartDevice"));
 	Serial.println(Version);
 }
+void wpFreakaZone::InitBootCounter(uint32 bc) {
+	bootCounter = bc;
+}
+void wpFreakaZone::BootCount() {
+	bootCounter++;
+	WriteBootCounter();
+}
+uint32 wpFreakaZone::GetBootCounter() {
+	return bootCounter;
+}
+void wpFreakaZone::ResetBootCounter() {
+	bootCounter = 0;
+	WriteBootCounter();
+}
 //###################################################################################
 // private
 //###################################################################################
+void wpFreakaZone::WriteBootCounter() {
+	EEPROM.put(wpEEPROM.addrBootCounter, bootCounter);
+	DebugWS(strINFO, F("WriteBootCounter"), F("new bootCounter: ") + String(bootCounter));
+}

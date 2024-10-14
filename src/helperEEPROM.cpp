@@ -371,6 +371,8 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
-
+	uint32 bc = 0;
+	EEPROM.get(addrBootCounter, bc);
+	wpFZ.InitBootCounter(bc);
 	readStringsFromEEPROM();
 }

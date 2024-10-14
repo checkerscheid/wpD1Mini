@@ -190,8 +190,9 @@ class helperEEPROM {
 		const uint16 byteCalcCycleUnderfloor3 = 96;
 		const uint16 byteCalcCycleUnderfloor4 = 97;
 // **********
+		const uint16 addrBootCounter = 496;
+		uint16 byteStartForString; // 500
 
-		uint16 byteStartForString;
 
 		String mqttTopicDebug;
 
