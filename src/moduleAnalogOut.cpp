@@ -64,7 +64,7 @@ void moduleAnalogOut::init() {
 	publishHandValueLast = 0;
 	handErrorLast = false;
 	publishHandErrorLast = 0;
-	publishPIDLast = 0;;
+	publishPIDLast = 0;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut);
@@ -266,7 +266,7 @@ void moduleAnalogOut::calc() {
 			output = autoValue;
 		}
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 255, 0, hardwareoutMax);
+	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(Pin, hardwareout);
 }
 

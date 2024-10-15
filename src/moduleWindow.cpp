@@ -25,7 +25,7 @@ moduleWindow::moduleWindow() {
 void moduleWindow::init() {
 	// section for define
 	Pin = D6;
-	pinMode(Pin, INPUT_PULLUP);
+	pinMode(Pin, INPUT);
 	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";

@@ -349,16 +349,16 @@ void moduleCwWw::BlenderEffect() {
 }
 
 void moduleCwWw::SmoothEffect() {
-	if(wpAnalogOut.handValueSet >= 255 ||
+	if(wpAnalogOut.handValueSet >= 100 ||
 		wpAnalogOut2.handValueSet <= 0) {
-		wpAnalogOut.handValueSet = 255;
+		wpAnalogOut.handValueSet = 100;
 		wpAnalogOut2.handValueSet = 0;
 		smoothDirection = true;
 	}
 	if(wpAnalogOut.handValueSet <= 0 ||
-		wpAnalogOut2.handValueSet >= 255) {
+		wpAnalogOut2.handValueSet >= 100) {
 		wpAnalogOut.handValueSet = 0;
-		wpAnalogOut2.handValueSet = 255;
+		wpAnalogOut2.handValueSet = 100;
 		smoothDirection = false;
 	}
 	if(smoothDirection) {

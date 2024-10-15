@@ -179,7 +179,7 @@ void moduleAnalogOut2::calc() {
 			output = autoValue;
 		}
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 255, 0, hardwareoutMax);
+	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
 	analogWrite(Pin, hardwareout);
 }
 

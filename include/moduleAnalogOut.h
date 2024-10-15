@@ -79,7 +79,7 @@ class moduleAnalogOut {
 		void SetHandValueSet(uint8 val);
 	private:
 		const double minOutput = 0.0;
-		const double maxOutput = 255.0;
+		const double maxOutput = 100.0;
 		uint8 outputLast;
 		unsigned long publishOutputLast;
 		uint8 autoValueLast;
