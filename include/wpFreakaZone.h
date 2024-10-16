@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 212                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 212 2024-10-16 09:30:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -151,7 +151,7 @@ class wpFreakaZone {
 		uint32 GetBootCounter();
 		void ResetBootCounter();
 	private:
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 212 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
