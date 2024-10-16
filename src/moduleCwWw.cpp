@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 209                                                     $ #
+//# Revision     : $Rev:: 212                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 209 2024-10-08 06:10:11Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 212 2024-10-16 09:30:20Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -349,16 +349,16 @@ void moduleCwWw::BlenderEffect() {
 }
 
 void moduleCwWw::SmoothEffect() {
-	if(wpAnalogOut.handValueSet >= 255 ||
+	if(wpAnalogOut.handValueSet >= 100 ||
 		wpAnalogOut2.handValueSet <= 0) {
-		wpAnalogOut.handValueSet = 255;
+		wpAnalogOut.handValueSet = 100;
 		wpAnalogOut2.handValueSet = 0;
 		smoothDirection = true;
 	}
 	if(wpAnalogOut.handValueSet <= 0 ||
-		wpAnalogOut2.handValueSet >= 255) {
+		wpAnalogOut2.handValueSet >= 100) {
 		wpAnalogOut.handValueSet = 0;
-		wpAnalogOut2.handValueSet = 255;
+		wpAnalogOut2.handValueSet = 100;
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
@@ -379,7 +379,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 209 $";
+	String SVN = "$Rev: 212 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

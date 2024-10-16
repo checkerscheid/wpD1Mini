@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 209                                                     $ #
+//# Revision     : $Rev:: 212                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 209 2024-10-08 06:10:11Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 212 2024-10-16 09:30:20Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -25,7 +25,7 @@ moduleBM::moduleBM() {
 void moduleBM::init() {
 	// section for define
 	Pin = D5;
-	pinMode(Pin, INPUT_PULLUP);
+	pinMode(Pin, INPUT);
 	digitalWrite(Pin, HIGH);
 	bm = true;
 	manual = false;
@@ -159,7 +159,7 @@ String moduleBM::SetManual() {
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 209 $";
+	String SVN = "$Rev: 212 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

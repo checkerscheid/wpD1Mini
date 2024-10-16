@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 212                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 207 2024-10-07 12:59:22Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 212 2024-10-16 09:30:20Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -25,7 +25,7 @@ moduleWindow::moduleWindow() {
 void moduleWindow::init() {
 	// section for define
 	Pin = D6;
-	pinMode(Pin, INPUT_PULLUP);
+	pinMode(Pin, INPUT);
 	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
 	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
@@ -139,7 +139,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 212 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
