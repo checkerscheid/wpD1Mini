@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 214                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.h 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: moduleWindow.h 214 2024-10-17 10:17:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWindow_h
@@ -53,7 +53,7 @@ class moduleWindow {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 214 $";
 
 		uint8 bitDebug;
 		byte bitsDebug;
