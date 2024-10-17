@@ -15,28 +15,51 @@
 //###################################################################################
 #include <moduleWindow.h>
 
-moduleWindow wpWindow;
+moduleWindow wpWindow1(1);
+moduleWindow wpWindow2(2);
+moduleWindow wpWindow3(3);
 
-moduleWindow::moduleWindow() {
-	// section to config and copy
-	ModuleName = "Window";
+moduleWindow::moduleWindow(uint8 n) {
+	no = n;
+	ModuleName = "Window" + String(no);
 	mb = new moduleBase(ModuleName);
 }
 void moduleWindow::init() {
+	switch(no) {
+		case 1:
+			Pin = D6;
+			bitDebug = wpEEPROM.bitDebugWindow;
+			bitsDebug = wpEEPROM.bitsDebugModules1;
+			addrDebug = wpEEPROM.addrBitsDebugModules1;
+			break;
+		case 2:
+			Pin = D1;
+			bitDebug = wpEEPROM.bitDebugWindow2;
+			bitsDebug = wpEEPROM.bitsDebugModules2;
+			addrDebug = wpEEPROM.addrBitsDebugModules2;
+			break;
+		case 3:
+			Pin = D2;
+			bitDebug = wpEEPROM.bitDebugWindow3;
+			bitsDebug = wpEEPROM.bitsDebugModules2;
+			addrDebug = wpEEPROM.addrBitsDebugModules2;
+			break;
+			break;
+		default:
+			wpFZ.DebugWS(wpFZ.strERRROR, "Window::init", "FatalError: unknown Window no: " + String(no));
+			break;
+	}
 	// section for define
-	Pin = D6;
-	pinMode(Pin, INPUT);
+	pinMode(Pin, INPUT_PULLUP);
 	bm = true;
 	mqttTopicBM = wpFZ.DeviceName + "/" + ModuleName;
-	mqttTopicThreshold = wpFZ.DeviceName + "/settings/" + ModuleName + "/Threshold";
-	mqttTopicLightToTurnOn = wpFZ.DeviceName + "/settings/" + ModuleName + "/LightToTurnOn";
 
 	bmLast = 0;
 	publishBMLast = 0;
 
 	// section to copy
 
-	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugWindow);
+	mb->initDebug(addrDebug, bitsDebug, bitDebug);
 
 }
 
@@ -51,10 +74,6 @@ void moduleWindow::publishSettings() {
 	publishSettings(false);
 }
 void moduleWindow::publishSettings(bool force) {
-	if(wpModules.useModuleLDR) {
-		wpMqtt.mqttClient.publish(mqttTopicThreshold.c_str(), String(threshold).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicLightToTurnOn.c_str(), lightToTurnOn.c_str());
-	}
 	mb->publishSettings(force);
 }
 void moduleWindow::publishValues() {
@@ -70,53 +89,16 @@ void moduleWindow::publishValues(bool force) {
 	mb->publishValues(force);
 }
 void moduleWindow::setSubscribes() {
-	if(wpModules.useModuleLDR) {
-		wpMqtt.mqttClient.subscribe(mqttTopicThreshold.c_str());
-		wpMqtt.mqttClient.subscribe(mqttTopicLightToTurnOn.c_str());
-	}
 	mb->setSubscribes();
 }
 void moduleWindow::checkSubscribes(char* topic, String msg) {
-	if(wpModules.useModuleLDR) {
-		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
-			uint16 readThreshold = msg.toInt();
-			if(threshold != readThreshold) {
-				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteWindowThreshold, threshold);
-				EEPROM.commit();
-				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
-			}
-		}
-		if(strcmp(topic, mqttTopicLightToTurnOn.c_str()) == 0) {
-			if(strcmp(msg.c_str(), lightToTurnOn.c_str()) != 0) {
-				lightToTurnOn = msg;
-				wpEEPROM.writeStringsToEEPROM();
-				wpFZ.DebugcheckSubscribes(mqttTopicLightToTurnOn, lightToTurnOn);
-			}
-		}
-	}
 	mb->checkSubscribes(topic, msg);
 }
 void moduleWindow::publishValue() {
 	wpMqtt.mqttClient.publish(mqttTopicBM.c_str(), String(bm).c_str());
 	bmLast = bm;
-	if(wpModules.useModuleLDR) {
-		if(bm && wpLDR.ldr <= threshold) {
-			String lm = "MQTT Set Light (" + String(wpLDR.ldr) + " <= " + String(threshold) + ")";
-			if(!lightToTurnOn.startsWith("_")) {
-				if(lightToTurnOn.startsWith("http://")) {
-					wpFZ.sendRawRest(lightToTurnOn);
-					lm += ", send REST '" + lightToTurnOn + "'";
-				} else {
-					wpMqtt.mqttClient.publish(lightToTurnOn.c_str(), String("on").c_str());
-					lm += ", send MQTT '" + lightToTurnOn + "': 'On'";
-				}
-			}
-			wpFZ.DebugWS(wpFZ.strDEBUG, "publishInfo", lm);
-		}
-	}
 	if(wpMqtt.Debug) {
-		mb->printPublishValueDebug("Window", String(bm));
+		mb->printPublishValueDebug(ModuleName, String(bm));
 	}
 	publishBMLast = wpFZ.loopStartedAt;
 }
@@ -127,7 +109,7 @@ void moduleWindow::calc() {
 		if(bm == false) {
 			wpFZ.blink();
 			if(mb->debug) {
-				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", "Fenster offen");
+				wpFZ.DebugWS(wpFZ.strDEBUG, "calcWindow", ModuleName + ": Fenster offen");
 			}
 		}
 		bm = true;

@@ -48,7 +48,7 @@ void setup() {
 		wpBM.init();
 	}
 	if(wpModules.useModuleWindow) {
-		wpWindow.init();
+		wpWindow1.init();
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
@@ -88,6 +88,12 @@ void setup() {
 	}
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.init();
+	}
+	if(wpModules.useModuleWindow2) {
+		wpWindow2.init();
+	}
+	if(wpModules.useModuleWindow3) {
+		wpWindow3.init();
 	}
 	#endif
 	#if BUILDWITH == 3
@@ -139,7 +145,7 @@ void loop() {
 			wpBM.cycle();
 		}
 		if(wpModules.useModuleWindow) {
-			wpWindow.cycle();
+			wpWindow1.cycle();
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
@@ -179,6 +185,12 @@ void loop() {
 		}
 		if(wpModules.useModuleImpulseCounter) {
 			wpImpulseCounter.cycle();
+		}
+		if(wpModules.useModuleWindow2) {
+			wpWindow2.cycle();
+		}
+		if(wpModules.useModuleWindow2) {
+			wpWindow2.cycle();
 		}
 		#endif
 		#if BUILDWITH == 3
@@ -235,7 +247,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpLDR.getVersion());
 	buildChecker(v, wpLight.getVersion());
 	buildChecker(v, wpBM.getVersion());
-	buildChecker(v, wpWindow.getVersion());
+	buildChecker(v, wpWindow1.getVersion());
 	buildChecker(v, wpRelais.getVersion());
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
@@ -251,6 +263,8 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpAnalogOut2.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
+	buildChecker(v, wpWindow2.getVersion());
+	buildChecker(v, wpWindow3.getVersion());
 	#endif
 	#if BUILDWITH == 3
 	buildChecker(v, wpUnderfloor1.getVersion());

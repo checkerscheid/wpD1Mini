@@ -53,6 +53,8 @@ class helperEEPROM {
 		const uint8 bitUseUnderfloor2 = 2; // include in bitsModules2
 		const uint8 bitUseUnderfloor3 = 3; // include in bitsModules2
 		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
+		const uint8 bitUseWindow2 = 5; // include in bitsModules2
+		const uint8 bitUseWindow3 = 6; // include in bitsModules2
 
 //###################################################################################
 
@@ -99,6 +101,8 @@ class helperEEPROM {
 		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
+		const uint8 bitDebugWindow2 = 0; // include in bitsDebugModules2
+		const uint8 bitDebugWindow3 = 0; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -167,7 +171,6 @@ class helperEEPROM {
 		const uint16 byteMoistureDry = 56;
 		const uint16 byteMoistureWet = 58;
 		const uint16 byteMaxVolume = 60;
-		const uint16 byteWindowThreshold = 62;
 		const uint16 byteAnalogOutKp = 64;
 		const uint16 byteAnalogOutTn = 66;
 		const uint16 byteAnalogOutTv = 68;

@@ -21,17 +21,13 @@
 
 class moduleWindow {
 	public:
-		moduleWindow();
+		moduleWindow(uint8 n);
 		moduleBase* mb;
 		uint8 Pin;
 
 		// section for define
 		bool bm;
-		uint16 threshold = 500;
-		String lightToTurnOn = "_";
 		String mqttTopicBM;
-		String mqttTopicThreshold;
-		String mqttTopicLightToTurnOn;
 
 		// section to copy
 		void init();
@@ -49,6 +45,7 @@ class moduleWindow {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
+		uint8 no;
 		bool bmLast;
 		unsigned long publishBMLast;
 		void publishValue();
@@ -58,7 +55,13 @@ class moduleWindow {
 		String ModuleName;
 		String SVNh = "$Rev: 207 $";
 
+		uint8 bitDebug;
+		byte bitsDebug;
+		uint16 addrDebug;
+
 };
-extern moduleWindow wpWindow;
+extern moduleWindow wpWindow1;
+extern moduleWindow wpWindow2;
+extern moduleWindow wpWindow3;
 
 #endif

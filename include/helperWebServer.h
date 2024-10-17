@@ -65,6 +65,8 @@ class helperWebServer {
 		const int8 cmdDebugUnderfloor2 = 36;
 		const int8 cmdDebugUnderfloor3 = 37;
 		const int8 cmdDebugUnderfloor4 = 38;
+		const int8 cmdDebugWindow2 = 39;
+		const int8 cmdDebugWindow3 = 40;
 		int8 doDebugChange;
 
 		const int8 cmdModuleDHT11 = 1;
@@ -88,6 +90,8 @@ class helperWebServer {
 		const int8 cmdmoduleUnderfloor2 = 19;
 		const int8 cmdmoduleUnderfloor3 = 20;
 		const int8 cmdmoduleUnderfloor4 = 21;
+		const int8 cmdModuleWindow2 = 22;
+		const int8 cmdModuleWindow3 = 23;
 		int8 doModuleChange;
 
 		int8 doBlink;

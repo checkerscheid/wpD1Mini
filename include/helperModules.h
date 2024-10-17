@@ -44,6 +44,8 @@ class helperModules {
 		bool useModuleUnderfloor2 = false;
 		bool useModuleUnderfloor3 = false;
 		bool useModuleUnderfloor4 = false;
+		bool useModuleWindow2 = false;
+		bool useModuleWindow3 = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -69,6 +71,8 @@ class helperModules {
 		String mqttTopicUseAnalogOut2;
 		String mqttTopicUseRpm;
 		String mqttTopicUseImpulseCounter;
+		String mqttTopicUseWindow2;
+		String mqttTopicUseWindow3;
 		#endif
 		#if BUILDWITH == 3
 		String mqttTopicUseUnderfloor1;
@@ -113,6 +117,8 @@ class helperModules {
 		void changeModuleAnalogOut2(bool newValue);
 		void changeModuleRpm(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
+		void changeModuleWindow2(bool newValue);
+		void changeModuleWindow3(bool newValue);
 		#endif
 		#if BUILDWITH == 3
 		void changemoduleUnderfloor1(bool newValue);
@@ -163,6 +169,10 @@ class helperModules {
 		unsigned long publishUseDistanceLast;
 		bool useImpulseCounterLast;
 		unsigned long publishUseImpulseCounterLast;
+		bool useWindow2Last;
+		unsigned long publishUseWindow2Last;
+		bool useWindow3Last;
+		unsigned long publishUseWindow3Last;
 		bool useUnderfloor1Last;
 		unsigned long publishUseUnderfloor1Last;
 		bool useUnderfloor2Last;
