@@ -71,6 +71,8 @@ void helperEEPROM::readStringsFromEEPROM() {
 	wpUnderfloor3.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
 	byteStartForString = byteStartForString + 1 + wpUnderfloor3.mqttTopicTemp.length();
 	wpUnderfloor4.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
+	byteStartForString = byteStartForString + 1 + wpAnalogOut.mqttTopicTemp.length();
+	wpAnalogOut.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpAnalogOut.mqttTopicTemp);
 }
 
 void helperEEPROM::writeStringsToEEPROM() {
@@ -83,6 +85,7 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor4.mqttTopicTemp);
+	byteStartForString = writeStringToEEPROM(byteStartForString, wpAnalogOut.mqttTopicTemp);
 }
 
 // void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
@@ -301,12 +304,12 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
 	wpNeoPixel.InitBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
-	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut));
+	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
-	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut));
+	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
