@@ -239,16 +239,7 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleAnalogOut) {
 			message += F("\"AnalogOut\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",");
-			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-				message +=
-					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
-					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.Kp)) + F(",") +
-					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.Tv)) + F(",") +
-					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.Tn)) + F(",") +
-					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.SetPoint)) + F(",");
-			}
-			message +=
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",") +
 				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.handError ? "true" : "false") + F(",") +
 				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.handValue)) +
 				F("},");
@@ -265,9 +256,10 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += F("\"AnalogOut\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",");
-			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || wpAnalogOut.mqttTopicTemp != "_") {
 				message +=
 					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
+					wpFZ.JsonKeyString(F("pidType"), wpAnalogOut.GetPidType()) + F(",") +
 					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.Kp)) + F(",") +
 					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.Tv)) + F(",") +
 					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.Tn)) + F(",") +
@@ -992,6 +984,19 @@ void helperWebServer::setupWebServer() {
 		// 	wpWebServer.setBlink();
 		// });
 	}
+	#endif
+	#if BUILDWITH == 2
+	webServer.on("/setAnalogOut", HTTP_GET, [](AsyncWebServerRequest *request) {
+		if(request->hasParam(F("PidType"))) {
+			uint8 pidType = request->getParam(F("PidType"))->value().toInt();
+			request->send(200, F("application/json"), wpAnalogOut.SetPidType(pidType).c_str());
+		}
+		if(request->hasParam(F("setPoint"))) {
+			uint8 setPoint = request->getParam(F("setPoint"))->value().toDouble();
+			request->send(200, F("application/json"), wpAnalogOut.SetSetPoint(setPoint).c_str());
+		}
+		wpWebServer.setBlink();
+	});
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {

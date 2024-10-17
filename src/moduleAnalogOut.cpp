@@ -32,21 +32,25 @@ void moduleAnalogOut::init() {
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
+	pidType = pidTypeHeating;
 
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-		pid = new PID(&PIDinput, &PIDoutput, &PIDsetPoint, Kp, Tv, Tn, REVERSE);
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
+		pid = new PID(&PIDinput, &PIDoutput, &PIDsetPoint, Kp, Tv, Tn, pidType);
 		pid->SetMode(AUTOMATIC);
 		pid->SetTunings(Kp, Tv, Tn);
 		pid->SetOutputLimits(minOutput, maxOutput);
+		wpFZ.DebugWS(wpFZ.strINFO, "AnalogOut::init", "PID Regler init: Kp = '" + String(Kp) + "', Tv = '" + String(Tv) + "', Tn = '" + String(Tn) + "'");
 	}
 
 	// values
 	mqttTopicOut = wpFZ.DeviceName + "/" + ModuleName + "/Output";
 	mqttTopicAutoValue = wpFZ.DeviceName + "/" + ModuleName + "/Auto";
 	mqttTopicHandValue = wpFZ.DeviceName + "/" + ModuleName + "/Hand";
+	mqttTopicReadedTemp = wpFZ.DeviceName + "/" + ModuleName + "/ReadedTemp";
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
 	// settings
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+	mqttTopicTempUrl = wpFZ.DeviceName + "/" + ModuleName + "/TempUrl";
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		mqttTopicKp = wpFZ.DeviceName + "/settings/" + ModuleName + "/Kp";
 		mqttTopicTv = wpFZ.DeviceName + "/settings/" + ModuleName + "/Tv";
 		mqttTopicTn = wpFZ.DeviceName + "/settings/" + ModuleName + "/Tn";
@@ -55,6 +59,7 @@ void moduleAnalogOut::init() {
 	// commands
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
+	mqttTopicSetTempUrl = wpFZ.DeviceName + "/settings/" + ModuleName + "/TempUrl";
 
 	outputLast = 0;
 	publishOutputLast = 0;
@@ -62,9 +67,13 @@ void moduleAnalogOut::init() {
 	publishAutoValueLast = 0;
 	handValueLast = 0;
 	publishHandValueLast = 0;
+	readedTempLast = 0;
+	publishReadedTempLast = 0;
 	handErrorLast = false;
 	publishHandErrorLast = 0;
 	publishPIDLast = 0;
+	tempUrlLast = "";
+	publishTempUrlLast = 0;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut);
@@ -76,7 +85,7 @@ void moduleAnalogOut::init() {
 //###################################################################################
 void moduleAnalogOut::cycle() {
 	if(wpFZ.calcValues) {
-		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 			if(wpFZ.calcValues && wpFZ.loopStartedAt > mb->calcLast + mb->calcCycle) {
 				calcOutput();
 				mb->calcLast = wpFZ.loopStartedAt;
@@ -94,6 +103,7 @@ void moduleAnalogOut::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
+		//wpMqtt.mqttClient.publish(mqttTopicSetTempUrl.c_str(), mqttTopicTempUrl.c_str());
 	}
 	mb->publishSettings(force);
 }
@@ -106,8 +116,10 @@ void moduleAnalogOut::publishValues(bool force) {
 		publishOutputLast = 0;
 		publishAutoValueLast = 0;
 		publishHandValueLast = 0;
+		publishReadedTempLast = 0;
 		publishHandErrorLast = 0;
 		publishPIDLast = 0;
+		publishTempUrlLast = 0;
 	}
 	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
@@ -128,6 +140,14 @@ void moduleAnalogOut::publishValues(bool force) {
 		}
 		publishHandValueLast = wpFZ.loopStartedAt;
 	}
+	if(readedTempLast != temp || wpFZ.CheckQoS(publishReadedTempLast)) {
+		readedTempLast = temp;
+		wpMqtt.mqttClient.publish(mqttTopicReadedTemp.c_str(), String(temp / 10.0).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(ModuleName + " readedTemp", String(temp));
+		}
+		publishReadedTempLast = wpFZ.loopStartedAt;
+	}
 	if(handErrorLast != handError || wpFZ.CheckQoS(publishHandErrorLast)) {
 		handErrorLast = handError;
 		wpMqtt.mqttClient.publish(mqttTopicErrorHand.c_str(), String(handError).c_str());
@@ -136,7 +156,7 @@ void moduleAnalogOut::publishValues(bool force) {
 		}
 		publishHandErrorLast = wpFZ.loopStartedAt;
 	}
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		if(KpLast != Kp || TvLast != Tv  || TnLast != Tn || SetPointLast != SetPoint || wpFZ.CheckQoS(publishPIDLast)) {
 			KpLast = Kp;
 			TvLast = Tv;
@@ -153,18 +173,31 @@ void moduleAnalogOut::publishValues(bool force) {
 			publishPIDLast = wpFZ.loopStartedAt;
 		}
 	}
+	if(tempUrlLast != mqttTopicTemp || wpFZ.CheckQoS(publishTempUrlLast)) {
+		tempUrlLast = mqttTopicTemp;
+		wpMqtt.mqttClient.publish(mqttTopicTempUrl.c_str(), String(mqttTopicTemp).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(ModuleName + " TempUrl", String(mqttTopicTemp));
+		}
+		publishTempUrlLast = wpFZ.loopStartedAt;
+	}
 	mb->publishValues(force);
 }
 
 void moduleAnalogOut::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHand.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetHandValue.c_str());
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		wpMqtt.mqttClient.subscribe(mqttTopicKp.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicTv.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicTn.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicSetPoint.c_str());
 	}
+	if(mqttTopicTemp != "_") {
+		wpFZ.DebugWS(wpFZ.strDEBUG, "setSubscribes", ModuleName + " subscribe: " + mqttTopicTemp);
+		wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
+	}
+	wpMqtt.mqttClient.subscribe(mqttTopicSetTempUrl.c_str());
 	mb->setSubscribes();
 }
 
@@ -183,11 +216,11 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
 		uint8 readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
-			SetHandValueSet(readSetHandValue);
+			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
-	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
+	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		if(strcmp(topic, mqttTopicKp.c_str()) == 0) {
 			double readKp = msg.toDouble();
 			if(Kp != readKp) {
@@ -221,20 +254,69 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		if(strcmp(topic, mqttTopicSetPoint.c_str()) == 0) {
 			double readSetPoint = msg.toDouble();
 			if(SetPoint != readSetPoint) {
-				SetPoint = readSetPoint;
-				EEPROM.put(wpEEPROM.byteAnalogOutSetPoint, (short) (SetPoint * 10));
-				EEPROM.commit();
+				SetSetPoint(readSetPoint);
 				wpFZ.DebugcheckSubscribes(mqttTopicSetPoint, String(SetPoint));
 			}
 		}
 	}
+	if(strcmp(topic, mqttTopicTemp.c_str()) == 0) {
+		temp = (int)(msg.toDouble() * 10);
+		wpFZ.DebugcheckSubscribes(mqttTopicTemp, String(temp));
+	}
+	if(strcmp(topic, mqttTopicSetTempUrl.c_str()) == 0) {
+		SetTopicTempUrl(msg);
+		wpFZ.DebugcheckSubscribes(mqttTopicSetTempUrl, mqttTopicTemp);
+	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleAnalogOut::SetHandValueSet(uint8 val) {
+void moduleAnalogOut::SetHandValue(uint8 val) {
 	handValueSet = val;
 	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut::handValueSet' = " + String(handValueSet));
+}
+String moduleAnalogOut::SetSetPoint(double sp) {
+	SetPoint = sp;
+	uint8 setPointToSave = (uint8) (SetPoint * 10);
+	EEPROM.write(wpEEPROM.byteAnalogOutSetPoint, setPointToSave);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint",
+		"save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPointToSave) + ", " +
+		"addr: " + String(wpEEPROM.byteAnalogOutSetPoint));
+	return "{\"erg\":\"S_OK\"}";
+}
+String moduleAnalogOut::SetTopicTempUrl(String topic) {
+	mqttTopicTemp = topic;
+	wpEEPROM.writeStringsToEEPROM();
+	//wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
+	wpFZ.restartRequired = true;
+	return "{\"erg\":\"S_OK\"}";
+}
+String moduleAnalogOut::SetPidType(uint8 t) {
+	switch(t) {
+		case pidTypeHeating:
+			pidType = pidTypeHeating;
+			pid->SetControllerDirection(pidType);
+			return F("{\"erg\":\"S_OK\",\"pidType\":\"Heating\"}");
+			break;
+		case pidTypeAirCondition:
+			pidType = pidTypeAirCondition;
+			pid->SetControllerDirection(pidType);
+			return F("{\"erg\":\"S_OK\",\"pidType\":\"AirCondition\"}");
+			break;
+		default:
+			return F("{\"erg\":\"S_ERROR\",\"msg\":\"pidType not exists\"}");
+			// ERROR
+			break;
+	}
+}
+String moduleAnalogOut::GetPidType() {
+	if(pidType == pidTypeHeating) {
+		return F("Heating");
+	}
+	if(pidType == pidTypeAirCondition) {
+		return F("AirCondition");
+	}
 }
 
 //###################################################################################
@@ -274,7 +356,12 @@ void moduleAnalogOut::calc() {
 
 void moduleAnalogOut::calcOutput() {
 	// @ the moment is configured as Ventilator with Humidity
-	PIDinput = (double) (wpDHT.humidity / 100.0);
+	if(temp == 0) temp = (short) (SetPoint * 10);
+	if(mqttTopicTemp != "_") {
+		PIDinput = (double) (temp / 10.0);
+	} else {
+		PIDinput = (double) (wpDHT.humidity / 100.0);
+	}
 	PIDsetPoint = (double) SetPoint;
 	pid->Compute();
 	autoValue = PIDoutput;

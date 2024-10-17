@@ -118,6 +118,7 @@ class helperEEPROM {
 		const uint8 bitUseRpmAvg = 0; // include in bitsSettingsModules1
 		const uint8 bitAnalogOut2Hand = 1; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelRGB = 2; // include in bitsSettingsModules1
+		const uint8 bitAnalogOutPidType = 3; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
@@ -157,7 +158,6 @@ class helperEEPROM {
 		const uint16 byteCalcCycleAnalogOut = 45;
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
-
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
