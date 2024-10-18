@@ -25,7 +25,7 @@ moduleBM::moduleBM() {
 void moduleBM::init() {
 	// section for define
 	Pin = D5;
-	pinMode(Pin, INPUT);
+	pinMode(Pin, INPUT_PULLUP);
 	digitalWrite(Pin, HIGH);
 	bm = true;
 	manual = false;

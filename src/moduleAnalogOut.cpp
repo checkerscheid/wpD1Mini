@@ -348,6 +348,13 @@ void moduleAnalogOut::calc() {
 			output = handValue;
 		} else {
 			output = autoValue;
+			if(wpModules.useModuleWindow && wpWindow1.bm)
+				output = 0;
+			if(wpModules.useModuleWindow2 && wpWindow2.bm)
+				output = 0;
+			if(wpModules.useModuleWindow3 && wpWindow3.bm)
+				output = 0;
+			
 		}
 	}
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);

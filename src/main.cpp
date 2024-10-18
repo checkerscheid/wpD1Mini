@@ -189,8 +189,8 @@ void loop() {
 		if(wpModules.useModuleWindow2) {
 			wpWindow2.cycle();
 		}
-		if(wpModules.useModuleWindow2) {
-			wpWindow2.cycle();
+		if(wpModules.useModuleWindow3) {
+			wpWindow3.cycle();
 		}
 		#endif
 		#if BUILDWITH == 3
@@ -252,26 +252,20 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
-	#if BUILDWITH == 1
 	buildChecker(v, wpCwWw.getVersion());
 	buildChecker(v, wpNeoPixel.getVersion());
 	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpAnalogOut2.getVersion());
-	#endif
-	#if BUILDWITH == 2
 	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpAnalogOut2.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
 	buildChecker(v, wpWindow2.getVersion());
 	buildChecker(v, wpWindow3.getVersion());
-	#endif
-	#if BUILDWITH == 3
 	buildChecker(v, wpUnderfloor1.getVersion());
 	buildChecker(v, wpUnderfloor2.getVersion());
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
-	#endif
 	return v;
 }
 void buildChecker(uint16 &v, uint16 moduleBuild) {

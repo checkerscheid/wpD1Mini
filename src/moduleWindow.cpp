@@ -44,7 +44,6 @@ void moduleWindow::init() {
 			bitsDebug = wpEEPROM.bitsDebugModules2;
 			addrDebug = wpEEPROM.addrBitsDebugModules2;
 			break;
-			break;
 		default:
 			wpFZ.DebugWS(wpFZ.strERRROR, "Window::init", "FatalError: unknown Window no: " + String(no));
 			break;
