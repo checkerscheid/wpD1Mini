@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 217                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 214 2024-10-17 10:17:02Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 217 2024-10-18 23:30:44Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 214 $";
+	String SVN = "$Rev: 217 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -428,31 +428,21 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("RelaisShield"), wpModules.useModuleRelaisShield ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Rain"), wpModules.useModuleRain ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Moisture"), wpModules.useModuleMoisture ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("Distance"), wpModules.useModuleDistance ? "true" : "false");
-		#if BUILDWITH == 1
-		message += 
+			F(",") + wpFZ.JsonKeyValue(F("Distance"), wpModules.useModuleDistance ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("CwWw"), wpModules.useModuleCwWw ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("NeoPixel"), wpModules.useModuleNeoPixel ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false");
-		#endif
-		#if BUILDWITH == 2
-		message += 
+			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpModules.useModuleRpm ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Window2"), wpModules.useModuleWindow2 ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("Window3"), wpModules.useModuleWindow3 ? "true" : "false");
-		#endif
-		#if BUILDWITH == 3
-		message += 
+			F(",") + wpFZ.JsonKeyValue(F("Window3"), wpModules.useModuleWindow3 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor1"), wpModules.useModuleUnderfloor1 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor2"), wpModules.useModuleUnderfloor2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor3"), wpModules.useModuleUnderfloor3 ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpModules.useModuleUnderfloor4 ? "true" : "false");
-		#endif
-		message += 
+			F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpModules.useModuleUnderfloor4 ? "true" : "false") +
 			F("}}}");
 		request->send(200, F("application/json"), message.c_str());
 	});

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 217                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 214 2024-10-17 10:17:02Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 217 2024-10-18 23:30:44Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 214 $";
+	String SVN = "$Rev: 217 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -182,6 +182,21 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleRain = bitRead(bitsModules0, bitUseRain);
 	wpModules.useModuleMoisture = bitRead(bitsModules1, bitUseMoisture);
 	wpModules.useModuleDistance = bitRead(bitsModules1, bitUseDistance);
+
+	wpModules.useModuleNeoPixel = false;
+	wpModules.useModuleCwWw = false;
+	wpModules.useModuleAnalogOut = false;
+	wpModules.useModuleAnalogOut2 = false;
+	wpModules.useModuleAnalogOut = false;
+	wpModules.useModuleAnalogOut2 = false;
+	wpModules.useModuleRpm = false;
+	wpModules.useModuleImpulseCounter = false;
+	wpModules.useModuleWindow2 = false;
+	wpModules.useModuleWindow3 = false;
+	wpModules.useModuleUnderfloor1 = false;
+	wpModules.useModuleUnderfloor2 = false;
+	wpModules.useModuleUnderfloor3 = false;
+	wpModules.useModuleUnderfloor4 = false;
 #if BUILDWITH == 1
 	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
 	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);

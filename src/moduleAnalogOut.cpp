@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 215                                                     $ #
+//# Revision     : $Rev:: 217                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 215 2024-10-18 05:01:38Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 217 2024-10-18 23:30:44Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -317,6 +317,7 @@ String moduleAnalogOut::GetPidType() {
 	if(pidType == pidTypeAirCondition) {
 		return F("AirCondition");
 	}
+	return F("unknown Type");
 }
 
 //###################################################################################
@@ -399,7 +400,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 215 $";
+	String SVN = "$Rev: 217 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
