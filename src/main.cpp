@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 215                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 212 2024-10-16 09:30:20Z                        $ #
+//# File-ID      : $Id:: main.cpp 215 2024-10-18 05:01:38Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -48,7 +48,7 @@ void setup() {
 		wpBM.init();
 	}
 	if(wpModules.useModuleWindow) {
-		wpWindow.init();
+		wpWindow1.init();
 	}
 	if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 		wpRelais.init();
@@ -88,6 +88,12 @@ void setup() {
 	}
 	if(wpModules.useModuleImpulseCounter) {
 		wpImpulseCounter.init();
+	}
+	if(wpModules.useModuleWindow2) {
+		wpWindow2.init();
+	}
+	if(wpModules.useModuleWindow3) {
+		wpWindow3.init();
 	}
 	#endif
 	#if BUILDWITH == 3
@@ -139,7 +145,7 @@ void loop() {
 			wpBM.cycle();
 		}
 		if(wpModules.useModuleWindow) {
-			wpWindow.cycle();
+			wpWindow1.cycle();
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			wpRelais.cycle();
@@ -180,6 +186,12 @@ void loop() {
 		if(wpModules.useModuleImpulseCounter) {
 			wpImpulseCounter.cycle();
 		}
+		if(wpModules.useModuleWindow2) {
+			wpWindow2.cycle();
+		}
+		if(wpModules.useModuleWindow3) {
+			wpWindow3.cycle();
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -203,7 +215,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 215 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -235,29 +247,25 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpLDR.getVersion());
 	buildChecker(v, wpLight.getVersion());
 	buildChecker(v, wpBM.getVersion());
-	buildChecker(v, wpWindow.getVersion());
+	buildChecker(v, wpWindow1.getVersion());
 	buildChecker(v, wpRelais.getVersion());
 	buildChecker(v, wpRain.getVersion());
 	buildChecker(v, wpMoisture.getVersion());
 	buildChecker(v, wpDistance.getVersion());
-	#if BUILDWITH == 1
 	buildChecker(v, wpCwWw.getVersion());
 	buildChecker(v, wpNeoPixel.getVersion());
 	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpAnalogOut2.getVersion());
-	#endif
-	#if BUILDWITH == 2
 	buildChecker(v, wpAnalogOut.getVersion());
 	buildChecker(v, wpAnalogOut2.getVersion());
 	buildChecker(v, wpRpm.getVersion());
 	buildChecker(v, wpImpulseCounter.getVersion());
-	#endif
-	#if BUILDWITH == 3
+	buildChecker(v, wpWindow2.getVersion());
+	buildChecker(v, wpWindow3.getVersion());
 	buildChecker(v, wpUnderfloor1.getVersion());
 	buildChecker(v, wpUnderfloor2.getVersion());
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
-	#endif
 	return v;
 }
 void buildChecker(uint16 &v, uint16 moduleBuild) {

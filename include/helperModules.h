@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 210                                                     $ #
+//# Revision     : $Rev:: 214                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 210 2024-10-11 05:56:25Z                 $ #
+//# File-ID      : $Id:: helperModules.h 214 2024-10-17 10:17:02Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -44,6 +44,8 @@ class helperModules {
 		bool useModuleUnderfloor2 = false;
 		bool useModuleUnderfloor3 = false;
 		bool useModuleUnderfloor4 = false;
+		bool useModuleWindow2 = false;
+		bool useModuleWindow3 = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -69,6 +71,8 @@ class helperModules {
 		String mqttTopicUseAnalogOut2;
 		String mqttTopicUseRpm;
 		String mqttTopicUseImpulseCounter;
+		String mqttTopicUseWindow2;
+		String mqttTopicUseWindow3;
 		#endif
 		#if BUILDWITH == 3
 		String mqttTopicUseUnderfloor1;
@@ -113,6 +117,8 @@ class helperModules {
 		void changeModuleAnalogOut2(bool newValue);
 		void changeModuleRpm(bool newValue);
 		void changemoduleImpulseCounter(bool newValue);
+		void changeModuleWindow2(bool newValue);
+		void changeModuleWindow3(bool newValue);
 		#endif
 		#if BUILDWITH == 3
 		void changemoduleUnderfloor1(bool newValue);
@@ -128,7 +134,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 210 $";
+		String SVNh = "$Rev: 214 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
@@ -163,6 +169,10 @@ class helperModules {
 		unsigned long publishUseDistanceLast;
 		bool useImpulseCounterLast;
 		unsigned long publishUseImpulseCounterLast;
+		bool useWindow2Last;
+		unsigned long publishUseWindow2Last;
+		bool useWindow3Last;
+		unsigned long publishUseWindow3Last;
 		bool useUnderfloor1Last;
 		unsigned long publishUseUnderfloor1Last;
 		bool useUnderfloor2Last;

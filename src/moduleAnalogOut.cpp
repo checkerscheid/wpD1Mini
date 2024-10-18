@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 215                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 212 2024-10-16 09:30:20Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 215 2024-10-18 05:01:38Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -348,6 +348,13 @@ void moduleAnalogOut::calc() {
 			output = handValue;
 		} else {
 			output = autoValue;
+			if(wpModules.useModuleWindow && wpWindow1.bm)
+				output = 0;
+			if(wpModules.useModuleWindow2 && wpWindow2.bm)
+				output = 0;
+			if(wpModules.useModuleWindow3 && wpWindow3.bm)
+				output = 0;
+			
 		}
 	}
 	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
@@ -392,7 +399,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 215 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

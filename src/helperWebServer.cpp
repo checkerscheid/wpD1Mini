@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 214                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 212 2024-10-16 09:30:20Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 214 2024-10-17 10:17:02Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 214 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -171,14 +171,8 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleWindow) {
 			message += F("\"Window\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow.Pin]));
-			if(wpModules.useModuleLDR) {
-				message += F(",\"LDR\":{") +
-					wpFZ.JsonKeyValue(F("Threshold"), String(wpWindow.threshold)) + F(",") +
-					wpFZ.JsonKeyString(F("LightToTurnOn"), wpWindow.lightToTurnOn) +
-					"}";
-			}
-			message += F("},");
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow1.Pin])) +
+				F("},");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += F("\"Relais\":{") +
@@ -294,6 +288,16 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue(F("Red"), String(wpImpulseCounter.counterRed)) +
 				F("},");
 		}
+		if(wpModules.useModuleWindow2) {
+			message += F("\"Window2\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow2.Pin])) +
+				F("},");
+		}
+		if(wpModules.useModuleWindow3) {
+			message += F("\"Window3\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow3.Pin])) +
+				F("},");
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -351,7 +355,7 @@ void helperWebServer::setupWebServer() {
 			message += F(",") + wpFZ.JsonKeyValue(F("BM"), wpBM.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleWindow) {
-			message += F(",") + wpFZ.JsonKeyValue(F("Window"), wpWindow.Debug() ? "true" : "false");
+			message += F(",") + wpFZ.JsonKeyValue(F("Window"), wpWindow1.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			message += F(",") + wpFZ.JsonKeyValue(F("Relais"), wpRelais.Debug() ? "true" : "false");
@@ -392,6 +396,12 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleImpulseCounter) {
 			message += F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpImpulseCounter.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleWindow2) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Window2"), wpWindow2.Debug() ? "true" : "false");
+		}
+		if(wpModules.useModuleWindow3) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Window3"), wpWindow3.Debug() ? "true" : "false");
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -431,7 +441,9 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpModules.useModuleAnalogOut ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpModules.useModuleAnalogOut2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Rpm"), wpModules.useModuleRpm ? "true" : "false") +
-			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false");
+			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Window2"), wpModules.useModuleWindow2 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Window3"), wpModules.useModuleWindow3 ? "true" : "false");
 		#endif
 		#if BUILDWITH == 3
 		message += 
@@ -530,6 +542,14 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Module"))->value() == F("useImpulseCounter")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useImpulseCounter"));
 				wpWebServer.setModuleChange(wpWebServer.cmdmoduleImpulseCounter);
+			}
+			if(request->getParam(F("Module"))->value() == F("useWindow2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useWindow2"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleWindow2);
+			}
+			if(request->getParam(F("Module"))->value() == F("useWindow3")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useWindow3"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleWindow3);
 			}
 			#endif
 			#if BUILDWITH == 3
@@ -664,6 +684,14 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Debug"))->value() == F("DebugImpulseCounter")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugImpulseCounter"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugImpulseCounter);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugWindow2")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWindow2"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugWindow2);
+			}
+			if(request->getParam(F("Debug"))->value() == F("DebugWindow3")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWindow3"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugWindow3);
 			}
 			#endif
 			#if BUILDWITH == 3
@@ -1168,6 +1196,8 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
 		if(doModuleChange == cmdModuleRpm) wpModules.changeModuleRpm(!wpModules.useModuleRpm);
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
+		if(doModuleChange == cmdModuleWindow2) wpModules.changeModuleWindow2(!wpModules.useModuleWindow2);
+		if(doModuleChange == cmdModuleWindow3) wpModules.changeModuleWindow3(!wpModules.useModuleWindow3);
 		#endif
 		#if BUILDWITH == 3
 		if(doModuleChange == cmdmoduleUnderfloor1) wpModules.changemoduleUnderfloor1(!wpModules.useModuleUnderfloor1);
@@ -1193,7 +1223,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugLDR) wpLDR.changeDebug();
 		if(doDebugChange == cmdDebugLight) wpLight.changeDebug();
 		if(doDebugChange == cmdDebugBM) wpBM.changeDebug();
-		if(doDebugChange == cmdDebugWindow) wpWindow.changeDebug();
+		if(doDebugChange == cmdDebugWindow) wpWindow1.changeDebug();
 		if(doDebugChange == cmdDebugRelais) wpRelais.changeDebug();
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
@@ -1207,6 +1237,8 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
 		if(doDebugChange == cmdDebugRpm) wpRpm.changeDebug();
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
+		if(doDebugChange == cmdDebugWindow2) wpWindow2.changeDebug();
+		if(doDebugChange == cmdDebugWindow3) wpWindow3.changeDebug();
 		#endif
 		#if BUILDWITH == 3
 		if(doDebugChange == cmdDebugUnderfloor1) wpUnderfloor1.changeDebug();
@@ -1281,7 +1313,9 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule(F("useAnalogOut"), F("wpAnalogOut"), wpModules.useModuleAnalogOut) +
 			wpWebServer.getchangeModule(F("useAnalogOut2"), F("wpAnalogOut2"), wpModules.useModuleAnalogOut2) +
 			wpWebServer.getchangeModule(F("useRpm"), F("wpRpm"), wpModules.useModuleRpm) +
-			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter);
+			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter) +
+			wpWebServer.getchangeModule(F("useWindow2"), F("wpWindow2"), wpModules.useModuleWindow2) +
+			wpWebServer.getchangeModule(F("useWindow3"), F("wpWindow3"), wpModules.useModuleWindow3);
 		#endif
 		#if BUILDWITH == 3
 		returns +=
@@ -1324,7 +1358,7 @@ String processor(const String& var) {
 			returns += wpWebServer.getChangeDebug(F("DebugBM"), F("BM"), wpBM.Debug());
 		}
 		if(wpModules.useModuleWindow) {
-			returns += wpWebServer.getChangeDebug(F("DebugWindow"), F("Window"), wpWindow.Debug());
+			returns += wpWebServer.getChangeDebug(F("DebugWindow"), F("Window"), wpWindow1.Debug());
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
 			returns += wpWebServer.getChangeDebug(F("DebugRelais"), F("Relais"), wpRelais.Debug());
@@ -1364,6 +1398,12 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleImpulseCounter) {
 			returns += wpWebServer.getChangeDebug(F("DebugImpulseCounter"), F("ImpulseCounter"), wpImpulseCounter.Debug());
+		}
+		if(wpModules.useModuleWindow2) {
+			returns += wpWebServer.getChangeDebug(F("DebugWindow2"), F("Window2"), wpWindow2.Debug());
+		}
+		if(wpModules.useModuleWindow3) {
+			returns += wpWebServer.getChangeDebug(F("DebugWindow3"), F("Window3"), wpWindow3.Debug());
 		}
 		#endif
 		#if BUILDWITH == 3

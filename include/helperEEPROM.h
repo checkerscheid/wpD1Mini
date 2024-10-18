@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 214                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 212 2024-10-16 09:30:20Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 214 2024-10-17 10:17:02Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -53,6 +53,8 @@ class helperEEPROM {
 		const uint8 bitUseUnderfloor2 = 2; // include in bitsModules2
 		const uint8 bitUseUnderfloor3 = 3; // include in bitsModules2
 		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
+		const uint8 bitUseWindow2 = 5; // include in bitsModules2
+		const uint8 bitUseWindow3 = 6; // include in bitsModules2
 
 //###################################################################################
 
@@ -99,6 +101,8 @@ class helperEEPROM {
 		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
+		const uint8 bitDebugWindow2 = 0; // include in bitsDebugModules2
+		const uint8 bitDebugWindow3 = 0; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -167,7 +171,6 @@ class helperEEPROM {
 		const uint16 byteMoistureDry = 56;
 		const uint16 byteMoistureWet = 58;
 		const uint16 byteMaxVolume = 60;
-		const uint16 byteWindowThreshold = 62;
 		const uint16 byteAnalogOutKp = 64;
 		const uint16 byteAnalogOutTn = 66;
 		const uint16 byteAnalogOutTv = 68;
@@ -212,7 +215,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 212 $";
+		String SVNh = "$Rev: 214 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

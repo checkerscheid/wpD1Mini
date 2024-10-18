@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 214                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 212 2024-10-16 09:30:20Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 214 2024-10-17 10:17:02Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 214 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -62,8 +62,6 @@ void helperEEPROM::readStringsFromEEPROM() {
 	byteStartForString = byteStartForString + 1 + wpFZ.DeviceDescription.length();
 	wpBM.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpBM.lightToTurnOn);
 	byteStartForString = byteStartForString + 1 + wpBM.lightToTurnOn.length();
-	wpWindow.lightToTurnOn = readStringFromEEPROM(byteStartForString, wpWindow.lightToTurnOn);
-	byteStartForString = byteStartForString + 1 + wpWindow.lightToTurnOn.length();
 	wpUnderfloor1.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
 	byteStartForString = byteStartForString + 1 + wpUnderfloor1.mqttTopicTemp.length();
 	wpUnderfloor2.mqttTopicTemp = readStringFromEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
@@ -80,7 +78,6 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceName);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpFZ.DeviceDescription);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpBM.lightToTurnOn);
-	byteStartForString = writeStringToEEPROM(byteStartForString, wpWindow.lightToTurnOn);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor1.mqttTopicTemp);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor2.mqttTopicTemp);
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpUnderfloor3.mqttTopicTemp);
@@ -196,6 +193,8 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleRpm = bitRead(bitsModules1, bitUseRpm);
 	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
+	wpModules.useModuleWindow2 = bitRead(bitsModules2, bitUseWindow2);
+	wpModules.useModuleWindow3 = bitRead(bitsModules2, bitUseWindow3);
 #endif
 #if BUILDWITH == 3
 	wpModules.useModuleUnderfloor1 = bitRead(bitsModules2, bitUseUnderfloor1);
@@ -226,7 +225,7 @@ void helperEEPROM::readVars() {
 	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
 	wpBM.Debug(bitRead(bitsDebugModules0, bitDebugBM));
-	wpWindow.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
+	wpWindow1.Debug(bitRead(bitsDebugModules1, bitDebugWindow));
 	wpRelais.Debug(bitRead(bitsDebugModules0, bitDebugRelais));
 	wpRain.Debug(bitRead(bitsDebugModules0, bitDebugRain));
 	wpMoisture.Debug(bitRead(bitsDebugModules0, bitDebugMoisture));
@@ -242,6 +241,8 @@ void helperEEPROM::readVars() {
 	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpRpm.Debug(bitRead(bitsDebugModules1, bitDebugRpm));
 	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
+	wpWindow2.Debug(bitRead(bitsDebugModules2, bitDebugWindow2));
+	wpWindow3.Debug(bitRead(bitsDebugModules2, bitDebugWindow3));
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor1));
@@ -330,7 +331,6 @@ void helperEEPROM::readVars() {
 /// byte values: 2byte 50 - 79
 	EEPROM.get(byteLightCorrection, wpLight.correction); // int
 	EEPROM.get(byteBMThreshold, wpBM.threshold);
-	EEPROM.get(byteWindowThreshold, wpWindow.threshold);
 	EEPROM.get(bytePumpPause, wpRelais.pumpPause);
 	EEPROM.get(byteMoistureDry, wpMoisture.dry);
 	EEPROM.get(byteMoistureWet, wpMoisture.wet);
