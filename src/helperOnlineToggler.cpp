@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 183 2024-07-29 03:32:26Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 218 2024-10-25 21:45:16Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -42,7 +42,7 @@ void helperOnlineToggler::cycle() {
 }
 
 uint16 helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -53,6 +53,7 @@ void helperOnlineToggler::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugOnlineToggler: " + String(Debug));
 	wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
 	wpFZ.blink();
 }

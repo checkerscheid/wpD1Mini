@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 217                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 217 2024-10-18 23:30:44Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 218 2024-10-25 21:45:16Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 217 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -50,6 +50,7 @@ void helperWebServer::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWebServer: " + String(Debug));
 	wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
 	wpFZ.blink();
 }

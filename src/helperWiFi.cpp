@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 211                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 211 2024-10-11 08:04:46Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 218 2024-10-25 21:45:16Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -48,7 +48,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 211 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -59,6 +59,7 @@ void helperWiFi::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWiFi: " + String(Debug));
 	wpFZ.SendWSDebug("DebugWiFi", Debug);
 	wpFZ.blink();
 }
@@ -72,7 +73,7 @@ void helperWiFi::setupWiFi() {
 	Serial.println(wpFZ.ssid);
 	
 	WiFi.disconnect();
-	WiFi.hostname(wpFZ.DeviceName.c_str());
+	WiFi.setHostname(wpFZ.DeviceName.c_str());
 	WiFi.begin(wpFZ.ssid, wpFZ.password);
 
 	Serial.print(wpFZ.getTime());

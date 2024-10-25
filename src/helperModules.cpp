@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 214 2024-10-17 10:17:02Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 218 2024-10-25 21:45:16Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -72,7 +72,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 214 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -83,6 +83,7 @@ void helperModules::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugModules: " + String(Debug));
 	wpFZ.SendWSDebug("DebugModules", Debug);
 	wpFZ.blink();
 }

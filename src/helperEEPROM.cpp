@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 217                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 217 2024-10-18 23:30:44Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 218 2024-10-25 21:45:16Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 217 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -50,6 +50,7 @@ void helperEEPROM::changeDebug() {
 	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
 	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugEEPROM: " + String(Debug));
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
 	wpFZ.blink();
 }

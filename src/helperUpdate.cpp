@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 211                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 211 2024-10-11 08:04:46Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 218 2024-10-25 21:45:16Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -63,7 +63,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 211 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -74,6 +74,7 @@ void helperUpdate::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugUpdate: " + String(Debug));
 	wpFZ.SendWSDebug("DebugUpdate", Debug);
 	wpFZ.blink();
 }

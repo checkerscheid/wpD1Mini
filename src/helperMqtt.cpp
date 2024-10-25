@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 183                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 183 2024-07-29 03:32:26Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 218 2024-10-25 21:45:16Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -54,7 +54,7 @@ void helperMqtt::cycle() {
 }
 
 uint16 helperMqtt::getVersion() {
-	String SVN = "$Rev: 183 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -65,6 +65,7 @@ void helperMqtt::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugMqtt: " + String(Debug));
 	wpFZ.SendWSDebug("DebugMqtt", Debug);
 	wpFZ.blink();
 }

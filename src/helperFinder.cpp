@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 181                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.cpp 181 2024-07-27 23:14:47Z                $ #
+//# File-ID      : $Id:: helperFinder.cpp 218 2024-10-25 21:45:16Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperFinder.h>
@@ -32,7 +32,7 @@ void helperFinder::cycle() {
 }
 
 uint16 helperFinder::getVersion() {
-	String SVN = "$Rev: 181 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -43,6 +43,7 @@ void helperFinder::changeDebug() {
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
 	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugFinder: " + String(Debug));
 	wpFZ.SendWSDebug("DebugFinder", Debug);
 	wpFZ.blink();
 }

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 217                                                     $ #
+//# Revision     : $Rev:: 218                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 217 2024-10-18 23:30:44Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 218 2024-10-25 21:45:16Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -365,11 +365,11 @@ void moduleAnalogOut::calc() {
 void moduleAnalogOut::calcOutput() {
 	// @ the moment is configured as Ventilator with Humidity
 	if(temp == 0) temp = (short) (SetPoint * 10);
-	if(mqttTopicTemp != "_") {
-		PIDinput = (double) (temp / 10.0);
-	} else {
-		PIDinput = (double) (wpDHT.humidity / 100.0);
+	if(mqttTopicTemp == "_") {
+		if(pidType == pidTypeHeating) temp = wpDHT.temperature / 10.0;
+		if(pidType == pidTypeAirCondition) temp = wpDHT.humidity / 10.0;
 	}
+	PIDinput = (double) (temp / 10.0);
 	PIDsetPoint = (double) SetPoint;
 	pid->Compute();
 	autoValue = PIDoutput;
@@ -400,7 +400,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 217 $";
+	String SVN = "$Rev: 218 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
