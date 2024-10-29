@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 214 2024-10-17 10:17:02Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 219 2024-10-29 10:36:32Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -55,6 +55,11 @@ class helperEEPROM {
 		const uint8 bitUseUnderfloor4 = 4; // include in bitsModules2
 		const uint8 bitUseWindow2 = 5; // include in bitsModules2
 		const uint8 bitUseWindow3 = 6; // include in bitsModules2
+		const uint8 bitUseWeight = 7; // include in bitsModules2
+
+		const uint16 addrBitsModules3 = 3;
+		byte bitsModules3;
+		const uint8 bitUseRFID = 0; // include in bitsModules3
 
 //###################################################################################
 
@@ -94,6 +99,7 @@ class helperEEPROM {
 		const uint8 bitDebugNeoPixel = 4; // include in bitsDebugModules1
 		const uint8 bitDebugImpulseCounter = 5; // include in bitsDebugModules1
 		const uint8 bitDebugCwWw = 6; // include in bitsDebugModules1
+		const uint8 bitDebugRFID = 7; // include in bitsDebugModules1
 		
 		const uint16 addrBitsDebugModules2 = 11;
 		byte bitsDebugModules2;
@@ -101,8 +107,9 @@ class helperEEPROM {
 		const uint8 bitDebugUnderfloor2 = 1; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor3 = 2; // include in bitsDebugModules2
 		const uint8 bitDebugUnderfloor4 = 3; // include in bitsDebugModules2
-		const uint8 bitDebugWindow2 = 0; // include in bitsDebugModules2
-		const uint8 bitDebugWindow3 = 0; // include in bitsDebugModules2
+		const uint8 bitDebugWindow2 = 4; // include in bitsDebugModules2
+		const uint8 bitDebugWindow3 = 5; // include in bitsDebugModules2
+		const uint8 bitDebugWeight = 6; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -123,6 +130,7 @@ class helperEEPROM {
 		const uint8 bitAnalogOut2Hand = 1; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelRGB = 2; // include in bitsSettingsModules1
 		const uint8 bitAnalogOutPidType = 3; // include in bitsSettingsModules1
+		const uint8 bitUseWeightAvg = 4; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
@@ -162,6 +170,8 @@ class helperEEPROM {
 		const uint16 byteCalcCycleAnalogOut = 45;
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
+		const uint16 byteCalcCycleWeight = 48;
+		const uint16 byteCalcCycleRFID = 49;
 
 //###################################################################################
 /// byte values: 2byte 50 - 79
@@ -178,6 +188,7 @@ class helperEEPROM {
 		const uint16 byteNeoPixelPixelCount = 72;
 		const uint16 byteImpulseCounterSilver = 74;
 		const uint16 byteImpulseCounterRed = 76;
+		const uint16 byteWeightTareValue = 77;
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
@@ -215,7 +226,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 214 $";
+		String SVNh = "$Rev: 219 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

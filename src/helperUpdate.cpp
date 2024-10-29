@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 218 2024-10-25 21:45:16Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 219 2024-10-29 10:36:32Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -48,6 +48,10 @@ void helperUpdate::init() {
 		file = F("firmwareheating.bin");
 		updateChanel = 3;
 	#endif
+	#if BUILDWITH == 4
+		file = F("firmwarerfid.bin");
+		updateChanel = 4;
+	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
 }
@@ -63,7 +67,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -244,6 +248,9 @@ String helperUpdate::GetUpdateChanel() {
 		case 3:
 			return F("heating");
 			break;
+		case 4:
+			return F("rfid");
+			break;
 		default:
 			return F("firmware");
 			break;
@@ -261,6 +268,10 @@ void helperUpdate::SetUpdateChanel(uint8 uc) {
 			break;
 		case 3:
 			file = F("firmwareheating.bin");
+			updateChanel = 3;
+			break;
+		case 4:
+			file = F("firmwarerfid.bin");
 			updateChanel = 3;
 			break;
 		default:

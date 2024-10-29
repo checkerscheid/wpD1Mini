@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 218 2024-10-25 21:45:16Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 219 2024-10-29 10:36:32Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -276,8 +276,8 @@ void helperWebServer::setupWebServer() {
 			message += F("\"Rpm\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRpm.Pin])) + F(",") +
 				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRpm.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpRain.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpRain.correction)) +
+				wpFZ.JsonKeyValue(F("useAvg"), wpRpm.UseAvg() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("Correction"), String(wpRpm.correction)) +
 				F("},");
 		}
 		if(wpModules.useModuleImpulseCounter) {
@@ -297,6 +297,14 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleWindow3) {
 			message += F("\"Window3\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow3.Pin])) +
+				F("},");
+		}
+		if(wpModules.useModuleWeight) {
+			message += F("\"Weight\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWeight.Pin])) + F(",") +
+				wpFZ.JsonKeyString(F("Pinout"), String(wpFZ.Pins[wpWeight.Pinout])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpWeight.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("useAvg"), wpWeight.UseAvg() ? "true" : "false") +
 				F("},");
 		}
 		#endif
@@ -331,6 +339,16 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor4.CalcCycle())) + F(",") +
 				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor4.GetSetPoint())) + F(",") +
 				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor4.mqttTopicTemp)) +
+				F("},");
+		}
+		#endif
+		#if BUILDWITH == 4
+		if(wpModules.useModuleRFID) {
+			message += F("\"RFID\":{") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor1.Pin])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor1.CalcCycle())) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor1.GetSetPoint())) + F(",") +
+				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor1.mqttTopicTemp)) +
 				F("},");
 		}
 		#endif
@@ -403,6 +421,9 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleWindow3) {
 			message += F(",") + wpFZ.JsonKeyValue(F("Window3"), wpWindow3.Debug() ? "true" : "false");
 		}
+		if(wpModules.useModuleWeight) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Weight"), wpWeight.Debug() ? "true" : "false");
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -416,6 +437,11 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleUnderfloor4) {
 			message += F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpUnderfloor4.Debug() ? "true" : "false");
+		}
+		#endif
+		#if BUILDWITH == 4
+		if(wpModules.useModuleRFID) {
+			message += F(",") + wpFZ.JsonKeyValue(F("RFID"), wpRFID.Debug() ? "true" : "false");
 		}
 		#endif
 		message += F("},\"useModul\":{") +
@@ -440,6 +466,7 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("ImpulseCounter"), wpModules.useModuleImpulseCounter ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Window2"), wpModules.useModuleWindow2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Window3"), wpModules.useModuleWindow3 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Weight"), wpModules.useModuleWeight ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor1"), wpModules.useModuleUnderfloor1 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor2"), wpModules.useModuleUnderfloor2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor3"), wpModules.useModuleUnderfloor3 ? "true" : "false") +
@@ -542,6 +569,10 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useWindow3"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleWindow3);
 			}
+			if(request->getParam(F("Module"))->value() == F("useWeight")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useWeight"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleWeight);
+			}
 			#endif
 			#if BUILDWITH == 3
 			if(request->getParam(F("Module"))->value() == F("useUnderfloor1")) {
@@ -559,6 +590,12 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Module"))->value() == F("useUnderfloor4")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useUnderfloor4"));
 				wpWebServer.setModuleChange(wpWebServer.cmdmoduleUnderfloor4);
+			}
+			#endif
+			#if BUILDWITH == 4
+			if(request->getParam(F("Module"))->value() == F("useRFID")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRFID"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleRFID);
 			}
 			#endif
 		}
@@ -684,6 +721,10 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWindow3"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugWindow3);
 			}
+			if(request->getParam(F("Debug"))->value() == F("DebugWeight")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugWeight"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugWeight);
+			}
 			#endif
 			#if BUILDWITH == 3
 			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor1")) {
@@ -701,6 +742,12 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Debug"))->value() == F("DebugUnderfloor4")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugUnderfloor4"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugUnderfloor4);
+			}
+			#endif
+			#if BUILDWITH == 4
+			if(request->getParam(F("Debug"))->value() == F("DebugRFID")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRFID"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugRFID);
 			}
 			#endif
 		}
@@ -1016,6 +1063,16 @@ void helperWebServer::setupWebServer() {
 		}
 		wpWebServer.setBlink();
 	});
+	webServer.on("/setWeight", HTTP_GET, [](AsyncWebServerRequest *request) {
+		if(request->hasParam(F("tare"))) {
+			if(request->getParam(F("tare"))->value().toInt() == 0) {
+				wpWeight.SetTare();
+				request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			} else {
+				request->send(200, F("application/json"), "{\"erg\":\"S_ERROR\"}");
+			}
+		}
+	});
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -1103,19 +1160,30 @@ void helperWebServer::setupWebServer() {
 		});
 	}
 	#endif
+	#if BUILDWITH == 4
+	// if(wpModules.useModuleRFID) {
+	// 	webServer.on("/setRFID", HTTP_GET, [](AsyncWebServerRequest *request) {
+	// 		if(request->hasParam(F("hand"))) {
+	// 			uint8 hand = request->getParam(F("hand"))->value().toInt();
+	// 			request->send(200, F("application/json"), wpUnderfloor1.SetHand(hand == 0 ? false : true).c_str());
+	// 		}
+	// 		wpWebServer.setBlink();
+	// 	});
+	// }
+	#endif
 	webServer.begin();
 }
 
 //###################################################################################
 // do the commands
 //###################################################################################
-void helperWebServer::setCommand(int8 command) {
+void helperWebServer::setCommand(uint8 command) {
 	doCommand = command;
 }
-void helperWebServer::setModuleChange(int8 module) {
+void helperWebServer::setModuleChange(uint8 module) {
 	doModuleChange = module;
 }
-void helperWebServer::setDebugChange(int8 debug) {
+void helperWebServer::setDebugChange(uint8 debug) {
 	doDebugChange = debug;
 }
 void helperWebServer::setBlink() {
@@ -1189,12 +1257,16 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdmoduleImpulseCounter) wpModules.changemoduleImpulseCounter(!wpModules.useModuleImpulseCounter);
 		if(doModuleChange == cmdModuleWindow2) wpModules.changeModuleWindow2(!wpModules.useModuleWindow2);
 		if(doModuleChange == cmdModuleWindow3) wpModules.changeModuleWindow3(!wpModules.useModuleWindow3);
+		if(doModuleChange == cmdModuleWeight) wpModules.changeModuleWeight(!wpModules.useModuleWeight);
 		#endif
 		#if BUILDWITH == 3
 		if(doModuleChange == cmdmoduleUnderfloor1) wpModules.changemoduleUnderfloor1(!wpModules.useModuleUnderfloor1);
 		if(doModuleChange == cmdmoduleUnderfloor2) wpModules.changemoduleUnderfloor2(!wpModules.useModuleUnderfloor2);
 		if(doModuleChange == cmdmoduleUnderfloor3) wpModules.changemoduleUnderfloor3(!wpModules.useModuleUnderfloor3);
 		if(doModuleChange == cmdmoduleUnderfloor4) wpModules.changemoduleUnderfloor4(!wpModules.useModuleUnderfloor4);
+		#endif
+		#if BUILDWITH == 4
+		if(doModuleChange == cmdModuleRFID) wpModules.changemoduleRFID(!wpModules.useModuleRFID);
 		#endif
 		doModuleChange = cmdDoNothing;
 	}
@@ -1230,12 +1302,16 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugImpulseCounter) wpImpulseCounter.changeDebug();
 		if(doDebugChange == cmdDebugWindow2) wpWindow2.changeDebug();
 		if(doDebugChange == cmdDebugWindow3) wpWindow3.changeDebug();
+		if(doDebugChange == cmdDebugWeight) wpWeight.changeDebug();
 		#endif
 		#if BUILDWITH == 3
 		if(doDebugChange == cmdDebugUnderfloor1) wpUnderfloor1.changeDebug();
 		if(doDebugChange == cmdDebugUnderfloor2) wpUnderfloor2.changeDebug();
 		if(doDebugChange == cmdDebugUnderfloor3) wpUnderfloor3.changeDebug();
 		if(doDebugChange == cmdDebugUnderfloor4) wpUnderfloor4.changeDebug();
+		#endif
+		#if BUILDWITH == 4
+		if(doDebugChange == cmdDebugRFID) wpRFID.changeDebug();
 		#endif
 		doDebugChange = cmdDoNothing;
 	}
@@ -1306,7 +1382,8 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule(F("useRpm"), F("wpRpm"), wpModules.useModuleRpm) +
 			wpWebServer.getchangeModule(F("useImpulseCounter"), F("wpImpulseCounter"), wpModules.useModuleImpulseCounter) +
 			wpWebServer.getchangeModule(F("useWindow2"), F("wpWindow2"), wpModules.useModuleWindow2) +
-			wpWebServer.getchangeModule(F("useWindow3"), F("wpWindow3"), wpModules.useModuleWindow3);
+			wpWebServer.getchangeModule(F("useWindow3"), F("wpWindow3"), wpModules.useModuleWindow3) +
+			wpWebServer.getchangeModule(F("useWeight"), F("wpWeight"), wpModules.useModuleWeight);
 		#endif
 		#if BUILDWITH == 3
 		returns +=
@@ -1314,6 +1391,10 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule(F("useUnderfloor2"), F("wpUnderfloor2"), wpModules.useModuleUnderfloor2) +
 			wpWebServer.getchangeModule(F("useUnderfloor3"), F("wpUnderfloor3"), wpModules.useModuleUnderfloor3) +
 			wpWebServer.getchangeModule(F("useUnderfloor4"), F("wpUnderfloor4"), wpModules.useModuleUnderfloor4);
+		#endif
+		#if BUILDWITH == 4
+		returns +=
+			wpWebServer.getchangeModule(F("useRFID"), F("wpRFID"), wpModules.useModuleRFID);
 		#endif
 		returns +=
 			"</ul>";
@@ -1396,6 +1477,9 @@ String processor(const String& var) {
 		if(wpModules.useModuleWindow3) {
 			returns += wpWebServer.getChangeDebug(F("DebugWindow3"), F("Window3"), wpWindow3.Debug());
 		}
+		if(wpModules.useModuleWeight) {
+			returns += wpWebServer.getChangeDebug(F("DebugWeight"), F("Weight"), wpWeight.Debug());
+		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
@@ -1409,6 +1493,11 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleUnderfloor4) {
 			returns += wpWebServer.getChangeDebug(F("DebugUnderfloor4"), F("Underfloor4"), wpUnderfloor4.Debug());
+		}
+		#endif
+		#if BUILDWITH == 4
+		if(wpModules.useModuleRFID) {
+			returns += wpWebServer.getChangeDebug(F("DebugRFID"), F("RFID"), wpRFID.Debug());
 		}
 		#endif
 		return returns += F("</ul>");

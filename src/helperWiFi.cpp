@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 218 2024-10-25 21:45:16Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 219 2024-10-29 10:36:32Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -48,7 +48,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -74,6 +74,7 @@ void helperWiFi::setupWiFi() {
 	
 	WiFi.disconnect();
 	WiFi.setHostname(wpFZ.DeviceName.c_str());
+	WiFi.mode(WIFI_STA);
 	WiFi.begin(wpFZ.ssid, wpFZ.password);
 
 	Serial.print(wpFZ.getTime());

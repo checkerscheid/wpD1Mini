@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 214 2024-10-17 10:17:02Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 219 2024-10-29 10:36:32Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -87,6 +87,7 @@ class moduleAnalogOut {
 		void SetHandValue(uint8 val);
 		String SetSetPoint(double setpoint);
 		String SetTopicTempUrl(String topic);
+		void InitPidType(uint8 t);
 		String SetPidType(uint8 t);
 		String GetPidType();
 	private:
@@ -114,12 +115,13 @@ class moduleAnalogOut {
 		void publishValue();
 		void calc();
 		void calcOutput();
+		void savePidType();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 214 $";
+		String SVNh = "$Rev: 219 $";
 		int temp;
-		uint8 pidType;
+		uint8 pidType = pidTypeHeating;
 };
 extern moduleAnalogOut wpAnalogOut;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 218 2024-10-25 21:45:16Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 219 2024-10-29 10:36:32Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -32,7 +32,6 @@ void moduleAnalogOut::init() {
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
-	pidType = pidTypeHeating;
 
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		pid = new PID(&PIDinput, &PIDoutput, &PIDsetPoint, Kp, Tv, Tn, pidType);
@@ -292,23 +291,8 @@ String moduleAnalogOut::SetTopicTempUrl(String topic) {
 	wpFZ.restartRequired = true;
 	return "{\"erg\":\"S_OK\"}";
 }
-String moduleAnalogOut::SetPidType(uint8 t) {
-	switch(t) {
-		case pidTypeHeating:
-			pidType = pidTypeHeating;
-			pid->SetControllerDirection(pidType);
-			return F("{\"erg\":\"S_OK\",\"pidType\":\"Heating\"}");
-			break;
-		case pidTypeAirCondition:
-			pidType = pidTypeAirCondition;
-			pid->SetControllerDirection(pidType);
-			return F("{\"erg\":\"S_OK\",\"pidType\":\"AirCondition\"}");
-			break;
-		default:
-			return F("{\"erg\":\"S_ERROR\",\"msg\":\"pidType not exists\"}");
-			// ERROR
-			break;
-	}
+void moduleAnalogOut::InitPidType(uint8 t) {
+	pidType = t;
 }
 String moduleAnalogOut::GetPidType() {
 	if(pidType == pidTypeHeating) {
@@ -318,6 +302,26 @@ String moduleAnalogOut::GetPidType() {
 		return F("AirCondition");
 	}
 	return F("unknown Type");
+}
+String moduleAnalogOut::SetPidType(uint8 t) {
+	switch(t) {
+		case pidTypeHeating:
+			pidType = pidTypeHeating;
+			pid->SetControllerDirection(pidType);
+			savePidType();
+			return F("{\"erg\":\"S_OK\",\"pidType\":\"Heating\"}");
+			break;
+		case pidTypeAirCondition:
+			pidType = pidTypeAirCondition;
+			pid->SetControllerDirection(pidType);
+			savePidType();
+			return F("{\"erg\":\"S_OK\",\"pidType\":\"AirCondition\"}");
+			break;
+		default:
+			return F("{\"erg\":\"S_ERROR\",\"msg\":\"pidType not exists\"}");
+			// ERROR
+			break;
+	}
 }
 
 //###################################################################################
@@ -379,6 +383,14 @@ void moduleAnalogOut::calcOutput() {
 	}
 }
 
+void moduleAnalogOut::savePidType() {
+	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitAnalogOutPidType, pidType);
+	EEPROM.write(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsSettingsModules1);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "savePidType",
+		"save to EEPROM: 'module" + ModuleName + "::savePidType' = " + GetPidType());
+}
+
 void moduleAnalogOut::InitKp(short kp) {
 	Kp = (double) (kp / 10.0);
 }
@@ -400,7 +412,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

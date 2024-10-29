@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 218 2024-10-25 21:45:16Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 219 2024-10-29 10:36:32Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -53,7 +53,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -138,16 +138,18 @@ void wpFreakaZone::blink() {
 		delay(blinkDelay);
 	}
 }
-
-long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
+long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax) {
 	if(inMax - inMin == 0) {
 		DebugWS(strERRROR, "Map", F("risky math operation: 'inMax - inMin == 0'"));
 		return 0;
 	}
 	long returns = map(in, inMin, inMax, outMin, outMax);
-	if(returns < outMin) returns = outMin;
-	if(returns > outMax) returns = outMax;
+	if(useMin && returns < outMin) returns = outMin;
+	if(useMax && returns > outMax) returns = outMax;
 	return returns;
+}
+long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
+	return Map(in, inMin, inMax, outMin, outMax, true, true);
 }
 
 String wpFreakaZone::JsonKeyValue(String name, String value) {

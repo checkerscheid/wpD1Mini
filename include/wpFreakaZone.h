@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 212 2024-10-16 09:30:20Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 219 2024-10-29 10:36:32Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -44,6 +44,8 @@
 #include <moduleImpulseCounter.h>
 #include <moduleRpm.h>
 #include <moduleUnderfloor.h>
+#include <moduleWeight.h>
+#include <moduleRFID.h>
 
 
 #define NTP_SERVER "172.17.1.1"
@@ -70,7 +72,7 @@ class wpFreakaZone {
 		unsigned long loopStartedAt;
 
 		uint16 MajorVersion = 3;
-		uint16 MinorVersion = 1;
+		uint16 MinorVersion = 2;
 		uint16 Build;
 		String Version;
 
@@ -117,6 +119,7 @@ class wpFreakaZone {
 		String getOnlineTime(bool forDebug);
 		String funcToString(String msg);
 		void blink();
+		long Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax);
 		long Map(long in, long inMin, long inMax, long outMin, long outMax);
 
 		static String JsonKeyValue(String name, String value);
@@ -151,7 +154,7 @@ class wpFreakaZone {
 		uint32 GetBootCounter();
 		void ResetBootCounter();
 	private:
-		String SVNh = "$Rev: 212 $";
+		String SVNh = "$Rev: 219 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;

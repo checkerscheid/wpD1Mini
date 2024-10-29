@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 218 2024-10-25 21:45:16Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 219 2024-10-29 10:36:32Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -47,12 +47,16 @@ void helperModules::init() {
 	mqttTopicUseImpulseCounter = wpFZ.DeviceName + "/settings/useModule/ImpulseCounter";
 	mqttTopicUseWindow2 = wpFZ.DeviceName + "/settings/useModule/Window2";
 	mqttTopicUseWindow3 = wpFZ.DeviceName + "/settings/useModule/Window3";
+	mqttTopicUseWeight = wpFZ.DeviceName + "/settings/useModule/Weight";
 	#endif
 	#if BUILDWITH == 3
 	mqttTopicUseUnderfloor1 = wpFZ.DeviceName + "/settings/useModule/Underfloor1";
 	mqttTopicUseUnderfloor2 = wpFZ.DeviceName + "/settings/useModule/Underfloor2";
 	mqttTopicUseUnderfloor3 = wpFZ.DeviceName + "/settings/useModule/Underfloor3";
 	mqttTopicUseUnderfloor4 = wpFZ.DeviceName + "/settings/useModule/Underfloor4";
+	#endif
+	#if BUILDWITH == 4
+	mqttTopicUseRFID = wpFZ.DeviceName + "/settings/useModule/RFID";
 	#endif
 
 	choosenDHTmodul = 0;
@@ -72,7 +76,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -126,12 +130,16 @@ void helperModules::publishValues(bool force) {
 		publishUseImpulseCounterLast = 0;
 		publishUseWindow2Last = 0;
 		publishUseWindow3Last = 0;
+		publishUseWeightLast = 0;
 		#endif
 		#if BUILDWITH == 3
 		publishUseUnderfloor1Last = 0;
 		publishUseUnderfloor2Last = 0;
 		publishUseUnderfloor3Last = 0;
 		publishUseUnderfloor4Last = 0;
+		#endif
+		#if BUILDWITH == 4
+		publishUseRFIDLast = 0;
 		#endif
 		publishDebugLast = 0;
 	}
@@ -285,6 +293,13 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useWindow3", useModuleWindow3);
 		publishUseWindow3Last = wpFZ.loopStartedAt;
 	}
+	if(useWeightLast != useModuleWeight || publishUseWeightLast == 0 ||
+		wpFZ.loopStartedAt > publishUseWeightLast + wpFZ.publishQoS) {
+		useWeightLast = useModuleWeight;
+		wpMqtt.mqttClient.publish(mqttTopicUseWeight.c_str(), String(useModuleWeight).c_str());
+		wpFZ.SendWSModule("useWeight", useModuleWeight);
+		publishUseWeightLast = wpFZ.loopStartedAt;
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(useUnderfloor1Last != useModuleUnderfloor1 || publishUseUnderfloor1Last == 0 ||
@@ -314,6 +329,15 @@ void helperModules::publishValues(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicUseUnderfloor4.c_str(), String(useModuleUnderfloor4).c_str());
 		wpFZ.SendWSModule("useUnderfloor4", useModuleUnderfloor4);
 		publishUseUnderfloor4Last = wpFZ.loopStartedAt;
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(useRFIDLast != useModuleRFID || publishUseRFIDLast == 0 ||
+		wpFZ.loopStartedAt > publishUseRFIDLast + wpFZ.publishQoS) {
+		useRFIDLast = useModuleRFID;
+		wpMqtt.mqttClient.publish(mqttTopicUseRFID.c_str(), String(useModuleRFID).c_str());
+		wpFZ.SendWSModule("useRFID", useModuleRFID);
+		publishUseRFIDLast = wpFZ.loopStartedAt;
 	}
 	#endif
 	if(DebugLast != Debug || publishDebugLast == 0 ||
@@ -349,12 +373,16 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseImpulseCounter.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseWindow2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseWindow3.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseWeight.c_str());
 	#endif
 	#if BUILDWITH == 3
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor1.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor3.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor4.c_str());
+	#endif
+	#if BUILDWITH == 4
+	wpMqtt.mqttClient.subscribe(mqttTopicUseRFID.c_str());
 	#endif
 	wpMqtt.mqttClient.subscribe(mqttTopicDebug.c_str());
 }
@@ -426,6 +454,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicUseWindow3.c_str()) == 0) {
 		changeModuleWindow3(readUseModule);
 	}
+	if(strcmp(topic, mqttTopicUseWeight.c_str()) == 0) {
+		changeModuleWeight(readUseModule);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(strcmp(topic, mqttTopicUseUnderfloor1.c_str()) == 0) {
@@ -439,6 +470,11 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseUnderfloor4.c_str()) == 0) {
 		changemoduleUnderfloor4(readUseModule);
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(strcmp(topic, mqttTopicUseRFID.c_str()) == 0) {
+		changemoduleRFID(readUseModule);
 	}
 	#endif
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
@@ -686,8 +722,19 @@ void helperModules::changeModuleWindow3(bool newValue) {
 		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleWindow2", useModuleWindow2);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow2, String(useModuleWindow2));
+		wpFZ.SendWSDebug("useModuleWindow3", useModuleWindow3);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow3, String(useModuleWindow3));
+	}
+}
+void helperModules::changeModuleWeight(bool newValue) {
+	if(useModuleWeight != newValue) {
+		useModuleWeight = newValue;
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseWeight, useModuleWeight);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useModuleWeight", useModuleWeight);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseWeight, String(useModuleWeight));
 	}
 }
 #endif
@@ -734,6 +781,19 @@ void helperModules::changemoduleUnderfloor4(bool newValue) {
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor4", useModuleUnderfloor4);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor4, String(useModuleUnderfloor4));
+	}
+}
+#endif
+#if BUILDWITH == 4
+void helperModules::changemoduleRFID(bool newValue) {
+	if(useModuleRFID != newValue) {
+		useModuleRFID = newValue;
+		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseRFID, useModuleRFID);
+		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useRFID", useModuleRFID);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseRFID, String(useModuleRFID));
 	}
 }
 #endif
@@ -813,6 +873,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleWindow3) {
 		wpWindow3.publishSettings(force);
 	}
+	if(wpModules.useModuleWeight) {
+		wpWeight.publishSettings(force);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -826,6 +889,11 @@ void helperModules::publishAllSettings(bool force) {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishSettings(force);
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(wpModules.useModuleRFID) {
+		wpRFID.publishSettings(force);
 	}
 	#endif
 	wpFZ.DebugWS(wpFZ.strDEBUG, "Modules::Settings", "Stop publish");
@@ -905,6 +973,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleWindow3) {
 		wpWindow3.publishValues(force);
 	}
+	if(wpModules.useModuleWeight) {
+		wpWeight.publishValues(force);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -918,6 +989,11 @@ void helperModules::publishAllValues(bool force) {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishValues(force);
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(wpModules.useModuleRFID) {
+		wpRFID.publishValues(force);
 	}
 	#endif
 }
@@ -993,6 +1069,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleWindow3) {
 		wpWindow3.setSubscribes();
 	}
+	if(wpModules.useModuleWeight) {
+		wpWeight.setSubscribes();
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -1006,6 +1085,11 @@ void helperModules::setAllSubscribes() {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.setSubscribes();
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(wpModules.useModuleRFID) {
+		wpRFID.setSubscribes();
 	}
 	#endif
 }
@@ -1079,6 +1163,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleWindow3) {
 		wpWindow3.checkSubscribes(topic, msg);
 	}
+	if(wpModules.useModuleWeight) {
+		wpWeight.checkSubscribes(topic, msg);
+	}
 	#endif
 	#if BUILDWITH == 3
 	if(wpModules.useModuleUnderfloor1) {
@@ -1092,6 +1179,11 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.checkSubscribes(topic, msg);
+	}
+	#endif
+	#if BUILDWITH == 4
+	if(wpModules.useModuleRFID) {
+		wpRFID.checkSubscribes(topic, msg);
 	}
 	#endif
 }

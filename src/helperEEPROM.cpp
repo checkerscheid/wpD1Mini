@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 218 2024-10-25 21:45:16Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 219 2024-10-29 10:36:32Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 219 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -194,6 +194,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleImpulseCounter = false;
 	wpModules.useModuleWindow2 = false;
 	wpModules.useModuleWindow3 = false;
+	wpModules.useModuleWeight = false;
 	wpModules.useModuleUnderfloor1 = false;
 	wpModules.useModuleUnderfloor2 = false;
 	wpModules.useModuleUnderfloor3 = false;
@@ -211,12 +212,16 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleImpulseCounter = bitRead(bitsModules1, bitUseImpulseCounter);
 	wpModules.useModuleWindow2 = bitRead(bitsModules2, bitUseWindow2);
 	wpModules.useModuleWindow3 = bitRead(bitsModules2, bitUseWindow3);
+	wpModules.useModuleWeight = bitRead(bitsModules2, bitUseWeight);
 #endif
 #if BUILDWITH == 3
 	wpModules.useModuleUnderfloor1 = bitRead(bitsModules2, bitUseUnderfloor1);
 	wpModules.useModuleUnderfloor2 = bitRead(bitsModules2, bitUseUnderfloor2);
 	wpModules.useModuleUnderfloor3 = bitRead(bitsModules2, bitUseUnderfloor3);
 	wpModules.useModuleUnderfloor4 = bitRead(bitsModules2, bitUseUnderfloor4);
+#endif
+#if BUILDWITH == 4
+	wpModules.useModuleRFID = bitRead(bitsModules2, bitUseRFID);
 #endif
 
 //###################################################################################
@@ -259,12 +264,16 @@ void helperEEPROM::readVars() {
 	wpImpulseCounter.Debug(bitRead(bitsDebugModules1, bitDebugImpulseCounter));
 	wpWindow2.Debug(bitRead(bitsDebugModules2, bitDebugWindow2));
 	wpWindow3.Debug(bitRead(bitsDebugModules2, bitDebugWindow3));
+	wpWeight.Debug(bitRead(bitsDebugModules2, bitDebugWeight));
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor1));
 	wpUnderfloor2.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor2));
 	wpUnderfloor3.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor3));
 	wpUnderfloor4.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor4));
+#endif
+#if BUILDWITH == 4
+	wpRFID.Debug(bitRead(bitsDebugModules2, bitDebugRFID));
 #endif
 
 //###################################################################################
@@ -286,7 +295,12 @@ void helperEEPROM::readVars() {
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
+	uint8 bitReadAnalogOutPidType = bitRead(bitsSettingsModules1, bitAnalogOutPidType);
+	if(bitReadAnalogOutPidType == wpAnalogOut.pidTypeAirCondition) {
+		wpAnalogOut.InitPidType(wpAnalogOut.pidTypeAirCondition);
+	}
 	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
+	wpWeight.UseAvg(bitRead(bitsSettingsModules1, bitUseWeightAvg));
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.handSet = bitRead(bitsSettingsModules2, bitUnderfloor1Hand);
@@ -297,6 +311,8 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor2HandValue);
 	wpUnderfloor3.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor3HandValue);
 	wpUnderfloor4.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor4HandValue);
+#endif
+#if BUILDWITH == 4
 #endif
 
 //###################################################################################
@@ -331,6 +347,7 @@ void helperEEPROM::readVars() {
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
 	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
+	wpWeight.CalcCycle(EEPROM.read(byteCalcCycleWeight) * 100);
 #endif
 #if BUILDWITH == 3
 	wpUnderfloor1.InitSetPoint(EEPROM.read(byteUnderfloor1Setpoint));
@@ -341,6 +358,9 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor2) * 100);
 	wpUnderfloor3.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor3) * 100);
 	wpUnderfloor4.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor4) * 100);
+#endif
+#if BUILDWITH == 4
+	wpRFID.CalcCycle(EEPROM.read(byteCalcCycleRFID) * 100);
 #endif
 
 //###################################################################################
@@ -387,9 +407,15 @@ void helperEEPROM::readVars() {
 #endif
 #if BUILDWITH == 3
 #endif
+#if BUILDWITH == 4
+#endif
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
+	uint32 tareValueRead = 0;
+	EEPROM.get(byteWeightTareValue, tareValueRead);
+	wpWeight.InitTareValue(tareValueRead);
+
 	uint32 bc = 0;
 	EEPROM.get(addrBootCounter, bc);
 	wpFZ.InitBootCounter(bc);

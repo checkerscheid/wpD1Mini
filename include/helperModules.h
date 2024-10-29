@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 219                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 214 2024-10-17 10:17:02Z                 $ #
+//# File-ID      : $Id:: helperModules.h 219 2024-10-29 10:36:32Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -46,6 +46,8 @@ class helperModules {
 		bool useModuleUnderfloor4 = false;
 		bool useModuleWindow2 = false;
 		bool useModuleWindow3 = false;
+		bool useModuleWeight = false;
+		bool useModuleRFID = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -73,12 +75,16 @@ class helperModules {
 		String mqttTopicUseImpulseCounter;
 		String mqttTopicUseWindow2;
 		String mqttTopicUseWindow3;
+		String mqttTopicUseWeight;
 		#endif
 		#if BUILDWITH == 3
 		String mqttTopicUseUnderfloor1;
 		String mqttTopicUseUnderfloor2;
 		String mqttTopicUseUnderfloor3;
 		String mqttTopicUseUnderfloor4;
+		#endif
+		#if BUILDWITH == 4
+		String mqttTopicUseRFID;
 		#endif
 
 		helperModules();
@@ -119,12 +125,16 @@ class helperModules {
 		void changemoduleImpulseCounter(bool newValue);
 		void changeModuleWindow2(bool newValue);
 		void changeModuleWindow3(bool newValue);
+		void changeModuleWeight(bool newValue);
 		#endif
 		#if BUILDWITH == 3
 		void changemoduleUnderfloor1(bool newValue);
 		void changemoduleUnderfloor2(bool newValue);
 		void changemoduleUnderfloor3(bool newValue);
 		void changemoduleUnderfloor4(bool newValue);
+		#endif
+		#if BUILDWITH == 4
+		void changemoduleRFID(bool newValue);
 		#endif
 
 		void publishAllSettings();
@@ -134,7 +144,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 214 $";
+		String SVNh = "$Rev: 219 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
@@ -173,6 +183,8 @@ class helperModules {
 		unsigned long publishUseWindow2Last;
 		bool useWindow3Last;
 		unsigned long publishUseWindow3Last;
+		bool useWeightLast;
+		unsigned long publishUseWeightLast;
 		bool useUnderfloor1Last;
 		unsigned long publishUseUnderfloor1Last;
 		bool useUnderfloor2Last;
@@ -181,11 +193,15 @@ class helperModules {
 		unsigned long publishUseUnderfloor3Last;
 		bool useUnderfloor4Last;
 		unsigned long publishUseUnderfloor4Last;
+		bool useRFIDLast;
+		unsigned long publishUseRFIDLast;
 		#if BUILDWITH == 1
 		#endif
 		#if BUILDWITH == 2
 		#endif
 		#if BUILDWITH == 3
+		#endif
+		#if BUILDWITH == 4
 		#endif
 
 		bool DebugLast;
