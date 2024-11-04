@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 209                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 209 2024-10-08 06:10:11Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 221 2024-11-04 15:10:40Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -26,6 +26,8 @@ class moduleCwWw {
 		
 		static const uint8 ModeStatic = 0;
 		static const uint8 ModeSmooth = 4;
+		static const uint8 ModeWwPulse = 5;
+		static const uint8 ModeCwPulse = 6;
 		
 		static const uint8 ModeBlender = 90; //CW, WW
 
@@ -63,7 +65,7 @@ class moduleCwWw {
 		String SetWW(uint8 ww);
 		String SetCW(uint8 cw);
 		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
-		void SetSmooth();
+		String SetEffect(uint8 effect);
 	private:
 		bool manual;
 		bool manualLast;
@@ -94,11 +96,13 @@ class moduleCwWw {
 		bool BlenderCWEffect();
 		bool smoothDirection;
 		void SmoothEffect();
+		void WwPulseEffect();
+		void CwPulseEffect();
 		uint8 GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 209 $";
+		String SVNh = "$Rev: 221 $";
 };
 extern moduleCwWw wpCwWw;
 

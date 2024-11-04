@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 212 2024-10-16 09:30:20Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 221 2024-11-04 15:10:40Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -236,9 +236,10 @@ void moduleCwWw::calcDuration() {
 	//if(mb->debug)
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
 }
-void moduleCwWw::SetSmooth() {
+String moduleCwWw::SetEffect(uint8 effect) {
 	manual = true;
-	modeCurrent = ModeSmooth;
+	modeCurrent = effect;
+	return "{\"erg\":\"S_OK\",\"effect\":\"" + GetModeName(modeCurrent) + "\"}";
 }
 
 String moduleCwWw::GetModeName(uint8 actualMode) {
@@ -252,6 +253,12 @@ String moduleCwWw::GetModeName(uint8 actualMode) {
 			break;
 		case ModeSmooth:
 			returns = "Mode Smooth";
+			break;
+		case ModeWwPulse:
+			returns = "Mode WW Pulse";
+			break;
+		case ModeCwPulse:
+			returns = "Mode CW Pulse";
 			break;
 		default:
 			returns = String(actualMode);
@@ -283,6 +290,12 @@ void moduleCwWw::calc() {
 				break;
 			case ModeSmooth:
 				SmoothEffect();
+				break;
+			case ModeWwPulse:
+				WwPulseEffect();
+				break;
+			case ModeCwPulse:
+				CwPulseEffect();
 				break;
 			default:
 				modeCurrent = ModeStatic;
@@ -362,11 +375,38 @@ void moduleCwWw::SmoothEffect() {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.handValueSet -= 5;
-		wpAnalogOut2.handValueSet += 5;
+		wpAnalogOut.handValueSet -= 1;
+		wpAnalogOut2.handValueSet += 1;
 	} else {
-		wpAnalogOut.handValueSet += 5;
-		wpAnalogOut2.handValueSet -= 5;
+		wpAnalogOut.handValueSet += 1;
+		wpAnalogOut2.handValueSet -= 1;
+	}
+}
+
+void moduleCwWw::WwPulseEffect() {
+	if(wpAnalogOut.handValueSet >= 100) {
+		smoothDirection = true;
+	}
+	if(wpAnalogOut.handValueSet <= 10) {
+		smoothDirection = false;
+	}
+	if(smoothDirection) {
+		wpAnalogOut.handValueSet -= 1;
+	} else {
+		wpAnalogOut.handValueSet += 1;
+	}
+}
+void moduleCwWw::CwPulseEffect() {
+	if(wpAnalogOut2.handValueSet >= 100) {
+		smoothDirection = true;
+	}
+	if(wpAnalogOut2.handValueSet <= 10) {
+		smoothDirection = false;
+	}
+	if(smoothDirection) {
+		wpAnalogOut2.handValueSet -= 1;
+	} else {
+		wpAnalogOut2.handValueSet += 1;
 	}
 }
 uint8 moduleCwWw::GetMaxPercent() {
@@ -379,7 +419,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 221 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

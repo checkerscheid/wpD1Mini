@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 220                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRFID.cpp 220 2024-10-29 10:37:04Z                  $ #
+//# File-ID      : $Id:: moduleRFID.cpp 221 2024-11-04 15:10:40Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRFID.h>
@@ -104,11 +104,11 @@ void moduleRFID::calc() {
 			chipID = ((chipID + rfid->uid.uidByte[i]) * 10);
 		}
 		wpFZ.DebugWS(wpFZ.strDEBUG, "RFID::calc", "new Card detected: " + String(chipID));
+		wpFZ.blink();
 		String minimac = WiFi.macAddress();
 		minimac.replace(":", "");
 		minimac.toLowerCase();
 		wpFZ.sendRawRest(F("http://172.17.1.11:255/?m=") + minimac + "&rfid=" + String(chipID));
-		wpFZ.blink();
 	}
 }
 
@@ -116,7 +116,7 @@ void moduleRFID::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleRFID::getVersion() {
-	String SVN = "$Rev: 220 $";
+	String SVN = "$Rev: 221 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

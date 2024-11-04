@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 206                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 206 2024-10-06 19:10:09Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 221 2024-11-04 15:10:40Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -253,7 +253,7 @@ String moduleUnderfloor::SetHand(bool val) {
 	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "SetHand", "save to EEPROM: 'module" + ModuleName + "::handSet' = " + String(handSet) + ", bit: " + String(bitHand) + ", addr: " + String(wpEEPROM.addrBitsSettingsModules2));
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetHandValue(bool val) {
 	handValueSet = val;
@@ -261,21 +261,21 @@ String moduleUnderfloor::SetHandValue(bool val) {
 	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "SetHandValueSet", "save to EEPROM: 'module" + ModuleName + "::handValueSet' = " + String(handValueSet) + ", bit: " + String(bitHandValue) + ", addr: " + String(wpEEPROM.addrBitsSettingsModules2));
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetSetPoint(uint8 setpoint) {
 	setPoint = setpoint;
 	EEPROM.write(byteSetpoint, setPoint);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint", "save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPoint) + ", addr: " + String(byteSetpoint));
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetTopicTempUrl(String topic) {
 	mqttTopicTemp = topic;
 	wpEEPROM.writeStringsToEEPROM();
 	//wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
 	wpFZ.restartRequired = true;
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 
 //###################################################################################
@@ -317,7 +317,7 @@ void moduleUnderfloor::calcOutput() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 206 $";
+	String SVN = "$Rev: 221 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

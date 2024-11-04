@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 219 2024-10-29 10:36:32Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 221 2024-11-04 15:10:40Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -53,7 +53,8 @@ void moduleAnalogOut::init() {
 		mqttTopicKp = wpFZ.DeviceName + "/settings/" + ModuleName + "/Kp";
 		mqttTopicTv = wpFZ.DeviceName + "/settings/" + ModuleName + "/Tv";
 		mqttTopicTn = wpFZ.DeviceName + "/settings/" + ModuleName + "/Tn";
-		mqttTopicSetPoint = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetPoint";
+		mqttTopicSetPoint = wpFZ.DeviceName + "/" + ModuleName + "/SetPoint";
+		mqttTopicSetSetPoint = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetPoint";
 	}
 	// commands
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
@@ -102,6 +103,7 @@ void moduleAnalogOut::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHand.c_str(), String(handSet).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetSetPoint.c_str(), String(SetPoint).c_str());
 		//wpMqtt.mqttClient.publish(mqttTopicSetTempUrl.c_str(), mqttTopicTempUrl.c_str());
 	}
 	mb->publishSettings(force);
@@ -190,7 +192,7 @@ void moduleAnalogOut::setSubscribes() {
 		wpMqtt.mqttClient.subscribe(mqttTopicKp.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicTv.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicTn.c_str());
-		wpMqtt.mqttClient.subscribe(mqttTopicSetPoint.c_str());
+		wpMqtt.mqttClient.subscribe(mqttTopicSetSetPoint.c_str());
 	}
 	if(mqttTopicTemp != "_") {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "setSubscribes", ModuleName + " subscribe: " + mqttTopicTemp);
@@ -250,11 +252,11 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 				wpFZ.DebugcheckSubscribes(mqttTopicTn, String(Tn));
 			}
 		}
-		if(strcmp(topic, mqttTopicSetPoint.c_str()) == 0) {
+		if(strcmp(topic, mqttTopicSetSetPoint.c_str()) == 0) {
 			double readSetPoint = msg.toDouble();
 			if(SetPoint != readSetPoint) {
 				SetSetPoint(readSetPoint);
-				wpFZ.DebugcheckSubscribes(mqttTopicSetPoint, String(SetPoint));
+				wpFZ.DebugcheckSubscribes(mqttTopicSetSetPoint, String(SetPoint));
 			}
 		}
 	}
@@ -282,14 +284,14 @@ String moduleAnalogOut::SetSetPoint(double sp) {
 	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint",
 		"save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPointToSave) + ", " +
 		"addr: " + String(wpEEPROM.byteAnalogOutSetPoint));
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 String moduleAnalogOut::SetTopicTempUrl(String topic) {
 	mqttTopicTemp = topic;
 	wpEEPROM.writeStringsToEEPROM();
 	//wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
 	wpFZ.restartRequired = true;
-	return "{\"erg\":\"S_OK\"}";
+	return wpFZ.jsonOK;
 }
 void moduleAnalogOut::InitPidType(uint8 t) {
 	pidType = t;
@@ -412,7 +414,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 221 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

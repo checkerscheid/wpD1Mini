@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 219 2024-10-29 10:36:32Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 221 2024-11-04 15:10:40Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -84,6 +84,9 @@ class wpFreakaZone {
 		const String strWARN   = "[* WARN  *]";
 		const String strERRROR = "[! ERROR !]";
 
+		const String jsonOK = "{\"erg\":\"S_OK\"}";
+		const String jsonERROR = "{\"erg\":\"S_ERROR\"}";
+
 		const char* Pins[18] = {"D3", "TX", "D4", "RX", "D2", "D1",
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
@@ -154,7 +157,7 @@ class wpFreakaZone {
 		uint32 GetBootCounter();
 		void ResetBootCounter();
 	private:
-		String SVNh = "$Rev: 219 $";
+		String SVNh = "$Rev: 221 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 221                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 219 2024-10-29 10:36:32Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 221 2024-11-04 15:10:40Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 221 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -345,10 +345,9 @@ void helperWebServer::setupWebServer() {
 		#if BUILDWITH == 4
 		if(wpModules.useModuleRFID) {
 			message += F("\"RFID\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor1.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor1.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor1.GetSetPoint())) + F(",") +
-				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor1.mqttTopicTemp)) +
+				wpFZ.JsonKeyString(F("PinSS"), String(wpFZ.Pins[wpRFID.PinSS])) + F(",") +
+				wpFZ.JsonKeyString(F("PinRST"), String(wpFZ.Pins[wpRFID.PinRST])) + F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRFID.CalcCycle())) +
 				F("},");
 		}
 		#endif
@@ -471,6 +470,7 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor2"), wpModules.useModuleUnderfloor2 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor3"), wpModules.useModuleUnderfloor3 ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Underfloor4"), wpModules.useModuleUnderfloor4 ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("RFID"), wpModules.useModuleRFID ? "true" : "false") +
 			F("}}}");
 		request->send(200, F("application/json"), message.c_str());
 	});
@@ -599,7 +599,7 @@ void helperWebServer::setupWebServer() {
 			}
 			#endif
 		}
-		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
+		request->send(200, F("application/json"), wpFZ.jsonOK);
 		wpWebServer.setBlink();
 	});
 
@@ -751,7 +751,7 @@ void helperWebServer::setupWebServer() {
 			}
 			#endif
 		}
-		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
+		request->send(200, F("application/json"), wpFZ.jsonOK);
 		wpWebServer.setBlink();
 	});
 
@@ -823,7 +823,7 @@ void helperWebServer::setupWebServer() {
 				wpFZ.ResetBootCounter();
 			}
 		}
-		request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
+		request->send(200, F("application/json"), wpFZ.jsonOK);
 		wpWebServer.setBlink();
 	});
 	if(wpModules.useModuleBM) {
@@ -869,7 +869,7 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam(F("sleep"))) {
 				uint sleep = request->getParam(F("sleep"))->value().toInt();
 				wpCwWw.SetSleep(sleep);
-				request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+				request->send(200, F("application/json"), wpFZ.jsonOK);
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set Sleep: '" + String(sleep) + "'");
 			}
 			if(request->hasParam(F("ww")) && request->hasParam(F("cw")) && request->hasParam(F("sleep"))) {
@@ -892,10 +892,12 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setCwWwEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
-			wpCwWw.SetSmooth();
-			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setCwWwEffect"));
-			request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
-			wpWebServer.setBlink();
+			if(request->hasParam(F("effect"))) {
+				uint effect = request->getParam(F("effect"))->value().toInt();
+				request->send(200, F("application/json"), wpCwWw.SetEffect(effect));
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setCwWwEffect"));
+				wpWebServer.setBlink();
+			}
 		});
 		webServer.on("/setCwWwSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint seconds = 0;
@@ -904,7 +906,7 @@ void helperWebServer::setupWebServer() {
 			}
 			wpCwWw.SetSleep(seconds);
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWwSleep"));
-			request->send(200, F("application/json"), F("{\"erg\":\"S_OK\"}"));
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 	}
@@ -914,7 +916,7 @@ void helperWebServer::setupWebServer() {
 				wpNeoPixel.demoMode = !wpNeoPixel.demoMode;
 			}
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setNeoPixelDemo"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelEffect", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -924,7 +926,7 @@ void helperWebServer::setupWebServer() {
 				wpNeoPixel.SetMode(effect);
 			}
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setNeoPixelEffect"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelColor", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -948,7 +950,7 @@ void helperWebServer::setupWebServer() {
 				"g: '" + String(g) + "', "
 				"b: '" + String(b) + "'");
 			
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelBrightness", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -958,7 +960,7 @@ void helperWebServer::setupWebServer() {
 				wpNeoPixel.SetBrightness(b);
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelBrightness, '" + String(b) + "'");
 			}
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelEffectSpeed", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -968,7 +970,7 @@ void helperWebServer::setupWebServer() {
 				wpNeoPixel.SetEffectSpeed(effectSpeed);
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelEffectSpeed, '" + String(effectSpeed) + "'");
 			}
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelWW", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -1006,7 +1008,7 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.ComplexEffect(pixel, r, g, b);
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixel"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -1016,7 +1018,7 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.SetSleep(seconds);
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelSleep"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelOn", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -1036,13 +1038,13 @@ void helperWebServer::setupWebServer() {
 			}
 			wpNeoPixel.SetOffRunner(steps);
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelOffRunner"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelBorder", HTTP_GET, [](AsyncWebServerRequest *request) {
 			wpNeoPixel.useBorder = !wpNeoPixel.useBorder;
 			wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixelBorder"));
-			request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
 		// webServer.on("/getNeoPixel", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -1067,9 +1069,9 @@ void helperWebServer::setupWebServer() {
 		if(request->hasParam(F("tare"))) {
 			if(request->getParam(F("tare"))->value().toInt() == 0) {
 				wpWeight.SetTare();
-				request->send(200, F("application/json"), "{\"erg\":\"S_OK\"}");
+				request->send(200, F("application/json"), wpFZ.jsonOK);
 			} else {
-				request->send(200, F("application/json"), "{\"erg\":\"S_ERROR\"}");
+				request->send(200, F("application/json"), wpFZ.jsonERROR);
 			}
 		}
 	});
@@ -1291,6 +1293,7 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugMoisture) wpMoisture.changeDebug();
 		if(doDebugChange == cmdDebugDistance) wpDistance.changeDebug();
 		#if BUILDWITH == 1
+		if(doDebugChange == cmdDebugCwWw) wpCwWw.changeDebug();
 		if(doDebugChange == cmdDebugNeoPixel) wpNeoPixel.changeDebug();
 		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
 		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
