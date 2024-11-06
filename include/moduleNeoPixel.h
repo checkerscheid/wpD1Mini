@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 222                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 212 2024-10-16 09:30:20Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 222 2024-11-06 08:10:21Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -183,12 +183,12 @@ class moduleNeoPixel {
 		bool BlenderBEffect();
 		bool BlenderBrightnessEffect();
 
-		void ColorWipeEffect(int wait);
-		void TheaterChaseEffect(int wait);
-		void RainbowEffect(uint8_t wait);
-		void RainbowWheelEffect(uint8_t wait);
-		void RainbowTvEffect(uint8_t wait);
-		void TheaterChaseRainbowEffect(uint8_t wait);
+		void ColorWipeEffect(uint wait);
+		void TheaterChaseEffect(uint wait);
+		void RainbowEffect(uint wait);
+		void RainbowWheelEffect(uint wait);
+		void RainbowTvEffect(uint wait);
+		void TheaterChaseRainbowEffect(uint wait);
 		void RunnerEffect(uint wait);
 		void RandomEffect(uint wait);
 		void OffRunnerEffect(uint wait);
@@ -198,7 +198,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 212 $";
+		String SVNh = "$Rev: 222 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 222                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 212 2024-10-16 09:30:20Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 222 2024-11-06 08:10:21Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -120,7 +120,7 @@ void moduleNeoPixel::init() {
 	publishValueLast = 0;
 	publishModeLast = 0;
 	lastBorderSend = 0;
-	effectSpeed = 1;
+	effectSpeed = 10;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugNeoPixel);
@@ -155,6 +155,7 @@ void moduleNeoPixel::cycle() {
 		//wpAnalogOut.hardwareoutMax = 50;
 		//wpAnalogOut2.hardwareoutMax = 50;
 	}
+	//ESP.wdtFeed();
 }
 
 void moduleNeoPixel::publishSettings() {
@@ -188,6 +189,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		publishStatusLast = 0;
 		publishMaxPercentLast = 0;
 		publishModeLast = 0;
+		publishEffectSpeedLast = 0;
 		publishUseBorderLast = 0;
 	}
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightnessLast != brightness ||
@@ -849,11 +851,11 @@ bool moduleNeoPixel::BlenderBrightnessEffect() {
 // (as a single 'packed' 32-bit value, which you can get by calling
 // strip.Color(red, green, blue) as shown in the loop() function above),
 // and a delay time (in milliseconds) between pixels.
-void moduleNeoPixel::ColorWipeEffect(int wait) {
+void moduleNeoPixel::ColorWipeEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint16_t current_pixel = 0;
 	static bool ison = false;
-	pixelInterval = wait;                         //  Update delay time
 	if(ison) {
 		strip->setPixelColor(current_pixel++, strip->Color(0, 0, 0));
 	} else {
@@ -869,12 +871,11 @@ void moduleNeoPixel::ColorWipeEffect(int wait) {
 // Theater-marquee-style chasing lights. Pass in a color (32-bit value,
 // a la strip.Color(r,g,b) as mentioned above), and a delay time (in ms)
 // between frames.
-void moduleNeoPixel::TheaterChaseEffect(int wait) {
+void moduleNeoPixel::TheaterChaseEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint32_t loop_count = 0;
 	static uint16_t current_pixel = 0;
-
-	pixelInterval = wait;                   //  Update delay time
 
 	strip->clear();
 
@@ -895,13 +896,12 @@ void moduleNeoPixel::TheaterChaseEffect(int wait) {
 	}
 }
 
-void moduleNeoPixel::RainbowEffect(uint8_t wait) {
-	if(pixelInterval != wait)
-		pixelInterval = wait;                         //  Update delay time
+void moduleNeoPixel::RainbowEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t lastval = Wheel(pixelCycle);
 	strip->fill(lastval);
 	if(useBorder) {
-		if(lastBorderSend == 0 || lastBorderSend + 1000 < wpFZ.loopStartedAt) {
+		if(lastBorderSend == 0 || lastBorderSend + 2000 < wpFZ.loopStartedAt) {
 			setBorder(lastval);
 		}
 	}
@@ -913,16 +913,15 @@ void moduleNeoPixel::RainbowEffect(uint8_t wait) {
 }
 
 // Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
-void moduleNeoPixel::RainbowWheelEffect(uint8_t wait) {
-	if(pixelInterval != wait)
-		pixelInterval = wait;
+void moduleNeoPixel::RainbowWheelEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t lastval = 0;
 	for(uint16_t i = 0; i < pixelCount; i++) {
 		lastval = Wheel((i + pixelCycle) % 255);
 		strip->setPixelColor(i, lastval); //  Update delay time  
 	}
 	if(useBorder) {
-		if(lastBorderSend == 0 || lastBorderSend + 5000 < wpFZ.loopStartedAt) {
+		if(lastBorderSend == 0 || lastBorderSend + 2000 < wpFZ.loopStartedAt) {
 			setBorder(lastval);
 		}
 	}
@@ -932,9 +931,8 @@ void moduleNeoPixel::RainbowWheelEffect(uint8_t wait) {
 		pixelCycle = 0;                     //  Loop the cycle back to the begining
 }
 // Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
-void moduleNeoPixel::RainbowTvEffect(uint8_t wait) {
-	if(pixelInterval != wait)
-		pixelInterval = wait;
+void moduleNeoPixel::RainbowTvEffect(uint wait) {
+	pixelInterval = wait;
 	for(uint16_t i = 0; i < pixelStartForTv; i++) {
 		strip->setPixelColor(i, strip->Color(0, 0, 0)); //  Update delay time  
 	}
@@ -948,9 +946,8 @@ void moduleNeoPixel::RainbowTvEffect(uint8_t wait) {
 }
 
 //Theatre-style crawling lights with rainbow effect
-void moduleNeoPixel::TheaterChaseRainbowEffect(uint8_t wait) {
-	if(pixelInterval != wait)
-		pixelInterval = wait;               //  Update delay time
+void moduleNeoPixel::TheaterChaseRainbowEffect(uint wait) {
+	pixelInterval = wait;
 	for(int i=0; i < pixelCount; i+=3) {
 		strip->setPixelColor(i + pixelQueue, Wheel((i + pixelCycle) & 255)); //  Update delay time
 	}
@@ -967,10 +964,9 @@ void moduleNeoPixel::TheaterChaseRainbowEffect(uint8_t wait) {
 }
 
 void moduleNeoPixel::RunnerEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t color = strip->Color(valueR, valueG, valueB);
 	static uint16_t current_pixel = 0;
-	if(pixelInterval != wait)
-		pixelInterval = wait;                         //  Update delay time
 	strip->clear();
 	strip->setPixelColor(current_pixel++, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
@@ -979,9 +975,9 @@ void moduleNeoPixel::RunnerEffect(uint wait) {
 	}
 }
 void moduleNeoPixel::RandomEffect(uint wait) {
+	pixelInterval = wait;
 	int pixel;
 	byte r, g, b;
-	pixelInterval = wait;                         //  Update delay time
 	strip->clear();
 	r = random(0, 255);
 	g = random(0, 255);
@@ -998,10 +994,9 @@ void moduleNeoPixel::RandomEffect(uint wait) {
 	strip->show();
 }
 void moduleNeoPixel::OffRunnerEffect(uint wait) {
+	pixelInterval = wait;
 	uint32_t color = strip->Color(0, 0, 0);
 	static uint16_t current_pixel = pixelCount;
-	if(pixelInterval != wait)
-		pixelInterval = wait;                         //  Update delay time
 	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
 	if(wpModules.useModuleAnalogOut) {
@@ -1086,7 +1081,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 222 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

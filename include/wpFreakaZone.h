@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 222                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 221 2024-11-04 15:10:40Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 222 2024-11-06 08:10:21Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -122,6 +122,7 @@ class wpFreakaZone {
 		String getOnlineTime(bool forDebug);
 		String funcToString(String msg);
 		void blink();
+		bool blinking();
 		long Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax);
 		long Map(long in, long inMin, long inMax, long outMin, long outMax);
 
@@ -157,14 +158,20 @@ class wpFreakaZone {
 		uint32 GetBootCounter();
 		void ResetBootCounter();
 	private:
-		String SVNh = "$Rev: 221 $";
+		const uint8 blinkStatusNothing = 0;
+		const uint8 blinkStatusStart = 1;
+		String SVNh = "$Rev: 222 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
 		bool restartRequiredLast;
 		unsigned long publishRestartRequiredLast;
+		uint8 blinkStatus;
+		unsigned long blinkStatsusLast;
 		uint32 bootCounter;
+		short blinkDelay;
 		void WriteBootCounter();
+		void doBlink();
 };
 extern wpFreakaZone wpFZ;
 

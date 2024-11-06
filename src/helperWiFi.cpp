@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 222                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 219 2024-10-29 10:36:32Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 222 2024-11-06 08:10:21Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -39,7 +39,7 @@ void helperWiFi::init() {
 //###################################################################################
 void helperWiFi::cycle() {
 	if(WiFi.status() == WL_CONNECTED) {
-		digitalWrite(LED_BUILTIN, LOW);
+		if(!wpFZ.blinking()) digitalWrite(LED_BUILTIN, LOW);
 	} else {
 		digitalWrite(LED_BUILTIN, HIGH);
 		setupWiFi();
@@ -48,7 +48,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 222 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -84,7 +84,16 @@ void helperWiFi::setupWiFi() {
 	while(WiFi.status() != WL_CONNECTED) {
 		delay(500);
 		Serial.print(".");
-		wpFZ.blink();
+		int led = digitalRead(LED_BUILTIN);
+		short blinkDelay = 50;
+		for(int i = 0; i < 2; i++) {
+			led = led == 0 ? 1 : 0;
+			digitalWrite(LED_BUILTIN, led);
+			delay(blinkDelay);
+			led = led == 0 ? 1 : 0;
+			digitalWrite(LED_BUILTIN, led);
+			delay(blinkDelay);
+		}
 	}
 	Serial.println();
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 222                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 219 2024-10-29 10:36:32Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 222 2024-11-06 08:10:21Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -42,6 +42,9 @@ void wpFreakaZone::init(String deviceName) {
 	publishOnDurationLast = 0;
 	restartRequiredLast = false;
 	publishRestartRequiredLast = 0;
+	blinkStatus = blinkStatusNothing;
+	blinkStatsusLast = 0;
+	blinkDelay = 35;
 }
 
 //###################################################################################
@@ -50,10 +53,11 @@ void wpFreakaZone::init(String deviceName) {
 void wpFreakaZone::cycle() {
 	OnDuration = getOnlineTime(false);
 	publishValues();
+	doBlink();
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 222 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -127,16 +131,10 @@ String wpFreakaZone::funcToString(String msg) {
 }
 
 void wpFreakaZone::blink() {
-	int led = digitalRead(LED_BUILTIN);
-	short blinkDelay = 50;
-	for(int i = 0; i < 2; i++) {
-		led = led == 0 ? 1 : 0;
-		digitalWrite(LED_BUILTIN, led);
-		delay(blinkDelay);
-		led = led == 0 ? 1 : 0;
-		digitalWrite(LED_BUILTIN, led);
-		delay(blinkDelay);
-	}
+	blinkStatus = blinkStatusStart;
+}
+bool wpFreakaZone::blinking() {
+	return blinkStatus != blinkStatusNothing;
 }
 long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax) {
 	if(inMax - inMin == 0) {
@@ -389,4 +387,13 @@ void wpFreakaZone::ResetBootCounter() {
 void wpFreakaZone::WriteBootCounter() {
 	EEPROM.put(wpEEPROM.addrBootCounter, bootCounter);
 	DebugWS(strINFO, F("WriteBootCounter"), F("new bootCounter: ") + String(bootCounter));
+}
+void wpFreakaZone::doBlink() {
+	if(blinkStatus != blinkStatusNothing && loopStartedAt > (blinkStatsusLast + blinkDelay)) {
+		blinkStatus++;
+		int led = digitalRead(LED_BUILTIN) == 0 ? 1 : 0;
+		digitalWrite(LED_BUILTIN, led);
+		blinkStatsusLast = loopStartedAt;
+		if(blinkStatus > 10) blinkStatus = blinkStatusNothing;
+	}
 }
