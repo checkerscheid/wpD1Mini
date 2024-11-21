@@ -48,6 +48,7 @@ class helperModules {
 		bool useModuleWindow3 = false;
 		bool useModuleWeight = false;
 		bool useModuleRFID = false;
+		bool useModuleClock = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -67,6 +68,7 @@ class helperModules {
 		String mqttTopicUseNeoPixel;
 		String mqttTopicUseAnalogOut;
 		String mqttTopicUseAnalogOut2;
+		String mqttTopicUseClock;
 		#endif
 		#if BUILDWITH == 2
 		String mqttTopicUseAnalogOut;
@@ -117,6 +119,7 @@ class helperModules {
 		void changeModuleNeoPixel(bool newValue);
 		void changeModuleAnalogOut(bool newValue);
 		void changeModuleAnalogOut2(bool newValue);
+		void changemoduleClock(bool newValue);
 		#endif
 		#if BUILDWITH == 2
 		void changeModuleAnalogOut(bool newValue);
@@ -195,6 +198,8 @@ class helperModules {
 		unsigned long publishUseUnderfloor4Last;
 		bool useRFIDLast;
 		unsigned long publishUseRFIDLast;
+		bool useClockLast;
+		unsigned long publishUseClockLast;
 		#if BUILDWITH == 1
 		#endif
 		#if BUILDWITH == 2

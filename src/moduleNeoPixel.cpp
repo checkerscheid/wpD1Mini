@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 222                                                     $ #
+//# Revision     : $Rev:: 224                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 222 2024-11-06 08:10:21Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 224 2024-11-14 05:35:15Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -88,6 +88,7 @@ void moduleNeoPixel::init() {
 	demoMode = false;
 	useBorder = false;
 	staticIsSet = false;
+	status = "S_OK";
 
 	// values
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
@@ -197,11 +198,11 @@ void moduleNeoPixel::publishValues(bool force) {
 		publishValue();
 	}
 	//if(statusLast != getStripStatus() || wpFZ.CheckQoS(publishStatusLast)) {
-	if(publishStatusLast + 10000 > wpFZ.loopStartedAt) {
-		//statusLast = getStripStatus();
-		wpMqtt.mqttClient.publish(mqttTopicStatus.c_str(), status.c_str());
-		publishStatusLast = wpFZ.loopStartedAt;
-	}
+	// if(publishStatusLast + 10000 > wpFZ.loopStartedAt) {
+	// 	//statusLast = getStripStatus();
+	// 	wpMqtt.mqttClient.publish(mqttTopicStatus.c_str(), status.c_str());
+	// 	publishStatusLast = wpFZ.loopStartedAt;
+	// }
 	if(maxPercentLast != maxPercent || wpFZ.CheckQoS(publishMaxPercentLast)) {
 		maxPercentLast = maxPercent;
 		wpMqtt.mqttClient.publish(mqttTopicMaxPercent.c_str(), String(maxPercent).c_str());
@@ -473,8 +474,9 @@ String moduleNeoPixel::SetOff() {
 	return returns += "}";
 }
 String moduleNeoPixel::SetWW(uint ww) {
-	targetWW = ww;
 	//targetCW = wpAnalogOut2.handValue;
+	if(ww + targetCW > 100) ww = 100 - targetCW;
+	targetWW = ww;
 	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
 	EEPROM.commit();
 	calcDuration();
@@ -487,6 +489,7 @@ String moduleNeoPixel::SetWW(uint ww) {
 }
 String moduleNeoPixel::SetCW(uint cw) {
 	//targetWW = wpAnalogOut.handValue;
+	if(cw + targetWW > 100) cw = 100 - targetWW;
 	targetCW = cw;
 	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	EEPROM.commit();
@@ -497,6 +500,44 @@ String moduleNeoPixel::SetCW(uint cw) {
 	return "{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
+}
+void moduleNeoPixel::setClock(short ph, short pm, short ps, uint8 hr, uint8 hg, uint8 hb, uint8 mr, uint8 mg, uint8 mb, uint8 sr, uint8 sg, uint8 sb) {
+	demoMode = false;
+	staticIsSet = true;
+	uint32_t quarter1 = strip->Color(16, 0, 8);
+	uint32_t quarter2 = strip->Color(8, 0, 8);
+	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
+	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
+	uint32_t colorh3 = strip->Color(hr, hg, hb);
+	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
+	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
+	uint32_t colorm3 = strip->Color(mr, mg, mb);
+	uint32_t colors = strip->Color(sr, sg, sb);
+	//strip->clear();
+	strip->fill();
+	strip->setPixelColor(0, quarter1);
+	strip->setPixelColor(5, quarter2);
+	strip->setPixelColor(10, quarter2);
+	strip->setPixelColor(15, quarter1);
+	strip->setPixelColor(20, quarter2);
+	strip->setPixelColor(25, quarter2);
+	strip->setPixelColor(30, quarter1);
+	strip->setPixelColor(35, quarter2);
+	strip->setPixelColor(40, quarter2);
+	strip->setPixelColor(45, quarter1);
+	strip->setPixelColor(50, quarter2);
+	strip->setPixelColor(55, quarter2);
+	//strip->setPixelColor(ph - 2, colorh1);
+	//strip->setPixelColor(ph - 1, colorh2);
+	strip->setPixelColor(ph, colorh3);
+	//strip->setPixelColor(pm - 2, colorm1);
+	//strip->setPixelColor(pm - 1, colorm2);
+	strip->setPixelColor(pm, colorm3);
+	strip->setPixelColor(ps, colors);
+	strip->show();
+	if(Debug()) {
+		wpFZ.DebugWS(wpFZ.strINFO, "SetPixel", F("Pixel h: ") + String(ph) + F(", Pixel m: ") + String(pm));
+	}
 }
 void moduleNeoPixel::calcDuration() {
 	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
@@ -1081,7 +1122,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 222 $";
+	String SVN = "$Rev: 224 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

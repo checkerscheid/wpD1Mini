@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 225                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 219 2024-10-29 10:36:32Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 225 2024-11-14 05:51:04Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -69,6 +69,7 @@ class helperWebServer {
 		const uint8 cmdDebugWindow3 = 40;
 		const uint8 cmdDebugWeight = 41;
 		const uint8 cmdDebugRFID = 42;
+		const uint8 cmdDebugClock = 43;
 		uint8 doDebugChange;
 
 		const uint8 cmdModuleDHT11 = 1;
@@ -96,6 +97,7 @@ class helperWebServer {
 		const uint8 cmdModuleWindow3 = 23;
 		const uint8 cmdModuleWeight = 24;
 		const uint8 cmdModuleRFID = 25;
+		const uint8 cmdModuleClock = 26;
 		uint8 doModuleChange;
 
 		uint8 doBlink;
@@ -128,7 +130,7 @@ class helperWebServer {
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 219 $";
+		String SVNh = "$Rev: 225 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -191,7 +193,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% <span class="setChange" onclick="changeName()">&#9998;</span> Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
 		<div id="restartRequired" class="wpContainer wpHidden"></div>
-		<div id="newVersion" class="wpContainer wpHidden"></div>
+		<div id="newVersion" class="wpContainer%newVersion%"></div>
 		<div id="progressContainer" class="wpHidden">
 			<div class="wpContainer">
 				<div id="progressBg">

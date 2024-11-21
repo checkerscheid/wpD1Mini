@@ -184,7 +184,7 @@ void moduleDistance::calc() {
 		if(volume > maxVolume) volume = maxVolume;
 		mb->error = false;
 		if(mb->debug) {
-			calcDistanceDebug("Distance", distanceAvg, distanceRaw);
+			calcDistanceDebug("Distance", distanceAvg, distanceRaw, duration);
 		}
 	} else {
 		mb->error = true;
@@ -206,8 +206,8 @@ uint16 moduleDistance::calcAvg(uint16 raw) {
 	avg += raw * avgLength;
 	return round(avg / avgCount);
 }
-void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw) {
-	String logmessage = name + ": " + String(avg) + " (" + String(raw) + ")";
+void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsigned long duration) {
+	String logmessage = name + " (avg): " + String(avg) + " (raw: " + String(raw) + ", duration: " + String(duration) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "calcDistance", logmessage);
 }
 

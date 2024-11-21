@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 224                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 219 2024-10-29 10:36:32Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 224 2024-11-14 05:35:15Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -39,7 +39,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 224 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -172,6 +172,7 @@ void helperEEPROM::readVars() {
 	bitsModules0 = EEPROM.read(addrBitsModules0);
 	bitsModules1 = EEPROM.read(addrBitsModules1);
 	bitsModules2 = EEPROM.read(addrBitsModules2);
+	bitsModules3 = EEPROM.read(addrBitsModules3);
 	wpModules.useModuleDHT11 = bitRead(bitsModules0, bitUseDHT11);
 	wpModules.useModuleDHT22 = bitRead(bitsModules0, bitUseDHT22);
 	wpModules.useModuleLDR = bitRead(bitsModules0, bitUseLDR);
@@ -204,6 +205,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);
 	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
 	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
+	wpModules.useModuleClock = bitRead(bitsModules3, bitUseClock);
 #endif
 #if BUILDWITH == 2
 	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
@@ -221,7 +223,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleUnderfloor4 = bitRead(bitsModules2, bitUseUnderfloor4);
 #endif
 #if BUILDWITH == 4
-	wpModules.useModuleRFID = bitRead(bitsModules2, bitUseRFID);
+	wpModules.useModuleRFID = bitRead(bitsModules3, bitUseRFID);
 #endif
 
 //###################################################################################
@@ -256,6 +258,7 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));
 	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
 	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
+	wpClock.Debug(bitRead(bitsDebugModules2, bitDebugClock));
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
@@ -339,6 +342,7 @@ void helperEEPROM::readVars() {
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
+	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
