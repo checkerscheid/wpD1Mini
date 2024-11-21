@@ -26,6 +26,7 @@ void setup() {
 	wpFZ.Build = getBuild();
 	wpFZ.Version = getStringVersion();
 	wpFZ.printRestored();
+	wpFZ.BootCount();
 
 	wpWiFi.init();
 	wpMqtt.init();
@@ -75,6 +76,9 @@ void setup() {
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.init();
 	}
+	if(wpModules.useModuleClock) {
+		wpClock.init();
+	}
 	#endif
 	#if BUILDWITH == 2
 	if(wpModules.useModuleAnalogOut) {
@@ -122,7 +126,6 @@ void setup() {
 	wpModules.publishAllSettings();
 	wpModules.setAllSubscribes();
 
-	wpFZ.BootCount();
 }
 
 //###################################################################################
@@ -179,6 +182,9 @@ void loop() {
 		}
 		if(wpModules.useModuleAnalogOut2) {
 			wpAnalogOut2.cycle();
+		}
+		if(wpModules.useModuleClock) {
+			wpClock.cycle();
 		}
 		#endif
 		#if BUILDWITH == 2
@@ -284,6 +290,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
 	buildChecker(v, wpRFID.getVersion());
+	buildChecker(v, wpClock.getVersion());
 	return v;
 }
 void buildChecker(uint16 &v, uint16 moduleBuild) {

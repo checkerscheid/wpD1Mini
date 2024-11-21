@@ -60,6 +60,7 @@ class helperEEPROM {
 		const uint16 addrBitsModules3 = 3;
 		byte bitsModules3;
 		const uint8 bitUseRFID = 0; // include in bitsModules3
+		const uint8 bitUseClock = 1; // include in bitsModules3
 
 //###################################################################################
 
@@ -110,6 +111,7 @@ class helperEEPROM {
 		const uint8 bitDebugWindow2 = 4; // include in bitsDebugModules2
 		const uint8 bitDebugWindow3 = 5; // include in bitsDebugModules2
 		const uint8 bitDebugWeight = 6; // include in bitsDebugModules2
+		const uint8 bitDebugClock = 7; // include in bitsDebugModules2
 
 //###################################################################################
 
@@ -195,6 +197,7 @@ class helperEEPROM {
 
 		const uint16 byteImpulseCounterKWh = 80;
 // kein Platz mehr gehabt...
+/// byte values: byte 90 - 110
 		const uint16 byteUnderfloor1Setpoint = 90;
 		const uint16 byteUnderfloor2Setpoint = 91;
 		const uint16 byteUnderfloor3Setpoint = 92;
@@ -203,6 +206,7 @@ class helperEEPROM {
 		const uint16 byteCalcCycleUnderfloor2 = 95;
 		const uint16 byteCalcCycleUnderfloor3 = 96;
 		const uint16 byteCalcCycleUnderfloor4 = 97;
+		const uint16 byteCalcCycleClock = 98;
 // **********
 		const uint16 addrBootCounter = 496;
 		uint16 byteStartForString; // 500

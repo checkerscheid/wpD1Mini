@@ -112,6 +112,7 @@ class moduleNeoPixel {
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
+		void setClock(short ph, short pm, short ps, uint8 hr, uint8 hg, uint8 hb, uint8 mr, uint8 mg, uint8 mb, uint8 sr, uint8 sg, uint8 sb);
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);

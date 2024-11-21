@@ -39,6 +39,7 @@ void helperModules::init() {
 	mqttTopicUseNeoPixel = wpFZ.DeviceName + "/settings/useModule/NeoPixel";
 	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
 	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
+	mqttTopicUseClock = wpFZ.DeviceName + "/settings/useModule/Clock";
 	#endif
 	#if BUILDWITH == 2
 	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
@@ -122,6 +123,7 @@ void helperModules::publishValues(bool force) {
 		publishUseNeoPixelLast = 0;
 		publishUseAnalogOutLast = 0;
 		publishUseAnalogOut2Last = 0;
+		publishUseClockLast = 0;
 		#endif
 		#if BUILDWITH == 2
 		publishUseAnalogOutLast = 0;
@@ -249,6 +251,13 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
 		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
 	}
+	if(useClockLast != useModuleClock || publishUseClockLast == 0 ||
+		wpFZ.loopStartedAt > publishUseClockLast + wpFZ.publishQoS) {
+		useClockLast = useModuleClock;
+		wpMqtt.mqttClient.publish(mqttTopicUseClock.c_str(), String(useModuleClock).c_str());
+		wpFZ.SendWSModule("useClock", useModuleClock);
+		publishUseClockLast = wpFZ.loopStartedAt;
+	}
 	#endif
 	#if BUILDWITH == 2
 	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
@@ -365,6 +374,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseNeoPixel.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseClock.c_str());
 	#endif
 	#if BUILDWITH == 2
 	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
@@ -433,6 +443,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseAnalogOut2.c_str()) == 0) {
 		changeModuleAnalogOut2(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseClock.c_str()) == 0) {
+		changemoduleClock(readUseModule);
 	}
 	#endif
 	#if BUILDWITH == 2
@@ -658,6 +671,17 @@ void helperModules::changeModuleAnalogOut2(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut2, String(useModuleAnalogOut2));
 	}
 }
+void helperModules::changemoduleClock(bool newValue) {
+	if(useModuleClock != newValue) {
+		useModuleClock = newValue;
+		bitWrite(wpEEPROM.bitsModules3, wpEEPROM.bitUseClock, useModuleClock);
+		EEPROM.write(wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useClock", useModuleClock);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseClock, String(useModuleClock));
+	}
+}
 #endif
 #if BUILDWITH == 2
 void helperModules::changeModuleAnalogOut(bool newValue) {
@@ -788,8 +812,8 @@ void helperModules::changemoduleUnderfloor4(bool newValue) {
 void helperModules::changemoduleRFID(bool newValue) {
 	if(useModuleRFID != newValue) {
 		useModuleRFID = newValue;
-		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseRFID, useModuleRFID);
-		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
+		bitWrite(wpEEPROM.bitsModules3, wpEEPROM.bitUseRFID, useModuleRFID);
+		EEPROM.write(wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3);
 		EEPROM.commit();
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useRFID", useModuleRFID);
@@ -852,6 +876,9 @@ void helperModules::publishAllSettings(bool force) {
 	}
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.publishSettings(force);
+	}
+	if(wpModules.useModuleClock) {
+		wpClock.publishSettings(force);
 	}
 	#endif
 	#if BUILDWITH == 2
@@ -953,6 +980,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.publishValues(force);
 	}
+	if(wpModules.useModuleClock) {
+		wpClock.publishValues(force);
+	}
 	#endif
 	#if BUILDWITH == 2
 	if(wpModules.useModuleAnalogOut) {
@@ -1049,6 +1079,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.setSubscribes();
 	}
+	if(wpModules.useModuleClock) {
+		wpClock.setSubscribes();
+	}
 	#endif
 	#if BUILDWITH == 2
 	if(wpModules.useModuleAnalogOut) {
@@ -1142,6 +1175,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleAnalogOut2) {
 		wpAnalogOut2.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleClock) {
+		wpClock.checkSubscribes(topic, msg);
 	}
 	#endif
 	#if BUILDWITH == 2

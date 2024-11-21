@@ -6,44 +6,38 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 02.06.2024                                                       #
+//# Date         : 10.11.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 207                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 207 2024-10-07 12:59:22Z                $ #
+//# File-ID      : $Id:: moduleLDR.h 207 2024-10-07 12:59:22Z                     $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleDistance_h
-#define moduleDistance_h
+#ifndef moduleClock_h
+#define moduleClock_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
+#include <Stepper.h>
 
-class moduleDistance {
+class moduleClock {
 	public:
-		moduleDistance();
+		moduleClock();
 		moduleBase* mb;
-		uint8 PinTrig;
-		uint8 PinEcho;
+		uint8 Pin1;
+		uint8 Pin2;
+		uint8 Pin3;
+		uint8 Pin4;
 
 		// section for define
-		uint16 volume;
-		uint16 distanceRaw;
-		uint16 distanceAvg;
-
-		uint8 height = 120;
-		uint16 maxVolume = 6000;
-		int8 correction = 0;
+		Stepper* Motor;
 
 		// values
-		String mqttTopicVolume;
-		String mqttTopicDistanceRaw;
-		String mqttTopicDistanceAvg;
+		String mqttTopicSpr;
+		String mqttTopicRpm;
 		// settings
-		String mqttTopicCorrection;
-		String mqttTopicHeight;
-		String mqttTopicMaxVolume;
-
+		String mqttTopicSetSpr;
+		String mqttTopicSetRpm;
 
 		// section to copy
 		void init();
@@ -62,28 +56,36 @@ class moduleDistance {
 		bool Debug(bool debug);
 		uint32 CalcCycle();
 		uint32 CalcCycle(uint32 calcCycle);
+		uint16 GetSpr();
+		void SetSpr(uint16 StepsPerRound);
+		uint16 GetRpm();
+		void SetRpm(uint16 RoundsPerMinute);
+		void SetSteps(short StepsToRun);
+		void SimulateTime();
+		void SimulateTime(short h, short m, short s);
 	private:
-		uint16 volumeLast;
-		unsigned long publishVolumeLast;
-		uint16 distanceRawLast;
-		unsigned long publishDistanceRawLast;
-		uint16 distanceAvgLast;
-		unsigned long publishDistanceAvgLast;
-		
-		static const uint8 avgLength = 128;
-		int avgValues[avgLength];
-
-		void publishValue();
-		void publishDistanceRaw();
-		void publishDistanceAvg();
+		uint8 hour;
+		uint8 minute;
+		uint8 minuteLast;
+		uint8 second;
+		uint8 secondLast;
+		bool simulateTime;
+		short steps;
+		// Steps per Round
+		uint16 spr = 2048;
+		uint16 sprLast;
+		unsigned long publishSprLast;
+		// Rounds per Minute
+		uint16 rpm = 5;
+		uint16 rpmLast;
+		unsigned long publishRpmLast;
 		void calc();
-		uint16 calcAvg(uint16 raw);
-		void calcDistanceDebug(String name, uint16 avg, uint16 raw, unsigned long duration);
 
+	
 		// section to config and copy
 		String ModuleName;
 		String SVNh = "$Rev: 207 $";
 };
-extern moduleDistance wpDistance;
+extern moduleClock wpClock;
 
 #endif

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 220                                                     $ #
+//# Revision     : $Rev:: 223                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 220 2024-10-29 10:37:04Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 223 2024-11-10 12:21:24Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -25,8 +25,8 @@ moduleWeight::moduleWeight() {
 }
 void moduleWeight::init() {
 	// section for define
-	Pinout = D6;
-	Pin = D7;
+	Pinout = D6; // DT / DAT
+	Pin = D7; // CLK / SCK
 	scale->begin(Pinout, Pin);
 	weight = 0;
 	tare = false;
@@ -137,7 +137,7 @@ void moduleWeight::calc() {
 			tare = false;
 		}
 		long correct = tareValue + raw;
-		long mapped = correct * 2.34; //wpFZ.Map(correct, 0, 427800, 0, 1000000, true, false);
+		long mapped = correct * 64.98; //wpFZ.Map(correct, 0, 427800, 0, 1000000, true, false);
 		long avg = mapped;
 		if(mb->useAvg) {
 			avg = calcAvg(avg);
@@ -177,7 +177,7 @@ long moduleWeight::calcAvg(long raw) {
 // section to copy
 //###################################################################################
 uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 220 $";
+	String SVN = "$Rev: 223 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
