@@ -55,6 +55,7 @@ void helperModules::init() {
 	mqttTopicUseUnderfloor2 = wpFZ.DeviceName + "/settings/useModule/Underfloor2";
 	mqttTopicUseUnderfloor3 = wpFZ.DeviceName + "/settings/useModule/Underfloor3";
 	mqttTopicUseUnderfloor4 = wpFZ.DeviceName + "/settings/useModule/Underfloor4";
+	mqttTopicUseDS18B20 = wpFZ.DeviceName + "/settings/useModule/DS18B20";
 	#endif
 	#if BUILDWITH == 4
 	mqttTopicUseRFID = wpFZ.DeviceName + "/settings/useModule/RFID";
@@ -139,6 +140,7 @@ void helperModules::publishValues(bool force) {
 		publishUseUnderfloor2Last = 0;
 		publishUseUnderfloor3Last = 0;
 		publishUseUnderfloor4Last = 0;
+		publishUseDS18B20Last = 0;
 		#endif
 		#if BUILDWITH == 4
 		publishUseRFIDLast = 0;
@@ -339,6 +341,13 @@ void helperModules::publishValues(bool force) {
 		wpFZ.SendWSModule("useUnderfloor4", useModuleUnderfloor4);
 		publishUseUnderfloor4Last = wpFZ.loopStartedAt;
 	}
+	if(useDS18B20Last != useModuleDS18B20 || publishUseDS18B20Last == 0 ||
+		wpFZ.loopStartedAt > publishUseDS18B20Last + wpFZ.publishQoS) {
+		useDS18B20Last = useModuleDS18B20;
+		wpMqtt.mqttClient.publish(mqttTopicUseDS18B20.c_str(), String(useModuleDS18B20).c_str());
+		wpFZ.SendWSModule("useDS18B20", useModuleDS18B20);
+		publishUseDS18B20Last = wpFZ.loopStartedAt;
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(useRFIDLast != useModuleRFID || publishUseRFIDLast == 0 ||
@@ -390,6 +399,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor3.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor4.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDS18B20.c_str());
 	#endif
 	#if BUILDWITH == 4
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRFID.c_str());
@@ -483,6 +493,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseUnderfloor4.c_str()) == 0) {
 		changemoduleUnderfloor4(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseDS18B20.c_str()) == 0) {
+		changemoduleDS18B20(readUseModule);
 	}
 	#endif
 	#if BUILDWITH == 4
