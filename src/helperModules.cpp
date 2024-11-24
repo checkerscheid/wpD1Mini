@@ -807,6 +807,17 @@ void helperModules::changemoduleUnderfloor4(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor4, String(useModuleUnderfloor4));
 	}
 }
+void helperModules::changemoduleDS18B20(bool newValue) {
+	if(useModuleDS18B20 != newValue) {
+		useModuleDS18B20 = newValue;
+		bitWrite(wpEEPROM.bitsModules3, wpEEPROM.bitUseDS18B20, useModuleDS18B20);
+		EEPROM.write(wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useDS18B20", useModuleDS18B20);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseDS18B20, String(useModuleDS18B20));
+	}
+}
 #endif
 #if BUILDWITH == 4
 void helperModules::changemoduleRFID(bool newValue) {
@@ -917,6 +928,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishSettings(force);
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.publishSettings(force);
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1020,6 +1034,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishValues(force);
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.publishValues(force);
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1119,6 +1136,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.setSubscribes();
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.setSubscribes();
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1215,6 +1235,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.checkSubscribes(topic, msg);
 	}
 	#endif
 	#if BUILDWITH == 4

@@ -47,6 +47,8 @@
 #include <moduleWeight.h>
 #include <moduleRFID.h>
 #include <moduleClock.h>
+#include <moduleDS18B20.h>
+
 
 
 #define NTP_SERVER "172.17.1.1"
@@ -88,7 +90,8 @@ class wpFreakaZone {
 		const String jsonOK = "{\"erg\":\"S_OK\"}";
 		const String jsonERROR = "{\"erg\":\"S_ERROR\"}";
 
-		const char* Pins[18] = {"D3", "TX", "D4", "RX", "D2", "D1",
+		const char* Pins[18] = {
+			"D3", "TX", "D4", "RX", "D2", "D1",
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
 

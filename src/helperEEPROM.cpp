@@ -221,6 +221,7 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleUnderfloor2 = bitRead(bitsModules2, bitUseUnderfloor2);
 	wpModules.useModuleUnderfloor3 = bitRead(bitsModules2, bitUseUnderfloor3);
 	wpModules.useModuleUnderfloor4 = bitRead(bitsModules2, bitUseUnderfloor4);
+	wpModules.useModuleDS18B20 = bitRead(bitsModules3, bitUseDS18B20);
 #endif
 #if BUILDWITH == 4
 	wpModules.useModuleRFID = bitRead(bitsModules3, bitUseRFID);
@@ -244,6 +245,7 @@ void helperEEPROM::readVars() {
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
 	bitsDebugModules1 = EEPROM.read(addrBitsDebugModules1);
 	bitsDebugModules2 = EEPROM.read(addrBitsDebugModules2);
+	bitsDebugModules3 = EEPROM.read(addrBitsDebugModules3);
 	wpDHT.Debug(bitRead(bitsDebugModules0, bitDebugDHT));
 	wpLDR.Debug(bitRead(bitsDebugModules0, bitDebugLDR));
 	wpLight.Debug(bitRead(bitsDebugModules0, bitDebugLight));
@@ -274,6 +276,7 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor2));
 	wpUnderfloor3.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor3));
 	wpUnderfloor4.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor4));
+	wpDS18B20.Debug(bitRead(bitsDebugModules3, bitDebugDS18B20));
 #endif
 #if BUILDWITH == 4
 	wpRFID.Debug(bitRead(bitsDebugModules2, bitDebugRFID));
@@ -362,6 +365,7 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor2) * 100);
 	wpUnderfloor3.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor3) * 100);
 	wpUnderfloor4.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor4) * 100);
+	wpDS18B20.CalcCycle(EEPROM.read(byteCalcCycleDS18B20) * 100);
 #endif
 #if BUILDWITH == 4
 	wpRFID.CalcCycle(EEPROM.read(byteCalcCycleRFID) * 100);

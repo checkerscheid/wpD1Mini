@@ -116,6 +116,9 @@ void setup() {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.init();
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.init();
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -223,6 +226,9 @@ void loop() {
 		if(wpModules.useModuleUnderfloor4) {
 			wpUnderfloor4.cycle();
 		}
+		if(wpModules.useModuleDS18B20) {
+			wpDS18B20.cycle();
+		}
 		#endif
 		#if BUILDWITH == 4
 		if(wpModules.useModuleRFID) {
@@ -289,6 +295,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpUnderfloor2.getVersion());
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
+	buildChecker(v, wpDS18B20.getVersion());
 	buildChecker(v, wpRFID.getVersion());
 	buildChecker(v, wpClock.getVersion());
 	return v;

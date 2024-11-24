@@ -70,6 +70,7 @@ class helperWebServer {
 		const uint8 cmdDebugWeight = 41;
 		const uint8 cmdDebugRFID = 42;
 		const uint8 cmdDebugClock = 43;
+		const uint8 cmdDebugDS18B20 = 44;
 		uint8 doDebugChange;
 
 		const uint8 cmdModuleDHT11 = 1;
@@ -98,6 +99,7 @@ class helperWebServer {
 		const uint8 cmdModuleWeight = 24;
 		const uint8 cmdModuleRFID = 25;
 		const uint8 cmdModuleClock = 26;
+		const uint8 cmdmoduleDS18B20 = 27;
 		uint8 doModuleChange;
 
 		uint8 doBlink;
