@@ -22,8 +22,7 @@
 deviceOneWire::deviceOneWire(uint8 no) {
 	// section to config and copy
 	number = no;
-	ModuleName = "deviceOneWire-" + String(no);
-	mb = new moduleBase(ModuleName);
+	ModuleName = "DS18B20/deviceOneWire" + String(no + 1);
 }
 void deviceOneWire::init() {
 	// section for define
@@ -39,9 +38,6 @@ void deviceOneWire::init() {
 	publishTemperatureLast = 0;
 
 	// section to copy
-	//mb->initUseAvg(wpEEPROM.addrBitsSettingsOneWire, wpEEPROM.bitsSettingsOneWire, wpEEPROM.bitUseAvgDS18B20[number]);
-
-	mb->calcLast = 0;
 }
 
 //###################################################################################
@@ -57,7 +53,6 @@ void deviceOneWire::publishSettings() {
 }
 void deviceOneWire::publishSettings(bool force) {
 	wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-	mb->publishSettings(force);
 }
 
 void deviceOneWire::publishValues() {
@@ -71,25 +66,17 @@ void deviceOneWire::publishValues(bool force) {
 		String sendTemperature = String(float(temperature / 100.0));
 		temperatureLast = temperature;
 		wpMqtt.mqttClient.publish(mqttTopicTemperature.c_str(), sendTemperature.c_str());
-		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("Temperature", sendTemperature);
-		}
 		publishTemperatureLast = wpFZ.loopStartedAt;
 	}
 	if(correctionLast != correction || wpFZ.CheckQoS(publishCorrectionLast)) {
 		correctionLast = correction;
 		wpMqtt.mqttClient.publish(mqttTopicCorrection.c_str(), String(correction).c_str());
-		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("Correction", String(correction));
-		}
 		publishCorrectionLast = wpFZ.loopStartedAt;
 	}
-	mb->publishValues(force);
 }
 
 void deviceOneWire::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetCorrection.c_str());
-	mb->setSubscribes();
 }
 
 void deviceOneWire::checkSubscribes(char* topic, String msg) {
@@ -102,12 +89,16 @@ void deviceOneWire::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetCorrection, String(correction));
 		}
 	}
-	mb->checkSubscribes(topic, msg);
 }
-void deviceOneWire::initAddress(uint8 adr[8]) {
-	for(uint8 i = 0; i < 8; i++) {
-		address[i] = adr[i];
-	}
+void deviceOneWire::initAddress(uint8 b0, uint8 b1, uint8 b2, uint8 b3, uint8 b4, uint8 b5, uint8 b6, uint8 b7) {
+	address[0] = b0;
+	address[1] = b1;
+	address[2] = b2;
+	address[3] = b3;
+	address[4] = b4;
+	address[5] = b5;
+	address[6] = b6;
+	address[7] = b7;
 }
 void deviceOneWire::setAddress(uint8 adr[8]) {
 	String print = "save Address: ";
@@ -120,6 +111,12 @@ void deviceOneWire::setAddress(uint8 adr[8]) {
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "setAddress", print);
 }
+uint8_t* deviceOneWire::getAddress() {
+	return address;
+}
+void deviceOneWire::setTemperature(float t) {
+	temperature = int(t * 100) + (correction * 10);
+}
 
 //###################################################################################
 // private
@@ -127,20 +124,6 @@ void deviceOneWire::setAddress(uint8 adr[8]) {
 
 void deviceOneWire::calc() {
 
-}
-uint16 deviceOneWire::calcAvg(uint16 raw) {
-	long avg = 0;
-	long avgCount = avgLength;
-	avgValues[avgLength - 1] = raw;
-	for(int i = 0; i < avgLength - 1; i++) {
-		if(avgValues[i + 1] > 0) {
-			avgValues[i] = avgValues[i + 1];
-			avg += avgValues[i] * (i + 1);
-			avgCount += (i + 1);
-		}
-	}
-	avg += raw * avgLength;
-	return round(avg / avgCount);
 }
 
 //###################################################################################
@@ -153,10 +136,3 @@ uint16 deviceOneWire::getVersion() {
 	return v > vh ? v : vh;
 }
 
-bool deviceOneWire::UseAvg() {
-	return mb->useAvg;
-}
-bool deviceOneWire::UseAvg(bool useAvg) {
-	mb->useAvg = useAvg;
-	return true;
-}

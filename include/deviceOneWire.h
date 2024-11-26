@@ -17,15 +17,12 @@
 #define deviceOneWire_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
-#include <moduleBase.h>
-// #include <OneWire.h>
-// #include <DallasTemperature.h>
 
 class deviceOneWire {
 	public:
 		deviceOneWire(uint8 no);
-		moduleBase* mb;
 		uint8 number;
+		bool debug;
 
 		// section for define
 		int temperature;
@@ -49,22 +46,20 @@ class deviceOneWire {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		// getter / setter
-		bool UseAvg();
-		bool UseAvg(bool useAvg);
 
-		void initAddress(uint8 adr[8]);
+		void initAddress(uint8 b0, uint8 b1, uint8 b2, uint8 b3, uint8 b4, uint8 b5, uint8 b6, uint8 b7);
 		void setAddress(uint8 adr[8]);
+		uint8_t* getAddress();
+
+		void setTemperature(float t);
 	private:
 		uint8 address[8];
 		int temperatureLast;
 		unsigned long publishTemperatureLast;
 		int8 correctionLast;
 		unsigned long publishCorrectionLast;
-		static const uint8 avgLength = 128;
-		int avgValues[avgLength];
 
 		void calc();
-		uint16 calcAvg(uint16 raw);
 
 	
 		// section to config and copy

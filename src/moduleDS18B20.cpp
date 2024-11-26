@@ -30,19 +30,24 @@ void moduleDS18B20::init() {
 	Pin = D7;
 	for(uint8 i = 0; i < count; i++) {
 		devices[i] = new deviceOneWire(i);
+		devices[i]->init();
 	}
 	ow = new OneWire(Pin);
 	dt = new DallasTemperature(ow);
 	// values
 	mqttTopicCount = wpFZ.DeviceName + "/" + ModuleName + "/Count";
 	// settings
-
 	countLast = 0;
 	publishCountLast = 0;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules3, wpEEPROM.bitsDebugModules3, wpEEPROM.bitDebugDS18B20);
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleDS18B20);
+	
+	for(uint8 i = 0; i < count; i++) {
+		if(devices[i] != NULL)
+			devices[i]->debug = mb->debug;
+	}
 
 	mb->calcLast = 0;
 
@@ -64,6 +69,11 @@ void moduleDS18B20::publishSettings() {
 	publishSettings(false);
 }
 void moduleDS18B20::publishSettings(bool force) {
+	for(int i = 0; i < count; i++) {
+		if(devices[i] != NULL) {
+			devices[i]->publishSettings(force);
+		}
+	}
 	mb->publishSettings(force);
 }
 
@@ -71,6 +81,11 @@ void moduleDS18B20::publishValues() {
 	publishValues(false);
 }
 void moduleDS18B20::publishValues(bool force) {
+	for(int i = 0; i < count; i++) {
+		if(devices[i] != NULL) {
+			devices[i]->publishValues(force);
+		}
+	}
 	if(force) {
 		publishCountLast = 0;
 	}
@@ -86,10 +101,20 @@ void moduleDS18B20::publishValues(bool force) {
 }
 
 void moduleDS18B20::setSubscribes() {
+	for(int i = 0; i < count; i++) {
+		if(devices[i] != NULL) {
+			devices[i]->setSubscribes();
+		}
+	}
 	mb->setSubscribes();
 }
 
 void moduleDS18B20::checkSubscribes(char* topic, String msg) {
+	for(int i = 0; i < count; i++) {
+		if(devices[i] != NULL) {
+			devices[i]->checkSubscribes(topic, msg);
+		}
+	}
 	mb->checkSubscribes(topic, msg);
 }
 
@@ -98,6 +123,13 @@ void moduleDS18B20::checkSubscribes(char* topic, String msg) {
 //###################################################################################
 
 void moduleDS18B20::calc() {
+	dt->requestTemperatures();
+	for(int i = 0; i < count; i++) {
+		if(devices[i] != NULL) {
+			float t = dt->getTempC(devices[i]->getAddress());
+			devices[i]->setTemperature(t);
+		}
+	}
 }
 
 String moduleDS18B20::scanBus() {
@@ -106,7 +138,8 @@ String moduleDS18B20::scanBus() {
 	DeviceAddress address;
 	for(uint8 i = 0;  i < count;  i++) {
 		dt->getAddress(address, i);
-		devices[i]->setAddress(address);
+		if(devices[i] != NULL)
+			devices[i]->setAddress(address);
 	}
 	return wpFZ.jsonOK;
 }
@@ -134,6 +167,10 @@ bool moduleDS18B20::Debug() {
 }
 bool moduleDS18B20::Debug(bool debug) {
 	mb->debug = debug;
+	for(uint8 i = 0; i < count; i++) {
+		if(devices[i] != NULL)
+			devices[i]->debug = mb->debug;
+	}
 	return true;
 }
 uint32 moduleDS18B20::CalcCycle(){

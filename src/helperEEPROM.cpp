@@ -366,6 +366,11 @@ void helperEEPROM::readVars() {
 	wpUnderfloor3.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor3) * 100);
 	wpUnderfloor4.CalcCycle(EEPROM.read(byteCalcCycleUnderfloor4) * 100);
 	wpDS18B20.CalcCycle(EEPROM.read(byteCalcCycleDS18B20) * 100);
+	wpDS18B20.count = EEPROM.read(byteDS18B20Count);
+	for(int i = 0; i < wpDS18B20.count; i++) {
+		if(wpDS18B20.devices[i] != NULL)
+			wpDS18B20.devices[i]->correction = EEPROM.read(byteDS18B20Correction[i]);
+	}
 #endif
 #if BUILDWITH == 4
 	wpRFID.CalcCycle(EEPROM.read(byteCalcCycleRFID) * 100);
@@ -414,6 +419,18 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteImpulseCounterRed, wpImpulseCounter.counterRed);
 #endif
 #if BUILDWITH == 3
+	for(int i = 0; i < wpDS18B20.count; i++) {
+		uint8 b0 = EEPROM.read(byteDS18B20adr[i][0]);
+		uint8 b1 = EEPROM.read(byteDS18B20adr[i][1]);
+		uint8 b2 = EEPROM.read(byteDS18B20adr[i][2]);
+		uint8 b3 = EEPROM.read(byteDS18B20adr[i][3]);
+		uint8 b4 = EEPROM.read(byteDS18B20adr[i][4]);
+		uint8 b5 = EEPROM.read(byteDS18B20adr[i][5]);
+		uint8 b6 = EEPROM.read(byteDS18B20adr[i][6]);
+		uint8 b7 = EEPROM.read(byteDS18B20adr[i][7]);
+		if(wpDS18B20.devices[i] != NULL)
+			wpDS18B20.devices[i]->initAddress(b0, b1, b2, b3, b4, b5, b6, b7);
+	}
 #endif
 #if BUILDWITH == 4
 #endif

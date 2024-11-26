@@ -216,12 +216,7 @@ class helperEEPROM {
 		const uint16 byteCalcCycleClock = 98;
 		const uint16 byteCalcCycleDS18B20 = 99;
 		const uint16 byteDS18B20Count = 100;
-// bits OneWire 190
-		const uint16 addrBitsSettingsOneWire = 190;
-		uint16 bitsSettingsOneWire;
-		const uint8 bitUseAvgDS18B20[10] = {
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-		};
+
 // byte oneWire TempCorrection 200
 		const uint16 byteDS18B20Correction[10] = {
 			200, 201, 202, 203, 204, 205, 206, 207, 208, 209
@@ -239,9 +234,6 @@ class helperEEPROM {
 			{364, 365, 366, 367, 368, 369, 370, 371},
 			{372, 373, 374, 375, 376, 377, 378, 379}
 		};
-
-
-
 
 // **********
 		const uint16 addrBootCounter = 496;
