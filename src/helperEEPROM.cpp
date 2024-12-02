@@ -298,10 +298,7 @@ void helperEEPROM::readVars() {
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
-	uint8 bitReadAnalogOutPidType = bitRead(bitsSettingsModules1, bitAnalogOutPidType);
-	if(bitReadAnalogOutPidType == wpAnalogOut.pidTypeAirCondition) {
-		wpAnalogOut.InitPidType(wpAnalogOut.pidTypeAirCondition);
-	}
+	wpAnalogOut.InitPidType(bitRead(bitsSettingsModules1, bitAnalogOutPidType));
 	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
 	wpWeight.UseAvg(bitRead(bitsSettingsModules1, bitUseWeightAvg));
 #endif
