@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 226 2024-11-21 13:14:50Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 227 2024-12-03 08:19:05Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -132,7 +132,7 @@ class helperWebServer {
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 227 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;

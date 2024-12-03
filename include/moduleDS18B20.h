@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 228                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.h 207 2024-10-07 12:59:22Z                     $ #
+//# File-ID      : $Id:: moduleDS18B20.h 228 2024-12-03 08:19:36Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDS18B20_h
@@ -68,7 +68,7 @@ class moduleDS18B20 {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 228 $";
 };
 extern moduleDS18B20 wpDS18B20;
 
