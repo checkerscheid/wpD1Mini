@@ -47,9 +47,9 @@ class deviceOneWire {
 		void checkSubscribes(char* topic, String msg);
 		// getter / setter
 
-		void initAddress(uint8 b0, uint8 b1, uint8 b2, uint8 b3, uint8 b4, uint8 b5, uint8 b6, uint8 b7);
 		void setAddress(uint8 adr[8]);
 		uint8_t* getAddress();
+		String getStringAddress();
 
 		void setTemperature(float t);
 	private:
@@ -60,6 +60,7 @@ class deviceOneWire {
 		unsigned long publishCorrectionLast;
 
 		void calc();
+		void initAddress();
 
 	
 		// section to config and copy

@@ -23,6 +23,9 @@ helperEEPROM::helperEEPROM() {
 		EEPROM.write(addrBitsModules0, 0);
 		EEPROM.write(addrBitsModules1, 0);
 		EEPROM.write(addrBitsModules2, 0);
+		EEPROM.write(byteDS18B20Count, 0);	
+		uint16 pixelCountReset = 0;
+		EEPROM.put(byteNeoPixelPixelCount, pixelCountReset);
 		EEPROM.commit();
 	}
 }
@@ -419,18 +422,19 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteImpulseCounterRed, wpImpulseCounter.counterRed);
 #endif
 #if BUILDWITH == 3
-	for(int i = 0; i < wpDS18B20.count; i++) {
-		uint8 b0 = EEPROM.read(byteDS18B20adr[i][0]);
-		uint8 b1 = EEPROM.read(byteDS18B20adr[i][1]);
-		uint8 b2 = EEPROM.read(byteDS18B20adr[i][2]);
-		uint8 b3 = EEPROM.read(byteDS18B20adr[i][3]);
-		uint8 b4 = EEPROM.read(byteDS18B20adr[i][4]);
-		uint8 b5 = EEPROM.read(byteDS18B20adr[i][5]);
-		uint8 b6 = EEPROM.read(byteDS18B20adr[i][6]);
-		uint8 b7 = EEPROM.read(byteDS18B20adr[i][7]);
-		if(wpDS18B20.devices[i] != NULL)
-			wpDS18B20.devices[i]->initAddress(b0, b1, b2, b3, b4, b5, b6, b7);
-	}
+	// wird lokal gemacht
+	// for(int i = 0; i < wpDS18B20.count; i++) {
+	// 	uint8 b0 = EEPROM.read(byteDS18B20adr[i][0]);
+	// 	uint8 b1 = EEPROM.read(byteDS18B20adr[i][1]);
+	// 	uint8 b2 = EEPROM.read(byteDS18B20adr[i][2]);
+	// 	uint8 b3 = EEPROM.read(byteDS18B20adr[i][3]);
+	// 	uint8 b4 = EEPROM.read(byteDS18B20adr[i][4]);
+	// 	uint8 b5 = EEPROM.read(byteDS18B20adr[i][5]);
+	// 	uint8 b6 = EEPROM.read(byteDS18B20adr[i][6]);
+	// 	uint8 b7 = EEPROM.read(byteDS18B20adr[i][7]);
+	// 	if(wpDS18B20.devices[i] != NULL)
+	// 		wpDS18B20.devices[i]->initAddress(b0, b1, b2, b3, b4, b5, b6, b7);
+	// }
 #endif
 #if BUILDWITH == 4
 #endif

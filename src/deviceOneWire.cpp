@@ -23,6 +23,7 @@ deviceOneWire::deviceOneWire(uint8 no) {
 	// section to config and copy
 	number = no;
 	ModuleName = "DS18B20/deviceOneWire" + String(no + 1);
+	initAddress();
 }
 void deviceOneWire::init() {
 	// section for define
@@ -90,15 +91,15 @@ void deviceOneWire::checkSubscribes(char* topic, String msg) {
 		}
 	}
 }
-void deviceOneWire::initAddress(uint8 b0, uint8 b1, uint8 b2, uint8 b3, uint8 b4, uint8 b5, uint8 b6, uint8 b7) {
-	address[0] = b0;
-	address[1] = b1;
-	address[2] = b2;
-	address[3] = b3;
-	address[4] = b4;
-	address[5] = b5;
-	address[6] = b6;
-	address[7] = b7;
+void deviceOneWire::initAddress() {
+	address[0] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][0]);
+	address[1] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][1]);
+	address[2] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][2]);
+	address[3] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][3]);
+	address[4] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][4]);
+	address[5] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][5]);
+	address[6] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][6]);
+	address[7] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][7]);
 }
 void deviceOneWire::setAddress(uint8 adr[8]) {
 	String print = "save Address: ";
@@ -114,8 +115,17 @@ void deviceOneWire::setAddress(uint8 adr[8]) {
 uint8_t* deviceOneWire::getAddress() {
 	return address;
 }
+String deviceOneWire::getStringAddress() {
+	String printadr = "";
+	for(uint8 i = 0; i < 8; i++) {
+		printadr += String(address[i], HEX);
+		if(i < 7) printadr += ":";
+	}
+	return printadr;
+}
 void deviceOneWire::setTemperature(float t) {
 	temperature = int(t * 100) + (correction * 10);
+	//wpFZ.DebugWS(wpFZ.strINFO, "setTemperature", "new Temp " + String(temperature) + " (" + String(t) + ") in Module " + String(number));
 }
 
 //###################################################################################

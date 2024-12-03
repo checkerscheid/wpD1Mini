@@ -310,11 +310,12 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 void wpFreakaZone::SendWSModule(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
-	DebugWS(strDEBUG, "changeDebug", "new value" + htmlId + ": debug = " + value);
+	DebugWS(strDEBUG, "sendUseModul", "send ws: id = " + htmlId + ", useModul = " + value);
 }
 void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
+	DebugWS(strDEBUG, "sendDebug", "send ws: id = " + htmlId + ", debug = " + value);
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");

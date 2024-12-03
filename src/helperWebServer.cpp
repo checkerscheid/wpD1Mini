@@ -351,9 +351,13 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleDS18B20) {
 			message += F("\"DS18B20\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDS18B20.Pin])) + F(",") +
-				//wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDS18B20.CalcCycle(1))) + F(",") +
-				//wpFZ.JsonKeyValue(F("useAvg1"), wpDS18B20.UseAvg(1) ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDS18B20.Pin])) + F(",");
+			//wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDS18B20.CalcCycle(1))) + F(",") +
+			//wpFZ.JsonKeyValue(F("useAvg1"), wpDS18B20.UseAvg(1) ? "true" : "false") + F(",") +
+			for(int c = 0; c < wpDS18B20.count; c++) {
+				message += wpFZ.JsonKeyString(F("Device") + String(c) + F("Address"), wpDS18B20.devices[c]->getStringAddress()) + F(",");
+			}
+			message += 
 				wpFZ.JsonKeyValue(F("Count"), String(wpDS18B20.count)) +
 				F("},");
 		}

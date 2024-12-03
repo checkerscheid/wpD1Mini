@@ -126,22 +126,31 @@ void moduleDS18B20::calc() {
 	dt->requestTemperatures();
 	for(int i = 0; i < count; i++) {
 		if(devices[i] != NULL) {
+			float ti = dt->getTempCByIndex(i);
 			float t = dt->getTempC(devices[i]->getAddress());
-			devices[i]->setTemperature(t);
+			devices[i]->setTemperature(ti);
+			if(mb->debug)
+				wpFZ.DebugWS(wpFZ.strDEBUG, "DS18B20::calc", "index: " + String(i) + ", ti: " + String(ti) + ", t: " + String(t));
 		}
 	}
 }
 
 String moduleDS18B20::scanBus() {
+	uint8 cds18 = dt->getDS18Count();
+	wpFZ.DebugWS(wpFZ.strINFO, "scanBus", "count ds18: " + String(cds18));
 	count = dt->getDeviceCount();
 	setCount();
 	DeviceAddress address;
+	String adr = "";
 	for(uint8 i = 0;  i < count;  i++) {
 		dt->getAddress(address, i);
-		if(devices[i] != NULL)
+		if(devices[i] != NULL) {
 			devices[i]->setAddress(address);
+			if(i > 0) adr += ",";
+			adr += "\"" + String(i) + "\":\"" + devices[i]->getStringAddress() + "\"";
+		}
 	}
-	return wpFZ.jsonOK;
+	return "{\"found\":" + String(count) + ",\"adr\":{" + adr + "}}"; //wpFZ.jsonOK;
 }
 
 void moduleDS18B20::setCount() {
