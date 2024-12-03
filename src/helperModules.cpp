@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 226 2024-11-21 13:14:50Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 227 2024-12-03 08:19:05Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -55,6 +55,7 @@ void helperModules::init() {
 	mqttTopicUseUnderfloor2 = wpFZ.DeviceName + "/settings/useModule/Underfloor2";
 	mqttTopicUseUnderfloor3 = wpFZ.DeviceName + "/settings/useModule/Underfloor3";
 	mqttTopicUseUnderfloor4 = wpFZ.DeviceName + "/settings/useModule/Underfloor4";
+	mqttTopicUseDS18B20 = wpFZ.DeviceName + "/settings/useModule/DS18B20";
 	#endif
 	#if BUILDWITH == 4
 	mqttTopicUseRFID = wpFZ.DeviceName + "/settings/useModule/RFID";
@@ -77,7 +78,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 226 $";
+	String SVN = "$Rev: 227 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -139,120 +140,105 @@ void helperModules::publishValues(bool force) {
 		publishUseUnderfloor2Last = 0;
 		publishUseUnderfloor3Last = 0;
 		publishUseUnderfloor4Last = 0;
+		publishUseDS18B20Last = 0;
 		#endif
 		#if BUILDWITH == 4
 		publishUseRFIDLast = 0;
 		#endif
 		publishDebugLast = 0;
 	}
-	if(useDHT11Last != useModuleDHT11 || publishUseDHT11Last == 0 ||
-		wpFZ.loopStartedAt > publishUseDHT11Last + wpFZ.publishQoS) {
+	if(useDHT11Last != useModuleDHT11 || wpFZ.CheckQoS(publishUseDHT11Last)) {
 		useDHT11Last = useModuleDHT11;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT11.c_str(), String(useModuleDHT11).c_str());
 		wpFZ.SendWSModule("useDHT11", useModuleDHT11);
 		publishUseDHT11Last = wpFZ.loopStartedAt;
 	}
-	if(useDHT22Last != useModuleDHT22 || publishUseDHT22Last == 0 ||
-		wpFZ.loopStartedAt > publishUseDHT22Last + wpFZ.publishQoS) {
+	if(useDHT22Last != useModuleDHT22 || wpFZ.CheckQoS(publishUseDHT22Last)) {
 		useDHT22Last = useModuleDHT22;
 		wpMqtt.mqttClient.publish(mqttTopicUseDHT22.c_str(), String(useModuleDHT22).c_str());
 		wpFZ.SendWSModule("useDHT22", useModuleDHT22);
 		publishUseDHT22Last = wpFZ.loopStartedAt;
 	}
-	if(useLDRLast != useModuleLDR || publishUseLDRLast == 0 ||
-		wpFZ.loopStartedAt > publishUseLDRLast + wpFZ.publishQoS) {
+	if(useLDRLast != useModuleLDR || wpFZ.CheckQoS(publishUseLDRLast)) {
 		useLDRLast = useModuleLDR;
 		wpMqtt.mqttClient.publish(mqttTopicUseLDR.c_str(), String(useModuleLDR).c_str());
 		wpFZ.SendWSModule("useLDR", useModuleLDR);
 		publishUseLDRLast = wpFZ.loopStartedAt;
 	}
-	if(useLightLast != useModuleLight || publishUseLightLast == 0 ||
-		wpFZ.loopStartedAt > publishUseLightLast + wpFZ.publishQoS) {
+	if(useLightLast != useModuleLight || wpFZ.CheckQoS(publishUseLightLast)) {
 		useLightLast = useModuleLight;
 		wpMqtt.mqttClient.publish(mqttTopicUseLight.c_str(), String(useModuleLight).c_str());
 		wpFZ.SendWSModule("useLight", useModuleLight);
 		publishUseLightLast = wpFZ.loopStartedAt;
 	}
-	if(useBMLast != useModuleBM || publishUseBMLast == 0 ||
-		wpFZ.loopStartedAt > publishUseBMLast + wpFZ.publishQoS) {
+	if(useBMLast != useModuleBM || wpFZ.CheckQoS(publishUseBMLast)) {
 		useBMLast = useModuleBM;
 		wpMqtt.mqttClient.publish(mqttTopicUseBM.c_str(), String(useModuleBM).c_str());
 		wpFZ.SendWSModule("useBM", useModuleBM);
 		publishUseBMLast = wpFZ.loopStartedAt;
 	}
-	if(useWindowLast != useModuleWindow || publishUseWindowLast == 0 ||
-		wpFZ.loopStartedAt > publishUseWindowLast + wpFZ.publishQoS) {
+	if(useWindowLast != useModuleWindow || wpFZ.CheckQoS(publishUseWindowLast)) {
 		useWindowLast = useModuleWindow;
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow.c_str(), String(useModuleWindow).c_str());
 		wpFZ.SendWSModule("useWindow", useModuleWindow);
 		publishUseWindowLast = wpFZ.loopStartedAt;
 	}
-	if(useRelaisLast != useModuleRelais || publishUseRelaisLast == 0 ||
-		wpFZ.loopStartedAt > publishUseRelaisLast + wpFZ.publishQoS) {
+	if(useRelaisLast != useModuleRelais || wpFZ.CheckQoS(publishUseRelaisLast)) {
 		useRelaisLast = useModuleRelais;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelais.c_str(), String(useModuleRelais).c_str());
 		wpFZ.SendWSModule("useRelais", useModuleRelais);
 		publishUseRelaisLast = wpFZ.loopStartedAt;
 	}
-	if(useRelaisShieldLast != useModuleRelaisShield || publishUseRelaisShieldLast == 0 ||
-		wpFZ.loopStartedAt > publishUseRelaisShieldLast + wpFZ.publishQoS) {
+	if(useRelaisShieldLast != useModuleRelaisShield || wpFZ.CheckQoS(publishUseRelaisShieldLast)) {
 		useRelaisShieldLast = useModuleRelaisShield;
 		wpMqtt.mqttClient.publish(mqttTopicUseRelaisShield.c_str(), String(useModuleRelaisShield).c_str());
 		wpFZ.SendWSModule("useRelaisShield", useModuleRelaisShield);
 		publishUseRelaisShieldLast = wpFZ.loopStartedAt;
 	}
-	if(useRainLast != useModuleRain || publishUseRainLast == 0 ||
-		wpFZ.loopStartedAt > publishUseRainLast + wpFZ.publishQoS) {
+	if(useRainLast != useModuleRain || wpFZ.CheckQoS(publishUseRainLast)) {
 		useRainLast = useModuleRain;
 		wpMqtt.mqttClient.publish(mqttTopicUseRain.c_str(), String(useModuleRain).c_str());
 		wpFZ.SendWSModule("useRain", useModuleRain);
 		publishUseRainLast = wpFZ.loopStartedAt;
 	}
-	if(useMoistureLast != useModuleMoisture || publishUseMoistureLast == 0 ||
-		wpFZ.loopStartedAt > publishUseMoistureLast + wpFZ.publishQoS) {
+	if(useMoistureLast != useModuleMoisture || wpFZ.CheckQoS(publishUseMoistureLast)) {
 		useMoistureLast = useModuleMoisture;
 		wpMqtt.mqttClient.publish(mqttTopicUseMoisture.c_str(), String(useModuleMoisture).c_str());
 		wpFZ.SendWSModule("useMoisture", useModuleMoisture);
 		publishUseMoistureLast = wpFZ.loopStartedAt;
 	}
-	if(useDistanceLast != useModuleDistance || publishUseDistanceLast == 0 ||
-		wpFZ.loopStartedAt > publishUseDistanceLast + wpFZ.publishQoS) {
+	if(useDistanceLast != useModuleDistance || wpFZ.CheckQoS(publishUseDistanceLast)) {
 		useDistanceLast = useModuleDistance;
 		wpMqtt.mqttClient.publish(mqttTopicUseDistance.c_str(), String(useModuleDistance).c_str());
 		wpFZ.SendWSModule("useDistance", useModuleDistance);
 		publishUseDistanceLast = wpFZ.loopStartedAt;
 	}
 	#if BUILDWITH == 1
-	if(useCwWwLast != useModuleCwWw || publishUseCwWwLast == 0 ||
-		wpFZ.loopStartedAt > publishUseCwWwLast + wpFZ.publishQoS) {
+	if(useCwWwLast != useModuleCwWw || wpFZ.CheckQoS(publishUseCwWwLast)) {
 		useCwWwLast = useModuleCwWw;
 		wpMqtt.mqttClient.publish(mqttTopicUseCwWw.c_str(), String(useModuleCwWw).c_str());
 		wpFZ.SendWSModule("useCwWw", useModuleCwWw);
 		publishUseCwWwLast = wpFZ.loopStartedAt;
 	}
-	if(useNeoPixelLast != useModuleNeoPixel || publishUseNeoPixelLast == 0 ||
-		wpFZ.loopStartedAt > publishUseNeoPixelLast + wpFZ.publishQoS) {
+	if(useNeoPixelLast != useModuleNeoPixel || wpFZ.CheckQoS(publishUseNeoPixelLast)) {
 		useNeoPixelLast = useModuleNeoPixel;
 		wpMqtt.mqttClient.publish(mqttTopicUseNeoPixel.c_str(), String(useModuleNeoPixel).c_str());
 		wpFZ.SendWSModule("useNeoPixel", useModuleNeoPixel);
 		publishUseNeoPixelLast = wpFZ.loopStartedAt;
 	}
-	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
-		wpFZ.loopStartedAt > publishUseAnalogOutLast + wpFZ.publishQoS) {
+	if(useAnalogOutLast != useModuleAnalogOut || wpFZ.CheckQoS(publishUseAnalogOutLast)) {
 		useAnalogOutLast = useModuleAnalogOut;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
 		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
 		publishUseAnalogOutLast = wpFZ.loopStartedAt;
 	}
-	if(useAnalogOut2Last != useModuleAnalogOut2 || publishUseAnalogOut2Last == 0 ||
-		wpFZ.loopStartedAt > publishUseAnalogOut2Last + wpFZ.publishQoS) {
+	if(useAnalogOut2Last != useModuleAnalogOut2 || wpFZ.CheckQoS(publishUseAnalogOut2Last)) {
 		useAnalogOut2Last = useModuleAnalogOut2;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut2.c_str(), String(useModuleAnalogOut2).c_str());
 		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
 		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
 	}
-	if(useClockLast != useModuleClock || publishUseClockLast == 0 ||
-		wpFZ.loopStartedAt > publishUseClockLast + wpFZ.publishQoS) {
+	if(useClockLast != useModuleClock || wpFZ.CheckQoS(publishUseClockLast)) {
 		useClockLast = useModuleClock;
 		wpMqtt.mqttClient.publish(mqttTopicUseClock.c_str(), String(useModuleClock).c_str());
 		wpFZ.SendWSModule("useClock", useModuleClock);
@@ -260,50 +246,43 @@ void helperModules::publishValues(bool force) {
 	}
 	#endif
 	#if BUILDWITH == 2
-	if(useAnalogOutLast != useModuleAnalogOut || publishUseAnalogOutLast == 0 ||
-		wpFZ.loopStartedAt > publishUseAnalogOutLast + wpFZ.publishQoS) {
+	if(useAnalogOutLast != useModuleAnalogOut || wpFZ.CheckQoS(publishUseAnalogOutLast)) {
 		useAnalogOutLast = useModuleAnalogOut;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
 		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
 		publishUseAnalogOutLast = wpFZ.loopStartedAt;
 	}
-	if(useAnalogOut2Last != useModuleAnalogOut2 || publishUseAnalogOut2Last == 0 ||
-		wpFZ.loopStartedAt > publishUseAnalogOut2Last + wpFZ.publishQoS) {
+	if(useAnalogOut2Last != useModuleAnalogOut2 || wpFZ.CheckQoS(publishUseAnalogOut2Last)) {
 		useAnalogOut2Last = useModuleAnalogOut2;
 		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut2.c_str(), String(useModuleAnalogOut2).c_str());
 		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
 		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
 	}
-	if(useRpmLast != useModuleRpm || publishUseRpmLast == 0 ||
-		wpFZ.loopStartedAt > publishUseRpmLast + wpFZ.publishQoS) {
+	if(useRpmLast != useModuleRpm || wpFZ.CheckQoS(publishUseRpmLast)) {
 		useRpmLast = useModuleRpm;
 		wpMqtt.mqttClient.publish(mqttTopicUseRpm.c_str(), String(useModuleRpm).c_str());
 		wpFZ.SendWSModule("useRpm", useModuleRpm);
 		publishUseRpmLast = wpFZ.loopStartedAt;
 	}
-	if(useImpulseCounterLast != useModuleImpulseCounter || publishUseImpulseCounterLast == 0 ||
-		wpFZ.loopStartedAt > publishUseImpulseCounterLast + wpFZ.publishQoS) {
+	if(useImpulseCounterLast != useModuleImpulseCounter || wpFZ.CheckQoS(publishUseImpulseCounterLast)) {
 		useImpulseCounterLast = useModuleImpulseCounter;
 		wpMqtt.mqttClient.publish(mqttTopicUseImpulseCounter.c_str(), String(useModuleImpulseCounter).c_str());
 		wpFZ.SendWSModule("useImpulseCounter", useModuleImpulseCounter);
 		publishUseImpulseCounterLast = wpFZ.loopStartedAt;
 	}
-	if(useWindow2Last != useModuleWindow2 || publishUseWindow2Last == 0 ||
-		wpFZ.loopStartedAt > publishUseWindow2Last + wpFZ.publishQoS) {
+	if(useWindow2Last != useModuleWindow2 || wpFZ.CheckQoS(publishUseWindow2Last)) {
 		useWindow2Last = useModuleWindow2;
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow2.c_str(), String(useModuleWindow2).c_str());
 		wpFZ.SendWSModule("useWindow2", useModuleWindow2);
 		publishUseWindow2Last = wpFZ.loopStartedAt;
 	}
-	if(useWindow3Last != useModuleWindow3 || publishUseWindow3Last == 0 ||
-		wpFZ.loopStartedAt > publishUseWindow3Last + wpFZ.publishQoS) {
+	if(useWindow3Last != useModuleWindow3 || wpFZ.CheckQoS(publishUseWindow3Last)) {
 		useWindow3Last = useModuleWindow3;
 		wpMqtt.mqttClient.publish(mqttTopicUseWindow3.c_str(), String(useModuleWindow3).c_str());
 		wpFZ.SendWSModule("useWindow3", useModuleWindow3);
 		publishUseWindow3Last = wpFZ.loopStartedAt;
 	}
-	if(useWeightLast != useModuleWeight || publishUseWeightLast == 0 ||
-		wpFZ.loopStartedAt > publishUseWeightLast + wpFZ.publishQoS) {
+	if(useWeightLast != useModuleWeight || wpFZ.CheckQoS(publishUseWeightLast)) {
 		useWeightLast = useModuleWeight;
 		wpMqtt.mqttClient.publish(mqttTopicUseWeight.c_str(), String(useModuleWeight).c_str());
 		wpFZ.SendWSModule("useWeight", useModuleWeight);
@@ -311,37 +290,39 @@ void helperModules::publishValues(bool force) {
 	}
 	#endif
 	#if BUILDWITH == 3
-	if(useUnderfloor1Last != useModuleUnderfloor1 || publishUseUnderfloor1Last == 0 ||
-		wpFZ.loopStartedAt > publishUseUnderfloor1Last + wpFZ.publishQoS) {
+	if(useUnderfloor1Last != useModuleUnderfloor1 || wpFZ.CheckQoS(publishUseUnderfloor1Last)) {
 		useUnderfloor1Last = useModuleUnderfloor1;
 		wpMqtt.mqttClient.publish(mqttTopicUseUnderfloor1.c_str(), String(useModuleUnderfloor1).c_str());
 		wpFZ.SendWSModule("useUnderfloor1", useModuleUnderfloor1);
 		publishUseUnderfloor1Last = wpFZ.loopStartedAt;
 	}
-	if(useUnderfloor2Last != useModuleUnderfloor2 || publishUseUnderfloor2Last == 0 ||
-		wpFZ.loopStartedAt > publishUseUnderfloor2Last + wpFZ.publishQoS) {
+	if(useUnderfloor2Last != useModuleUnderfloor2 || wpFZ.CheckQoS(publishUseUnderfloor2Last)) {
 		useUnderfloor2Last = useModuleUnderfloor2;
 		wpMqtt.mqttClient.publish(mqttTopicUseUnderfloor2.c_str(), String(useModuleUnderfloor2).c_str());
 		wpFZ.SendWSModule("useUnderfloor2", useModuleUnderfloor2);
 		publishUseUnderfloor2Last = wpFZ.loopStartedAt;
 	}
-	if(useUnderfloor3Last != useModuleUnderfloor3 || publishUseUnderfloor3Last == 0 ||
-		wpFZ.loopStartedAt > publishUseUnderfloor3Last + wpFZ.publishQoS) {
+	if(useUnderfloor3Last != useModuleUnderfloor3 || wpFZ.CheckQoS(publishUseUnderfloor3Last)) {
 		useUnderfloor3Last = useModuleUnderfloor3;
 		wpMqtt.mqttClient.publish(mqttTopicUseUnderfloor3.c_str(), String(useModuleUnderfloor3).c_str());
 		wpFZ.SendWSModule("useUnderfloor3", useModuleUnderfloor3);
 		publishUseUnderfloor3Last = wpFZ.loopStartedAt;
 	}
-	if(useUnderfloor4Last != useModuleUnderfloor4 || publishUseUnderfloor4Last == 0 ||
-		wpFZ.loopStartedAt > publishUseUnderfloor4Last + wpFZ.publishQoS) {
+	if(useUnderfloor4Last != useModuleUnderfloor4 || wpFZ.CheckQoS(publishUseUnderfloor4Last)) {
 		useUnderfloor4Last = useModuleUnderfloor4;
 		wpMqtt.mqttClient.publish(mqttTopicUseUnderfloor4.c_str(), String(useModuleUnderfloor4).c_str());
 		wpFZ.SendWSModule("useUnderfloor4", useModuleUnderfloor4);
 		publishUseUnderfloor4Last = wpFZ.loopStartedAt;
 	}
+	if(useDS18B20Last != useModuleDS18B20 || wpFZ.CheckQoS(publishUseDS18B20Last)) {
+		useDS18B20Last = useModuleDS18B20;
+		wpMqtt.mqttClient.publish(mqttTopicUseDS18B20.c_str(), String(useModuleDS18B20).c_str());
+		wpFZ.SendWSModule("useDS18B20", useModuleDS18B20);
+		publishUseDS18B20Last = wpFZ.loopStartedAt;
+	}
 	#endif
 	#if BUILDWITH == 4
-	if(useRFIDLast != useModuleRFID || publishUseRFIDLast == 0 ||
+	if(useRFIDLast != useModuleRFID || wpFZ.CheckQoS(publishUseRFIDLast == 0 ||
 		wpFZ.loopStartedAt > publishUseRFIDLast + wpFZ.publishQoS) {
 		useRFIDLast = useModuleRFID;
 		wpMqtt.mqttClient.publish(mqttTopicUseRFID.c_str(), String(useModuleRFID).c_str());
@@ -349,8 +330,7 @@ void helperModules::publishValues(bool force) {
 		publishUseRFIDLast = wpFZ.loopStartedAt;
 	}
 	#endif
-	if(DebugLast != Debug || publishDebugLast == 0 ||
-		wpFZ.loopStartedAt > publishDebugLast + wpFZ.publishQoS) {
+	if(DebugLast != Debug || wpFZ.CheckQoS(publishDebugLast)) {
 		DebugLast = Debug;
 		wpMqtt.mqttClient.publish(mqttTopicDebug.c_str(), String(Debug).c_str());
 		publishDebugLast = wpFZ.loopStartedAt;
@@ -390,6 +370,7 @@ void helperModules::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor3.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseUnderfloor4.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicUseDS18B20.c_str());
 	#endif
 	#if BUILDWITH == 4
 	wpMqtt.mqttClient.subscribe(mqttTopicUseRFID.c_str());
@@ -483,6 +464,9 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	}
 	if(strcmp(topic, mqttTopicUseUnderfloor4.c_str()) == 0) {
 		changemoduleUnderfloor4(readUseModule);
+	}
+	if(strcmp(topic, mqttTopicUseDS18B20.c_str()) == 0) {
+		changemoduleDS18B20(readUseModule);
 	}
 	#endif
 	#if BUILDWITH == 4
@@ -807,6 +791,17 @@ void helperModules::changemoduleUnderfloor4(bool newValue) {
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor4, String(useModuleUnderfloor4));
 	}
 }
+void helperModules::changemoduleDS18B20(bool newValue) {
+	if(useModuleDS18B20 != newValue) {
+		useModuleDS18B20 = newValue;
+		bitWrite(wpEEPROM.bitsModules3, wpEEPROM.bitUseDS18B20, useModuleDS18B20);
+		EEPROM.write(wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3);
+		EEPROM.commit();
+		wpFZ.restartRequired = true;
+		wpFZ.SendWSDebug("useDS18B20", useModuleDS18B20);
+		wpFZ.DebugcheckSubscribes(mqttTopicUseDS18B20, String(useModuleDS18B20));
+	}
+}
 #endif
 #if BUILDWITH == 4
 void helperModules::changemoduleRFID(bool newValue) {
@@ -917,6 +912,9 @@ void helperModules::publishAllSettings(bool force) {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishSettings(force);
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.publishSettings(force);
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1020,6 +1018,9 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.publishValues(force);
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.publishValues(force);
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1119,6 +1120,9 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.setSubscribes();
 	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.setSubscribes();
+	}
 	#endif
 	#if BUILDWITH == 4
 	if(wpModules.useModuleRFID) {
@@ -1215,6 +1219,9 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.checkSubscribes(topic, msg);
+	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.checkSubscribes(topic, msg);
 	}
 	#endif
 	#if BUILDWITH == 4

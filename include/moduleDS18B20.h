@@ -6,38 +6,39 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 10.11.2024                                                       #
+//# Date         : 21.11.2024                                                       #
 //#                                                                                 #
 //# Revision     : $Rev:: 228                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.h 228 2024-12-03 08:19:36Z                   $ #
+//# File-ID      : $Id:: moduleDS18B20.h 228 2024-12-03 08:19:36Z                 $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef moduleClock_h
-#define moduleClock_h
+#ifndef moduleDS18B20_h
+#define moduleDS18B20_h
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
-#include <Stepper.h>
+#include <deviceOneWire.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-class moduleClock {
+/// @brief  forward declaration
+class deviceOneWire;
+class moduleDS18B20 {
 	public:
-		moduleClock();
+		moduleDS18B20();
+		deviceOneWire* devices[10];
 		moduleBase* mb;
-		uint8 Pin1;
-		uint8 Pin2;
-		uint8 Pin3;
-		uint8 Pin4;
+		uint8 Pin;
+		uint8 count = 0;
+		OneWire* ow;
+		DallasTemperature * dt;
 
 		// section for define
-		Stepper* Motor;
 
 		// values
-		String mqttTopicSpr;
-		String mqttTopicRpm;
+		String mqttTopicCount;
 		// settings
-		String mqttTopicSetSpr;
-		String mqttTopicSetRpm;
 
 		// section to copy
 		void init();
@@ -56,36 +57,19 @@ class moduleClock {
 		bool Debug(bool debug);
 		uint32 CalcCycle();
 		uint32 CalcCycle(uint32 calcCycle);
-		uint16 GetSpr();
-		void SetSpr(uint16 StepsPerRound);
-		uint16 GetRpm();
-		void SetRpm(uint16 RoundsPerMinute);
-		void SetSteps(short StepsToRun);
-		void SimulateTime();
-		void SimulateTime(short h, short m, short s);
+		String scanBus();
 	private:
-		uint8 hour;
-		uint8 minute;
-		uint8 minuteLast;
-		uint8 second;
-		uint8 secondLast;
-		bool simulateTime;
-		short steps;
-		// Steps per Round
-		uint16 spr = 2048;
-		uint16 sprLast;
-		unsigned long publishSprLast;
-		// Rounds per Minute
-		uint16 rpm = 5;
-		uint16 rpmLast;
-		unsigned long publishRpmLast;
-		void calc();
+		uint8 countLast;
+		unsigned long publishCountLast;
 
+		void publishValue();
+		void calc();
+		void setCount();
 	
 		// section to config and copy
 		String ModuleName;
 		String SVNh = "$Rev: 228 $";
 };
-extern moduleClock wpClock;
+extern moduleDS18B20 wpDS18B20;
 
 #endif

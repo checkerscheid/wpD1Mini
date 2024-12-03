@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 226 2024-11-21 13:14:50Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 227 2024-12-03 08:19:05Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -70,6 +70,7 @@ class helperWebServer {
 		const uint8 cmdDebugWeight = 41;
 		const uint8 cmdDebugRFID = 42;
 		const uint8 cmdDebugClock = 43;
+		const uint8 cmdDebugDS18B20 = 44;
 		uint8 doDebugChange;
 
 		const uint8 cmdModuleDHT11 = 1;
@@ -98,6 +99,7 @@ class helperWebServer {
 		const uint8 cmdModuleWeight = 24;
 		const uint8 cmdModuleRFID = 25;
 		const uint8 cmdModuleClock = 26;
+		const uint8 cmdmoduleDS18B20 = 27;
 		uint8 doModuleChange;
 
 		uint8 doBlink;
@@ -130,7 +132,7 @@ class helperWebServer {
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 227 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;

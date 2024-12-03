@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 226 2024-11-21 13:14:50Z                        $ #
+//# File-ID      : $Id:: main.cpp 227 2024-12-03 08:19:05Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -115,6 +115,9 @@ void setup() {
 	}
 	if(wpModules.useModuleUnderfloor4) {
 		wpUnderfloor4.init();
+	}
+	if(wpModules.useModuleDS18B20) {
+		wpDS18B20.init();
 	}
 	#endif
 	#if BUILDWITH == 4
@@ -223,6 +226,9 @@ void loop() {
 		if(wpModules.useModuleUnderfloor4) {
 			wpUnderfloor4.cycle();
 		}
+		if(wpModules.useModuleDS18B20) {
+			wpDS18B20.cycle();
+		}
 		#endif
 		#if BUILDWITH == 4
 		if(wpModules.useModuleRFID) {
@@ -237,7 +243,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 226 $";
+	String SVN = "$Rev: 227 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -289,6 +295,7 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpUnderfloor2.getVersion());
 	buildChecker(v, wpUnderfloor3.getVersion());
 	buildChecker(v, wpUnderfloor4.getVersion());
+	buildChecker(v, wpDS18B20.getVersion());
 	buildChecker(v, wpRFID.getVersion());
 	buildChecker(v, wpClock.getVersion());
 	return v;
