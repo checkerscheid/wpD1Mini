@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 226 2024-11-21 13:14:50Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 227 2024-12-03 08:19:05Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -61,6 +61,7 @@ class helperEEPROM {
 		byte bitsModules3;
 		const uint8 bitUseRFID = 0; // include in bitsModules3
 		const uint8 bitUseClock = 1; // include in bitsModules3
+		const uint8 bitUseDS18B20 = 2; // include in bitsModules3
 
 //###################################################################################
 
@@ -77,6 +78,8 @@ class helperEEPROM {
 		const uint16 addrBitsDebugBasis1 = 5;
 		byte bitsDebugBasis1;
 		const uint8 bitDebugWiFi = 0; // include in bitsDebugBasis1
+
+		// const uint16 addrBitsDebugModules0 = 8; used in BitsDebugModules3
 
 //###################################################################################
 
@@ -112,6 +115,10 @@ class helperEEPROM {
 		const uint8 bitDebugWindow3 = 5; // include in bitsDebugModules2
 		const uint8 bitDebugWeight = 6; // include in bitsDebugModules2
 		const uint8 bitDebugClock = 7; // include in bitsDebugModules2
+
+		const uint16 addrBitsDebugModules3 = 8;
+		byte bitsDebugModules3;
+		const uint8 bitDebugDS18B20 = 0; // include in bitsDebugModules3
 
 //###################################################################################
 
@@ -207,6 +214,27 @@ class helperEEPROM {
 		const uint16 byteCalcCycleUnderfloor3 = 96;
 		const uint16 byteCalcCycleUnderfloor4 = 97;
 		const uint16 byteCalcCycleClock = 98;
+		const uint16 byteCalcCycleDS18B20 = 99;
+		const uint16 byteDS18B20Count = 100;
+
+// byte oneWire TempCorrection 200
+		const uint16 byteDS18B20Correction[10] = {
+			200, 201, 202, 203, 204, 205, 206, 207, 208, 209
+		};
+// byte oneWire Addresses from 300, each 8 byte
+		const uint16 byteDS18B20adr[10][8] = {
+			{300, 301, 302, 303, 304, 305, 306, 307},
+			{308, 309, 310, 311, 312, 313, 314, 315},
+			{316, 317, 318, 319, 320, 321, 322, 323},
+			{324, 325, 326, 327, 328, 329, 330, 331},
+			{332, 333, 334, 335, 336, 337, 338, 339},
+			{340, 341, 342, 343, 344, 345, 346, 347},
+			{348, 349, 350, 351, 352, 353, 354, 355},
+			{356, 357, 358, 359, 360, 361, 362, 363},
+			{364, 365, 366, 367, 368, 369, 370, 371},
+			{372, 373, 374, 375, 376, 377, 378, 379}
+		};
+
 // **********
 		const uint16 addrBootCounter = 496;
 		uint16 byteStartForString; // 500
@@ -230,7 +258,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 227 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;
