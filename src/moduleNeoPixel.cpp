@@ -611,6 +611,12 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 }
 void moduleNeoPixel::SetMode(uint8 newMode) {
 	modeCurrent = newMode;
+	targetCW = 0;
+	targetWW = 0;
+	if(brightness < 25) {
+		brightness = 25;
+		strip->setBrightness(brightness);
+	}
 	staticIsSet = false;
 }
 String moduleNeoPixel::getStripStatus() {
@@ -683,33 +689,53 @@ void moduleNeoPixel::calc() {
 		if(!staticIsSet) strip->setBrightness(brightness);
 		switch (modeCurrent) {
 			case ModeColorWipe:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				ColorWipeEffect(effectSpeed * 25); // Red
 				break;
 			case ModeTheaterChase:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				TheaterChaseEffect(effectSpeed * 25); // White
 				break;
 			case ModeRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowEffect(effectSpeed * 25); // Flowing rainbow cycle along the whole strip
 				break;
 			case ModeWheelRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowWheelEffect(effectSpeed * 25);
 				break;
 			case ModeRainbowTv:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowTvEffect(effectSpeed * 25);
 				break;
 			case ModeTheaterChaseRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				TheaterChaseRainbowEffect(effectSpeed * 25); // Rainbow-enhanced theaterChase variant
 				break;
 			case ModeRunner:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RunnerEffect(effectSpeed * 25); // Runner Red
 				break;
 			case ModeRandom:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RandomEffect(effectSpeed * 25); // Random
 				break;
 			case ModeOffRunner:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				OffRunnerEffect(25); // ModeOffRunner
 				break;
 			case ModeComplex:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				// nothing todo, but save LED state
 				break;
 			case ModeBlender:
