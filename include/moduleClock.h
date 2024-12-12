@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 10.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.h 228 2024-12-03 08:19:36Z                   $ #
+//# File-ID      : $Id:: moduleClock.h 229 2024-12-12 07:52:51Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleClock_h
@@ -115,7 +115,7 @@ class moduleClock {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 228 $";
+		String SVNh = "$Rev: 229 $";
 };
 extern moduleClock wpClock;
 
