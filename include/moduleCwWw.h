@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 230                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 221 2024-11-04 15:10:40Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 230 2024-12-12 07:56:47Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -115,7 +115,7 @@ class moduleCwWw {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 221 $";
+		String SVNh = "$Rev: 230 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;
