@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 227 2024-12-03 08:19:05Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 229 2024-12-12 07:52:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -45,6 +45,7 @@
 #include <moduleRpm.h>
 #include <moduleUnderfloor.h>
 #include <moduleWeight.h>
+#include <moduleDS18B20.h>
 #include <moduleRFID.h>
 #include <moduleClock.h>
 #include <moduleDS18B20.h>
@@ -165,7 +166,7 @@ class wpFreakaZone {
 	private:
 		const uint8 blinkStatusNothing = 0;
 		const uint8 blinkStatusStart = 1;
-		String SVNh = "$Rev: 227 $";
+		String SVNh = "$Rev: 229 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
