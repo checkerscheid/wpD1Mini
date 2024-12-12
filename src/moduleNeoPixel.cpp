@@ -501,18 +501,18 @@ String moduleNeoPixel::SetCW(uint cw) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-void moduleNeoPixel::setClock(short ph, short pm, short ps, uint8 hr, uint8 hg, uint8 hb, uint8 mr, uint8 mg, uint8 mb, uint8 sr, uint8 sg, uint8 sb) {
+void moduleNeoPixel::setClock(short ph, short pm, short ps) {
 	demoMode = false;
 	staticIsSet = true;
-	uint32_t quarter1 = strip->Color(16, 0, 8);
-	uint32_t quarter2 = strip->Color(8, 0, 8);
+	uint32_t quarter1 = strip->Color(wpClock.ColorQR, wpClock.ColorQG, wpClock.ColorQB);
+	uint32_t quarter2 = strip->Color(wpClock.Color5R, wpClock.Color5G, wpClock.Color5B);
 	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
 	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
-	uint32_t colorh3 = strip->Color(hr, hg, hb);
+	uint32_t colorh3 = strip->Color(wpClock.ColorHR, wpClock.ColorHG, wpClock.ColorHB);
 	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
 	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
-	uint32_t colorm3 = strip->Color(mr, mg, mb);
-	uint32_t colors = strip->Color(sr, sg, sb);
+	uint32_t colorm3 = strip->Color(wpClock.ColorMR, wpClock.ColorMG, wpClock.ColorMB);
+	uint32_t colors = strip->Color(wpClock.ColorSR, wpClock.ColorSG, wpClock.ColorSB);
 	//strip->clear();
 	strip->fill();
 	strip->setPixelColor(0, quarter1);

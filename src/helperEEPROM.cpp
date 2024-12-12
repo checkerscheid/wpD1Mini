@@ -349,6 +349,22 @@ void helperEEPROM::readVars() {
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
+	
+	wpClock.ColorHR = EEPROM.read(byteClockColorHR);
+	wpClock.ColorHG = EEPROM.read(byteClockColorHG);
+	wpClock.ColorHB = EEPROM.read(byteClockColorHB);
+	wpClock.ColorMR = EEPROM.read(byteClockColorMR);
+	wpClock.ColorMG = EEPROM.read(byteClockColorMG);
+	wpClock.ColorMB = EEPROM.read(byteClockColorMB);
+	wpClock.ColorSR = EEPROM.read(byteClockColorSR);
+	wpClock.ColorSG = EEPROM.read(byteClockColorSG);
+	wpClock.ColorSB = EEPROM.read(byteClockColorSB); 
+	wpClock.ColorQR = EEPROM.read(byteClockColorQR);
+	wpClock.ColorQG = EEPROM.read(byteClockColorQG);
+	wpClock.ColorQB = EEPROM.read(byteClockColorQB);
+	wpClock.Color5R = EEPROM.read(byteClockColor5R);
+	wpClock.Color5G = EEPROM.read(byteClockColor5G);
+	wpClock.Color5B = EEPROM.read(byteClockColor5B);
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);

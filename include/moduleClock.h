@@ -29,6 +29,26 @@ class moduleClock {
 		uint8 Pin3;
 		uint8 Pin4;
 
+		uint8 ColorHR;
+		uint8 ColorHG;
+		uint8 ColorHB;
+
+		uint8 ColorMR;
+		uint8 ColorMG;
+		uint8 ColorMB;
+
+		uint8 ColorSR;
+		uint8 ColorSG;
+		uint8 ColorSB;
+
+		uint8 ColorQR = 16;
+		uint8 ColorQG = 0;
+		uint8 ColorQB = 8;
+
+		uint8 Color5R = 8;
+		uint8 Color5G = 0;
+		uint8 Color5B = 8;
+
 		// section for define
 		Stepper* Motor;
 
@@ -61,6 +81,17 @@ class moduleClock {
 		uint16 GetRpm();
 		void SetRpm(uint16 RoundsPerMinute);
 		void SetSteps(short StepsToRun);
+		String GetColorH();
+		String GetColorM();
+		String GetColorS();
+		String GetColorQ();
+		String GetColor5();
+		void SetColorH(uint8 r, uint8 g, uint8 b);
+		void SetColorM(uint8 r, uint8 g, uint8 b);
+		void SetColorS(uint8 r, uint8 g, uint8 b);
+		void SetColorQ(uint8 r, uint8 g, uint8 b);
+		void SetColor5(uint8 r, uint8 g, uint8 b);
+
 		void SimulateTime();
 		void SimulateTime(short h, short m, short s);
 	private:

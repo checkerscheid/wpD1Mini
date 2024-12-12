@@ -45,6 +45,7 @@
 #include <moduleRpm.h>
 #include <moduleUnderfloor.h>
 #include <moduleWeight.h>
+#include <moduleDS18B20.h>
 #include <moduleRFID.h>
 #include <moduleClock.h>
 
