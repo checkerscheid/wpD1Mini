@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 227 2024-12-03 08:19:05Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 229 2024-12-12 07:52:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -216,6 +216,22 @@ class helperEEPROM {
 		const uint16 byteCalcCycleClock = 98;
 		const uint16 byteCalcCycleDS18B20 = 99;
 		const uint16 byteDS18B20Count = 100;
+		const uint16 byteClockColorHR = 101;
+		const uint16 byteClockColorHG = 102;
+		const uint16 byteClockColorHB = 103;
+		const uint16 byteClockColorMR = 104;
+		const uint16 byteClockColorMG = 105;
+		const uint16 byteClockColorMB = 106;
+		const uint16 byteClockColorSR = 107;
+		const uint16 byteClockColorSG = 108;
+		const uint16 byteClockColorSB = 109;
+		const uint16 byteClockColorQR = 110;
+		const uint16 byteClockColorQG = 111;
+		const uint16 byteClockColorQB = 112;
+		const uint16 byteClockColor5R = 113;
+		const uint16 byteClockColor5G = 114;
+		const uint16 byteClockColor5B = 115;
+
 
 // byte oneWire TempCorrection 200
 		const uint16 byteDS18B20Correction[10] = {
@@ -258,7 +274,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 227 $";
+		String SVNh = "$Rev: 229 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 227 2024-12-03 08:19:05Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 229 2024-12-12 07:52:51Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -39,7 +39,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 227 $";
+	String SVN = "$Rev: 229 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -251,7 +251,12 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyString(F("Pin1"), String(wpFZ.Pins[wpClock.Pin1])) + F(",") +
 				wpFZ.JsonKeyString(F("Pin2"), String(wpFZ.Pins[wpClock.Pin2])) + F(",") +
 				wpFZ.JsonKeyString(F("Pin3"), String(wpFZ.Pins[wpClock.Pin3])) + F(",") +
-				wpFZ.JsonKeyString(F("Pin4"), String(wpFZ.Pins[wpClock.Pin4])) +
+				wpFZ.JsonKeyString(F("Pin4"), String(wpFZ.Pins[wpClock.Pin4])) + F(",") +
+				wpFZ.JsonKeyValue(F("Hour"), wpClock.GetColorH()) + F(",") +
+				wpFZ.JsonKeyValue(F("Minute"), wpClock.GetColorM()) + F(",") +
+				wpFZ.JsonKeyValue(F("Second"), wpClock.GetColorS()) + F(",") +
+				wpFZ.JsonKeyValue(F("Quarter"), wpClock.GetColorQ()) + F(",") +
+				wpFZ.JsonKeyValue(F("Five"), wpClock.GetColor5()) +
 				F("},");
 		}
 		#endif
@@ -1114,6 +1119,56 @@ void helperWebServer::setupWebServer() {
 				} else {
 					wpClock.SimulateTime();
 					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found simulate Time deactivated"));
+				}
+				request->send(200, F("application/json"), wpFZ.jsonOK);
+			}
+			if(request->hasParam(F("cmd")) && request->getParam(F("cmd"))->value() == F("setColorH")) {
+				if(request->hasParam(F("r")) && request->hasParam(F("g")) && request->hasParam(F("b"))) {
+					short r = request->getParam(F("r"))->value().toInt();
+					short g = request->getParam(F("g"))->value().toInt();
+					short b = request->getParam(F("b"))->value().toInt();
+					wpClock.SetColorH(r, g, b);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Set Color Hour, R: ") + String(r) + F(", G: ") + String(g) + F(", B: ") + String(b));
+				}
+				request->send(200, F("application/json"), wpFZ.jsonOK);
+			}
+			if(request->hasParam(F("cmd")) && request->getParam(F("cmd"))->value() == F("setColorM")) {
+				if(request->hasParam(F("r")) && request->hasParam(F("g")) && request->hasParam(F("b"))) {
+					short r = request->getParam(F("r"))->value().toInt();
+					short g = request->getParam(F("g"))->value().toInt();
+					short b = request->getParam(F("b"))->value().toInt();
+					wpClock.SetColorM(r, g, b);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Set Color Minute, R: ") + String(r) + F(", G: ") + String(g) + F(", B: ") + String(b));
+				}
+				request->send(200, F("application/json"), wpFZ.jsonOK);
+			}
+			if(request->hasParam(F("cmd")) && request->getParam(F("cmd"))->value() == F("setColorS")) {
+				if(request->hasParam(F("r")) && request->hasParam(F("g")) && request->hasParam(F("b"))) {
+					short r = request->getParam(F("r"))->value().toInt();
+					short g = request->getParam(F("g"))->value().toInt();
+					short b = request->getParam(F("b"))->value().toInt();
+					wpClock.SetColorS(r, g, b);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Set Color Second, R: ") + String(r) + F(", G: ") + String(g) + F(", B: ") + String(b));
+				}
+				request->send(200, F("application/json"), wpFZ.jsonOK);
+			}
+			if(request->hasParam(F("cmd")) && request->getParam(F("cmd"))->value() == F("setColorQ")) {
+				if(request->hasParam(F("r")) && request->hasParam(F("g")) && request->hasParam(F("b"))) {
+					short r = request->getParam(F("r"))->value().toInt();
+					short g = request->getParam(F("g"))->value().toInt();
+					short b = request->getParam(F("b"))->value().toInt();
+					wpClock.SetColorQ(r, g, b);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Set Color Quarter, R: ") + String(r) + F(", G: ") + String(g) + F(", B: ") + String(b));
+				}
+				request->send(200, F("application/json"), wpFZ.jsonOK);
+			}
+			if(request->hasParam(F("cmd")) && request->getParam(F("cmd"))->value() == F("setColor5")) {
+				if(request->hasParam(F("r")) && request->hasParam(F("g")) && request->hasParam(F("b"))) {
+					short r = request->getParam(F("r"))->value().toInt();
+					short g = request->getParam(F("g"))->value().toInt();
+					short b = request->getParam(F("b"))->value().toInt();
+					wpClock.SetColor5(r, g, b);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Set Color Five, R: ") + String(r) + F(", G: ") + String(g) + F(", B: ") + String(b));
 				}
 				request->send(200, F("application/json"), wpFZ.jsonOK);
 			}

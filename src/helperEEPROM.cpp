@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 227 2024-12-03 08:19:05Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 229 2024-12-12 07:52:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -42,7 +42,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 227 $";
+	String SVN = "$Rev: 229 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -349,6 +349,22 @@ void helperEEPROM::readVars() {
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
 	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
+	
+	wpClock.ColorHR = EEPROM.read(byteClockColorHR);
+	wpClock.ColorHG = EEPROM.read(byteClockColorHG);
+	wpClock.ColorHB = EEPROM.read(byteClockColorHB);
+	wpClock.ColorMR = EEPROM.read(byteClockColorMR);
+	wpClock.ColorMG = EEPROM.read(byteClockColorMG);
+	wpClock.ColorMB = EEPROM.read(byteClockColorMB);
+	wpClock.ColorSR = EEPROM.read(byteClockColorSR);
+	wpClock.ColorSG = EEPROM.read(byteClockColorSG);
+	wpClock.ColorSB = EEPROM.read(byteClockColorSB); 
+	wpClock.ColorQR = EEPROM.read(byteClockColorQR);
+	wpClock.ColorQG = EEPROM.read(byteClockColorQG);
+	wpClock.ColorQB = EEPROM.read(byteClockColorQB);
+	wpClock.Color5R = EEPROM.read(byteClockColor5R);
+	wpClock.Color5G = EEPROM.read(byteClockColor5G);
+	wpClock.Color5B = EEPROM.read(byteClockColor5B);
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);

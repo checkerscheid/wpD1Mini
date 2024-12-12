@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 228 2024-12-03 08:19:36Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 229 2024-12-12 07:52:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -130,7 +130,7 @@ void moduleClock::calc() {
 		double pixel = him * pg / gm;
 		short p = round(pixel);
 		
-		wpNeoPixel.setClock(60 + p, minute, second, 255, 255, 255, 0, 255, 255, 0, 0, 255);
+		wpNeoPixel.setClock(60 + p, minute, second);
 		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "Clock::calc", "set Minute: " + String(minute));
 			wpFZ.DebugWS(wpFZ.strDEBUG, "Clock::calc", "set Hour: " + String(hour) +
@@ -199,6 +199,89 @@ void moduleClock::SetRpm(uint16 RoundsPerMinute) {
 void moduleClock::SetSteps(short StepsToRun) {
 	steps = StepsToRun;
 }
+
+String moduleClock::GetColorH() {
+	return F("{") + 
+	wpFZ.JsonKeyValue("R", String(ColorHR)) + F(",") +
+	wpFZ.JsonKeyValue("G", String(ColorHG)) + F(",") +
+	wpFZ.JsonKeyValue("B", String(ColorHB)) + F("}");
+}
+String moduleClock::GetColorM() {
+	return F("{") + 
+	wpFZ.JsonKeyValue("R", String(ColorMR)) + F(",") +
+	wpFZ.JsonKeyValue("G", String(ColorMG)) + F(",") +
+	wpFZ.JsonKeyValue("B", String(ColorMB)) + F("}");
+}
+String moduleClock::GetColorS() {
+	return F("{") + 
+	wpFZ.JsonKeyValue("R", String(ColorSR)) + F(",") +
+	wpFZ.JsonKeyValue("G", String(ColorSG)) + F(",") +
+	wpFZ.JsonKeyValue("B", String(ColorSB)) + F("}");
+}
+String moduleClock::GetColorQ() {
+	return F("{") + 
+	wpFZ.JsonKeyValue("R", String(ColorQR)) + F(",") +
+	wpFZ.JsonKeyValue("G", String(ColorQG)) + F(",") +
+	wpFZ.JsonKeyValue("B", String(ColorQB)) + F("}");
+}
+String moduleClock::GetColor5() {
+	return F("{") + 
+	wpFZ.JsonKeyValue("R", String(Color5R)) + F(",") +
+	wpFZ.JsonKeyValue("G", String(Color5G)) + F(",") +
+	wpFZ.JsonKeyValue("B", String(Color5B)) + F("}");
+}
+
+void moduleClock::SetColorH(uint8 r, uint8 g, uint8 b) {
+	ColorHR = r;
+	EEPROM.write(wpEEPROM.byteClockColorHR, r);
+	ColorHG = g;
+	EEPROM.write(wpEEPROM.byteClockColorHG, g);
+	ColorHB = b;
+	EEPROM.write(wpEEPROM.byteClockColorHB, b);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorH());
+}
+void moduleClock::SetColorM(uint8 r, uint8 g, uint8 b) {
+	ColorMR = r;
+	EEPROM.write(wpEEPROM.byteClockColorMR, r);
+	ColorMG = g;
+	EEPROM.write(wpEEPROM.byteClockColorMG, g);
+	ColorMB = b;
+	EEPROM.write(wpEEPROM.byteClockColorMB, b);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorM());
+}
+void moduleClock::SetColorS(uint8 r, uint8 g, uint8 b) {
+	ColorSR = r;
+	EEPROM.write(wpEEPROM.byteClockColorSR, r);
+	ColorSG = g;
+	EEPROM.write(wpEEPROM.byteClockColorSG, g);
+	ColorSB = b;
+	EEPROM.write(wpEEPROM.byteClockColorSB, b);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorS());
+}
+void moduleClock::SetColorQ(uint8 r, uint8 g, uint8 b) {
+	ColorQR = r;
+	EEPROM.write(wpEEPROM.byteClockColorQR, r);
+	ColorQG = g;
+	EEPROM.write(wpEEPROM.byteClockColorQG, g);
+	ColorQB = b;
+	EEPROM.write(wpEEPROM.byteClockColorQB, b);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorQ());
+}
+void moduleClock::SetColor5(uint8 r, uint8 g, uint8 b) {
+	Color5R = r;
+	EEPROM.write(wpEEPROM.byteClockColor5R, r);
+	Color5G = g;
+	EEPROM.write(wpEEPROM.byteClockColor5G, g);
+	Color5B = b;
+	EEPROM.write(wpEEPROM.byteClockColor5B, b);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColor5());
+}
+
 void moduleClock::SimulateTime() {
 	simulateTime = false;
 }
@@ -212,7 +295,7 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 228 $";
+	String SVN = "$Rev: 229 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
