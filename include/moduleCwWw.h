@@ -25,9 +25,12 @@ class moduleCwWw {
 		moduleBase* mb;
 		
 		static const uint8 ModeStatic = 0;
-		static const uint8 ModeSmooth = 4;
+		static const uint8 ModePulse = 4;
 		static const uint8 ModeWwPulse = 5;
 		static const uint8 ModeCwPulse = 6;
+		static const uint8 ModeSmooth = 7;
+		static const uint8 ModeWwSmooth = 8;
+		static const uint8 ModeCwSmooth = 9;
 		
 		static const uint8 ModeBlender = 90; //CW, WW
 
@@ -36,10 +39,12 @@ class moduleCwWw {
 		String mqttTopicMaxPercent;
 		String mqttTopicModeName;
 		String mqttTopicSleep;
+		String mqttTopicSpeed;
 		// settings
 		// commands
 		String mqttTopicSetMode;
 		String mqttTopicSetSleep;
+		String mqttTopicSetSpeed;
 
 		// section to copy
 		void init();
@@ -58,6 +63,7 @@ class moduleCwWw {
 		bool Debug(bool debug);
 
 		String GetModeName(uint8 actualMode);
+		void SetEffectSpeed(uint8 speed);
 		void SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
@@ -90,19 +96,27 @@ class moduleCwWw {
 
 		uint8 targetWW;
 		uint8 targetCW;
+		float winkelWW;
+		float winkelCW;
+		uint8 effectSpeed;
+
 		void calcDuration();
 		void BlenderEffect();
 		bool BlenderWWEffect();
 		bool BlenderCWEffect();
 		bool smoothDirection;
-		void SmoothEffect();
+		void PulseEffect();
 		void WwPulseEffect();
 		void CwPulseEffect();
+		void SmoothEffect();
+		void WwSmoothEffect();
+		void CwSmoothEffect();
 		uint8 GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;
 		String SVNh = "$Rev: 221 $";
+		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;
 

@@ -943,6 +943,16 @@ void helperWebServer::setupWebServer() {
 				wpWebServer.setBlink();
 			}
 		});
+		webServer.on("/setCwWwEffectSpeed", HTTP_GET, [](AsyncWebServerRequest *request) {
+			uint8 effectSpeed = 0;
+			if(request->hasParam(F("effectSpeed"))) {
+				effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
+				wpCwWw.SetEffectSpeed(effectSpeed);
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWwEffectSpeed, '" + String(effectSpeed) + "'");
+			}
+			request->send(200, F("application/json"), wpFZ.jsonOK);
+			wpWebServer.setBlink();
+		});
 		webServer.on("/setCwWwSleep", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint seconds = 0;
 			if(request->hasParam(F("sleep"))) {
