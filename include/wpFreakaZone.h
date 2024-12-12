@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 226 2024-11-21 13:14:50Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 227 2024-12-03 08:19:05Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -48,6 +48,8 @@
 #include <moduleDS18B20.h>
 #include <moduleRFID.h>
 #include <moduleClock.h>
+#include <moduleDS18B20.h>
+
 
 
 #define NTP_SERVER "172.17.1.1"
@@ -89,7 +91,8 @@ class wpFreakaZone {
 		const String jsonOK = "{\"erg\":\"S_OK\"}";
 		const String jsonERROR = "{\"erg\":\"S_ERROR\"}";
 
-		const char* Pins[18] = {"D3", "TX", "D4", "RX", "D2", "D1",
+		const char* Pins[18] = {
+			"D3", "TX", "D4", "RX", "D2", "D1",
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
 
@@ -163,7 +166,7 @@ class wpFreakaZone {
 	private:
 		const uint8 blinkStatusNothing = 0;
 		const uint8 blinkStatusStart = 1;
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 227 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
