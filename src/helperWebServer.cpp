@@ -227,7 +227,7 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue(F("ValueR"), String(wpNeoPixel.GetValueR())) + F(",") +
 				wpFZ.JsonKeyValue(F("ValueG"), String(wpNeoPixel.GetValueG())) + F(",") +
 				wpFZ.JsonKeyValue(F("ValueB"), String(wpNeoPixel.GetValueB())) + F(",") +
-				wpFZ.JsonKeyValue(F("Brightness"), String(wpNeoPixel.GetBrightness())) + F(",") +
+				//wpFZ.JsonKeyValue(F("Brightness"), String(wpNeoPixel.GetBrightness())) + F(",") +
 				wpFZ.JsonKeyValue(F("PixelCount"), String(wpNeoPixel.GetPixelCount())) + F(",") +
 				wpFZ.JsonKeyValue(F("isRGB"), wpNeoPixel.GetRGB() ? "true" : "false") +
 				F("},");
@@ -1012,16 +1012,16 @@ void helperWebServer::setupWebServer() {
 			request->send(200, F("application/json"), wpFZ.jsonOK);
 			wpWebServer.setBlink();
 		});
-		webServer.on("/setNeoPixelBrightness", HTTP_GET, [](AsyncWebServerRequest *request) {
-			byte b = 0;
-			if(request->hasParam(F("brightness"))) {
-				b = request->getParam(F("brightness"))->value().toInt();
-				wpNeoPixel.SetBrightness(b);
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelBrightness, '" + String(b) + "'");
-			}
-			request->send(200, F("application/json"), wpFZ.jsonOK);
-			wpWebServer.setBlink();
-		});
+		// webServer.on("/setNeoPixelBrightness", HTTP_GET, [](AsyncWebServerRequest *request) {
+		// 	byte b = 0;
+		// 	if(request->hasParam(F("brightness"))) {
+		// 		b = request->getParam(F("brightness"))->value().toInt();
+		// 		wpNeoPixel.SetBrightness(b);
+		// 		wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelBrightness, '" + String(b) + "'");
+		// 	}
+		// 	request->send(200, F("application/json"), wpFZ.jsonOK);
+		// 	wpWebServer.setBlink();
+		// });
 		webServer.on("/setNeoPixelEffectSpeed", HTTP_GET, [](AsyncWebServerRequest *request) {
 			uint8 effectSpeed = 0;
 			if(request->hasParam(F("effectSpeed"))) {

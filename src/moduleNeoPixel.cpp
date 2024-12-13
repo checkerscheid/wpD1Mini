@@ -95,7 +95,7 @@ void moduleNeoPixel::init() {
 	mqttTopicValueR = wpFZ.DeviceName + "/" + ModuleName + "/R";
 	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
-	mqttTopicBrightness = wpFZ.DeviceName + "/" + ModuleName + "/Brightness";
+	//mqttTopicBrightness = wpFZ.DeviceName + "/" + ModuleName + "/Brightness";
 	mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
@@ -108,7 +108,7 @@ void moduleNeoPixel::init() {
 	mqttTopicSetR = wpFZ.DeviceName + "/settings/" + ModuleName + "/R";
 	mqttTopicSetG = wpFZ.DeviceName + "/settings/" + ModuleName + "/G";
 	mqttTopicSetB = wpFZ.DeviceName + "/settings/" + ModuleName + "/B";
-	mqttTopicSetBrightness = wpFZ.DeviceName + "/settings/" + ModuleName + "/Brightness";
+	//mqttTopicSetBrightness = wpFZ.DeviceName + "/settings/" + ModuleName + "/Brightness";
 	mqttTopicSetDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetEffectSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetEffectSpeed";
@@ -137,7 +137,7 @@ void moduleNeoPixel::init() {
 
 	strip->begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
 	strip->show();            // Turn OFF all pixels ASAP
-	strip->setBrightness(brightness); // Set BRIGHTNESS to about 1/5 (max = 255)
+	//strip->setBrightness(brightness); // Set BRIGHTNESS to about 1/5 (max = 255)
 }
 
 // loop() function -- runs repeatedly as long as board is on ---------------
@@ -169,7 +169,7 @@ void moduleNeoPixel::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetR.c_str(), String(valueR).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetG.c_str(), String(valueG).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetB.c_str(), String(valueB).c_str());
-		wpMqtt.mqttClient.publish(mqttTopicSetBrightness.c_str(), String(brightness).c_str());
+		//wpMqtt.mqttClient.publish(mqttTopicSetBrightness.c_str(), String(brightness).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetDemoMode.c_str(), String(demoMode).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetMode.c_str(), String(modeCurrent).c_str());
 		wpMqtt.mqttClient.publish(mqttTopicSetEffectSpeed.c_str(), String(effectSpeed).c_str());
@@ -193,7 +193,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		publishEffectSpeedLast = 0;
 		publishUseBorderLast = 0;
 	}
-	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || brightnessLast != brightness ||
+	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB || // brightnessLast != brightness ||
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
 	}
@@ -252,7 +252,7 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetG.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetB.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetBrightness.c_str());
+	//wpMqtt.mqttClient.subscribe(mqttTopicSetBrightness.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetDemoMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
@@ -285,13 +285,13 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetB, String(valueB));
 		}
 	}
-	if(strcmp(topic, mqttTopicSetBrightness.c_str()) == 0) {
-		uint8 readBrightness = msg.toInt();
-		if(brightness != readBrightness) {
-			SetBrightness(readBrightness);
-			wpFZ.DebugcheckSubscribes(mqttTopicSetBrightness, String(brightness));
-		}
-	}
+	// if(strcmp(topic, mqttTopicSetBrightness.c_str()) == 0) {
+	// 	uint8 readBrightness = msg.toInt();
+	// 	if(brightness != readBrightness) {
+	// 		SetBrightness(readBrightness);
+	// 		wpFZ.DebugcheckSubscribes(mqttTopicSetBrightness, String(brightness));
+	// 	}
+	// }
 	if(strcmp(topic, mqttTopicSetDemoMode.c_str()) == 0) {
 		bool readDemoMode = msg.toInt();
 		if(demoMode != readDemoMode) {
@@ -380,19 +380,19 @@ void moduleNeoPixel::SetValueB(uint8 b) {
 	modeCurrent = ModeBlender;
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBlue", "Write Blue to EEPROM");
 }
-void moduleNeoPixel::InitBrightness(uint8 br) {
-	brightness = br;
-	staticIsSet = false;
-}
-uint8 moduleNeoPixel::GetBrightness() { return brightness; }
-void moduleNeoPixel::SetBrightness(uint8 br) {
-	targetBr = br;
-	EEPROM.write(wpEEPROM.byteNeoPixelBrightness, br);
-	EEPROM.commit();
-	staticIsSet = false;
-	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBrightness", "Write Brightness to EEPROM");
-}
+// void moduleNeoPixel::InitBrightness(uint8 br) {
+// 	brightness = br;
+// 	staticIsSet = false;
+// }
+// uint8 moduleNeoPixel::GetBrightness() { return brightness; }
+// void moduleNeoPixel::SetBrightness(uint8 br) {
+// 	targetBr = br;
+// 	EEPROM.write(wpEEPROM.byteNeoPixelBrightness, br);
+// 	EEPROM.commit();
+// 	staticIsSet = false;
+// 	modeCurrent = ModeBlender;
+// 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBrightness", "Write Brightness to EEPROM");
+// }
 void moduleNeoPixel::SetEffectSpeed(uint8 es) {
 	if(es > 20) es = 20;
 	if(es < 1) es = 1;
@@ -433,15 +433,15 @@ String moduleNeoPixel::SetOn() {
 	targetR = EEPROM.read(wpEEPROM.byteNeoPixelValueR);
 	targetG = EEPROM.read(wpEEPROM.byteNeoPixelValueG);
 	targetB = EEPROM.read(wpEEPROM.byteNeoPixelValueB);
-	targetBr = EEPROM.read(wpEEPROM.byteNeoPixelBrightness);
+	//targetBr = EEPROM.read(wpEEPROM.byteNeoPixelBrightness);
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
 	String returns = "{" +
 		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
-		wpFZ.JsonKeyValue("B", String(valueB)) + "," +
-		wpFZ.JsonKeyValue("Brightness", String(brightness));
+		wpFZ.JsonKeyValue("B", String(valueB)); // + "," +
+		//wpFZ.JsonKeyValue("Brightness", String(brightness));
 	if(wpModules.useModuleAnalogOut) {
 		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
 	}
@@ -456,15 +456,15 @@ String moduleNeoPixel::SetOff() {
 	targetR = 0;
 	targetG = 0;
 	targetB = 0;
-	targetBr = 0;
+	//targetBr = 0;
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
 	String returns = "{" +
 		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
-		wpFZ.JsonKeyValue("B", String(valueB)) + "," +
-		wpFZ.JsonKeyValue("Brightness", String(brightness));
+		wpFZ.JsonKeyValue("B", String(valueB)); // + "," +
+		//wpFZ.JsonKeyValue("Brightness", String(brightness));
 	if(wpModules.useModuleAnalogOut) {
 		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
 	}
@@ -613,10 +613,10 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 	modeCurrent = newMode;
 	targetCW = 0;
 	targetWW = 0;
-	if(brightness < 25) {
-		brightness = 25;
-		strip->setBrightness(brightness);
-	}
+	// if(brightness < 25) {
+	// 	brightness = 25;
+	// 	strip->setBrightness(brightness);
+	// }
 	staticIsSet = false;
 }
 String moduleNeoPixel::getStripStatus() {
@@ -652,16 +652,16 @@ void moduleNeoPixel::publishValue() {
 	valueRLast = valueR;
 	valueGLast = valueG;
 	valueBLast = valueB;
-	brightnessLast = brightness;
+	//brightnessLast = brightness;
 	wpMqtt.mqttClient.publish(mqttTopicValueR.c_str(), String(valueR).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueG.c_str(), String(valueG).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicValueB.c_str(), String(valueB).c_str());
-	wpMqtt.mqttClient.publish(mqttTopicBrightness.c_str(), String(brightness).c_str());
+	//wpMqtt.mqttClient.publish(mqttTopicBrightness.c_str(), String(brightness).c_str());
 	if(wpMqtt.Debug) {
 		mb->printPublishValueDebug(mqttTopicValueR, String(valueR));
 		mb->printPublishValueDebug(mqttTopicValueG, String(valueG));
 		mb->printPublishValueDebug(mqttTopicValueB, String(valueB));
-		mb->printPublishValueDebug(mqttTopicBrightness, String(brightness));
+		//mb->printPublishValueDebug(mqttTopicBrightness, String(brightness));
 	}
 	publishValueLast = wpFZ.loopStartedAt;
 }
@@ -686,7 +686,7 @@ void moduleNeoPixel::calc() {
 	}
 	if(wpFZ.loopStartedAt - pixelPrevious >= pixelInterval) {        //  Check for expired time
 		pixelPrevious = wpFZ.loopStartedAt;                            //  Run current frame
-		if(!staticIsSet) strip->setBrightness(brightness);
+		//if(!staticIsSet) strip->setBrightness(brightness);
 		switch (modeCurrent) {
 			case ModeColorWipe:
 				BlenderWWEffect();
@@ -757,13 +757,13 @@ void moduleNeoPixel::BlenderEffect() {
 	bool bre = BlenderREffect();
 	bool bge = BlenderGEffect();
 	bool bbe = BlenderBEffect();
-	bool bbre = BlenderBrightnessEffect();
+	//bool bbre = BlenderBrightnessEffect();
 	bool bwwe = BlenderWWEffect();
 	bool bcwe = BlenderCWEffect();
 	strip->fill(strip->Color(valueR, valueG, valueB));
-	strip->setBrightness(brightness);
+	//strip->setBrightness(brightness);
 	strip->show();
-	if(bre && bge && bbe && bbre && bwwe && bcwe) {
+	if(bre && bge && bbe /* && bbre */ && bwwe && bcwe) {
 		modeCurrent = ModeStatic;
 	}
 }
@@ -887,30 +887,30 @@ bool moduleNeoPixel::BlenderBEffect() {
 	}
 	return valueB == targetB;
 }
-bool moduleNeoPixel::BlenderBrightnessEffect() {
-	if(brightness != targetBr) {
-		if(brightness <= targetBr) {
-			if(brightness + steps <= targetBr) {
-				brightness += steps;
-			} else {
-				brightness = targetBr;
-			}
-			if(brightness >= targetBr) {
-				brightness = targetBr;
-			}
-		} else {
-			if(brightness - steps >= targetBr) {
-				brightness -= steps;
-			} else {
-				brightness = targetBr;
-			}
-			if(brightness <= targetBr) {
-				brightness = targetBr;
-			}
-		}
-	}
-	return brightness == targetBr;
-}
+// bool moduleNeoPixel::BlenderBrightnessEffect() {
+// 	if(brightness != targetBr) {
+// 		if(brightness <= targetBr) {
+// 			if(brightness + steps <= targetBr) {
+// 				brightness += steps;
+// 			} else {
+// 				brightness = targetBr;
+// 			}
+// 			if(brightness >= targetBr) {
+// 				brightness = targetBr;
+// 			}
+// 		} else {
+// 			if(brightness - steps >= targetBr) {
+// 				brightness -= steps;
+// 			} else {
+// 				brightness = targetBr;
+// 			}
+// 			if(brightness <= targetBr) {
+// 				brightness = targetBr;
+// 			}
+// 		}
+// 	}
+// 	return brightness == targetBr;
+// }
 // Some functions of our own for creating animated effects -----------------
 
 // Fill strip pixels one after another with a color. Strip is NOT cleared
@@ -1080,7 +1080,7 @@ void moduleNeoPixel::OffRunnerEffect(uint wait) {
 			wpAnalogOut2.handValueSet = 0;
 		}
 	}
-	if(brightness <= 0 &&
+	if(//brightness <= 0 &&
 		(wpModules.useModuleAnalogOut && wpAnalogOut.handValueSet <= 0) &&
 		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.handValueSet <= 0)) {            //  Loop the pattern from the first LED
 		staticIsSet = true;
@@ -1093,7 +1093,7 @@ void moduleNeoPixel::StaticEffect() {
 	demoMode = false;
 	modeCurrent = ModeStatic;
 	strip->fill(color);
-	strip->setBrightness(brightness);
+	// strip->setBrightness(brightness);
 	strip->show();
 	if(useBorder) {
 		if(lastBorderSend == 0 || lastBorderSend + 5000 < wpFZ.loopStartedAt) {
@@ -1130,14 +1130,17 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 	String target = "http://172.17.80.163/color/0?"
 		"red=" + String((uint8_t)(c >> 16)) + "&"
 		"green=" + String((uint8_t)(c >>  8)) + "&"
-		"blue=" + String((uint8_t)(c >>  0)) + "&"
-		"gain=" + String((uint8_t)(round(brightness / 2.55)));
+		"blue=" + String((uint8_t)(c >>  0)); // + "&"
+		//"gain=" + String((uint8_t)(round(brightness / 2.55)));
 	wpFZ.sendRawRest(target);
 	lastBorderSend = wpFZ.loopStartedAt;
 }
 uint8 moduleNeoPixel::GetMaxPercent() {
 	uint8 returns = 0;
-	returns = brightness > returns ? brightness : returns;
+	//returns = brightness > returns ? brightness : returns;
+	returns = valueR > returns ? valueR : returns;
+	returns = valueG > returns ? valueG : returns;
+	returns = valueB > returns ? valueB : returns;
 	if(wpModules.useModuleAnalogOut)
 		returns = wpAnalogOut.handValue > returns ? wpAnalogOut.handValue : returns;
 	if(wpModules.useModuleAnalogOut2)
