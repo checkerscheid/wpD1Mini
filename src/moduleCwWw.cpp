@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 230                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 221 2024-11-04 15:10:40Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 230 2024-12-12 07:56:47Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -28,6 +28,7 @@ moduleCwWw::moduleCwWw() {
 }
 void moduleCwWw::init() {
 	sleep = 0;
+	effectSpeed = 1;
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
@@ -35,14 +36,18 @@ void moduleCwWw::init() {
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
+	mqttTopicSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
 	// settings
 	// commands
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
+	mqttTopicSetSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/EffectSpeed";
 
 	manual = false;
 	maxPercent = 0;
 	publishModeLast = 0;
+	winkelWW = 0.0;
+	winkelCW = 0.0;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugCwWw);
@@ -142,6 +147,11 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 		wpFZ.DebugcheckSubscribes(mqttTopicSleep, String(readSleep));
 	}
 	mb->checkSubscribes(topic, msg);
+}
+void moduleCwWw::SetEffectSpeed(uint8 speed) {
+	if(speed < 1) speed = 1;
+	if(speed > 9) speed = 9;
+	effectSpeed = speed;
 }
 void moduleCwWw::SetSleep(uint seconds) {
 	if(seconds == 0) {
@@ -251,14 +261,23 @@ String moduleCwWw::GetModeName(uint8 actualMode) {
 		case ModeBlender:
 			returns = "Mode Blender";
 			break;
-		case ModeSmooth:
-			returns = "Mode Smooth";
+		case ModePulse:
+			returns = "Mode Pulse";
 			break;
 		case ModeWwPulse:
 			returns = "Mode WW Pulse";
 			break;
 		case ModeCwPulse:
 			returns = "Mode CW Pulse";
+			break;
+		case ModeSmooth:
+			returns = "Mode Smooth";
+			break;
+		case ModeWwSmooth:
+			returns = "Mode WW Smooth";
+			break;
+		case ModeCwSmooth:
+			returns = "Mode CW Smooth";
 			break;
 		default:
 			returns = String(actualMode);
@@ -288,14 +307,23 @@ void moduleCwWw::calc() {
 			case ModeBlender:
 				BlenderEffect(); // ModeOn
 				break;
-			case ModeSmooth:
-				SmoothEffect();
+			case ModePulse:
+				PulseEffect();
 				break;
 			case ModeWwPulse:
 				WwPulseEffect();
 				break;
 			case ModeCwPulse:
 				CwPulseEffect();
+				break;
+			case ModeSmooth:
+				SmoothEffect();
+				break;
+			case ModeWwSmooth:
+				WwSmoothEffect();
+				break;
+			case ModeCwSmooth:
+				CwSmoothEffect();
 				break;
 			default:
 				modeCurrent = ModeStatic;
@@ -360,8 +388,7 @@ void moduleCwWw::BlenderEffect() {
 		modeCurrent = ModeStatic;
 	}
 }
-
-void moduleCwWw::SmoothEffect() {
+void moduleCwWw::PulseEffect() {
 	if(wpAnalogOut.handValueSet >= 100 ||
 		wpAnalogOut2.handValueSet <= 0) {
 		wpAnalogOut.handValueSet = 100;
@@ -375,11 +402,11 @@ void moduleCwWw::SmoothEffect() {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.handValueSet -= 1;
-		wpAnalogOut2.handValueSet += 1;
+		wpAnalogOut.handValueSet -= effectSpeed;
+		wpAnalogOut2.handValueSet += effectSpeed;
 	} else {
-		wpAnalogOut.handValueSet += 1;
-		wpAnalogOut2.handValueSet -= 1;
+		wpAnalogOut.handValueSet += effectSpeed;
+		wpAnalogOut2.handValueSet -= effectSpeed;
 	}
 }
 
@@ -391,9 +418,9 @@ void moduleCwWw::WwPulseEffect() {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.handValueSet -= 1;
+		wpAnalogOut.handValueSet -= effectSpeed;
 	} else {
-		wpAnalogOut.handValueSet += 1;
+		wpAnalogOut.handValueSet += effectSpeed;
 	}
 }
 void moduleCwWw::CwPulseEffect() {
@@ -404,10 +431,42 @@ void moduleCwWw::CwPulseEffect() {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut2.handValueSet -= 1;
+		wpAnalogOut2.handValueSet -= effectSpeed;
 	} else {
-		wpAnalogOut2.handValueSet += 1;
+		wpAnalogOut2.handValueSet += effectSpeed;
 	}
+}
+void moduleCwWw::SmoothEffect() {
+	winkelWW += effectSpeed / 100.0;
+	winkelCW += effectSpeed / 100.0;
+	if(winkelWW > 2 * pi || winkelCW > 3 * pi) {
+		winkelWW = 0;
+		winkelCW = pi;
+	}
+	float sinWW = sin(winkelWW);
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "sinWW: " + String(sinWW) + " von Bogen: " + String(winkelWW));
+	wpAnalogOut.handValueSet = (int)(50 * (sinWW + 1));
+	float sinCW = sin(winkelCW);
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "sinCW: " + String(sinCW) + " von Bogen: " + String(winkelCW));
+	wpAnalogOut2.handValueSet = (int)(50 * (sinCW + 1));
+}
+void moduleCwWw::WwSmoothEffect() {
+	if(winkelWW >= 2 * pi) {
+		winkelWW = 0;
+	}
+	winkelWW += effectSpeed / 100.0;
+	float sinWW = sin(winkelWW);
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "sinWW: " + String(sinWW) + " von Bogen: " + String(winkelWW));
+	wpAnalogOut.handValueSet = (int)(50 * (sinWW + 1));
+}
+void moduleCwWw::CwSmoothEffect() {
+	if(winkelCW >= 2 * pi) {
+		winkelCW = 0;
+	}
+	winkelCW += effectSpeed / 100.0;
+	float sinCW = sin(winkelCW);
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "sinCW: " + String(sinCW) + " von Bogen: " + String(winkelCW));
+	wpAnalogOut2.handValueSet = (int)(50 * (sinCW + 1));
 }
 uint8 moduleCwWw::GetMaxPercent() {
 	uint8 returns = 0;
@@ -419,7 +478,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 221 $";
+	String SVN = "$Rev: 230 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 226 2024-11-21 13:14:50Z                 $ #
+//# File-ID      : $Id:: helperModules.h 227 2024-12-03 08:19:05Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -44,6 +44,7 @@ class helperModules {
 		bool useModuleUnderfloor2 = false;
 		bool useModuleUnderfloor3 = false;
 		bool useModuleUnderfloor4 = false;
+		bool useModuleDS18B20 = false;
 		bool useModuleWindow2 = false;
 		bool useModuleWindow3 = false;
 		bool useModuleWeight = false;
@@ -84,6 +85,7 @@ class helperModules {
 		String mqttTopicUseUnderfloor2;
 		String mqttTopicUseUnderfloor3;
 		String mqttTopicUseUnderfloor4;
+		String mqttTopicUseDS18B20;
 		#endif
 		#if BUILDWITH == 4
 		String mqttTopicUseRFID;
@@ -135,6 +137,7 @@ class helperModules {
 		void changemoduleUnderfloor2(bool newValue);
 		void changemoduleUnderfloor3(bool newValue);
 		void changemoduleUnderfloor4(bool newValue);
+		void changemoduleDS18B20(bool newValue);
 		#endif
 		#if BUILDWITH == 4
 		void changemoduleRFID(bool newValue);
@@ -147,7 +150,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 227 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
@@ -196,6 +199,8 @@ class helperModules {
 		unsigned long publishUseUnderfloor3Last;
 		bool useUnderfloor4Last;
 		unsigned long publishUseUnderfloor4Last;
+		bool useDS18B20Last;
+		unsigned long publishUseDS18B20Last;
 		bool useRFIDLast;
 		unsigned long publishUseRFIDLast;
 		bool useClockLast;

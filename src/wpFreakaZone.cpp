@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 224                                                     $ #
+//# Revision     : $Rev:: 227                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 224 2024-11-14 05:35:15Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 227 2024-12-03 08:19:05Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -57,7 +57,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 224 $";
+	String SVN = "$Rev: 227 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -310,11 +310,12 @@ void wpFreakaZone::DebugWS(String typ, String func, String msg) {
 void wpFreakaZone::SendWSModule(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setModule\",\"msg\":" + msg + "}");
-	DebugWS(strDEBUG, "changeDebug", "new value" + htmlId + ": debug = " + value);
+	DebugWS(strDEBUG, "sendUseModul", "send ws: id = " + htmlId + ", useModul = " + value);
 }
 void wpFreakaZone::SendWSDebug(String htmlId, bool value) {
 	String msg = "{\"id\":\"" + htmlId + "\",\"value\":" + (value ? "true" : "false") + "}";
 	wpWebServer.webSocket.textAll("{\"cmd\":\"setDebug\",\"msg\":" + msg + "}");
+	DebugWS(strDEBUG, "sendDebug", "send ws: id = " + htmlId + ", debug = " + value);
 }
 void wpFreakaZone::SendRestartRequired(String msg) {
 	wpWebServer.webSocket.textAll("{\"cmd\":\"restartRequired\",\"msg\":" + msg + "}");

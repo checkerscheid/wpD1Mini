@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 226 2024-11-21 13:14:50Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 229 2024-12-12 07:52:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -112,7 +112,7 @@ class moduleNeoPixel {
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
-		void setClock(short ph, short pm, short ps, uint8 hr, uint8 hg, uint8 hb, uint8 mr, uint8 mg, uint8 mb, uint8 sr, uint8 sg, uint8 sb);
+		void setClock(short ph, short pm, short ps);
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
@@ -199,7 +199,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 226 $";
+		String SVNh = "$Rev: 229 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

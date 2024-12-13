@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 229                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 226 2024-11-21 13:14:50Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 229 2024-12-12 07:52:51Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -501,18 +501,18 @@ String moduleNeoPixel::SetCW(uint cw) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-void moduleNeoPixel::setClock(short ph, short pm, short ps, uint8 hr, uint8 hg, uint8 hb, uint8 mr, uint8 mg, uint8 mb, uint8 sr, uint8 sg, uint8 sb) {
+void moduleNeoPixel::setClock(short ph, short pm, short ps) {
 	demoMode = false;
 	staticIsSet = true;
-	uint32_t quarter1 = strip->Color(16, 0, 8);
-	uint32_t quarter2 = strip->Color(8, 0, 8);
+	uint32_t quarter1 = strip->Color(wpClock.ColorQR, wpClock.ColorQG, wpClock.ColorQB);
+	uint32_t quarter2 = strip->Color(wpClock.Color5R, wpClock.Color5G, wpClock.Color5B);
 	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
 	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
-	uint32_t colorh3 = strip->Color(hr, hg, hb);
+	uint32_t colorh3 = strip->Color(wpClock.ColorHR, wpClock.ColorHG, wpClock.ColorHB);
 	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
 	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
-	uint32_t colorm3 = strip->Color(mr, mg, mb);
-	uint32_t colors = strip->Color(sr, sg, sb);
+	uint32_t colorm3 = strip->Color(wpClock.ColorMR, wpClock.ColorMG, wpClock.ColorMB);
+	uint32_t colors = strip->Color(wpClock.ColorSR, wpClock.ColorSG, wpClock.ColorSB);
 	//strip->clear();
 	strip->fill();
 	strip->setPixelColor(0, quarter1);
@@ -611,6 +611,12 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 }
 void moduleNeoPixel::SetMode(uint8 newMode) {
 	modeCurrent = newMode;
+	targetCW = 0;
+	targetWW = 0;
+	if(brightness < 25) {
+		brightness = 25;
+		strip->setBrightness(brightness);
+	}
 	staticIsSet = false;
 }
 String moduleNeoPixel::getStripStatus() {
@@ -683,33 +689,53 @@ void moduleNeoPixel::calc() {
 		if(!staticIsSet) strip->setBrightness(brightness);
 		switch (modeCurrent) {
 			case ModeColorWipe:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				ColorWipeEffect(effectSpeed * 25); // Red
 				break;
 			case ModeTheaterChase:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				TheaterChaseEffect(effectSpeed * 25); // White
 				break;
 			case ModeRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowEffect(effectSpeed * 25); // Flowing rainbow cycle along the whole strip
 				break;
 			case ModeWheelRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowWheelEffect(effectSpeed * 25);
 				break;
 			case ModeRainbowTv:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RainbowTvEffect(effectSpeed * 25);
 				break;
 			case ModeTheaterChaseRainbow:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				TheaterChaseRainbowEffect(effectSpeed * 25); // Rainbow-enhanced theaterChase variant
 				break;
 			case ModeRunner:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RunnerEffect(effectSpeed * 25); // Runner Red
 				break;
 			case ModeRandom:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				RandomEffect(effectSpeed * 25); // Random
 				break;
 			case ModeOffRunner:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				OffRunnerEffect(25); // ModeOffRunner
 				break;
 			case ModeComplex:
+				BlenderWWEffect();
+				BlenderCWEffect();
 				// nothing todo, but save LED state
 				break;
 			case ModeBlender:
@@ -1122,7 +1148,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 226 $";
+	String SVN = "$Rev: 229 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
