@@ -24,23 +24,7 @@ class moduleAnalogOut {
 	public:
 		moduleAnalogOut();
 		moduleBase* mb;
-		PID* pid;
 		uint8 Pin;
-
-		// section for define
-		uint8 output;
-		uint hardwareoutMax;
-		uint8 autoValue;
-		uint8 handValue;
-		bool handError;
-		bool handSet = false;
-		uint8 handValueSet = 0;
-		static const uint8 pidTypeHeating = 0;
-		static const uint8 pidTypeAirCondition = 1;
-		double Kp = 1.0;
-		double Tv = 0.2;
-		double Tn = 0.0;
-		double SetPoint = 75.0;
 
 		// values
 		String mqttTopicOut;
@@ -78,21 +62,49 @@ class moduleAnalogOut {
 		bool Debug(bool debug);
 		uint32 CalcCycle();
 		uint32 CalcCycle(uint32 calcCycle);
-		uint8 GetSetPoint();
 		void InitKp(short kp);
+		double GetKp();
 		void InitTv(short tv);
+		double GetTv();
 		void InitTn(short tn);
+		double GetTn();
 		void InitSetPoint(short setpoint);
+		uint8 GetSetPoint();
 		void resetPID();
-		void SetHandValue(uint8 val);
 		String SetSetPoint(double setpoint);
 		String SetTopicTempUrl(String topic);
+
+		void InitHand(bool hand);
+
+		void InitHandValue(uint8 value);
+		void SetHandValue(uint8 value);
+		void SetHandValueProzent(uint8 value);
+		uint8 GetHandValue();
+
+		bool GetHandError();
+
 		void InitPidType(uint8 t);
 		String SetPidType(uint8 t);
 		String GetPidType();
+
 	private:
+		PID* pid;
+		// section for define
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
+		bool handError;
+		bool handSet = false;
+		uint8 handValueSet = 0;
+		static const uint8 pidTypeHeating = 0;
+		static const uint8 pidTypeAirCondition = 1;
+		double Kp = 1.0;
+		double Tv = 0.2;
+		double Tn = 0.0;
+		double SetPoint = 75.0;
+
 		const double minOutput = 0.0;
-		const double maxOutput = 100.0;
+		const double maxOutput = 255.0;
 		uint8 outputLast;
 		unsigned long publishOutputLast;
 		uint8 autoValueLast;
