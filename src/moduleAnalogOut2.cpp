@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 212                                                     $ #
+//# Revision     : $Rev:: 231                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 212 2024-10-16 09:30:20Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 231 2024-12-14 03:25:15Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -201,7 +201,7 @@ void moduleAnalogOut2::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 212 $";
+	String SVN = "$Rev: 231 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 231                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 219 2024-10-29 10:36:32Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 231 2024-12-14 03:25:15Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -131,7 +131,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 219 $";
+		String SVNh = "$Rev: 231 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 };

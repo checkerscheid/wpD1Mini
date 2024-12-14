@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 231                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 207 2024-10-07 12:59:22Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 231 2024-12-14 03:25:15Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -84,7 +84,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 231 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 
