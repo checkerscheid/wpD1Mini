@@ -53,7 +53,7 @@ class moduleNeoPixel {
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
-		String mqttTopicBrightness;
+		//String mqttTopicBrightness;
 		String mqttTopicStatus;
 		String mqttTopicDemoMode;
 		String mqttTopicModeName;
@@ -66,7 +66,7 @@ class moduleNeoPixel {
 		String mqttTopicSetR;
 		String mqttTopicSetG;
 		String mqttTopicSetB;
-		String mqttTopicSetBrightness;
+		//String mqttTopicSetBrightness;
 		String mqttTopicSetDemoMode;
 		String mqttTopicSetMode;
 		String mqttTopicSetEffectSpeed;
@@ -99,9 +99,9 @@ class moduleNeoPixel {
 		void InitValueB(uint8 b);
 		uint8 GetValueB();
 		void SetValueB(uint8 b);
-		void InitBrightness(uint8 bn);
-		uint8 GetBrightness();
-		void SetBrightness(uint8 bn);
+		//void InitBrightness(uint8 bn);
+		//uint8 GetBrightness();
+		//void SetBrightness(uint8 bn);
 		void SetEffectSpeed(uint8 es);
 		void ComplexEffect(uint pixel, byte r, byte g, byte b);
 		void ComplexEffect(uint pixel, uint32_t color);
@@ -136,8 +136,8 @@ class moduleNeoPixel {
 		uint8 valueGLast;
 		uint8 valueB = 0;
 		uint8 valueBLast;
-		uint8 brightness = 0;
-		uint8 brightnessLast;
+		//uint8 brightness = 0;
+		//uint8 brightnessLast;
 		String status;
 		String statusLast;
 		unsigned long publishStatusLast;
@@ -172,7 +172,7 @@ class moduleNeoPixel {
 		uint8 targetR;
 		uint8 targetG;
 		uint8 targetB;
-		uint8 targetBr;
+		//uint8 targetBr;
 		uint8 targetWW;
 		uint8 targetCW;
 		void calcDuration();
@@ -182,7 +182,7 @@ class moduleNeoPixel {
 		bool BlenderREffect();
 		bool BlenderGEffect();
 		bool BlenderBEffect();
-		bool BlenderBrightnessEffect();
+		//bool BlenderBrightnessEffect();
 
 		void ColorWipeEffect(uint wait);
 		void TheaterChaseEffect(uint wait);

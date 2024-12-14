@@ -341,7 +341,6 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
-	wpNeoPixel.InitBrightness(EEPROM.read(byteNeoPixelBrightness));
 	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
 	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));

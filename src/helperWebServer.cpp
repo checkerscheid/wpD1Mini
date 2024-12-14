@@ -227,7 +227,6 @@ void helperWebServer::setupWebServer() {
 				wpFZ.JsonKeyValue(F("ValueR"), String(wpNeoPixel.GetValueR())) + F(",") +
 				wpFZ.JsonKeyValue(F("ValueG"), String(wpNeoPixel.GetValueG())) + F(",") +
 				wpFZ.JsonKeyValue(F("ValueB"), String(wpNeoPixel.GetValueB())) + F(",") +
-				wpFZ.JsonKeyValue(F("Brightness"), String(wpNeoPixel.GetBrightness())) + F(",") +
 				wpFZ.JsonKeyValue(F("PixelCount"), String(wpNeoPixel.GetPixelCount())) + F(",") +
 				wpFZ.JsonKeyValue(F("isRGB"), wpNeoPixel.GetRGB() ? "true" : "false") +
 				F("},");

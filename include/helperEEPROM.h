@@ -175,7 +175,7 @@ class helperEEPROM {
 		const uint16 byteNeoPixelValueR = 41;
 		const uint16 byteNeoPixelValueG = 42;
 		const uint16 byteNeoPixelValueB = 43;
-		const uint16 byteNeoPixelBrightness = 44;
+		
 		const uint16 byteCalcCycleAnalogOut = 45;
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
