@@ -238,8 +238,8 @@ String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 	}
 }
 void moduleCwWw::calcDuration() {
-	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
-	uint8 distCW = abs(wpAnalogOut2.handValue - targetCW);
+	uint8 distWW = abs(wpAnalogOut.GetHandValue() - targetWW);
+	uint8 distCW = abs(wpAnalogOut2.GetHandValue() - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 50.0);
 	steps = s == 0 ? 1 : s;
@@ -334,52 +334,52 @@ void moduleCwWw::calc() {
 }
 
 bool moduleCwWw::BlenderWWEffect() {
-	if(wpAnalogOut.handValueSet != targetWW) {
-		if(wpAnalogOut.handValueSet <= targetWW) {
-			if(wpAnalogOut.handValueSet + steps <= targetWW) {
-				wpAnalogOut.handValueSet += steps;
+	if(wpAnalogOut.GetHandValue() != targetWW) {
+		if(wpAnalogOut.GetHandValue() <= targetWW) {
+			if(wpAnalogOut.GetHandValue() + steps <= targetWW) {
+				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + steps);
 			} else {
-				wpAnalogOut.handValueSet = targetWW;
+				wpAnalogOut.InitHandValue(targetWW);
 			}
-			if(wpAnalogOut.handValueSet >= targetWW) {
-				wpAnalogOut.handValueSet = targetWW;
+			if(wpAnalogOut.GetHandValue() >= targetWW) {
+				wpAnalogOut.InitHandValue(targetWW);
 			}
 		} else {
-			if(wpAnalogOut.handValueSet - steps >= targetWW) {
-				wpAnalogOut.handValueSet -= steps;
+			if(wpAnalogOut.GetHandValue() - steps >= targetWW) {
+				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
 			} else {
-				wpAnalogOut.handValueSet = targetWW;
+				wpAnalogOut.InitHandValue(targetWW);
 			}
-			if(wpAnalogOut.handValueSet <= targetWW) {
-				wpAnalogOut.handValueSet = targetWW;
+			if(wpAnalogOut.GetHandValue() <= targetWW) {
+				wpAnalogOut.InitHandValue(targetWW);
 			}
 		}
 	}
-	return wpAnalogOut.handValueSet == targetWW;
+	return wpAnalogOut.GetHandValue() == targetWW;
 }
 bool moduleCwWw::BlenderCWEffect() {
-	if(wpAnalogOut2.handValueSet != targetCW) {
-		if(wpAnalogOut2.handValueSet <= targetCW) {
-			if(wpAnalogOut2.handValueSet + steps <= targetCW) {
-				wpAnalogOut2.handValueSet += steps;
+	if(wpAnalogOut2.GetHandValue() != targetCW) {
+		if(wpAnalogOut2.GetHandValue() <= targetCW) {
+			if(wpAnalogOut2.GetHandValue() + steps <= targetCW) {
+				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + steps);
 			} else {
-				wpAnalogOut2.handValueSet = targetCW;
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
-			if(wpAnalogOut2.handValueSet >= targetCW) {
-				wpAnalogOut2.handValueSet = targetCW;
+			if(wpAnalogOut2.GetHandValue() >= targetCW) {
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
 		} else {
-			if(wpAnalogOut2.handValueSet - steps >= targetCW) {
-				wpAnalogOut2.handValueSet -= steps;
+			if(wpAnalogOut2.GetHandValue() - steps >= targetCW) {
+				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
 			} else {
-				wpAnalogOut2.handValueSet = targetCW;
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
-			if(wpAnalogOut2.handValueSet <= targetCW) {
-				wpAnalogOut2.handValueSet = targetCW;
+			if(wpAnalogOut2.GetHandValue() <= targetCW) {
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
 		}
 	}
-	return wpAnalogOut2.handValueSet == targetCW;
+	return wpAnalogOut2.GetHandValue() == targetCW;
 }
 void moduleCwWw::BlenderEffect() {
 	bool bwwe = BlenderWWEffect();
@@ -389,51 +389,51 @@ void moduleCwWw::BlenderEffect() {
 	}
 }
 void moduleCwWw::PulseEffect() {
-	if(wpAnalogOut.handValueSet >= 100 ||
-		wpAnalogOut2.handValueSet <= 0) {
-		wpAnalogOut.handValueSet = 100;
-		wpAnalogOut2.handValueSet = 0;
+	if(wpAnalogOut.GetHandValue() >= 255 ||
+		wpAnalogOut2.GetHandValue() <= 0) {
+		wpAnalogOut.InitHandValue(255);
+		wpAnalogOut2.InitHandValue(0);
 		smoothDirection = true;
 	}
-	if(wpAnalogOut.handValueSet <= 0 ||
-		wpAnalogOut2.handValueSet >= 100) {
-		wpAnalogOut.handValueSet = 0;
-		wpAnalogOut2.handValueSet = 100;
+	if(wpAnalogOut.GetHandValue() <= 0 ||
+		wpAnalogOut2.GetHandValue() >= 255) {
+		wpAnalogOut.InitHandValue(0);
+		wpAnalogOut2.InitHandValue(255);
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.handValueSet -= effectSpeed;
-		wpAnalogOut2.handValueSet += effectSpeed;
+		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - effectSpeed);
+		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + effectSpeed);
 	} else {
-		wpAnalogOut.handValueSet += effectSpeed;
-		wpAnalogOut2.handValueSet -= effectSpeed;
+		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + effectSpeed);
+		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - effectSpeed);
 	}
 }
 
 void moduleCwWw::WwPulseEffect() {
-	if(wpAnalogOut.handValueSet >= 100) {
+	if(wpAnalogOut.GetHandValue() >= 255) {
 		smoothDirection = true;
 	}
-	if(wpAnalogOut.handValueSet <= 10) {
+	if(wpAnalogOut.GetHandValue() <= 10) {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.handValueSet -= effectSpeed;
+		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - effectSpeed);
 	} else {
-		wpAnalogOut.handValueSet += effectSpeed;
+		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + effectSpeed);
 	}
 }
 void moduleCwWw::CwPulseEffect() {
-	if(wpAnalogOut2.handValueSet >= 100) {
+	if(wpAnalogOut2.GetHandValue() >= 100) {
 		smoothDirection = true;
 	}
-	if(wpAnalogOut2.handValueSet <= 10) {
+	if(wpAnalogOut2.GetHandValue() <= 10) {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut2.handValueSet -= effectSpeed;
+		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - effectSpeed);
 	} else {
-		wpAnalogOut2.handValueSet += effectSpeed;
+		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + effectSpeed);
 	}
 }
 void moduleCwWw::SmoothEffect() {
@@ -444,34 +444,38 @@ void moduleCwWw::SmoothEffect() {
 		winkelCW = pi;
 	}
 	float sinWW = sin(winkelWW);
-	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "sinWW: " + String(sinWW) + " von Bogen: " + String(winkelWW));
-	wpAnalogOut.handValueSet = (int)(50 * (sinWW + 1));
+	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
+	wpAnalogOut.InitHandValue(sinWWByte);
 	float sinCW = sin(winkelCW);
-	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "sinCW: " + String(sinCW) + " von Bogen: " + String(winkelCW));
-	wpAnalogOut2.handValueSet = (int)(50 * (sinCW + 1));
+	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
+	wpAnalogOut2.InitHandValue(sinCWByte);
 }
 void moduleCwWw::WwSmoothEffect() {
+	winkelWW += effectSpeed / 100.0;
 	if(winkelWW >= 2 * pi) {
 		winkelWW = 0;
 	}
-	winkelWW += effectSpeed / 100.0;
 	float sinWW = sin(winkelWW);
-	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "sinWW: " + String(sinWW) + " von Bogen: " + String(winkelWW));
-	wpAnalogOut.handValueSet = (int)(50 * (sinWW + 1));
+	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
+	wpAnalogOut.InitHandValue(sinWWByte);
 }
 void moduleCwWw::CwSmoothEffect() {
+	winkelCW += effectSpeed / 100.0;
 	if(winkelCW >= 2 * pi) {
 		winkelCW = 0;
 	}
-	winkelCW += effectSpeed / 100.0;
 	float sinCW = sin(winkelCW);
-	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "sinCW: " + String(sinCW) + " von Bogen: " + String(winkelCW));
-	wpAnalogOut2.handValueSet = (int)(50 * (sinCW + 1));
+	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
+	wpAnalogOut2.InitHandValue(sinCWByte);
 }
 uint8 moduleCwWw::GetMaxPercent() {
 	uint8 returns = 0;
-	returns = wpAnalogOut.handValue > returns ? wpAnalogOut.handValue : returns;
-	returns = wpAnalogOut2.handValue > returns ? wpAnalogOut2.handValue : returns;
+	returns = wpAnalogOut.GetHandValue() > returns ? wpAnalogOut.GetHandValue() : returns;
+	returns = wpAnalogOut2.GetHandValue() > returns ? wpAnalogOut2.GetHandValue() : returns;
 	return returns;
 }
 //###################################################################################

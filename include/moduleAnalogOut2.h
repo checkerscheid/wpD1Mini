@@ -25,15 +25,6 @@ class moduleAnalogOut2 {
 		moduleBase* mb;
 		uint8 Pin;
 
-		// section for define
-		uint8 output;
-		uint hardwareoutMax;
-		uint8 autoValue;
-		uint8 handValue;
-		bool handError;
-		bool handSet = false;
-		uint8 handValueSet = 0;
-
 		// values
 		String mqttTopicOut;
 		String mqttTopicAutoValue;
@@ -59,8 +50,26 @@ class moduleAnalogOut2 {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		void SetHandValueSet(uint8 val);
+
+		void InitHand(bool hand);
+
+		void InitHandValue(uint8 value);
+		void SetHandValue(uint8 value);
+		void SetHandValueProzent(uint8 value);
+		uint8 GetHandValue();
+
+		bool GetHandError();
+
 	private:
+
+		// section for define
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
+		bool handError;
+		bool handSet = false;
+		uint8 handValueSet = 0;
+
 		uint8 outputLast;
 		unsigned long publishOutputLast;
 		uint8 autoValueLast;

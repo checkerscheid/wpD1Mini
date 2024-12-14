@@ -28,7 +28,6 @@ void moduleAnalogOut2::init() {
 
 	pinMode(Pin, OUTPUT);
 	output = 0;
-	hardwareoutMax = 255;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
@@ -92,17 +91,17 @@ void moduleAnalogOut2::publishValues(bool force) {
 	}
 	if(autoValueLast != autoValue || wpFZ.CheckQoS(publishAutoValueLast)) {
 		autoValueLast = autoValue;
-		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String(autoValue).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String((uint8)(autoValue / 2.55)).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("AnalogOut2 Auto Value", String(autoValue));
+			mb->printPublishValueDebug("AnalogOut2 Auto Value", String((uint8)(autoValue / 2.55)));
 		}
 		publishAutoValueLast = wpFZ.loopStartedAt;
 	}
 	if(handValueLast != handValue || wpFZ.CheckQoS(publishHandValueLast)) {
 		handValueLast = handValue;
-		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String(handValue).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String((uint8)(handValue / 2.55)).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("AnalogOut2 Hand Value", String(handValue));
+			mb->printPublishValueDebug("AnalogOut2 Hand Value", String((uint8)(handValue / 2.55)));
 		}
 		publishHandValueLast = wpFZ.loopStartedAt;
 	}
@@ -135,36 +134,49 @@ void moduleAnalogOut2::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8 readSetHandValue = msg.toInt();
+		uint8 readSetHandValue = (uint8)(msg.toInt() * 2.55);
 		if(handValueSet != readSetHandValue) {
-			SetHandValueSet(readSetHandValue);
+			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleAnalogOut2::SetHandValueSet(uint8 val) {
-	handValueSet = val;
+void moduleAnalogOut2::InitHand(bool hand) {
+	handSet = hand;
+}
+void moduleAnalogOut2::InitHandValue(uint8 value) {
+	handValueSet = value;
+}
+void moduleAnalogOut2::SetHandValue(uint8 value) {
+	handValueSet = value;
 	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, handValueSet);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut2::handValueSet' = " + String(handValueSet));
+}
+void moduleAnalogOut2::SetHandValueProzent(uint8 value) {
+	SetHandValue((uint8)(value * 2.55));
+}
+uint8 moduleAnalogOut2::GetHandValue() {
+	return handValue;
+}
+bool moduleAnalogOut2::GetHandError() {
+	return handError;
 }
 
 //###################################################################################
 // private
 //###################################################################################
 void moduleAnalogOut2::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String((uint8)(output / 2.55)).c_str());
 	outputLast = output;
 	if(wpMqtt.Debug) {
-		mb->printPublishValueDebug("AnalogOut2", String(output));
+		mb->printPublishValueDebug("AnalogOut2", String((uint8)(output / 2.55)));
 	}
 	publishOutputLast = wpFZ.loopStartedAt;
 }
 
 void moduleAnalogOut2::calc() {
-	if(handValueSet < 0) handValueSet = 0;
-	if(handValueSet > 100) handValueSet = 100;
 	if(handValue != handValueSet) {
 		handValue = handValueSet;
 	}
@@ -181,7 +193,7 @@ void moduleAnalogOut2::calc() {
 			output = autoValue;
 		}
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
+	uint16 hardwareout = output;
 	analogWrite(Pin, hardwareout);
 }
 

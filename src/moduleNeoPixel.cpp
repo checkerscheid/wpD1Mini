@@ -416,10 +416,10 @@ String moduleNeoPixel::SetOn() {
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
 		wpFZ.JsonKeyValue("B", String(valueB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
 	}
 	return returns += "}";
 }
@@ -438,16 +438,16 @@ String moduleNeoPixel::SetOff() {
 		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
 		wpFZ.JsonKeyValue("B", String(valueB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.handValue));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.handValue));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
 	}
 	return returns += "}";
 }
 String moduleNeoPixel::SetWW(uint ww) {
 	//targetCW = wpAnalogOut2.handValue;
-	if(ww + targetCW > 100) ww = 100 - targetCW;
+	if(ww + targetCW > 255) ww = 255 - targetCW;
 	targetWW = ww;
 	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
 	EEPROM.commit();
@@ -461,7 +461,7 @@ String moduleNeoPixel::SetWW(uint ww) {
 }
 String moduleNeoPixel::SetCW(uint cw) {
 	//targetWW = wpAnalogOut.handValue;
-	if(cw + targetWW > 100) cw = 100 - targetWW;
+	if(cw + targetWW > 255) cw = 255 - targetWW;
 	targetCW = cw;
 	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	EEPROM.commit();
@@ -512,8 +512,8 @@ void moduleNeoPixel::setClock(short ph, short pm, short ps) {
 	}
 }
 void moduleNeoPixel::calcDuration() {
-	uint8 distWW = abs(wpAnalogOut.handValue - targetWW);
-	uint8 distCW = abs(wpAnalogOut2.handValue - targetCW);
+	uint8 distWW = abs(wpAnalogOut.GetHandValue() - targetWW);
+	uint8 distCW = abs(wpAnalogOut2.GetHandValue() - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
@@ -605,9 +605,9 @@ String moduleNeoPixel::getStripStatus() {
 		status.concat("},");
 	}
 	status.concat("\"ww\":");
-	status.concat(wpAnalogOut.output);
+	status.concat(wpAnalogOut.GetHandValue());
 	status.concat(",\"cw\":");
-	status.concat(wpAnalogOut2.output);
+	status.concat(wpAnalogOut2.GetHandValue());
 	status.concat(",\"b\":");
 	status.concat(strip->getBrightness());
 	status.concat("}");
@@ -730,52 +730,52 @@ void moduleNeoPixel::BlenderEffect() {
 	}
 }
 bool moduleNeoPixel::BlenderWWEffect() {
-	if(wpAnalogOut.handValueSet != targetWW) {
-		if(wpAnalogOut.handValueSet <= targetWW) {
-			if(wpAnalogOut.handValueSet + steps <= targetWW) {
-				wpAnalogOut.handValueSet += steps;
+	if(wpAnalogOut.GetHandValue() != targetWW) {
+		if(wpAnalogOut.GetHandValue() <= targetWW) {
+			if(wpAnalogOut.GetHandValue() + steps <= targetWW) {
+				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + steps);
 			} else {
-				wpAnalogOut.handValueSet = targetWW;
+				wpAnalogOut.InitHandValue(targetWW);
 			}
-			if(wpAnalogOut.handValueSet >= targetWW) {
-				wpAnalogOut.handValueSet = targetWW;
+			if(wpAnalogOut.GetHandValue() >= targetWW) {
+				wpAnalogOut.InitHandValue(targetWW);
 			}
 		} else {
-			if(wpAnalogOut.handValueSet - steps >= targetWW) {
-				wpAnalogOut.handValueSet -= steps;
+			if(wpAnalogOut.GetHandValue() - steps >= targetWW) {
+				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
 			} else {
-				wpAnalogOut.handValueSet = targetWW;
+				wpAnalogOut.InitHandValue(targetWW);
 			}
-			if(wpAnalogOut.handValueSet <= targetWW) {
-				wpAnalogOut.handValueSet = targetWW;
+			if(wpAnalogOut.GetHandValue() <= targetWW) {
+				wpAnalogOut.InitHandValue(targetWW);
 			}
 		}
 	}
-	return wpAnalogOut.handValueSet == targetWW;
+	return wpAnalogOut.GetHandValue() == targetWW;
 }
 bool moduleNeoPixel::BlenderCWEffect() {
-	if(wpAnalogOut2.handValueSet != targetCW) {
-		if(wpAnalogOut2.handValueSet <= targetCW) {
-			if(wpAnalogOut2.handValueSet + steps <= targetCW) {
-				wpAnalogOut2.handValueSet += steps;
+	if(wpAnalogOut2.GetHandValue() != targetCW) {
+		if(wpAnalogOut2.GetHandValue() <= targetCW) {
+			if(wpAnalogOut2.GetHandValue() + steps <= targetCW) {
+				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + steps);
 			} else {
-				wpAnalogOut2.handValueSet = targetCW;
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
-			if(wpAnalogOut2.handValueSet >= targetCW) {
-				wpAnalogOut2.handValueSet = targetCW;
+			if(wpAnalogOut2.GetHandValue() >= targetCW) {
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
 		} else {
-			if(wpAnalogOut2.handValueSet - steps >= targetCW) {
-				wpAnalogOut2.handValueSet -= steps;
+			if(wpAnalogOut2.GetHandValue() - steps >= targetCW) {
+				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
 			} else {
-				wpAnalogOut2.handValueSet = targetCW;
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
-			if(wpAnalogOut2.handValueSet <= targetCW) {
-				wpAnalogOut2.handValueSet = targetCW;
+			if(wpAnalogOut2.GetHandValue() <= targetCW) {
+				wpAnalogOut2.InitHandValue(targetCW);
 			}
 		}
 	}
-	return wpAnalogOut2.handValueSet == targetCW;
+	return wpAnalogOut2.GetHandValue() == targetCW;
 }
 bool moduleNeoPixel::BlenderREffect() {
 	if(valueR != targetR) {
@@ -1005,22 +1005,22 @@ void moduleNeoPixel::OffRunnerEffect(uint wait) {
 	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
 	if(wpModules.useModuleAnalogOut) {
-		if(wpAnalogOut.handValueSet >= steps) {
-			wpAnalogOut.handValueSet -= steps;
+		if(wpAnalogOut.GetHandValue() >= steps) {
+			wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
 		} else {
-			wpAnalogOut.handValueSet = 0;
+			wpAnalogOut.InitHandValue(0);
 		}
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		if(wpAnalogOut2.handValueSet >= steps) {
-			wpAnalogOut2.handValueSet -= steps;
+		if(wpAnalogOut2.GetHandValue() >= steps) {
+			wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
 		} else {
-			wpAnalogOut2.handValueSet = 0;
+			wpAnalogOut2.InitHandValue(0);
 		}
 	}
 	if(
-		(wpModules.useModuleAnalogOut && wpAnalogOut.handValueSet <= 0) &&
-		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.handValueSet <= 0)) {            //  Loop the pattern from the first LED
+		(wpModules.useModuleAnalogOut && wpAnalogOut.GetHandValue() <= 0) &&
+		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.GetHandValue() <= 0)) {            //  Loop the pattern from the first LED
 		staticIsSet = true;
 		modeCurrent = ModeStatic;
 	}
@@ -1077,9 +1077,9 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 	returns = valueG > returns ? valueG : returns;
 	returns = valueB > returns ? valueB : returns;
 	if(wpModules.useModuleAnalogOut)
-		returns = wpAnalogOut.handValue > returns ? wpAnalogOut.handValue : returns;
+		returns = wpAnalogOut.GetHandValue() > returns ? wpAnalogOut.GetHandValue() : returns;
 	if(wpModules.useModuleAnalogOut2)
-		returns = wpAnalogOut2.handValue > returns ? wpAnalogOut2.handValue : returns;
+		returns = wpAnalogOut2.GetHandValue() > returns ? wpAnalogOut2.GetHandValue() : returns;
 	return returns;
 }
 //###################################################################################

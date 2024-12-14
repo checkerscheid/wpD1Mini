@@ -234,15 +234,15 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleAnalogOut) {
 			message += F("\"AnalogOut\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.handError ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.handValue)) +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.GetHandError() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.GetHandValue())) +
 				F("},");
 		}
 		if(wpModules.useModuleAnalogOut2) {
 			message += F("\"AnalogOut2\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.handError ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.handValue)) +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.GetHandError() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.GetHandValue())) +
 				F("},");
 		}
 		if(wpModules.useModuleClock) {
@@ -267,21 +267,21 @@ void helperWebServer::setupWebServer() {
 				message +=
 					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
 					wpFZ.JsonKeyString(F("pidType"), wpAnalogOut.GetPidType()) + F(",") +
-					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.Kp)) + F(",") +
-					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.Tv)) + F(",") +
-					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.Tn)) + F(",") +
-					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.SetPoint)) + F(",");
+					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.GetKp())) + F(",") +
+					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.GetTv())) + F(",") +
+					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.GetTn())) + F(",") +
+					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.GetSetPoint())) + F(",");
 			}
 			message +=
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.handError ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.handValue)) +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.GetHandError() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.GetHandValue())) +
 				F("},");
 		}
 		if(wpModules.useModuleAnalogOut2) {
 			message += F("\"AnalogOut2\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.handError ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.handValue)) +
+				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.GetHandError() ? "true" : "false") + F(",") +
+				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.GetHandValue())) +
 				F("},");
 		}
 		if(wpModules.useModuleRpm) {
@@ -894,8 +894,8 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleCwWw) {
 		webServer.on("/setCwWwAuto", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("ww")) && request->hasParam(F("cw")) && request->hasParam(F("sleep"))) {
-				byte ww = request->getParam(F("ww"))->value().toInt();
-				byte cw = request->getParam(F("cw"))->value().toInt();
+				byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
+				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
 				uint sleep = request->getParam(F("sleep"))->value().toInt();
 				request->send(200, F("application/json"), wpCwWw.SetWwCwAuto(ww, cw, sleep).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WwCw: '" + String(ww) + "'");
@@ -921,18 +921,18 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set Sleep: '" + String(sleep) + "'");
 			}
 			if(request->hasParam(F("ww")) && request->hasParam(F("cw")) && request->hasParam(F("sleep"))) {
-				byte ww = request->getParam(F("ww"))->value().toInt();
-				byte cw = request->getParam(F("cw"))->value().toInt();
+				byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
+				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
 				request->send(200, F("application/json"), wpCwWw.SetWwCw(ww, cw).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WwCw: '" + String(ww) + "'");
 			} else {
 				if(request->hasParam(F("ww"))) {
-					byte ww = request->getParam(F("ww"))->value().toInt();
+				byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
 					request->send(200, F("application/json"), wpCwWw.SetWW(ww).c_str());
 					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set WW: '" + String(ww) + "'");
 				}
 				if(request->hasParam(F("cw"))) {
-					byte cw = request->getParam(F("cw"))->value().toInt();
+				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
 					request->send(200, F("application/json"), wpCwWw.SetCW(cw).c_str());
 					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setCwWw, set CW: '" + String(cw) + "'");
 				}
@@ -1023,7 +1023,7 @@ void helperWebServer::setupWebServer() {
 		});
 		webServer.on("/setNeoPixelWW", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("ww"))) {
-				byte ww = request->getParam(F("ww"))->value().toInt();
+				byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
 				request->send(200, F("application/json"), wpNeoPixel.SetWW(ww).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelWW, '" + String(ww) + "'");
 			}
@@ -1031,7 +1031,7 @@ void helperWebServer::setupWebServer() {
 		});
 		webServer.on("/setNeoPixelCW", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("cw"))) {
-				byte cw = request->getParam(F("cw"))->value().toInt();
+				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
 				request->send(200, F("application/json"), wpNeoPixel.SetCW(cw).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelCW, '" + String(cw) + "'");
 			}

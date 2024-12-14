@@ -299,16 +299,13 @@ void helperEEPROM::readVars() {
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 #if BUILDWITH == 1
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
-	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
-	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
+	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
+	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 #endif
 #if BUILDWITH == 2
-	wpAnalogOut.handSet = bitRead(bitsSettingsModules0, bitAnalogOutHand);
-	uint8 bitReadAnalogOutPidType = bitRead(bitsSettingsModules1, bitAnalogOutPidType);
-	if(bitReadAnalogOutPidType == wpAnalogOut.pidTypeAirCondition) {
-		wpAnalogOut.InitPidType(wpAnalogOut.pidTypeAirCondition);
-	}
-	wpAnalogOut2.handSet = bitRead(bitsSettingsModules1, bitAnalogOut2Hand);
+	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
+	wpAnalogOut.InitPidType(bitRead(bitsSettingsModules1, bitAnalogOutPidType));
+	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 	wpWeight.UseAvg(bitRead(bitsSettingsModules1, bitUseWeightAvg));
 #endif
 #if BUILDWITH == 3
@@ -344,9 +341,9 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
-	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
+	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
-	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
+	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));
 	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
 	
 	wpClock.ColorHR = EEPROM.read(byteClockColorHR);
@@ -366,9 +363,10 @@ void helperEEPROM::readVars() {
 	wpClock.Color5B = EEPROM.read(byteClockColor5B);
 #endif
 #if BUILDWITH == 2
-	wpAnalogOut.handValueSet = EEPROM.read(byteAnalogOutHandValue);
+	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
-	wpAnalogOut2.handValueSet = EEPROM.read(byteAnalogOut2HandValue);
+	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
+	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
 	wpImpulseCounter.CalcCycle(EEPROM.read(byteCalcCycleImpulseCounter) * 100);
 	wpImpulseCounter.UpKWh = EEPROM.read(byteImpulseCounterUpKWh);
