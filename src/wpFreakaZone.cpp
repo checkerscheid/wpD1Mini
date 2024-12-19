@@ -352,6 +352,11 @@ void wpFreakaZone::SetDeviceName(String name) {
 	wpFZ.restartRequired = true;
 	DebugcheckSubscribes(wpFZ.mqttTopicDeviceName, wpFZ.DeviceName);
 }
+void wpFreakaZone::SetDeviceDescription(String description) {
+	wpFZ.DeviceDescription = description;
+	wpEEPROM.writeStringsToEEPROM();
+	DebugcheckSubscribes(wpFZ.mqttTopicDeviceDescription, wpFZ.DeviceDescription);
+}
 
 void wpFreakaZone::printStart() {
 	Serial.println();

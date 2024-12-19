@@ -136,6 +136,7 @@ class helperWebServer {
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
+		String newDescription;
 };
 extern helperWebServer wpWebServer;
 
@@ -207,7 +208,9 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="wpContainer wpHidden" id="changeNameContainer">
 			<span>New Name:</span>
-			<input type="text" id="SetNewDevicename" value="%DeviceName%" />
+			<input type="text" id="SetNewDevicename" value="%DeviceName%" /><br />
+			<span>New Description:</span>
+			<input type="text" id="SetNewDeviceDescription" value="%DeviceDescription%" /><br />
 			<span id="SetDevicename" class="wpButton" onclick="cmdNewDevicename()">save</span>
 		</div>
 		<div class="ulContainer">
@@ -219,7 +222,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
 				<li><span class='bold'>Updates:</span></li><li><hr /></li>
-				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li>
+				<!--li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li-->
 				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
 				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
 				<li><span class='bold'>Stuff:</span></li><li><hr /></li>
@@ -280,7 +283,7 @@ function onClose(event) {
 }
 function onMessage(event) {
 	%debugWebServer%
-	const d = JSON.parse(event.data);
+	const d = tryParseJSONObject(event.data);
 	if(typeof d.cmd != 'undefined') {
 		if(d.cmd == 'setDebug') {
 			console.log('setDebug:');
@@ -340,14 +343,24 @@ function onMessage(event) {
 		}
 	} else {
 		%debugOnMessage%
-		console.log('[d.cmd = undefined]:');
-		console.log(d);
+		console.log('[d.cmd == undefined], event.data:');
+		console.log(event.data);
 		WebSerialBox.innerHTML =
 			'<p>' +
 				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
 				'<span>' + d.msgbody + '</span>' +
 			'</p>' + WebSerialBox.innerHTML;
 	}
+}
+function tryParseJSONObject(jsonString) {
+    try {
+        var o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    }
+    catch (e) { }
+    return false;
 }
 function changePumpState(elem, state) {
 	let elemHTML = document.getElementById(elem);
@@ -384,7 +397,10 @@ function changeName() {
 }
 function cmdNewDevicename() {
 	let newName = document.getElementById('SetNewDevicename').value;
-	xmlHttp.open("GET", "/setCmd?cmd=SetDeviceName&newName=" + newName, false);
+	if(newName != '') newName = '&newName=' + newName;
+	let newDescription = document.getElementById('SetNewDeviceDescription').value;
+	if(newDescription != '') newDescription = '&newDescription=' + newDescription;
+	xmlHttp.open("GET", "/setCmd?cmd=SetDeviceName" + newName + newDescription, false);
 	xmlHttp.send(null);
 }
 	</script>

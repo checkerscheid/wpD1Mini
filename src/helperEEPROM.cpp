@@ -23,9 +23,18 @@ helperEEPROM::helperEEPROM() {
 		EEPROM.write(addrBitsModules0, 0);
 		EEPROM.write(addrBitsModules1, 0);
 		EEPROM.write(addrBitsModules2, 0);
+		EEPROM.write(addrBitsModules3, 0);
 		EEPROM.write(byteDS18B20Count, 0);	
 		uint16 pixelCountReset = 0;
 		EEPROM.put(byteNeoPixelPixelCount, pixelCountReset);
+		readStringsFromEEPROM();
+		wpBM.lightToTurnOn = "_";
+		wpUnderfloor1.mqttTopicTemp = "_";
+		wpUnderfloor2.mqttTopicTemp = "_";
+		wpUnderfloor3.mqttTopicTemp = "_";
+		wpUnderfloor4.mqttTopicTemp = "_";
+		wpAnalogOut.mqttTopicTemp = "_";
+		writeStringsToEEPROM();
 		EEPROM.commit();
 	}
 }

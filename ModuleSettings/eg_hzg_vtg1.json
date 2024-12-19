@@ -1,0 +1,80 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "EG_HZG_VTG1",
+		"DeviceDescription": "EG Fussbodenheizung Ventilgruppe 1",
+		"Version": "V 3.2 Build 218",
+		"newVersion": true,
+		"UpdateChanel": "heating",
+		"MAC": "A4:CF:12:FD:67:65",
+		"miniMAC": "a4cf12fd6765",
+		"IP": "172.17.44.61",
+		"UpdateMode": false,
+		"calcValues": true,
+		"BootCounter": 2,
+		"Underfloor1": {
+			"Pin": "D1",
+			"CalcCycle": 2000,
+			"SetPoint": 220,
+			"TempUrl": "KU1_RU/Temperature"
+		},
+		"Underfloor2": {
+			"Pin": "D2",
+			"CalcCycle": 2000,
+			"SetPoint": 200,
+			"TempUrl": "WZ1_RU/Temperature"
+		},
+		"Underfloor3": {
+			"Pin": "D6",
+			"CalcCycle": 2000,
+			"SetPoint": 210,
+			"TempUrl": "WZ1_RU/Temperature"
+		},
+		"Underfloor4": {
+			"Pin": "D7",
+			"CalcCycle": 2000,
+			"SetPoint": 190,
+			"TempUrl": "WZ1_RU/Temperature"
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"Underfloor1": true,
+			"Underfloor2": true,
+			"Underfloor3": true,
+			"Underfloor4": true
+		},
+		"useModul": {
+			"DHT11": false,
+			"DHT22": false,
+			"LDR": false,
+			"Light": false,
+			"BM": false,
+			"Window": false,
+			"Relais": false,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": false,
+			"Distance": false,
+			"CwWw": false,
+			"NeoPixel": false,
+			"AnalogOut": false,
+			"AnalogOut2": false,
+			"AnalogOut": false,
+			"AnalogOut2": false,
+			"Rpm": false,
+			"ImpulseCounter": false,
+			"Window2": false,
+			"Window3": false,
+			"Underfloor1": true,
+			"Underfloor2": true,
+			"Underfloor3": true,
+			"Underfloor4": true
+		}
+	}
+}

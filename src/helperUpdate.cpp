@@ -125,8 +125,9 @@ void helperUpdate::check() {
 	int httpCode = http.GET();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
 	String payload = http.getString();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	deserializeJson(doc, payload);
+	payload.replace("\"", "'");
+	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	serverVersion = doc["wpFreakaZone"]["Version"].as<String>();
 	newVersion = !(serverVersion == installedVersion);
 	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);

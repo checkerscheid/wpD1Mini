@@ -1,0 +1,68 @@
+{
+	"FreakaZoneDevice": {
+		"DeviceName": "WZ_KE",
+		"DeviceDescription": "Wohnzimmer Event Lichterketten",
+		"Version": "V 3.2 Build 222",
+		"newVersion": false,
+		"UpdateChanel": "light",
+		"MAC": "5C:CF:7F:F9:39:94",
+		"miniMAC": "5ccf7ff93994",
+		"IP": "172.17.80.97",
+		"UpdateMode": false,
+		"calcValues": true,
+		"BootCounter": 16,
+		"CwWw": {},
+		"AnalogOut": {
+			"Pin": "D6",
+			"Hand": false,
+			"HandValue": 0
+		},
+		"AnalogOut2": {
+			"Pin": "D5",
+			"Hand": false,
+			"HandValue": 0
+		},
+		"Debug": {
+			"EEPROM": false,
+			"Finder": false,
+			"Modules": false,
+			"MQTT": false,
+			"OnlineToggler": false,
+			"Update": false,
+			"WebServer": false,
+			"WiFi": false,
+			"CwWw": false,
+			"AnalogOut": false,
+			"AnalogOut2": false
+		},
+		"useModul": {
+			"DHT11": false,
+			"DHT22": false,
+			"LDR": false,
+			"Light": false,
+			"BM": false,
+			"Window": false,
+			"Relais": false,
+			"RelaisShield": false,
+			"Rain": false,
+			"Moisture": false,
+			"Distance": false,
+			"CwWw": true,
+			"NeoPixel": false,
+			"AnalogOut": true,
+			"AnalogOut2": true,
+			"AnalogOut": true,
+			"AnalogOut2": true,
+			"Rpm": false,
+			"ImpulseCounter": false,
+			"Window2": false,
+			"Window3": false,
+			"Weight": false,
+			"Underfloor1": false,
+			"Underfloor2": false,
+			"Underfloor3": false,
+			"Underfloor4": false,
+			"RFID": false
+		}
+	}
+}

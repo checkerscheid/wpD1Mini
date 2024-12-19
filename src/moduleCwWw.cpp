@@ -445,10 +445,12 @@ void moduleCwWw::SmoothEffect() {
 	}
 	float sinWW = sin(winkelWW);
 	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
 	wpAnalogOut.InitHandValue(sinWWByte);
 	float sinCW = sin(winkelCW);
 	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	wpAnalogOut2.InitHandValue(sinCWByte);
 }
@@ -459,6 +461,7 @@ void moduleCwWw::WwSmoothEffect() {
 	}
 	float sinWW = sin(winkelWW);
 	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
 	wpAnalogOut.InitHandValue(sinWWByte);
 }
@@ -469,6 +472,7 @@ void moduleCwWw::CwSmoothEffect() {
 	}
 	float sinCW = sin(winkelCW);
 	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	wpAnalogOut2.InitHandValue(sinCWByte);
 }

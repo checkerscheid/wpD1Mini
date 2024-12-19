@@ -24,6 +24,8 @@ void helperWebServer::init() {
 	doModuleChange = cmdDoNothing;
 	doDebugChange = cmdDoNothing;
 	doBlink = cmdDoNothing;
+	newName = wpFZ.DeviceName;
+	newDescription = wpFZ.DeviceDescription;
 	setupWebServer();
 }
 
@@ -133,7 +135,10 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyString(F("IP"), WiFi.localIP().toString()) + F(",") +
 			wpFZ.JsonKeyValue(F("UpdateMode"), wpUpdate.UpdateFW ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyValue(F("calcValues"), wpFZ.calcValues ? "true" : "false") + F(",") +
-			wpFZ.JsonKeyValue(F("BootCounter"), String(wpFZ.GetBootCounter())) + F(",");
+			wpFZ.JsonKeyValue(F("BootCounter"), String(wpFZ.GetBootCounter())) + F(",") +
+			wpFZ.JsonKeyString(F("OnSince"), wpFZ.OnSince) + F(",") +
+			wpFZ.JsonKeyString(F("WiFiSince"), wpWiFi.WiFiSince) + F(",") +
+			wpFZ.JsonKeyString(F("OnDuration"), wpFZ.OnDuration) + F(",");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += F("\"DHT\":{") +
 				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDHT.Pin])) + F(",") +
@@ -857,8 +862,11 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd SetDeviceName"));
 				if(request->hasParam(F("newName"))) {
 					wpWebServer.newName = request->getParam(F("newName"))->value();
-					wpWebServer.setCommand(wpWebServer.cmdSetName);
 				}
+				if(request->hasParam(F("newDescription"))) {
+					wpWebServer.newDescription = request->getParam(F("newDescription"))->value();
+				}
+				wpWebServer.setCommand(wpWebServer.cmdSetName);
 			}
 			if(request->getParam(F("cmd"))->value() == F("SetUpdateChanel")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd SetUpdateChanel"));
@@ -1358,6 +1366,7 @@ void helperWebServer::doTheCommand() {
 		}
 		if(doCommand == cmdSetName) {
 			wpFZ.SetDeviceName(newName);
+			wpFZ.SetDeviceDescription(newDescription);
 		}
 		doCommand = cmdDoNothing;
 	}
