@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.h 207 2024-10-07 12:59:22Z                   $ #
+//# File-ID      : $Id:: moduleLight.h 232 2024-12-19 15:27:48Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleLight_h
@@ -21,7 +21,7 @@
 #include <AS_BH1750.h>
 #include <Wire.h>
 
-class moduleLight {
+class moduleLight : public IModuleBase {
 	public:
 		moduleLight();
 		moduleBase* mb;
@@ -51,6 +51,7 @@ class moduleLight {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool UseAvg();
 		bool UseAvg(bool useAvg);
@@ -72,7 +73,7 @@ class moduleLight {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 232 $";
 };
 extern moduleLight wpLight;
 

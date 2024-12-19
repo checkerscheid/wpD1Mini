@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 215                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 215 2024-10-18 05:01:38Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 232 2024-12-19 15:27:48Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -159,10 +159,23 @@ String moduleBM::SetManual() {
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 215 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleBM::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin]));
+	if(wpModules.useModuleLDR) {
+		json += ",\"LDR\":{" +
+			wpFZ.JsonKeyValue(F("Threshold"), String(threshold)) + F(",") +
+			wpFZ.JsonKeyString(F("LightToTurnOn"), lightToTurnOn) +
+			F("}");
+	}
+	json += F("}");
+	return json;
 }
 
 bool moduleBM::Debug() {

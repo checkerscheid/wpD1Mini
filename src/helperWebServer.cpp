@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 231 2024-12-14 03:25:15Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 232 2024-12-19 15:27:48Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 231 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -140,244 +140,92 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyString(F("WiFiSince"), wpWiFi.WiFiSince) + F(",") +
 			wpFZ.JsonKeyString(F("OnDuration"), wpFZ.OnDuration) + F(",");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
-			message += F("\"DHT\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDHT.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDHT.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("TemperatureCorrection"), String(float(wpDHT.temperatureCorrection / 10.0))) + F(",") +
-				wpFZ.JsonKeyValue(F("HumidityCorrection"), String(float(wpDHT.humidityCorrection / 10.0))) +
-				F("},");
+			message += wpDHT.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleLDR) {
-			message += F("\"LDR\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpLDR.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpLDR.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpLDR.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpLDR.correction)) +
-				F("},");
+			message += wpLDR.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleLight) {
-			message += F("\"Light\":{") +
-				wpFZ.JsonKeyString(F("PinSCL"), String(wpFZ.Pins[wpLight.PinSCL])) + F(",") +
-				wpFZ.JsonKeyString(F("PinSDA"), String(wpFZ.Pins[wpLight.PinSDA])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpLight.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpLight.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpLight.correction)) +
-				F("},");
+			message += wpLight.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleBM) {
-			message += F("\"BM\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpBM.Pin]));
-			if(wpModules.useModuleLDR) {
-				message += ",\"LDR\":{" +
-					wpFZ.JsonKeyValue(F("Threshold"), String(wpBM.threshold)) + F(",") +
-					wpFZ.JsonKeyString(F("LightToTurnOn"), wpBM.lightToTurnOn) +
-					"}";
-			}
-			message += F("},");
+			message += wpBM.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleWindow) {
-			message += F("\"Window\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow1.Pin])) +
-				F("},");
+			message += wpWindow1.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleRelais || wpModules.useModuleRelaisShield) {
-			message += F("\"Relais\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRelais.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpRelais.handError ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), wpRelais.handValue ? "true" : "false");
-			if(wpModules.useModuleMoisture) {
-				message += F(",\"Moisture\":{") +
-					wpFZ.JsonKeyValue(F("waterEmpty"), wpRelais.waterEmptySet ? "true" : "false") + F(",") +
-					wpFZ.JsonKeyValue(F("pumpActive"), String(wpRelais.pumpActive)) + F(",") +
-					wpFZ.JsonKeyValue(F("pumpPause"), String(wpRelais.pumpPause / 60)) +
-					"}";
-			}
-			message += F("},");
+			message += wpRelais.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleRain) {
-			message += F("\"Rain\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRain.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRain.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpRain.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpRain.correction)) +
-				F("},");
+			message += wpRain.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleMoisture) {
-			message += F("\"Moisture\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpMoisture.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpMoisture.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpMoisture.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Min"), String(wpMoisture.minValue)) + F(",") +
-				wpFZ.JsonKeyValue(F("Dry"), String(wpMoisture.dry)) + F(",") +
-				wpFZ.JsonKeyValue(F("Wet"), String(wpMoisture.wet)) +
-				F("},");
+			message += wpMoisture.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleDistance) {
-			message += F("\"Distance\":{") +
-				wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[wpDistance.PinTrig])) + F(",") +
-				wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[wpDistance.PinEcho])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDistance.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpDistance.correction)) + F(",") +
-				wpFZ.JsonKeyValue(F("maxVolume"), String(wpDistance.maxVolume)) + F(",") +
-				wpFZ.JsonKeyValue(F("height"), String(wpDistance.height)) +
-				F("},");
+			message += wpDistance.GetJsonSettings() + F(",");
 		}
 		#if BUILDWITH == 1
 		if(wpModules.useModuleCwWw) {
-			message += F("\"CwWw\":{},");
+			message += wpCwWw.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleNeoPixel) {
-			message += F("\"NeoPixel\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpNeoPixel.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("ValueR"), String(wpNeoPixel.GetValueR())) + F(",") +
-				wpFZ.JsonKeyValue(F("ValueG"), String(wpNeoPixel.GetValueG())) + F(",") +
-				wpFZ.JsonKeyValue(F("ValueB"), String(wpNeoPixel.GetValueB())) + F(",") +
-				wpFZ.JsonKeyValue(F("PixelCount"), String(wpNeoPixel.GetPixelCount())) + F(",") +
-				wpFZ.JsonKeyValue(F("isRGB"), wpNeoPixel.GetRGB() ? "true" : "false") +
-				F("},");
+			message += wpNeoPixel.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleAnalogOut) {
-			message += F("\"AnalogOut\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.GetHandError() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.GetHandValue())) +
-				F("},");
+			message += wpAnalogOut.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleAnalogOut2) {
-			message += F("\"AnalogOut2\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.GetHandError() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.GetHandValue())) +
-				F("},");
+			message += wpAnalogOut2.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleClock) {
-			message += F("\"Clock\":{") +
-				wpFZ.JsonKeyString(F("Pin1"), String(wpFZ.Pins[wpClock.Pin1])) + F(",") +
-				wpFZ.JsonKeyString(F("Pin2"), String(wpFZ.Pins[wpClock.Pin2])) + F(",") +
-				wpFZ.JsonKeyString(F("Pin3"), String(wpFZ.Pins[wpClock.Pin3])) + F(",") +
-				wpFZ.JsonKeyString(F("Pin4"), String(wpFZ.Pins[wpClock.Pin4])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hour"), wpClock.GetColorH()) + F(",") +
-				wpFZ.JsonKeyValue(F("Minute"), wpClock.GetColorM()) + F(",") +
-				wpFZ.JsonKeyValue(F("Second"), wpClock.GetColorS()) + F(",") +
-				wpFZ.JsonKeyValue(F("Quarter"), wpClock.GetColorQ()) + F(",") +
-				wpFZ.JsonKeyValue(F("Five"), wpClock.GetColor5()) +
-				F("},");
+			message += wpClock.GetJsonSettings() + F(",");
 		}
 		#endif
 		#if BUILDWITH == 2
 		if(wpModules.useModuleAnalogOut) {
-			message += F("\"AnalogOut\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut.Pin])) + F(",");
-			if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || wpAnalogOut.mqttTopicTemp != "_") {
-				message +=
-					wpFZ.JsonKeyValue(F("CalcCycle"), String(wpAnalogOut.CalcCycle())) + F(",") +
-					wpFZ.JsonKeyString(F("pidType"), wpAnalogOut.GetPidType()) + F(",") +
-					wpFZ.JsonKeyValue(F("Kp"), String(wpAnalogOut.GetKp())) + F(",") +
-					wpFZ.JsonKeyValue(F("Tv"), String(wpAnalogOut.GetTv())) + F(",") +
-					wpFZ.JsonKeyValue(F("Tn"), String(wpAnalogOut.GetTn())) + F(",") +
-					wpFZ.JsonKeyValue(F("SetPoint"), String(wpAnalogOut.GetSetPoint())) + F(",");
-			}
-			message +=
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut.GetHandError() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut.GetHandValue())) +
-				F("},");
+			message += wpAnalogOut.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleAnalogOut2) {
-			message += F("\"AnalogOut2\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpAnalogOut2.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("Hand"), wpAnalogOut2.GetHandError() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("HandValue"), String(wpAnalogOut2.GetHandValue())) +
-				F("},");
+			message += wpAnalogOut2.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleRpm) {
-			message += F("\"Rpm\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpRpm.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRpm.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpRpm.UseAvg() ? "true" : "false") + F(",") +
-				wpFZ.JsonKeyValue(F("Correction"), String(wpRpm.correction)) +
-				F("},");
+			message += wpRpm.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleImpulseCounter) {
-			message += F("\"ImpulseCounter\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpImpulseCounter.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpImpulseCounter.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("UpKWh"), String(wpImpulseCounter.UpKWh)) + F(",") +
-				wpFZ.JsonKeyValue(F("Silver"), String(wpImpulseCounter.counterSilver)) + F(",") +
-				wpFZ.JsonKeyValue(F("Red"), String(wpImpulseCounter.counterRed)) +
-				F("},");
+			message += wpImpulseCounter.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleWindow2) {
-			message += F("\"Window2\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow2.Pin])) +
-				F("},");
+			message += wpWindow2.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleWindow3) {
-			message += F("\"Window3\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWindow3.Pin])) +
-				F("},");
+			message += wpWindow3.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleWeight) {
-			message += F("\"Weight\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpWeight.Pin])) + F(",") +
-				wpFZ.JsonKeyString(F("Pinout"), String(wpFZ.Pins[wpWeight.Pinout])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpWeight.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("useAvg"), wpWeight.UseAvg() ? "true" : "false") +
-				F("},");
+			message += wpWeight.GetJsonSettings() + F(",");
 		}
 		#endif
 		#if BUILDWITH == 3
 		if(wpModules.useModuleUnderfloor1) {
-			message += F("\"Underfloor1\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor1.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor1.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor1.GetSetPoint())) + F(",") +
-				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor1.mqttTopicTemp)) +
-				F("},");
+			message += wpUnderfloor1.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleUnderfloor2) {
-			message += F("\"Underfloor2\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor2.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor2.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor2.GetSetPoint())) + F(",") +
-				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor2.mqttTopicTemp)) +
-				F("},");
+			message += wpUnderfloor2.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleUnderfloor3) {
-			message += F("\"Underfloor3\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor3.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor3.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor3.GetSetPoint())) + F(",") +
-				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor3.mqttTopicTemp)) +
-				F("},");
+			message += wpUnderfloor3.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleUnderfloor4) {
-			message += F("\"Underfloor4\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpUnderfloor4.Pin])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpUnderfloor4.CalcCycle())) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String(wpUnderfloor4.GetSetPoint())) + F(",") +
-				wpFZ.JsonKeyString(F("TempUrl"), String(wpUnderfloor4.mqttTopicTemp)) +
-				F("},");
+			message += wpUnderfloor4.GetJsonSettings() + F(",");
 		}
 		if(wpModules.useModuleDS18B20) {
-			message += F("\"DS18B20\":{") +
-				wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[wpDS18B20.Pin])) + F(",");
-			//wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDS18B20.CalcCycle(1))) + F(",") +
-			//wpFZ.JsonKeyValue(F("useAvg1"), wpDS18B20.UseAvg(1) ? "true" : "false") + F(",") +
-			for(int c = 0; c < wpDS18B20.count; c++) {
-				message += wpFZ.JsonKeyString(F("Device") + String(c) + F("Address"), wpDS18B20.devices[c]->getStringAddress()) + F(",");
-			}
-			message += 
-				wpFZ.JsonKeyValue(F("Count"), String(wpDS18B20.count)) +
-				F("},");
+			message += wpDS18B20.GetJsonSettings() + F(",");
 		}
 		#endif
 		#if BUILDWITH == 4
 		if(wpModules.useModuleRFID) {
-			message += F("\"RFID\":{") +
-				wpFZ.JsonKeyString(F("PinSS"), String(wpFZ.Pins[wpRFID.PinSS])) + F(",") +
-				wpFZ.JsonKeyString(F("PinRST"), String(wpFZ.Pins[wpRFID.PinRST])) + F(",") +
-				wpFZ.JsonKeyValue(F("CalcCycle"), String(wpRFID.CalcCycle())) +
-				F("},");
+			message += wpRFID.GetJsonSettings() + F(",");
 		}
 		#endif
 		message += F("\"Debug\":{") +

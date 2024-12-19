@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 231 2024-12-14 03:25:15Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 232 2024-12-19 15:27:48Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -1086,10 +1086,22 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 231 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleNeoPixel::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("ValueR"), String(GetValueR())) + F(",") +
+		wpFZ.JsonKeyValue(F("ValueG"), String(GetValueG())) + F(",") +
+		wpFZ.JsonKeyValue(F("ValueB"), String(GetValueB())) + F(",") +
+		wpFZ.JsonKeyValue(F("PixelCount"), String(GetPixelCount())) + F(",") +
+		wpFZ.JsonKeyValue(F("isRGB"), GetRGB() ? "true" : "false") +
+		F("},");
+	return json;
 }
 
 void moduleNeoPixel::changeDebug() {

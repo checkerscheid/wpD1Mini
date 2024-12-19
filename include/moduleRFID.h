@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 220                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRFID.h 220 2024-10-29 10:37:04Z                    $ #
+//# File-ID      : $Id:: moduleRFID.h 232 2024-12-19 15:27:48Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRFID_h
@@ -21,7 +21,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-class moduleRFID {
+class moduleRFID : public IModuleBase {
 	public:
 		moduleRFID();
 		moduleBase* mb;
@@ -49,6 +49,7 @@ class moduleRFID {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -63,7 +64,7 @@ class moduleRFID {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 220 $";
+		String SVNh = "$Rev: 232 $";
 };
 extern moduleRFID wpRFID;
 

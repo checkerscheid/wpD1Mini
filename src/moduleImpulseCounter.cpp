@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.cpp 207 2024-10-07 12:59:22Z        $ #
+//# File-ID      : $Id:: moduleImpulseCounter.cpp 232 2024-12-19 15:27:48Z        $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleImpulseCounter.h>
@@ -158,10 +158,21 @@ void moduleImpulseCounter::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleImpulseCounter::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleImpulseCounter::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("UpKWh"), String(UpKWh)) + F(",") +
+		wpFZ.JsonKeyValue(F("Silver"), String(counterSilver)) + F(",") +
+		wpFZ.JsonKeyValue(F("Red"), String(counterRed)) +
+		F("},");
+	return json;
 }
 
 bool moduleImpulseCounter::Debug() {
