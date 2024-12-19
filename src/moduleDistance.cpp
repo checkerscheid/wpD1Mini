@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 234                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 232 2024-12-19 15:27:48Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 234 2024-12-19 15:51:45Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -215,7 +215,7 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsi
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 234 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -229,7 +229,7 @@ String moduleDistance::GetJsonSettings() {
 		wpFZ.JsonKeyValue(F("Correction"), String(correction)) + F(",") +
 		wpFZ.JsonKeyValue(F("maxVolume"), String(maxVolume)) + F(",") +
 		wpFZ.JsonKeyValue(F("height"), String(height)) +
-		F("},");
+		F("}");
 	return json;
 }
 

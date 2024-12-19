@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 234                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 232 2024-12-19 15:27:48Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 234 2024-12-19 15:51:45Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -120,7 +120,7 @@ void moduleWindow::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 234 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -128,7 +128,7 @@ uint16 moduleWindow::getVersion() {
 
 String moduleWindow::GetJsonSettings() {
 	String json = F("\"") + ModuleName + F("\":{") +
-		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) +
 		F("}");
 	return json;
 }
