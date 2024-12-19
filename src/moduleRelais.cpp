@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 207 2024-10-07 12:59:22Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 232 2024-12-19 15:27:48Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -365,10 +365,26 @@ String moduleRelais::getReadableTime(unsigned long time) {
 // section to copy
 //###################################################################################
 uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleRelais::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false") + F(",") +
+		wpFZ.JsonKeyValue(F("HandValue"), handValue ? "true" : "false");
+	if(wpModules.useModuleMoisture) {
+		json += F(",\"Moisture\":{") +
+			wpFZ.JsonKeyValue(F("waterEmpty"), waterEmptySet ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("pumpActive"), String(pumpActive)) + F(",") +
+			wpFZ.JsonKeyValue(F("pumpPause"), String(pumpPause / 60)) +
+			F("}");
+	}
+	json += F("}");
+	return json;
 }
 
 void moduleRelais::changeDebug() {

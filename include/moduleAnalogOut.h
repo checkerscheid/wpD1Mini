@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 231 2024-12-14 03:25:15Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 232 2024-12-19 15:27:48Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <PID_v1.h>
 
-class moduleAnalogOut {
+class moduleAnalogOut : public IModuleBase {
 	public:
 		moduleAnalogOut();
 		moduleBase* mb;
@@ -57,19 +57,16 @@ class moduleAnalogOut {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
 		uint32 CalcCycle(uint32 calcCycle);
 		void InitKp(short kp);
-		double GetKp();
 		void InitTv(short tv);
-		double GetTv();
 		void InitTn(short tn);
-		double GetTn();
 		void InitSetPoint(short setpoint);
-		uint8 GetSetPoint();
 		void resetPID();
 		String SetSetPoint(double setpoint);
 		String SetTopicTempUrl(String topic);
@@ -85,6 +82,7 @@ class moduleAnalogOut {
 
 		void InitPidType(uint8 t);
 		String SetPidType(uint8 t);
+
 		String GetPidType();
 
 	private:
@@ -131,7 +129,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 231 $";
+		String SVNh = "$Rev: 232 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 };

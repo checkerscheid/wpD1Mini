@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 207 2024-10-07 12:59:22Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 232 2024-12-19 15:27:48Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -150,10 +150,20 @@ uint16 moduleRpm::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleRpm::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("useAvg"), UseAvg() ? "true" : "false") + F(",") +
+		wpFZ.JsonKeyValue(F("Correction"), String(correction)) +
+		F("},");
+	return json;
 }
 
 void moduleRpm::changeDebug() {

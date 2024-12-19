@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 231 2024-12-14 03:25:15Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 232 2024-12-19 15:27:48Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -310,26 +310,14 @@ bool moduleAnalogOut::GetHandError() {
 void moduleAnalogOut::InitKp(short kp) {
 	Kp = (double) (kp / 10.0);
 }
-double moduleAnalogOut::GetKp() {
-	return Kp * 10.0;
-}
 void moduleAnalogOut::InitTv(short tv) {
 	Tv = (double) (tv / 10.0);
-}
-double moduleAnalogOut::GetTv() {
-	return Tv * 10.0;
 }
 void moduleAnalogOut::InitTn(short tn) {
 	Tn = (double) (tn / 10.0);
 }
-double moduleAnalogOut::GetTn() {
-	return Tn * 10.0;
-}
 void moduleAnalogOut::InitSetPoint(short setpoint) {
 	SetPoint = (double) (setpoint / 10.0);
-}
-uint8 moduleAnalogOut::GetSetPoint() {
-	return (uint8)(SetPoint * 10.0);
 }
 void moduleAnalogOut::InitPidType(uint8 t) {
 	pidType = t;
@@ -436,10 +424,31 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 231 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleAnalogOut::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",");
+	if(!wpModules.useModuleCwWw && !wpModules.useModuleNeoPixel) {
+		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || wpAnalogOut.mqttTopicTemp != "_") {
+			json +=
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+				wpFZ.JsonKeyString(F("pidType"), GetPidType()) + F(",") +
+				wpFZ.JsonKeyValue(F("Kp"), String(Kp * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("Tv"), String(Tv * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("Tn"), String(Tn * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0))) + F(",");
+		}
+		json +=
+			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false") + F(",") +
+			wpFZ.JsonKeyValue(F("HandValue"), String(handValue));
+	}
+	json += F("}");
+	return json;
 }
 
 void moduleAnalogOut::changeDebug() {

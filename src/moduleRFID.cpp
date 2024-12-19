@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRFID.cpp 221 2024-11-04 15:10:40Z                  $ #
+//# File-ID      : $Id:: moduleRFID.cpp 232 2024-12-19 15:27:48Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRFID.h>
@@ -116,10 +116,19 @@ void moduleRFID::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleRFID::getVersion() {
-	String SVN = "$Rev: 221 $";
+	String SVN = "$Rev: 232 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleRFID::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("PinSS"), String(wpFZ.Pins[PinSS])) + F(",") +
+		wpFZ.JsonKeyString(F("PinRST"), String(wpFZ.Pins[PinRST])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) +
+		F("},");
+	return json;
 }
 
 void moduleRFID::changeDebug() {

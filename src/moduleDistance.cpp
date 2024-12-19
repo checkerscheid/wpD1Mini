@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 226                                                     $ #
+//# Revision     : $Rev:: 234                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 226 2024-11-21 13:14:50Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 234 2024-12-19 15:51:45Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -215,10 +215,22 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsi
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 226 $";
+	String SVN = "$Rev: 234 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleDistance::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString("Pin Trigger", String(wpFZ.Pins[PinTrig])) + F(",") +
+		wpFZ.JsonKeyString("Pin Echo", String(wpFZ.Pins[PinEcho])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("Correction"), String(correction)) + F(",") +
+		wpFZ.JsonKeyValue(F("maxVolume"), String(maxVolume)) + F(",") +
+		wpFZ.JsonKeyValue(F("height"), String(height)) +
+		F("}");
+	return json;
 }
 
 void moduleDistance::changeDebug() {

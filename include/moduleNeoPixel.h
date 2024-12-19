@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 232                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 231 2024-12-14 03:25:15Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 232 2024-12-19 15:27:48Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <Adafruit_NeoPixel.h>
 
-class moduleNeoPixel {
+class moduleNeoPixel : public IModuleBase {
 	public:
 		moduleNeoPixel();
 		moduleBase* mb;
@@ -87,6 +87,7 @@ class moduleNeoPixel {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -199,7 +200,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 231 $";
+		String SVNh = "$Rev: 232 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 
