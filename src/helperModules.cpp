@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 235                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 232 2024-12-19 15:27:48Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 235 2024-12-20 07:34:35Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -78,7 +78,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 235 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -322,7 +322,7 @@ void helperModules::publishValues(bool force) {
 	}
 	#endif
 	#if BUILDWITH == 4
-	if(useRFIDLast != useModuleRFID || wpFZ.CheckQoS(publishUseRFIDLast == 0)) {
+	if(useRFIDLast != useModuleRFID || wpFZ.CheckQoS(publishUseRFIDLast)) {
 		useRFIDLast = useModuleRFID;
 		wpMqtt.mqttClient.publish(mqttTopicUseRFID.c_str(), String(useModuleRFID).c_str());
 		wpFZ.SendWSModule("useRFID", useModuleRFID);

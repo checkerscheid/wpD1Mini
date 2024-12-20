@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 235                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 232 2024-12-19 15:27:48Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 235 2024-12-20 07:34:35Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -177,7 +177,7 @@ long moduleWeight::calcAvg(long raw) {
 // section to copy
 //###################################################################################
 uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 235 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -189,7 +189,7 @@ String moduleWeight::GetJsonSettings() {
 		wpFZ.JsonKeyString(F("Pinout"), String(wpFZ.Pins[Pinout])) + F(",") +
 		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
 		wpFZ.JsonKeyValue(F("useAvg"), UseAvg() ? "true" : "false") +
-		F("},");
+		F("}");
 	return json;
 }
 

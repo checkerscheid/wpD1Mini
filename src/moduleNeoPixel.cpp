@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 235                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 232 2024-12-19 15:27:48Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 235 2024-12-20 07:34:35Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -58,6 +58,9 @@ moduleNeoPixel::moduleNeoPixel() {
 }
 void moduleNeoPixel::init() {
 	Pin = D7;
+	if(pixelCount > 10000) {
+		SetPixelCount(0);
+	}
 	// Declare our NeoPixel strip object:
 	if(isRGB) {
 		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
@@ -1086,7 +1089,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 235 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1100,7 +1103,7 @@ String moduleNeoPixel::GetJsonSettings() {
 		wpFZ.JsonKeyValue(F("ValueB"), String(GetValueB())) + F(",") +
 		wpFZ.JsonKeyValue(F("PixelCount"), String(GetPixelCount())) + F(",") +
 		wpFZ.JsonKeyValue(F("isRGB"), GetRGB() ? "true" : "false") +
-		F("},");
+		F("}");
 	return json;
 }
 

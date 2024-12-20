@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 235                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 232 2024-12-19 15:27:48Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 235 2024-12-20 07:34:35Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -424,7 +424,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 235 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -432,18 +432,18 @@ uint16 moduleAnalogOut::getVersion() {
 
 String moduleAnalogOut::GetJsonSettings() {
 	String json = F("\"") + ModuleName + F("\":{") +
-		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",");
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin]));
 	if(!wpModules.useModuleCwWw && !wpModules.useModuleNeoPixel) {
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || wpAnalogOut.mqttTopicTemp != "_") {
-			json +=
+			json += F(",") +
 				wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
 				wpFZ.JsonKeyString(F("pidType"), GetPidType()) + F(",") +
 				wpFZ.JsonKeyValue(F("Kp"), String(Kp * 10.0)) + F(",") +
 				wpFZ.JsonKeyValue(F("Tv"), String(Tv * 10.0)) + F(",") +
 				wpFZ.JsonKeyValue(F("Tn"), String(Tn * 10.0)) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0))) + F(",");
+				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0)));
 		}
-		json +=
+		json += F(",") +
 			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyValue(F("HandValue"), String(handValue));
 	}
