@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 235                                                     $ #
+//# Revision     : $Rev:: 236                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 235 2024-12-20 07:34:35Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 236 2024-12-25 01:16:52Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -415,9 +415,9 @@ String moduleNeoPixel::SetOn() {
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
 	String returns = "{" +
-		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
-		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
-		wpFZ.JsonKeyValue("B", String(valueB));
+		wpFZ.JsonKeyValue("R", String(targetR)) + "," +
+		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
+		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
 		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
 	}
@@ -437,9 +437,9 @@ String moduleNeoPixel::SetOff() {
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
 	String returns = "{" +
-		wpFZ.JsonKeyValue("R", String(valueR)) + "," +
-		wpFZ.JsonKeyValue("G", String(valueG)) + "," +
-		wpFZ.JsonKeyValue("B", String(valueB));
+		wpFZ.JsonKeyValue("R", String(targetR)) + "," +
+		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
+		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
 		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
 	}
@@ -1089,7 +1089,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 235 $";
+	String SVN = "$Rev: 236 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

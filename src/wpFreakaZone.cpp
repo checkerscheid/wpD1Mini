@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 236                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 232 2024-12-19 15:27:48Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 236 2024-12-25 01:16:52Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -38,6 +38,7 @@ void wpFreakaZone::init(String deviceName) {
 	mqttTopicCalcValues = wpFZ.DeviceName + "/settings/calcValues";
 
 	loopStartedAt = millis();
+	maxWorkingMillis = 0;
 	publishCalcValuesLast = 0;
 	publishOnDurationLast = 0;
 	restartRequiredLast = false;
@@ -54,10 +55,11 @@ void wpFreakaZone::cycle() {
 	OnDuration = getOnlineTime(false);
 	publishValues();
 	doBlink();
+	RestartAfterMaxWorking();
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 236 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -170,6 +172,15 @@ String wpFreakaZone::JsonKeyValue(String name, String value) {
 String wpFreakaZone::JsonKeyString(String name, String value) {
 	String message = "\"" + name + "\":\"" + value + "\"";
 	return message;
+}
+
+void wpFreakaZone::RestartAfterMaxWorking() {
+	if(loopStartedAt > days40) {
+		maxWorkingMillis = loopStartedAt + maxWorkingDelay;
+	}
+	if(loopStartedAt > maxWorkingMillis) {
+		ESP.restart();
+	}
 }
 
 void wpFreakaZone::publishSettings() {

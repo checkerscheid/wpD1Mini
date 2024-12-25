@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 236                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 232 2024-12-19 15:27:48Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 236 2024-12-25 01:16:52Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -72,6 +72,7 @@ class wpFreakaZone {
 		const uint32 minute2 = 1000 * 60 * 2;
 		const uint32 sekunde30 = 1000 * 30;
 		const uint32 sekunde10 = 1000 * 10;
+		const unsigned long days40 = 1000 * 60 * 60 * 24 * 40;
 		const uint32 publishQoS = minute10; // 10 minutes in ms
 
 		unsigned long loopStartedAt;
@@ -168,7 +169,8 @@ class wpFreakaZone {
 	private:
 		const uint8 blinkStatusNothing = 0;
 		const uint8 blinkStatusStart = 1;
-		String SVNh = "$Rev: 232 $";
+		const uint16 maxWorkingDelay = 1000;
+		String SVNh = "$Rev: 236 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
@@ -178,8 +180,10 @@ class wpFreakaZone {
 		unsigned long blinkStatsusLast;
 		uint32 bootCounter;
 		short blinkDelay;
+		unsigned long maxWorkingMillis;
 		void WriteBootCounter();
 		void doBlink();
+		void RestartAfterMaxWorking();
 };
 extern wpFreakaZone wpFZ;
 
