@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 235                                                     $ #
+//# Revision     : $Rev:: 238                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 235 2024-12-20 07:34:35Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 238 2025-01-08 12:32:06Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -321,6 +321,8 @@ void moduleAnalogOut::InitSetPoint(short setpoint) {
 }
 void moduleAnalogOut::InitPidType(uint8 t) {
 	pidType = t;
+	wpFZ.DebugWS(wpFZ.strINFO, "startPidType",
+		"start PID Type from EEPROM: 'module" + ModuleName + "::loadPidType' = " + GetPidType());
 }
 String moduleAnalogOut::GetPidType() {
 	if(pidType == pidTypeHeating) {
@@ -409,8 +411,7 @@ void moduleAnalogOut::calcOutput() {
 }
 
 void moduleAnalogOut::savePidType() {
-	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitAnalogOutPidType, pidType);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsSettingsModules1);
+	EEPROM.write(wpEEPROM.byteAnalogOutPidType, pidType);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "savePidType",
 		"save to EEPROM: 'module" + ModuleName + "::savePidType' = " + GetPidType());
@@ -424,7 +425,7 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 235 $";
+	String SVN = "$Rev: 238 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -438,16 +439,19 @@ String moduleAnalogOut::GetJsonSettings() {
 			json += F(",") +
 				wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
 				wpFZ.JsonKeyString(F("pidType"), GetPidType()) + F(",") +
+				wpFZ.JsonKeyValue(F("pidTypeRaw"), String(pidType)) + F(",") +
 				wpFZ.JsonKeyValue(F("Kp"), String(Kp * 10.0)) + F(",") +
 				wpFZ.JsonKeyValue(F("Tv"), String(Tv * 10.0)) + F(",") +
 				wpFZ.JsonKeyValue(F("Tn"), String(Tn * 10.0)) + F(",") +
-				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0)));
+				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0))) + F(",") +
+				wpFZ.JsonKeyString(F("TopicTemp"), mqttTopicTemp);
 		}
 		json += F(",") +
-			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false") + F(",") +
-			wpFZ.JsonKeyValue(F("HandValue"), String(handValue));
+			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false");
 	}
-	json += F("}");
+	json += F(",") +
+		wpFZ.JsonKeyValue(F("HandValue"), String(handValue)) +
+		F("}");
 	return json;
 }
 

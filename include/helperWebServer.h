@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 232 2024-12-19 15:27:48Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 239 2025-01-21 16:28:55Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -35,6 +35,7 @@ class helperWebServer {
 		const uint8 cmdScanWiFi = 8;
 		const uint8 cmdCheckDns = 9;
 		const uint8 cmdSetName = 10;
+		const uint8 cmdMaxWorking = 11;
 		uint8 doCommand;
 
 		const uint8 cmdDebugEEPROM = 1;
@@ -131,8 +132,9 @@ class helperWebServer {
 		void checkSubscribes(char* topic, String msg);
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
+		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 232 $";
+		String SVNh = "$Rev: 239 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -221,6 +223,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
+				<li><a class="wpButton" href="/status" target="_blank">Status</a></li>
 				<li><span class='bold'>Updates:</span></li><li><hr /></li>
 				<!--li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li-->
 				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>

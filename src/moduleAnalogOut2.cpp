@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 238                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 232 2024-12-19 15:27:48Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 238 2025-01-08 12:32:06Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -201,7 +201,7 @@ void moduleAnalogOut2::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 238 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -212,10 +212,11 @@ String moduleAnalogOut2::GetJsonSettings() {
 		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin]));
 	if(!wpModules.useModuleCwWw && !wpModules.useModuleNeoPixel) {
 		json += F(",") +
-			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false") + F(",") +
-			wpFZ.JsonKeyValue(F("HandValue"), String(handValue));
+			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false");
 	}
-	json += F("}");
+	json += F(",") +
+		wpFZ.JsonKeyValue(F("HandValue"), String(handValue)) +
+		F("}");
 	return json;
 }
 

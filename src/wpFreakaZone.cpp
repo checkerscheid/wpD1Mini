@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 237                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 237 2024-12-25 01:19:53Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 239 2025-01-21 16:28:55Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -59,7 +59,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 237 $";
+	String SVN = "$Rev: 239 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -174,11 +174,23 @@ String wpFreakaZone::JsonKeyString(String name, String value) {
 	return message;
 }
 
+void wpFreakaZone::InitMaxWorking(bool maxWorking) {
+	useMaxWorking = maxWorking;
+}
+void wpFreakaZone::SetMaxWorking() {
+	useMaxWorking = !useMaxWorking;
+	bitWrite(wpEEPROM.bitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useMaxWorking);
+	EEPROM.write(wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitsSettingsBasis0);
+	DebugSaveBoolToEEPROM(F("useMaxWorking"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useMaxWorking);
+	EEPROM.commit();
+	SendWSDebug(F("useMaxWorking"), useMaxWorking);
+}
+bool wpFreakaZone::GetMaxWorking() {
+	return useMaxWorking;
+}
 void wpFreakaZone::RestartAfterMaxWorking() {
-	if(loopStartedAt > maxWorkingDays) {
-		maxWorkingMillis = loopStartedAt + maxWorkingDelay;
-	}
-	if(loopStartedAt > maxWorkingMillis) {
+	if(useMaxWorking && loopStartedAt > maxWorkingDays) {
+		wpFZ.SetRestartReason(wpFZ.restartReasonMaxWorking);
 		ESP.restart();
 	}
 }
@@ -259,6 +271,7 @@ void wpFreakaZone::checkSubscribes(char* topic, String msg) {
 		if(readRestartDevice > 0) {
 			wpOnlineToggler.setMqttOffline();
 			DebugcheckSubscribes(mqttTopicRestartDevice, String(readRestartDevice));
+			wpFZ.SetRestartReason(wpFZ.restartReasonCmd);
 			ESP.restart();
 		}
 	}
@@ -299,7 +312,21 @@ bool wpFreakaZone::sendRawRest(String target) {
 	http.end();
 	return returns;
 }
-
+void wpFreakaZone::InitLastRestartReason(uint8 restartReason) {
+	_restartReason = restartReason;
+}
+String wpFreakaZone::getLastRestartReason() {
+	if(_restartReason == restartReasonCmd) return restartReasonStringCmd;
+	if(_restartReason == restartReasonMaxWorking) return restartReasonStringMaxWorking;
+	if(_restartReason == restartReasonUpdate) return restartReasonStringUpdate;
+	if(_restartReason == restartReasonWiFi) return restartReasonStringWiFi;
+	if(_restartReason == restartReasonOnlineToggler) return restartReasonStringOnlineToggler;
+	return "Unknown: " + String(_restartReason);
+}
+void wpFreakaZone::SetRestartReason(uint8 restartReason) {
+	EEPROM.write(wpEEPROM.addrRestartReason, restartReason);
+	EEPROM.commit();
+}
 //###################################################################################
 // Debug Messages
 //###################################################################################
@@ -355,6 +382,10 @@ void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;
 	wpFZ.DebugWS(wpFZ.strINFO, F("checkSubscripes"), logmessage);
 	wpFZ.blink();
+}
+void wpFreakaZone::DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state) {
+	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bit) + ", state: " + String(state);
+	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
 }
 
 void wpFreakaZone::SetDeviceName(String name) {

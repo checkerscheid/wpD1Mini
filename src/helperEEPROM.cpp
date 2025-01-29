@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 232 2024-12-19 15:27:48Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 239 2025-01-21 16:28:55Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -19,7 +19,7 @@ helperEEPROM wpEEPROM;
 
 helperEEPROM::helperEEPROM() {
 	EEPROM.begin(4095);
-	if(false) {
+	#if BUILDWITH == 99
 		EEPROM.write(addrBitsModules0, 0);
 		EEPROM.write(addrBitsModules1, 0);
 		EEPROM.write(addrBitsModules2, 0);
@@ -36,7 +36,7 @@ helperEEPROM::helperEEPROM() {
 		wpAnalogOut.mqttTopicTemp = "_";
 		writeStringsToEEPROM();
 		EEPROM.commit();
-	}
+	#endif
 }
 void helperEEPROM::init() {
 	readVars();
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 239 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -61,6 +61,7 @@ void helperEEPROM::changeDebug() {
 	Debug = !Debug;
 	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
 	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugEEPROM", addrBitsDebugBasis0, bitDebugEEPROM, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugEEPROM: " + String(Debug));
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
@@ -252,6 +253,9 @@ void helperEEPROM::readVars() {
 	wpWebServer.Debug = bitRead(bitsDebugBasis0, bitDebugWebServer);
 	wpWiFi.Debug = bitRead(bitsDebugBasis1, bitDebugWiFi);
 
+	bitsSettingsBasis0 = EEPROM.read(addrBitsSettingsBasis0);
+	wpFZ.InitMaxWorking(bitRead(bitsSettingsBasis0, bitUseMaxWorking));
+
 //###################################################################################
 
 	bitsDebugModules0 = EEPROM.read(addrBitsDebugModules0);
@@ -313,7 +317,6 @@ void helperEEPROM::readVars() {
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
-	wpAnalogOut.InitPidType(bitRead(bitsSettingsModules1, bitAnalogOutPidType));
 	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 	wpWeight.UseAvg(bitRead(bitsSettingsModules1, bitUseWeightAvg));
 #endif
@@ -374,6 +377,7 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 2
 	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
 	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
+	wpAnalogOut.InitPidType(EEPROM.read(byteAnalogOutPidType));
 	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));
 	wpRpm.CalcCycle(EEPROM.read(byteCalcCycleRpm) * 100);
@@ -466,6 +470,8 @@ void helperEEPROM::readVars() {
 	uint32 tareValueRead = 0;
 	EEPROM.get(byteWeightTareValue, tareValueRead);
 	wpWeight.InitTareValue(tareValueRead);
+
+	wpFZ.InitLastRestartReason(EEPROM.read(addrRestartReason));
 
 	uint32 bc = 0;
 	EEPROM.get(addrBootCounter, bc);

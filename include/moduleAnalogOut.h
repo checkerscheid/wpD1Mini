@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 238                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 232 2024-12-19 15:27:48Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 238 2025-01-08 12:32:06Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -94,8 +94,8 @@ class moduleAnalogOut : public IModuleBase {
 		bool handError;
 		bool handSet = false;
 		uint8 handValueSet = 0;
-		static const uint8 pidTypeHeating = 0;
-		static const uint8 pidTypeAirCondition = 1;
+		static const uint8 pidTypeHeating = DIRECT;
+		static const uint8 pidTypeAirCondition = REVERSE;
 		double Kp = 1.0;
 		double Tv = 0.2;
 		double Tn = 0.0;
@@ -129,7 +129,7 @@ class moduleAnalogOut : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 232 $";
+		String SVNh = "$Rev: 238 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 };

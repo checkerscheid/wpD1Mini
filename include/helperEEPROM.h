@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 231                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 231 2024-12-14 03:25:15Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 239 2025-01-21 16:28:55Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -79,6 +79,12 @@ class helperEEPROM {
 		byte bitsDebugBasis1;
 		const uint8 bitDebugWiFi = 0; // include in bitsDebugBasis1
 
+//###################################################################################
+
+		const uint16 addrBitsSettingsBasis0 = 6;
+		byte bitsSettingsBasis0;
+		const uint8 bitUseMaxWorking = 0; // include in bitsSettingsBasis0
+
 		// const uint16 addrBitsDebugModules0 = 8; used in BitsDebugModules3
 
 //###################################################################################
@@ -138,7 +144,6 @@ class helperEEPROM {
 		const uint8 bitUseRpmAvg = 0; // include in bitsSettingsModules1
 		const uint8 bitAnalogOut2Hand = 1; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelRGB = 2; // include in bitsSettingsModules1
-		const uint8 bitAnalogOutPidType = 3; // include in bitsSettingsModules1
 		const uint8 bitUseWeightAvg = 4; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
@@ -175,7 +180,7 @@ class helperEEPROM {
 		const uint16 byteNeoPixelValueR = 41;
 		const uint16 byteNeoPixelValueG = 42;
 		const uint16 byteNeoPixelValueB = 43;
-		
+		const uint16 byteAnalogOutPidType = 44;
 		const uint16 byteCalcCycleAnalogOut = 45;
 		const uint16 byteCalcCycleImpulseCounter = 46;
 		const uint16 byteImpulseCounterUpKWh = 47;
@@ -252,6 +257,7 @@ class helperEEPROM {
 		};
 
 // **********
+		const uint16 addrRestartReason = 495;
 		const uint16 addrBootCounter = 496;
 		uint16 byteStartForString; // 500
 
@@ -274,7 +280,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 231 $";
+		String SVNh = "$Rev: 239 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

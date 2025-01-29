@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 237                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 237 2024-12-25 01:19:53Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 239 2025-01-21 16:28:55Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -98,6 +98,12 @@ class wpFreakaZone {
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
 
+		const uint8 restartReasonCmd = 1;
+		const uint8 restartReasonMaxWorking = 2;
+		const uint8 restartReasonUpdate = 3;
+		const uint8 restartReasonWiFi = 4;
+		const uint8 restartReasonOnlineToggler = 5;
+
 		String DeviceName = "BasisEmpty";
 		String DeviceDescription = "BasisEmpty";
 		bool calcValues;
@@ -150,6 +156,7 @@ class wpFreakaZone {
 		void SetDeviceName(String name);
 		void SetDeviceDescription(String description);
 		void DebugcheckSubscribes(String topic, String value);
+		void DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state);
 
 		void printStart();
 		void printRestored();
@@ -166,11 +173,25 @@ class wpFreakaZone {
 		void BootCount();
 		uint32 GetBootCounter();
 		void ResetBootCounter();
+		void InitMaxWorking(bool maxWorking);
+		void SetMaxWorking();
+		bool GetMaxWorking();
+		void InitLastRestartReason(uint8 restartReason);
+		String getLastRestartReason();
+		void SetRestartReason(uint8 restartReason);
 	private:
 		const uint8 blinkStatusNothing = 0;
 		const uint8 blinkStatusStart = 1;
 		const uint16 maxWorkingDelay = 1000;
-		String SVNh = "$Rev: 237 $";
+		
+		uint8 _restartReason = 0;
+		const String restartReasonStringCmd = "Cmd";
+		const String restartReasonStringMaxWorking = "Max Working Counter occurd";
+		const String restartReasonStringUpdate = "Update";
+		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
+		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
+
+		String SVNh = "$Rev: 239 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
@@ -180,6 +201,7 @@ class wpFreakaZone {
 		unsigned long blinkStatsusLast;
 		uint32 bootCounter;
 		short blinkDelay;
+		bool useMaxWorking = false;
 		unsigned long maxWorkingMillis;
 		void WriteBootCounter();
 		void doBlink();

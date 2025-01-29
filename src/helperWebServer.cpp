@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 232 2024-12-19 15:27:48Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 239 2025-01-21 16:28:55Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 239 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -51,6 +51,7 @@ void helperWebServer::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugWebServer", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWebServer: " + String(Debug));
 	wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
@@ -136,6 +137,8 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue(F("UpdateMode"), wpUpdate.UpdateFW ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyValue(F("calcValues"), wpFZ.calcValues ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyValue(F("BootCounter"), String(wpFZ.GetBootCounter())) + F(",") +
+			wpFZ.JsonKeyString(F("RestartReason"), wpFZ.getLastRestartReason()) + F(",") +
+			wpFZ.JsonKeyValue(F("useMaxWorking"), wpFZ.GetMaxWorking() ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyString(F("OnSince"), wpFZ.OnSince) + F(",") +
 			wpFZ.JsonKeyString(F("WiFiSince"), wpWiFi.WiFiSince) + F(",") +
 			wpFZ.JsonKeyString(F("OnDuration"), wpFZ.OnDuration) + F(",");
@@ -699,6 +702,10 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd calcValues"));
 				wpFZ.calcValues = !wpFZ.calcValues;
 			}
+			if(request->getParam(F("cmd"))->value() == F("useMaxWorking")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found cmd useMaxWorking"));
+				wpWebServer.setCommand(wpWebServer.cmdMaxWorking);
+			}
 			if(request->getParam(F("cmd"))->value() == F("Blink")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found Blink"));
 			}
@@ -1204,7 +1211,11 @@ void helperWebServer::doTheCommand() {
 		}
 		if(doCommand == cmdRestartESP) {
 			wpOnlineToggler.setMqttOffline();
+			wpFZ.SetRestartReason(wpFZ.restartReasonCmd);
 			ESP.restart();
+		}
+		if(doCommand == cmdMaxWorking) {
+			wpFZ.SetMaxWorking();
 		}
 		if(doCommand == cmdScanWiFi) {
 			wpWiFi.scanWiFi();
@@ -1329,6 +1340,12 @@ String helperWebServer::getChangeDebug(String id, String name, bool state) {
 	returns += F("</li>");
 	return returns;
 }
+String helperWebServer::getChangeCmd(String id, String name, bool state) {
+	String returns = F("<li class='setChange' onclick='cmdHandle(event)'>");
+	returns += F("<span id='") + id + F("' class='") + (state ? "color-ok" : "") + F("'>") + name + F("</span>");
+	returns += F("</li>");
+	return returns;
+}
 
 //###################################################################################
 // stuff
@@ -1402,7 +1419,8 @@ String processor(const String& var) {
 //###################################################################################
 	if(var == F("Debug")) {
 		returns = F("<ul class='wpContainer'><li><span class='bold'>Cmds:</span></li><li><hr /></li>") +
-			wpWebServer.getChangeDebug(F("calcValues"), F("calc Values"), wpFZ.calcValues);
+			wpWebServer.getChangeDebug(F("calcValues"), F("calc Values"), wpFZ.calcValues) +
+			wpWebServer.getChangeCmd(F("useMaxWorking"), F("Use Max Working"), wpFZ.GetMaxWorking());
 		if((wpModules.useModuleRelais || wpModules.useModuleRelaisShield) && wpModules.useModuleMoisture) {
 			returns += wpWebServer.getChangeDebug(F("waterEmpty"), F("waterEmpty"), wpRelais.waterEmptySet);
 		}

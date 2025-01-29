@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 236                                                     $ #
+//# Revision     : $Rev:: 238                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 236 2024-12-25 01:16:52Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 238 2025-01-08 12:32:06Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -637,8 +637,7 @@ void moduleNeoPixel::publishValue() {
 void moduleNeoPixel::calc() {	
 	if(sleepAt > 0) {
 		if(wpFZ.loopStartedAt > sleepAt) {
-			demoMode = false;
-			modeCurrent = ModeBlender;
+			SetOff();
 			sleep = 0;
 			sleepAt = 0;
 		} else {
@@ -1089,7 +1088,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 236 $";
+	String SVN = "$Rev: 238 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 232                                                     $ #
+//# Revision     : $Rev:: 239                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 232 2024-12-19 15:27:48Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 239 2025-01-21 16:28:55Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -34,8 +34,12 @@ void helperUpdate::init() {
 	lastUpdateCheck = 0;
 	serverVersion = "";
 	newVersion = false;
-	updateChanel = 0;
 	file = F("firmware.bin");
+	updateChanel = 0;
+	#if BUILDWITH == 99
+		file = F("firmwareclean.bin");
+		updateChanel = 99;
+	#endif
 	#if BUILDWITH == 1
 		file = F("firmwarelight.bin");
 		updateChanel = 1;
@@ -67,7 +71,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 232 $";
+	String SVN = "$Rev: 239 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -77,6 +81,7 @@ void helperUpdate::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugUpdate", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugUpdate: " + String(Debug));
 	wpFZ.SendWSDebug("DebugUpdate", Debug);
@@ -86,6 +91,7 @@ void helperUpdate::changeDebug() {
 bool helperUpdate::setupOta() {
 	bool returns = false;
 	ArduinoOTA.onStart([]() {
+		wpFZ.SetRestartReason(wpFZ.restartReasonUpdate);
 		wpOnlineToggler.setMqttOffline();
 		String logmessage = "OTA Start";
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
@@ -240,6 +246,9 @@ void helperUpdate::doCheckUpdate() {
 }
 String helperUpdate::GetUpdateChanel() {
 	switch(updateChanel) {
+		case 99:
+			return F("cleaner");
+			break;
 		case 1:
 			return F("light");
 			break;
@@ -259,6 +268,10 @@ String helperUpdate::GetUpdateChanel() {
 }
 void helperUpdate::SetUpdateChanel(uint8 uc) {
 	switch(uc) {
+		case 99:
+			file = F("firmwarecleaner.bin");
+			updateChanel = 99;
+			break;
 		case 1:
 			file = F("firmwarelight.bin");
 			updateChanel = 1;
@@ -283,6 +296,7 @@ void helperUpdate::SetUpdateChanel(uint8 uc) {
 	wpMqtt.mqttClient.publish(mqttTopicUpdateChanel.c_str(), GetUpdateChanel().c_str());
 }
 void helperUpdate::started() {
+	wpFZ.SetRestartReason(wpFZ.restartReasonUpdate);
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }
 
