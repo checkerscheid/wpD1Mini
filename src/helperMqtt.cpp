@@ -121,7 +121,7 @@ void helperMqtt::connectMqtt() {
 		} else {
 			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 5 seconds";
 			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
-			delay(5000);
+			//delay(5000); do this in main loop / cycle
 		}
 	}
 }

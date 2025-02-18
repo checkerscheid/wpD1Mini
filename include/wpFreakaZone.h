@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 240                                                     $ #
+//# Revision     : $Rev:: 243                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 240 2025-01-29 18:36:01Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 243 2025-02-18 14:12:17Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -191,7 +191,7 @@ class wpFreakaZone {
 		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
 		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
 
-		String SVNh = "$Rev: 240 $";
+		String SVNh = "$Rev: 243 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
