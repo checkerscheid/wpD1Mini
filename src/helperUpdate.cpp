@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 240                                                     $ #
+//# Revision     : $Rev:: 247                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 240 2025-01-29 18:36:01Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 247 2025-02-18 19:03:11Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -36,25 +36,31 @@ void helperUpdate::init() {
 	newVersion = false;
 	file = F("firmware.bin");
 	updateChanel = 0;
+	jsonsub = "firmware";
 	#if BUILDWITH == 99
 		file = F("firmwareclean.bin");
 		updateChanel = 99;
+		jsonsub = "firmware";
 	#endif
 	#if BUILDWITH == 1
 		file = F("firmwarelight.bin");
 		updateChanel = 1;
+		jsonsub = "light";
 	#endif
 	#if BUILDWITH == 2
 		file = F("firmwareio.bin");
 		updateChanel = 2;
+		jsonsub = "io";
 	#endif
 	#if BUILDWITH == 3
 		file = F("firmwareheating.bin");
 		updateChanel = 3;
+		jsonsub = "heating";
 	#endif
 	#if BUILDWITH == 4
 		file = F("firmwarerfid.bin");
 		updateChanel = 4;
+		jsonsub = "rfid";
 	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
@@ -71,7 +77,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 240 $";
+	String SVN = "$Rev: 247 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -134,12 +140,13 @@ void helperUpdate::check() {
 	deserializeJson(doc, payload);
 	payload.replace("\"", "'");
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
-	serverVersion = doc["wpFreakaZone"]["Version"].as<String>();
+	serverVersion = doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>();
 	newVersion = !(serverVersion == installedVersion);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Selected Chanel: " + jsonsub);
 	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + serverVersion);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"]["date"].as<String>());
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"]["filename"].as<String>());
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"][jsonsub]["date"].as<String>());
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"][jsonsub]["filename"].as<String>());
 	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {

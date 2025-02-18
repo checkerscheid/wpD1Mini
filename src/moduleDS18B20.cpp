@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 235                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDS18B20.cpp 235 2024-12-20 07:34:35Z               $ #
+//# File-ID      : $Id:: moduleDS18B20.cpp 246 2025-02-18 16:27:11Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDS18B20.h>
@@ -162,7 +162,7 @@ void moduleDS18B20::setCount() {
 // section to copy
 //###################################################################################
 uint16 moduleDS18B20::getVersion() {
-	String SVN = "$Rev: 235 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
