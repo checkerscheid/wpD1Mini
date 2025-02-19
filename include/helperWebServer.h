@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 248                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 246 2025-02-18 16:27:11Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 248 2025-02-19 10:00:24Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -134,7 +134,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 248 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -198,7 +198,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% <span class="setChange" onclick="changeName()">&#9998;</span> Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
 		<div id="restartRequired" class="wpContainer wpHidden"></div>
-		<div id="newVersion" class="wpContainer%newVersion%"></div>
+		<div id="newVersion" class="wpContainer%newVersion%">%innernewVersion%</div>
 		<div id="progressContainer" class="wpHidden">
 			<div class="wpContainer">
 				<div id="progressBg">
@@ -265,7 +265,7 @@ function initWebSocket() {
 	websocket.onclose = onClose;
 	websocket.onmessage = onMessage;
 	document.getElementById('restartRequired').classList.add('wpHidden');
-	document.getElementById('newVersion').classList.add('wpHidden');
+	//document.getElementById('newVersion').classList.add('wpHidden');
 	document.getElementById('LiPump').classList.add('wpHidden');
 	document.getElementById('progressContainer').classList.add('wpHidden');
 }

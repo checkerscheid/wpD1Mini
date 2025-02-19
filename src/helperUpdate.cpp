@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 247                                                     $ #
+//# Revision     : $Rev:: 248                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 247 2025-02-18 19:03:11Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 248 2025-02-19 10:00:24Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -32,7 +32,6 @@ void helperUpdate::init() {
 	
 	twelveHours = 12 * 60 * 60 * 1000;
 	lastUpdateCheck = 0;
-	serverVersion = "";
 	newVersion = false;
 	file = F("firmware.bin");
 	updateChanel = 0;
@@ -77,7 +76,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 247 $";
+	String SVN = "$Rev: 248 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -140,13 +139,13 @@ void helperUpdate::check() {
 	deserializeJson(doc, payload);
 	payload.replace("\"", "'");
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
-	serverVersion = doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>();
-	newVersion = !(serverVersion == installedVersion);
+	newVersion = !(doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>() == installedVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Selected Chanel: " + jsonsub);
-	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + serverVersion);
+	wpFZ.DebugWS(newVersion ? wpFZ.strWARN : wpFZ.strINFO, "UpdateCheck", "installed Version: " + installedVersion);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>());
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"][jsonsub]["date"].as<String>());
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"][jsonsub]["filename"].as<String>());
+	serverVersion = doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>();
 	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {

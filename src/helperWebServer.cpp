@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 248                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 246 2025-02-18 16:27:11Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 248 2025-02-19 10:00:24Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 248 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1352,7 +1352,7 @@ String helperWebServer::getChangeCmd(String id, String name, bool state) {
 //###################################################################################
 
 String processor(const String& var) {
-	String returns;
+	String returns = "";
 //###################################################################################
 	if(var == F("IPADRESS"))
 		return WiFi.localIP().toString();
@@ -1366,8 +1366,15 @@ String processor(const String& var) {
 	if(var == F("Version"))
 		return wpFZ.Version;
 //###################################################################################
-	if(var == F("newVersion"))
-		return wpUpdate.newVersion ? F("") : F(" wpHidden");
+	if(var == F("newVersion")) {
+		if(!wpUpdate.newVersion)
+			return F(" wpHidden");
+	}
+//###################################################################################
+	if(var == F("innernewVersion")) {
+		if(wpUpdate.newVersion)
+			return F("--- Update Available ---<br />installed: ") + wpUpdate.installedVersion + F("<br />update: ") + wpUpdate.serverVersion;
+	}
 //###################################################################################
 	if(var == "CompiledWith") {
 		returns = "<ul class='wpContainer'><li><span class='bold'>Modules:</span></li><li><hr /></li>" +
