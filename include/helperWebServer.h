@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 248                                                     $ #
+//# Revision     : $Rev:: 249                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 248 2025-02-19 10:00:24Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 249 2025-02-20 21:11:36Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -134,7 +134,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 248 $";
+		String SVNh = "$Rev: 249 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -226,8 +226,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><a class="wpButton" href="/status" target="_blank">Status</a></li>
 				<li><span class='bold'>Updates:</span></li><li><hr /></li>
 				<!--li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li-->
-				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
-				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
+				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check Update</span></li>
+				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">Update</span></li>
 				<li><span class='bold'>Stuff:</span></li><li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
 				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>

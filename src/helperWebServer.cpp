@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 248                                                     $ #
+//# Revision     : $Rev:: 249                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 248 2025-02-19 10:00:24Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 249 2025-02-20 21:11:36Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 248 $";
+	String SVN = "$Rev: 249 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -141,6 +141,7 @@ void helperWebServer::setupWebServer() {
 			wpFZ.JsonKeyValue(F("useMaxWorking"), wpFZ.GetMaxWorking() ? "true" : "false") + F(",") +
 			wpFZ.JsonKeyString(F("OnSince"), wpFZ.OnSince) + F(",") +
 			wpFZ.JsonKeyString(F("WiFiSince"), wpWiFi.WiFiSince) + F(",") +
+			wpFZ.JsonKeyString(F("MQTTSince"), wpMqtt.MqttSince) + F(",") +
 			wpFZ.JsonKeyString(F("OnDuration"), wpFZ.OnDuration) + F(",");
 		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22) {
 			message += wpDHT.GetJsonSettings() + F(",");
