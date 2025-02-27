@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 250                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 246 2025-02-18 16:27:11Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 250 2025-02-27 13:50:21Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -33,13 +33,14 @@ void helperOnlineToggler::cycle() {
 	publishValues();
 	if(wpFZ.loopStartedAt > lastContact + Minutes10) {
 		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, 'checkSubscribes' not fired, restart ...");
-		wpFZ.SetRestartReason(wpFZ.restartReasonOnlineToggler);
-		ESP.restart();
+		wpMqtt.connectMqtt();
+		//wpFZ.SetRestartReason(wpFZ.restartReasonOnlineToggler);
+		//ESP.restart();
 	}
 }
 
 uint16 helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 250 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

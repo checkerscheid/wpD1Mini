@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 250                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 250 2025-02-27 13:50:21Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -32,8 +32,7 @@ void helperMqtt::init() {
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
-	mqttClient.setCallback(callbackMqtt);
-	lastConnectTry = millis();
+	lastConnectTry = 0;
 	//connectMqtt();
 }
 
@@ -42,9 +41,9 @@ void helperMqtt::init() {
 //###################################################################################
 void helperMqtt::cycle() {
 	if(!mqttClient.connected()) {
-		if((lastConnectTry + 5000) > millis()) {
+		if(lastConnectTry == 0 || (lastConnectTry + 5000) > millis()) {
 			lastConnectTry = millis();
-			Serial.println(mqttClient.state());
+			wpFZ.DebugWS(wpFZ.strINFO, "MQTT cycle", "MQTT State: " + String(mqttClient.state()));
 			connectMqtt();
 		}
 		//connectMqtt();
@@ -54,7 +53,7 @@ void helperMqtt::cycle() {
 }
 
 uint16 helperMqtt::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 250 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -111,6 +110,7 @@ void helperMqtt::connectMqtt() {
 	mqttClient.disconnect();
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
+			mqttClient.setCallback(callbackMqtt);
 			wpModules.publishAllValues();
 			wpModules.publishAllSettings();
 			wpModules.setAllSubscribes();

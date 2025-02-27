@@ -21,12 +21,13 @@ moduleAnalogOut2::moduleAnalogOut2() {
 	// section to config and copy
 	ModuleName = "AnalogOut2";
 	mb = new moduleBase(ModuleName);
+	Pin = D5;
+	pinMode(Pin, OUTPUT);
+	analogWrite(Pin, LOW);
 }
 void moduleAnalogOut2::init() {
 	// section for define
-	Pin = D5;
 
-	pinMode(Pin, OUTPUT);
 	output = 0;
 	autoValue = 0;
 	handValue = 0;
