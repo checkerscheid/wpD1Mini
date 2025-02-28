@@ -129,7 +129,9 @@ class wpFreakaZone {
 		/// @brief Extract the version from the SVN string
 		/// @return SVN version
 		uint16 getVersion();
-
+		/// @brief Extract the build from the SVN string
+		/// @param Rev SVN string
+		/// @return SVN build
 		uint16 getBuild(String);
 		String getTime();
 		void getTime(uint8 &h, uint8 &m, uint8 &s);
