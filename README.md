@@ -16,6 +16,8 @@ Welcome to the FreakaZone:
    - filesufix = updatechannel
 
 5. Pin assignment
+
+   Combinations are possible, but no double occupancy
    - AnalogOut D6 (WW Warm White, eventlightning left) PWM
    - AnalogOut2 D5 (CW Cold White, eventlightning right) PWM
    - BM D5 (window / potentionalfree)
