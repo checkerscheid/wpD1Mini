@@ -12,7 +12,6 @@ Welcome to the FreakaZone:
    - build_with=3 ;heating, DS18B20: Includes PID for heating / aircondition or oneline temperature DS18B20 for multiple heating supply and return
    - build_with=4 ;RFID: just testing now
 
-
 4. The 'dest' in the sendToUpdateServer.py is the http update sever location folder (available through your web server)
    - filesufix = updatechannel
 
@@ -57,11 +56,7 @@ Welcome to the FreakaZone:
       - window3 D2
 
 7. example images
-
-ToDo: Upload 'print' page demo
-
-ToDo: Upload 'status' (json) page demo
-
-ToDo: Upload circuit diagram
-
-ToDo: Upload soldered examples
+    ToDo: Upload 'print' page demo
+    ToDo: Upload 'status' (json) page demo
+    ToDo: Upload circuit diagram
+    ToDo: Upload soldered examples
