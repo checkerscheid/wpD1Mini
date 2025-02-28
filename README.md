@@ -57,4 +57,11 @@ Welcome to the FreakaZone:
       - window3 D2
 
 7. example images
-   ToDo: Upload 'print' page demo, 'status' (json) page demo
+
+ToDo: Upload 'print' page demo
+
+ToDo: Upload 'status' (json) page demo
+
+ToDo: Upload circuit diagram
+
+ToDo: Upload soldered examples
