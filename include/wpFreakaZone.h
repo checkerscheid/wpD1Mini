@@ -126,6 +126,8 @@ class wpFreakaZone {
 		wpFreakaZone();
 		void init(String);
 		void cycle();
+		/// @brief Extract the version from the SVN string
+		/// @return SVN version
 		uint16 getVersion();
 
 		uint16 getBuild(String);
