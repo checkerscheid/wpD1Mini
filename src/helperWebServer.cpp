@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 249                                                     $ #
+//# Revision     : $Rev:: 252                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 249 2025-02-20 21:11:36Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 252 2025-03-13 12:49:49Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 249 $";
+	String SVN = "$Rev: 252 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1538,13 +1538,6 @@ String processor(const String& var) {
 		String returns = F("");
 		if(wpWebServer.Debug) {
 			returns = F("console.log(event)");
-		}
-		return returns;
-	}
-	if(var == F("debugOnMessage")) {
-		String returns = F("");
-		if(wpWebServer.Debug) {
-			returns = F("console.log('[d.cmd = undefined]:'); console.log(d);");
 		}
 		return returns;
 	}

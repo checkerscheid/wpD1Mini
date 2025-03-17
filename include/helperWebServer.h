@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 249                                                     $ #
+//# Revision     : $Rev:: 252                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 249 2025-02-20 21:11:36Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 252 2025-03-13 12:49:49Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -134,7 +134,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 249 $";
+		String SVNh = "$Rev: 252 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
@@ -289,15 +289,12 @@ function onMessage(event) {
 	const d = tryParseJSONObject(event.data);
 	if(typeof d.cmd != 'undefined') {
 		if(d.cmd == 'setDebug') {
-			console.log('setDebug:');
 			console.log(d);
 			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'setModule') {
-			console.log('setModule:');
 			console.log(d);
 			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'restartRequired') {
-			console.log('restartRequired:');
 			console.log(d);
 			let restartRequired = document.getElementById('restartRequired');
 			restartRequired.classList.remove('wpHidden');
@@ -305,7 +302,6 @@ function onMessage(event) {
 		} else if(d.cmd == 'newVersion') {
 			let newVersion = document.getElementById('newVersion');
 			if(d.msg.newVersion) {
-				console.log('newVersionAvailable:');
 				console.log(d);
 				newVersion.classList.remove('wpHidden');
 				newVersion.innerHTML = '--- Update Available ---<br />installed: ' + d.msg.installedVersion + '<br />update: ' + d.msg.serverVersion;
@@ -313,14 +309,12 @@ function onMessage(event) {
 				newVersion.classList.add('wpHidden');
 			}
 		} else if(d.cmd == 'remainPumpInPause') {
-			console.log('remainPumpInPause:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
 			let remainPumpInPause = document.getElementById('remainPumpInPause');
 			remainPumpInPause.innerHTML = d.msg;
 		} else if(d.cmd == 'pumpStatus') {
-			console.log('pumpStatus:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
@@ -328,12 +322,10 @@ function onMessage(event) {
 			changePumpState('pumpStarted', d.msg.pumpStarted != 0);
 			changePumpState('pumpInPause', d.msg.pumpInPause != 0);
 		} else if(d.cmd == 'pumpCycleFinished') {
-			console.log('pumpCycleFinished:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.add('wpHidden');
 		} else if(d.cmd == 'updateProgress') {
-			console.log('updateProgress:');
 			console.log(d);
 			document.getElementById('progressContainer').classList.remove('wpHidden');
 			let progress = document.getElementById('progress');
@@ -344,15 +336,18 @@ function onMessage(event) {
 			console.log('unknown command:');
 			console.log(d);
 		}
-	} else {
-		%debugOnMessage%
-		console.log('[d.cmd == undefined], event.data:');
-		console.log(event.data);
-		WebSerialBox.innerHTML =
-			'<p>' +
-				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
-				'<span>' + d.msgbody + '</span>' +
-			'</p>' + WebSerialBox.innerHTML;
+	}
+	if(typeof d.msgheader != 'undefined') {
+		console.log(d);
+		let spanHeader = document.createElement('span');
+		spanHeader.classList.add(d.cssClass);
+		spanHeader.innerHTML = d.msgheader;
+		let spanBody = document.createElement('span');
+		spanBody.innerHTML = d.msgbody;
+		let p = document.createElement('p');
+		p.appendChild(spanHeader);
+		p.appendChild(spanBody);
+		WebSerialBox.prepend(p);
 	}
 }
 function tryParseJSONObject(jsonString) {
