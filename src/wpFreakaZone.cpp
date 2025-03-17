@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 243                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 243 2025-02-18 14:12:17Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 253 2025-03-17 19:29:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -59,7 +59,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 243 $";
+	String SVN = "$Rev: 253 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -148,6 +148,15 @@ void wpFreakaZone::blink() {
 bool wpFreakaZone::blinking() {
 	return blinkStatus != blinkStatusNothing;
 }
+/// @brief linear interpolation
+/// @param in input value
+/// @param inMin x value of the first point
+/// @param inMax y value of the first point
+/// @param outMin x value of the second point
+/// @param outMax y value of the second point
+/// @param useMin can't be smaller than outMin
+/// @param useMax can't be bigger than outMax
+/// @return calculated value
 long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax) {
 	if(inMax - inMin == 0) {
 		DebugWS(strERRROR, "Map", F("risky math operation: 'inMax - inMin == 0'"));
@@ -158,6 +167,13 @@ long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax
 	if(useMax && returns > outMax) returns = outMax;
 	return returns;
 }
+/// @brief linear interpolation
+/// @param in input value
+/// @param inMin x value of the first point
+/// @param inMax y value of the first point
+/// @param outMin x value of the second point
+/// @param outMax y value of the second point
+/// @return calculated value
 long wpFreakaZone::Map(long in, long inMin, long inMax, long outMin, long outMax) {
 	return Map(in, inMin, inMax, outMin, outMax, true, true);
 }

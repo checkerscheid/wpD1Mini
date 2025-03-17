@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 252                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 252 2025-03-13 12:49:49Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 253 2025-03-17 19:29:41Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 252 $";
+	String SVN = "$Rev: 253 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1053,11 +1053,18 @@ void helperWebServer::setupWebServer() {
 	});
 	webServer.on("/setWeight", HTTP_GET, [](AsyncWebServerRequest *request) {
 		if(request->hasParam(F("tare"))) {
-			if(request->getParam(F("tare"))->value().toInt() == 0) {
-				wpWeight.SetTare();
-				request->send(200, F("application/json"), wpFZ.jsonOK);
-			} else {
-				request->send(200, F("application/json"), wpFZ.jsonERROR);
+			int tare = request->getParam(F("tare"))->value().toInt();
+			switch(tare) {
+				case 0:
+					wpWeight.SetTare();
+					request->send(200, F("application/json"), wpFZ.jsonOK);
+					break;
+				case 5:
+					wpWeight.Set1kg();
+					request->send(200, F("application/json"), wpFZ.jsonOK);
+					break;
+				default:
+					request->send(200, F("application/json"), wpFZ.jsonERROR);
 			}
 		}
 	});

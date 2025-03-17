@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleWeight.h 253 2025-03-17 19:29:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWeight_h
@@ -31,12 +31,15 @@ class moduleWeight : public IModuleBase {
 		// section for define
 		long weight;
 		long tareValue = 50000;
+		long tare1kg = 200000;
 
 		// values
 		String mqttTopicWeight;
 		String mqttTopicTareValue;
+		String mqttTopicTare1kg;
 		// settings
 		String mqttTopicSetTare;
+		String mqttTopicSet1kg;
 
 		// section to copy
 		void init();
@@ -51,8 +54,10 @@ class moduleWeight : public IModuleBase {
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
 		String GetJsonSettings();
-		void InitTareValue(uint32 tareValue);
+		void InitTareValue(uint32 tv);
 		void SetTare();
+		void InitTare1kg(uint32 t1kg);
+		void Set1kg();
 		// getter / setter
 		bool UseAvg();
 		bool UseAvg(bool useAvg);
@@ -65,9 +70,12 @@ class moduleWeight : public IModuleBase {
 		unsigned long publishWeightLast;
 		long tareValueLast;
 		unsigned long publishTareValueLast;
+		long tare1kgLast;
+		unsigned long publishTare1kgLast;
 		static const uint8 avgLength = 128;
 		long avgValues[avgLength];
-		bool tare;
+		bool makeTare;
+		bool make1kg;
 
 		void publishValue();
 		void calc();
@@ -75,7 +83,7 @@ class moduleWeight : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 253 $";
 };
 extern moduleWeight wpWeight;
 

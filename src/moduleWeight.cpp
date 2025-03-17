@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 253 2025-03-17 19:29:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -29,12 +29,15 @@ void moduleWeight::init() {
 	Pin = D7; // CLK / SCK
 	scale->begin(Pinout, Pin);
 	weight = 0;
-	tare = false;
+	makeTare = false;
+	make1kg = false;
 	// values
 	mqttTopicWeight = wpFZ.DeviceName + "/" + ModuleName + "/Output";
-	mqttTopicTareValue = wpFZ.DeviceName + "/" + ModuleName + "/Tare";
+	mqttTopicTareValue = wpFZ.DeviceName + "/" + ModuleName + "/TareValue";
+	mqttTopicTare1kg = wpFZ.DeviceName + "/" + ModuleName + "/Tare1kg";
 	// settings
 	mqttTopicSetTare = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetTare";
+	mqttTopicSet1kg = wpFZ.DeviceName + "/settings/" + ModuleName + "/Set1kg";
 
 	weightLast = 0;
 	publishWeightLast = 0;
@@ -65,6 +68,7 @@ void moduleWeight::publishSettings() {
 void moduleWeight::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetTare.c_str(), "0");
+		wpMqtt.mqttClient.publish(mqttTopicSet1kg.c_str(), "0");
 	}
 	mb->publishSettings(force);
 }
@@ -88,11 +92,20 @@ void moduleWeight::publishValues(bool force) {
 		}
 		publishTareValueLast = wpFZ.loopStartedAt;
 	}
+	if(tare1kgLast != tare1kg || wpFZ.CheckQoS(publishTare1kgLast)) {
+		wpMqtt.mqttClient.publish(mqttTopicTare1kg.c_str(), String(tare1kg).c_str());
+		tare1kgLast = tare1kg;
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug("Tare1kg", String(tare1kg));
+		}
+		publishTare1kgLast = wpFZ.loopStartedAt;
+	}
 	mb->publishValues(force);
 }
 
 void moduleWeight::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetTare.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSet1kg.c_str());
 	mb->setSubscribes();
 }
 
@@ -100,9 +113,17 @@ void moduleWeight::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetTare.c_str()) == 0) {
 		bool readSetTare = msg.toInt();
 		if(readSetTare != 0) {
-			tare = true;
+			SetTare();
 			wpMqtt.mqttClient.publish(mqttTopicSetTare.c_str(), "0");
 			wpFZ.DebugcheckSubscribes(mqttTopicSetTare, String(readSetTare));
+		}
+	}
+	if(strcmp(topic, mqttTopicSet1kg.c_str()) == 0) {
+		bool readSet1kg = msg.toInt();
+		if(readSet1kg != 0) {
+			Set1kg();
+			wpMqtt.mqttClient.publish(mqttTopicSet1kg.c_str(), "0");
+			wpFZ.DebugcheckSubscribes(mqttTopicSet1kg, String(readSet1kg));
 		}
 	}
 	mb->checkSubscribes(topic, msg);
@@ -112,9 +133,16 @@ void moduleWeight::InitTareValue(uint32 tv) {
 	tareValue = tv * 1000;
 }
 void moduleWeight::SetTare() {
-	tare = true;
+	makeTare = true;
+	calc();
 }
-
+void moduleWeight::InitTare1kg(uint32 t1kg) {
+	tare1kg = t1kg * 1000;
+}
+void moduleWeight::Set1kg() {
+	make1kg = true;
+	calc();
+}
 //###################################################################################
 // private
 //###################################################################################
@@ -129,15 +157,24 @@ void moduleWeight::publishValue() {
 
 void moduleWeight::calc() {
 	if(scale->is_ready()) {
-		long raw = scale->read();
-		if(tare) {
-			tareValue = -1 * raw;
+		long raw = -1 * scale->read();
+		if(makeTare) {
+			tareValue = raw;
 			EEPROM.put(wpEEPROM.byteWeightTareValue, (uint32) (tareValue / 1000.0));
 			EEPROM.commit();
-			tare = false;
+			wpFZ.DebugWS(wpFZ.strDEBUG, "calcWeight", "Save to EEPROM: Tare: " + String(tareValue));
+			makeTare = false;
 		}
-		long correct = tareValue + raw;
-		long mapped = correct * 64.98; //wpFZ.Map(correct, 0, 427800, 0, 1000000, true, false);
+		if(make1kg) {
+			tare1kg = raw;
+			EEPROM.put(wpEEPROM.byteWeightTare1kg, (uint32) (tare1kg / 1000.0));
+			EEPROM.commit();
+			wpFZ.DebugWS(wpFZ.strDEBUG, "calcWeight", "Save to EEPROM: Tare 1 kg: " + String(tare1kg));
+			make1kg = false;
+		}
+		// long correct = tareValue + raw;
+		// long mapped = correct * 64.98; // old static
+		long mapped = wpFZ.Map(raw, tareValue, tare1kg, 0, 1000, true, false);
 		long avg = mapped;
 		if(mb->useAvg) {
 			avg = calcAvg(avg);
@@ -148,7 +185,7 @@ void moduleWeight::calc() {
 			String logmessage = "Weight: " + String(weight) + " ("
 				"Avg: " + String(avg) + ", "
 				"Mapped: " + String(mapped) + ", "
-				"Correct: " + String(correct) + ", "
+				//"Correct: " + String(correct) + ", "
 				"Raw: " + String(raw) + ")";
 			wpFZ.DebugWS(wpFZ.strDEBUG, "calcWeight", logmessage);
 		}
@@ -177,7 +214,7 @@ long moduleWeight::calcAvg(long raw) {
 // section to copy
 //###################################################################################
 uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 253 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -187,6 +224,8 @@ String moduleWeight::GetJsonSettings() {
 	String json = F("\"") + ModuleName + F("\":{") +
 		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
 		wpFZ.JsonKeyString(F("Pinout"), String(wpFZ.Pins[Pinout])) + F(",") +
+		wpFZ.JsonKeyValue(F("Tare 0"), String(tareValue)) + F(",") +
+		wpFZ.JsonKeyValue(F("Tare 1 kg"), String(tare1kg)) + F(",") +
 		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
 		wpFZ.JsonKeyValue(F("useAvg"), UseAvg() ? "true" : "false") +
 		F("}");
