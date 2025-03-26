@@ -34,7 +34,7 @@ class moduleNeoPixel : public IModuleBase {
 		static const uint8 ModeWheelRainbow = 4;
 		static const uint8 ModeTheaterChaseRainbow = 5;
 		static const uint8 ModeRunner = 6;
-		static const uint8 ModeRandom = 7;
+		static const uint8 ModeDisco = 7;
 		static const uint8 ModeRainbowTv = 8;
 
 		static const uint8 ModeBlender = 90; //CW, WW
@@ -192,7 +192,7 @@ class moduleNeoPixel : public IModuleBase {
 		void RainbowTvEffect(uint wait);
 		void TheaterChaseRainbowEffect(uint wait);
 		void RunnerEffect(uint wait);
-		void RandomEffect(uint wait);
+		void DiscoEffect(uint wait);
 		void OffRunnerEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
