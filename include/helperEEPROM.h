@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 253 2025-03-17 19:29:41Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -188,7 +188,7 @@ class helperEEPROM {
 		const uint16 byteCalcCycleRFID = 49;
 
 //###################################################################################
-/// byte values: 2byte 50 - 79
+/// byte values: 2byte 50 - 99
 		const uint16 byteLightCorrection = 50; // int
 		const uint16 byteBMThreshold = 52;
 		const uint16 bytePumpPause = 54;
@@ -202,14 +202,12 @@ class helperEEPROM {
 		const uint16 byteNeoPixelPixelCount = 72;
 		const uint16 byteImpulseCounterSilver = 74;
 		const uint16 byteImpulseCounterRed = 76;
-		const uint16 byteWeightTareValue = 77;
 
 //###################################################################################
-/// byte values: 4byte 80 - 99
+/// byte values: 4byte 90 - 149
 
-		const uint16 byteImpulseCounterKWh = 80;
 // kein Platz mehr gehabt...
-/// byte values: byte 90 - 110
+/// byte values: byte 90 - 119
 		const uint16 byteUnderfloor1Setpoint = 90;
 		const uint16 byteUnderfloor2Setpoint = 91;
 		const uint16 byteUnderfloor3Setpoint = 92;
@@ -236,6 +234,11 @@ class helperEEPROM {
 		const uint16 byteClockColor5R = 113;
 		const uint16 byteClockColor5G = 114;
 		const uint16 byteClockColor5B = 115;
+
+// ab hier 4 bytes
+		const uint16 byteImpulseCounterKWh = 120;
+		const uint16 byteWeightTareValue = 124;
+		const uint16 byteWeightTare1kg = 128;
 
 
 // byte oneWire TempCorrection 200
@@ -280,7 +283,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 253 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

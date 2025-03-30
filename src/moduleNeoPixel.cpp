@@ -566,8 +566,8 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 		case ModeRunner:
 			returns = "ModeRunner";
 			break;
-		case ModeRandom:
-			returns = "ModeRandom";
+		case ModeDisco:
+			returns = "ModeDisco";
 			break;
 		case ModeComplex:
 			returns = "ModeComplex";
@@ -689,10 +689,10 @@ void moduleNeoPixel::calc() {
 				BlenderCWEffect();
 				RunnerEffect(effectSpeed * 25); // Runner Red
 				break;
-			case ModeRandom:
+			case ModeDisco:
 				BlenderWWEffect();
 				BlenderCWEffect();
-				RandomEffect(effectSpeed * 25); // Random
+				DiscoEffect(effectSpeed * 25); // Disco
 				break;
 			case ModeOffRunner:
 				BlenderWWEffect();
@@ -981,7 +981,7 @@ void moduleNeoPixel::RunnerEffect(uint wait) {
 		current_pixel = 0;
 	}
 }
-void moduleNeoPixel::RandomEffect(uint wait) {
+void moduleNeoPixel::DiscoEffect(uint wait) {
 	pixelInterval = wait;
 	int pixel;
 	byte r, g, b;

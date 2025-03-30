@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 253                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 253 2025-03-17 19:29:41Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 253 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -470,6 +470,10 @@ void helperEEPROM::readVars() {
 	uint32 tareValueRead = 0;
 	EEPROM.get(byteWeightTareValue, tareValueRead);
 	wpWeight.InitTareValue(tareValueRead);
+
+	uint32 tare1kgRead = 0;
+	EEPROM.get(byteWeightTare1kg, tare1kgRead);
+	wpWeight.InitTare1kg(tare1kgRead);
 
 	wpFZ.InitLastRestartReason(EEPROM.read(addrRestartReason));
 
