@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 229                                                     $ #
+//# Revision     : $Rev:: 254                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 229 2024-12-12 07:52:51Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 254 2025-03-30 13:01:15Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -199,7 +199,7 @@ class moduleNeoPixel {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 229 $";
+		String SVNh = "$Rev: 254 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

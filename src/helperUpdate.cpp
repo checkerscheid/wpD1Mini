@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 254                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 219 2024-10-29 10:36:32Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 254 2025-03-30 13:01:15Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -35,7 +35,12 @@ void helperUpdate::init() {
 	serverVersion = "";
 	newVersion = false;
 	updateChanel = 0;
-	file = F("firmware.bin");
+	jsonsub = "firmware";
+	#if BUILDWITH == 99
+		file = F("firmware.bin");
+		updateChanel = 99;
+		jsonsub = "firmware";
+	#endif
 	#if BUILDWITH == 1
 		file = F("firmwarelight.bin");
 		updateChanel = 1;
@@ -67,7 +72,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 219 $";
+	String SVN = "$Rev: 254 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
