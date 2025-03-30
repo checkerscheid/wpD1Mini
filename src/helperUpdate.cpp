@@ -32,7 +32,6 @@ void helperUpdate::init() {
 	
 	twelveHours = 12 * 60 * 60 * 1000;
 	lastUpdateCheck = 0;
-	serverVersion = "";
 	newVersion = false;
 	updateChanel = 0;
 	jsonsub = "firmware";
@@ -44,18 +43,22 @@ void helperUpdate::init() {
 	#if BUILDWITH == 1
 		file = F("firmwarelight.bin");
 		updateChanel = 1;
+		jsonsub = "light";
 	#endif
 	#if BUILDWITH == 2
 		file = F("firmwareio.bin");
 		updateChanel = 2;
+		jsonsub = "io";
 	#endif
 	#if BUILDWITH == 3
 		file = F("firmwareheating.bin");
 		updateChanel = 3;
+		jsonsub = "heating";
 	#endif
 	#if BUILDWITH == 4
 		file = F("firmwarerfid.bin");
 		updateChanel = 4;
+		jsonsub = "rfid";
 	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
@@ -82,6 +85,7 @@ void helperUpdate::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugUpdate", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugUpdate: " + String(Debug));
 	wpFZ.SendWSDebug("DebugUpdate", Debug);
@@ -91,6 +95,7 @@ void helperUpdate::changeDebug() {
 bool helperUpdate::setupOta() {
 	bool returns = false;
 	ArduinoOTA.onStart([]() {
+		wpFZ.SetRestartReason(wpFZ.restartReasonUpdate);
 		wpOnlineToggler.setMqttOffline();
 		String logmessage = "OTA Start";
 		wpFZ.DebugWS(wpFZ.strINFO, "setupOta", logmessage);
@@ -130,14 +135,16 @@ void helperUpdate::check() {
 	int httpCode = http.GET();
 	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
 	String payload = http.getString();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	deserializeJson(doc, payload);
-	serverVersion = doc["wpFreakaZone"]["Version"].as<String>();
-	newVersion = !(serverVersion == installedVersion);
-	wpFZ.DebugWS(serverVersion == installedVersion ? wpFZ.strINFO : wpFZ.strWARN, "UpdateCheck", "installed Version: " + installedVersion);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + serverVersion);
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"]["date"].as<String>());
-	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"]["filename"].as<String>());
+	payload.replace("\"", "'");
+	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
+	newVersion = !(doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>() == installedVersion);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Selected Chanel: " + jsonsub);
+	wpFZ.DebugWS(newVersion ? wpFZ.strWARN : wpFZ.strINFO, "UpdateCheck", "installed Version: " + installedVersion);
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "available Version: " + doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>());
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Date: " + doc["wpFreakaZone"][jsonsub]["date"].as<String>());
+	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "File: " + doc["wpFreakaZone"][jsonsub]["filename"].as<String>());
+	serverVersion = doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>();
 	wpFZ.SendNewVersion(newVersion);
 }
 void helperUpdate::start() {
@@ -244,6 +251,9 @@ void helperUpdate::doCheckUpdate() {
 }
 String helperUpdate::GetUpdateChanel() {
 	switch(updateChanel) {
+		case 99:
+			return F("cleaner");
+			break;
 		case 1:
 			return F("light");
 			break;
@@ -263,6 +273,10 @@ String helperUpdate::GetUpdateChanel() {
 }
 void helperUpdate::SetUpdateChanel(uint8 uc) {
 	switch(uc) {
+		case 99:
+			file = F("firmwarecleaner.bin");
+			updateChanel = 99;
+			break;
 		case 1:
 			file = F("firmwarelight.bin");
 			updateChanel = 1;
@@ -287,6 +301,7 @@ void helperUpdate::SetUpdateChanel(uint8 uc) {
 	wpMqtt.mqttClient.publish(mqttTopicUpdateChanel.c_str(), GetUpdateChanel().c_str());
 }
 void helperUpdate::started() {
+	wpFZ.SetRestartReason(wpFZ.restartReasonUpdate);
 	wpFZ.DebugWS(wpFZ.strINFO, "wpUpdate::started", "HTTP update started");
 }
 

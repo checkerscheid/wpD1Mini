@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -19,7 +19,7 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleRelais {
+class moduleRelais : public IModuleBase {
 	public:
 		moduleRelais();
 		moduleBase* mb;
@@ -68,6 +68,7 @@ class moduleRelais {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -106,7 +107,7 @@ class moduleRelais {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleRelais wpRelais;
 

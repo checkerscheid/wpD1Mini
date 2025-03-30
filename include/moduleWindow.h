@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 214                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.h 214 2024-10-17 10:17:02Z                  $ #
+//# File-ID      : $Id:: moduleWindow.h 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWindow_h
@@ -19,7 +19,7 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleWindow {
+class moduleWindow : public IModuleBase {
 	public:
 		moduleWindow(uint8 n);
 		moduleBase* mb;
@@ -41,6 +41,7 @@ class moduleWindow {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -53,7 +54,7 @@ class moduleWindow {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 214 $";
+		String SVNh = "$Rev: 246 $";
 
 		uint8 bitDebug;
 		byte bitsDebug;

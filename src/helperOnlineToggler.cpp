@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 251                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 218 2024-10-25 21:45:16Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 251 2025-03-13 09:20:04Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -19,7 +19,6 @@ helperOnlineToggler wpOnlineToggler;
 
 helperOnlineToggler::helperOnlineToggler() {}
 void helperOnlineToggler::init() {
-	lastContact = millis();
 	// settings
 	mqttTopicErrorOnline = wpFZ.DeviceName + "/ERROR/Online";
 	// commands
@@ -32,17 +31,17 @@ void helperOnlineToggler::init() {
 //###################################################################################
 void helperOnlineToggler::cycle() {
 	publishValues();
-	if(millis() > lastContact + Minutes10) {
-		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, reconnect ...");
+	if(wpFZ.loopStartedAt > lastContact + Minutes10) {
+		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, 'checkSubscribes' not fired, restart ...");
 		wpMqtt.connectMqtt();
-		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "... and renew Subscribes");
-		wpModules.setAllSubscribes();
-		lastContact = millis();
+		lastContact = wpFZ.loopStartedAt; // give him time to connect
+		//wpFZ.SetRestartReason(wpFZ.restartReasonOnlineToggler);
+		//ESP.restart();
 	}
 }
 
 uint16 helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 251 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -52,6 +51,7 @@ void helperOnlineToggler::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugOnlineToggler", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugOnlineToggler: " + String(Debug));
 	wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
@@ -96,7 +96,7 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 			//reset
 			wpMqtt.mqttClient.publish(mqttTopicOnlineToggler.c_str(), String(1).c_str());
 		}
-		lastContact = millis();
+		lastContact = wpFZ.loopStartedAt;
 		if(Debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "TopicOnlineToggler", "get 'Online question' Message From Server, reset counter");
 		}

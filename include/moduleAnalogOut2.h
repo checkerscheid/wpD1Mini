@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 207 2024-10-07 12:59:22Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 246 2025-02-18 16:27:11Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -19,20 +19,11 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleAnalogOut2 {
+class moduleAnalogOut2 : public IModuleBase {
 	public:
 		moduleAnalogOut2();
 		moduleBase* mb;
 		uint8 Pin;
-
-		// section for define
-		uint8 output;
-		uint hardwareoutMax;
-		uint8 autoValue;
-		uint8 handValue;
-		bool handError;
-		bool handSet = false;
-		uint8 handValueSet = 0;
 
 		// values
 		String mqttTopicOut;
@@ -56,11 +47,30 @@ class moduleAnalogOut2 {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		void SetHandValueSet(uint8 val);
+
+		void InitHand(bool hand);
+
+		void InitHandValue(uint8 value);
+		void SetHandValue(uint8 value);
+		void SetHandValueProzent(uint8 value);
+		uint8 GetHandValue();
+
+		bool GetHandError();
+
 	private:
+
+		// section for define
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
+		bool handError;
+		bool handSet = false;
+		uint8 handValueSet = 0;
+
 		uint8 outputLast;
 		unsigned long publishOutputLast;
 		uint8 autoValueLast;
@@ -75,7 +85,7 @@ class moduleAnalogOut2 {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 

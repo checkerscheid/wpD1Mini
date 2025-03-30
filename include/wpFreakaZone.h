@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 229                                                     $ #
+//# Revision     : $Rev:: 252                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 229 2024-12-12 07:52:51Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 252 2025-03-13 12:49:49Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -27,6 +27,7 @@
 #include <helperWebServer.h>
 #include <helperWiFi.h>
 #include <moduleBase.h>
+#include <IModuleBase.h>
 
 #include <moduleDHT.h>
 #include <moduleLDR.h>
@@ -71,12 +72,13 @@ class wpFreakaZone {
 		const uint32 minute2 = 1000 * 60 * 2;
 		const uint32 sekunde30 = 1000 * 30;
 		const uint32 sekunde10 = 1000 * 10;
+		const unsigned long maxWorkingDays = 1000 * 60 * 60 * 24 * 14;
 		const uint32 publishQoS = minute10; // 10 minutes in ms
 
 		unsigned long loopStartedAt;
 
 		uint16 MajorVersion = 3;
-		uint16 MinorVersion = 2;
+		uint16 MinorVersion = 4;
 		uint16 Build;
 		String Version;
 
@@ -95,6 +97,12 @@ class wpFreakaZone {
 			"D3", "TX", "D4", "RX", "D2", "D1",
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
+
+		const uint8 restartReasonCmd = 1;
+		const uint8 restartReasonMaxWorking = 2;
+		const uint8 restartReasonUpdate = 3;
+		const uint8 restartReasonWiFi = 4;
+		const uint8 restartReasonOnlineToggler = 5;
 
 		String DeviceName = "BasisEmpty";
 		String DeviceDescription = "BasisEmpty";
@@ -118,8 +126,12 @@ class wpFreakaZone {
 		wpFreakaZone();
 		void init(String);
 		void cycle();
+		/// @brief Extract the version from the SVN string
+		/// @return SVN version
 		uint16 getVersion();
-
+		/// @brief Extract the build from the SVN string
+		/// @param Rev SVN string
+		/// @return SVN build
 		uint16 getBuild(String);
 		String getTime();
 		void getTime(uint8 &h, uint8 &m, uint8 &s);
@@ -146,7 +158,9 @@ class wpFreakaZone {
 		void pumpCycleFinished();
 		void updateProgress(int percent);
 		void SetDeviceName(String name);
+		void SetDeviceDescription(String description);
 		void DebugcheckSubscribes(String topic, String value);
+		void DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state);
 
 		void printStart();
 		void printRestored();
@@ -163,10 +177,25 @@ class wpFreakaZone {
 		void BootCount();
 		uint32 GetBootCounter();
 		void ResetBootCounter();
+		void InitMaxWorking(bool maxWorking);
+		void SetMaxWorking();
+		bool GetMaxWorking();
+		void InitLastRestartReason(uint8 restartReason);
+		String getLastRestartReason();
+		void SetRestartReason(uint8 restartReason);
 	private:
 		const uint8 blinkStatusNothing = 0;
 		const uint8 blinkStatusStart = 1;
-		String SVNh = "$Rev: 229 $";
+		const uint16 maxWorkingDelay = 1000;
+		
+		uint8 _restartReason = 0;
+		const String restartReasonStringCmd = "Cmd";
+		const String restartReasonStringMaxWorking = "Max Working Counter occurd";
+		const String restartReasonStringUpdate = "Update";
+		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
+		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
+
+		String SVNh = "$Rev: 252 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
@@ -176,8 +205,11 @@ class wpFreakaZone {
 		unsigned long blinkStatsusLast;
 		uint32 bootCounter;
 		short blinkDelay;
+		bool useMaxWorking = false;
+		unsigned long maxWorkingMillis;
 		void WriteBootCounter();
 		void doBlink();
+		void RestartAfterMaxWorking();
 };
 extern wpFreakaZone wpFZ;
 

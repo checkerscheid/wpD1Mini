@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDS18B20.cpp 228 2024-12-03 08:19:36Z               $ #
+//# File-ID      : $Id:: moduleDS18B20.cpp 246 2025-02-18 16:27:11Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDS18B20.h>
@@ -162,10 +162,24 @@ void moduleDS18B20::setCount() {
 // section to copy
 //###################################################################################
 uint16 moduleDS18B20::getVersion() {
-	String SVN = "$Rev: 228 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleDS18B20::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",");
+	//wpFZ.JsonKeyValue(F("CalcCycle"), String(wpDS18B20.CalcCycle(1))) + F(",") +
+	//wpFZ.JsonKeyValue(F("useAvg1"), wpDS18B20.UseAvg(1) ? "true" : "false") + F(",") +
+	for(int c = 0; c < count; c++) {
+		json += wpFZ.JsonKeyString(F("Device") + String(c) + F("Address"), devices[c]->getStringAddress()) + F(",");
+	}
+	json += 
+		wpFZ.JsonKeyValue(F("Count"), String(count)) +
+		F("}");
+	return json;
 }
 
 void moduleDS18B20::changeDebug() {

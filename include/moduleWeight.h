@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 220                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.h 220 2024-10-29 10:37:04Z                  $ #
+//# File-ID      : $Id:: moduleWeight.h 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWeight_h
@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <HX711.h>
 
-class moduleWeight {
+class moduleWeight : public IModuleBase {
 	public:
 		moduleWeight();
 		moduleBase* mb;
@@ -50,6 +50,7 @@ class moduleWeight {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		void InitTareValue(uint32 tareValue);
 		void SetTare();
 		// getter / setter
@@ -74,7 +75,7 @@ class moduleWeight {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 220 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleWeight wpWeight;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -128,12 +128,14 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 void moduleBase::writeEEPROMuseAvg() {
 	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
 	EEPROM.write(_addrUseAvg, _byteUseAvg);
+	wpFZ.DebugSaveBoolToEEPROM(_name + F(" useAvg"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useAvg);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " useAvg: " + String(useAvg));
 }
 void moduleBase::writeEEPROMdebug() {
 	bitWrite(_byteDebug, _bitDebug, debug);
 	EEPROM.write(_addrDebug, _byteDebug);
+	wpFZ.DebugSaveBoolToEEPROM(_name + F(" debug"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " debug: " + String(debug));
 }

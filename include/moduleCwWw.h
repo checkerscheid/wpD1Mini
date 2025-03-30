@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 230                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 230 2024-12-12 07:56:47Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 246 2025-02-18 16:27:11Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -19,7 +19,7 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleCwWw {
+class moduleCwWw : public IModuleBase {
 	public:
 		moduleCwWw();
 		moduleBase* mb;
@@ -58,6 +58,7 @@ class moduleCwWw {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -115,7 +116,7 @@ class moduleCwWw {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 230 $";
+		String SVNh = "$Rev: 246 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;

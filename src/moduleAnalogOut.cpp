@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 251                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 221 2024-11-04 15:10:40Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 251 2025-03-13 09:20:04Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -21,14 +21,14 @@ moduleAnalogOut::moduleAnalogOut() {
 	// section to config and copy
 	ModuleName = "AnalogOut";
 	mb = new moduleBase(ModuleName);
+	Pin = D6;
+	pinMode(Pin, OUTPUT);
+	analogWrite(Pin, LOW);
 }
 void moduleAnalogOut::init() {
 	// section for define
-	Pin = D6;
 
-	pinMode(Pin, OUTPUT);
 	output = 0;
-	hardwareoutMax = 255;
 	autoValue = 0;
 	handValue = 0;
 	handError = false;
@@ -127,17 +127,17 @@ void moduleAnalogOut::publishValues(bool force) {
 	}
 	if(autoValueLast != autoValue || wpFZ.CheckQoS(publishAutoValueLast)) {
 		autoValueLast = autoValue;
-		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String(autoValue).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicAutoValue.c_str(), String((uint8)(autoValue / 2.55)).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("AnalogOut Auto Value", String(autoValue));
+			mb->printPublishValueDebug("AnalogOut Auto Value", String((uint8)(autoValue / 2.55)));
 		}
 		publishAutoValueLast = wpFZ.loopStartedAt;
 	}
 	if(handValueLast != handValue || wpFZ.CheckQoS(publishHandValueLast)) {
 		handValueLast = handValue;
-		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String(handValue).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicHandValue.c_str(), String((uint8)(handValue / 2.55)).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug("AnalogOut Hand Value", String(handValue));
+			mb->printPublishValueDebug("AnalogOut Hand Value", String((uint8)(handValue / 2.55)));
 		}
 		publishHandValueLast = wpFZ.loopStartedAt;
 	}
@@ -215,7 +215,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8 readSetHandValue = msg.toInt();
+		uint8 readSetHandValue = (uint8)(msg.toInt() * 2.55);
 		if(handValueSet != readSetHandValue) {
 			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
@@ -270,12 +270,6 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleAnalogOut::SetHandValue(uint8 val) {
-	handValueSet = val;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut::handValueSet' = " + String(handValueSet));
-}
 String moduleAnalogOut::SetSetPoint(double sp) {
 	SetPoint = sp;
 	uint8 setPointToSave = (uint8) (SetPoint * 10);
@@ -293,8 +287,43 @@ String moduleAnalogOut::SetTopicTempUrl(String topic) {
 	wpFZ.restartRequired = true;
 	return wpFZ.jsonOK;
 }
+void moduleAnalogOut::InitHand(bool hand) {
+	handSet = hand;
+}
+void moduleAnalogOut::InitHandValue(uint8 value) {
+	handValueSet = value;
+}
+void moduleAnalogOut::SetHandValue(uint8 value) {
+	handValueSet = value;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
+	EEPROM.commit();
+	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut::handValueSet' = " + String(handValueSet));
+}
+void moduleAnalogOut::SetHandValueProzent(uint8 value) {
+	SetHandValue((uint8)(value * 2.55));
+}
+uint8 moduleAnalogOut::GetHandValue() {
+	return handValue;
+}
+bool moduleAnalogOut::GetHandError() {
+	return handError;
+}
+void moduleAnalogOut::InitKp(short kp) {
+	Kp = (double) (kp / 10.0);
+}
+void moduleAnalogOut::InitTv(short tv) {
+	Tv = (double) (tv / 10.0);
+}
+void moduleAnalogOut::InitTn(short tn) {
+	Tn = (double) (tn / 10.0);
+}
+void moduleAnalogOut::InitSetPoint(short setpoint) {
+	SetPoint = (double) (setpoint / 10.0);
+}
 void moduleAnalogOut::InitPidType(uint8 t) {
 	pidType = t;
+	wpFZ.DebugWS(wpFZ.strINFO, "startPidType",
+		"start PID Type from EEPROM: 'module" + ModuleName + "::loadPidType' = " + GetPidType());
 }
 String moduleAnalogOut::GetPidType() {
 	if(pidType == pidTypeHeating) {
@@ -330,17 +359,15 @@ String moduleAnalogOut::SetPidType(uint8 t) {
 // private
 //###################################################################################
 void moduleAnalogOut::publishValue() {
-	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String(output).c_str());
+	wpMqtt.mqttClient.publish(mqttTopicOut.c_str(), String((uint8)(output / 2.55)).c_str());
 	outputLast = output;
 	if(wpMqtt.Debug) {
-		mb->printPublishValueDebug("AnalogOut", String(output));
+		mb->printPublishValueDebug("AnalogOut", String((uint8)(output / 2.55)));
 	}
 	publishOutputLast = wpFZ.loopStartedAt;
 }
 
 void moduleAnalogOut::calc() {
-	if(handValueSet < 0) handValueSet = 0;
-	if(handValueSet > 100) handValueSet = 100;
 	if(handValue != handValueSet) {
 		handValue = handValueSet;
 	}
@@ -364,8 +391,7 @@ void moduleAnalogOut::calc() {
 			
 		}
 	}
-	uint16 hardwareout = wpFZ.Map(output, 0, 100, 0, hardwareoutMax);
-	analogWrite(Pin, hardwareout);
+	analogWrite(Pin, output);
 }
 
 void moduleAnalogOut::calcOutput() {
@@ -386,24 +412,10 @@ void moduleAnalogOut::calcOutput() {
 }
 
 void moduleAnalogOut::savePidType() {
-	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitAnalogOutPidType, pidType);
-	EEPROM.write(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsSettingsModules1);
+	EEPROM.write(wpEEPROM.byteAnalogOutPidType, pidType);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "savePidType",
 		"save to EEPROM: 'module" + ModuleName + "::savePidType' = " + GetPidType());
-}
-
-void moduleAnalogOut::InitKp(short kp) {
-	Kp = (double) (kp / 10.0);
-}
-void moduleAnalogOut::InitTv(short tv) {
-	Tv = (double) (tv / 10.0);
-}
-void moduleAnalogOut::InitTn(short tn) {
-	Tn = (double) (tn / 10.0);
-}
-void moduleAnalogOut::InitSetPoint(short setpoint) {
-	SetPoint = (double) (setpoint / 10.0);
 }
 void moduleAnalogOut::resetPID() {
 	pid->SetOutputLimits(0.0, 1.0);
@@ -414,10 +426,34 @@ void moduleAnalogOut::resetPID() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 221 $";
+	String SVN = "$Rev: 251 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleAnalogOut::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin]));
+	if(!wpModules.useModuleCwWw && !wpModules.useModuleNeoPixel) {
+		if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || wpAnalogOut.mqttTopicTemp != "_") {
+			json += F(",") +
+				wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+				wpFZ.JsonKeyString(F("pidType"), GetPidType()) + F(",") +
+				wpFZ.JsonKeyValue(F("pidTypeRaw"), String(pidType)) + F(",") +
+				wpFZ.JsonKeyValue(F("Kp"), String(Kp * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("Tv"), String(Tv * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("Tn"), String(Tn * 10.0)) + F(",") +
+				wpFZ.JsonKeyValue(F("SetPoint"), String((uint8)(SetPoint * 10.0))) + F(",") +
+				wpFZ.JsonKeyString(F("TopicTemp"), mqttTopicTemp);
+		}
+		json += F(",") +
+			wpFZ.JsonKeyValue(F("Hand"), handError ? "true" : "false");
+	}
+	json += F(",") +
+		wpFZ.JsonKeyValue(F("HandValue"), String(handValue)) +
+		F("}");
+	return json;
 }
 
 void moduleAnalogOut::changeDebug() {

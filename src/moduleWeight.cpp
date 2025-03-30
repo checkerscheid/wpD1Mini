@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 223                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 223 2024-11-10 12:21:24Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 246 2025-02-18 16:27:11Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -177,10 +177,20 @@ long moduleWeight::calcAvg(long raw) {
 // section to copy
 //###################################################################################
 uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 223 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleWeight::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyString(F("Pinout"), String(wpFZ.Pins[Pinout])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("useAvg"), UseAvg() ? "true" : "false") +
+		F("}");
+	return json;
 }
 
 void moduleWeight::changeDebug() {

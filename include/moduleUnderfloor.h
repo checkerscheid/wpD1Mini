@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 205                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.h 205 2024-10-04 09:53:16Z              $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 246 2025-02-18 16:27:11Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleUnderfloor1_h
@@ -19,7 +19,7 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleUnderfloor {
+class moduleUnderfloor : public IModuleBase {
 	public:
 		moduleUnderfloor(uint8 n);
 		moduleBase* mb;
@@ -61,6 +61,7 @@ class moduleUnderfloor {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		void InitSetPoint(uint8 setpoint);
 		// getter / setter
 		bool Debug();
@@ -95,7 +96,7 @@ class moduleUnderfloor {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 205 $";
+		String SVNh = "$Rev: 246 $";
 
 		uint8 bitDebug;
 		uint8 bitHand;

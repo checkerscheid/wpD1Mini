@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 252                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 227 2024-12-03 08:19:05Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 252 2025-03-13 12:49:49Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -35,6 +35,7 @@ class helperWebServer {
 		const uint8 cmdScanWiFi = 8;
 		const uint8 cmdCheckDns = 9;
 		const uint8 cmdSetName = 10;
+		const uint8 cmdMaxWorking = 11;
 		uint8 doCommand;
 
 		const uint8 cmdDebugEEPROM = 1;
@@ -131,11 +132,13 @@ class helperWebServer {
 		void checkSubscribes(char* topic, String msg);
 		String getchangeModule(String id, String name, bool state);
 		String getChangeDebug(String id, String name, bool state);
+		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 227 $";
+		String SVNh = "$Rev: 252 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;
+		String newDescription;
 };
 extern helperWebServer wpWebServer;
 
@@ -195,7 +198,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		<h1>Freaka<span class="z">Z</span>one %DeviceName% <span class="setChange" onclick="changeName()">&#9998;</span> Web<span class="z">S</span>erial:</h1>
 		<h2>%DeviceDescription% (%Version%)</h2>
 		<div id="restartRequired" class="wpContainer wpHidden"></div>
-		<div id="newVersion" class="wpContainer%newVersion%"></div>
+		<div id="newVersion" class="wpContainer%newVersion%">%innernewVersion%</div>
 		<div id="progressContainer" class="wpHidden">
 			<div class="wpContainer">
 				<div id="progressBg">
@@ -207,7 +210,9 @@ const char index_html[] PROGMEM = R"rawliteral(
 		</div>
 		<div class="wpContainer wpHidden" id="changeNameContainer">
 			<span>New Name:</span>
-			<input type="text" id="SetNewDevicename" value="%DeviceName%" />
+			<input type="text" id="SetNewDevicename" value="%DeviceName%" /><br />
+			<span>New Description:</span>
+			<input type="text" id="SetNewDeviceDescription" value="%DeviceDescription%" /><br />
 			<span id="SetDevicename" class="wpButton" onclick="cmdNewDevicename()">save</span>
 		</div>
 		<div class="ulContainer">
@@ -218,10 +223,11 @@ const char index_html[] PROGMEM = R"rawliteral(
 				<li><span id="RestartDevice" class="wpButton" onclick="cmdHandle(event)">RestartDevice</span></li>
 				<li><span id="ForceMqttUpdate" class="wpButton" onclick="cmdHandle(event)">ForceMqttUpdate</span></li>
 				<li><span id="ForceRenewValue" class="wpButton" onclick="cmdHandle(event)">ForceRenewValue</span></li>
+				<li><a class="wpButton" href="/status" target="_blank">Status</a></li>
 				<li><span class='bold'>Updates:</span></li><li><hr /></li>
-				<li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li>
-				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check HTTP Update</span></li>
-				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">HTTP Update</span></li>
+				<!--li><span id="UpdateFW" class="wpButton" onclick="cmdHandle(event)">set Update Mode</span></li-->
+				<li><span id="UpdateCheck" class="wpButton" onclick="cmdHandle(event)">Check Update</span></li>
+				<li><span id="UpdateHTTP" class="wpButton" onclick="cmdHandle(event)">Update</span></li>
 				<li><span class='bold'>Stuff:</span></li><li><hr /></li>
 				<li><span id="ScanWiFi" class="wpButton" onclick="cmdHandle(event)">Scan WiFi</span></li>
 				<li><span id="CheckDns" class="wpButton" onclick="cmdHandle(event)">Check DNS</span></li>
@@ -259,7 +265,7 @@ function initWebSocket() {
 	websocket.onclose = onClose;
 	websocket.onmessage = onMessage;
 	document.getElementById('restartRequired').classList.add('wpHidden');
-	document.getElementById('newVersion').classList.add('wpHidden');
+	//document.getElementById('newVersion').classList.add('wpHidden');
 	document.getElementById('LiPump').classList.add('wpHidden');
 	document.getElementById('progressContainer').classList.add('wpHidden');
 }
@@ -280,18 +286,15 @@ function onClose(event) {
 }
 function onMessage(event) {
 	%debugWebServer%
-	const d = JSON.parse(event.data);
+	const d = tryParseJSONObject(event.data);
 	if(typeof d.cmd != 'undefined') {
 		if(d.cmd == 'setDebug') {
-			console.log('setDebug:');
 			console.log(d);
 			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'setModule') {
-			console.log('setModule:');
 			console.log(d);
 			changeBoolValue(d.msg.id, d.msg.value);
 		} else if(d.cmd == 'restartRequired') {
-			console.log('restartRequired:');
 			console.log(d);
 			let restartRequired = document.getElementById('restartRequired');
 			restartRequired.classList.remove('wpHidden');
@@ -299,7 +302,6 @@ function onMessage(event) {
 		} else if(d.cmd == 'newVersion') {
 			let newVersion = document.getElementById('newVersion');
 			if(d.msg.newVersion) {
-				console.log('newVersionAvailable:');
 				console.log(d);
 				newVersion.classList.remove('wpHidden');
 				newVersion.innerHTML = '--- Update Available ---<br />installed: ' + d.msg.installedVersion + '<br />update: ' + d.msg.serverVersion;
@@ -307,14 +309,12 @@ function onMessage(event) {
 				newVersion.classList.add('wpHidden');
 			}
 		} else if(d.cmd == 'remainPumpInPause') {
-			console.log('remainPumpInPause:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
 			let remainPumpInPause = document.getElementById('remainPumpInPause');
 			remainPumpInPause.innerHTML = d.msg;
 		} else if(d.cmd == 'pumpStatus') {
-			console.log('pumpStatus:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.remove('wpHidden');
@@ -322,12 +322,10 @@ function onMessage(event) {
 			changePumpState('pumpStarted', d.msg.pumpStarted != 0);
 			changePumpState('pumpInPause', d.msg.pumpInPause != 0);
 		} else if(d.cmd == 'pumpCycleFinished') {
-			console.log('pumpCycleFinished:');
 			console.log(d);
 			let LiPump = document.getElementById('LiPump');
 			LiPump.classList.add('wpHidden');
 		} else if(d.cmd == 'updateProgress') {
-			console.log('updateProgress:');
 			console.log(d);
 			document.getElementById('progressContainer').classList.remove('wpHidden');
 			let progress = document.getElementById('progress');
@@ -338,16 +336,29 @@ function onMessage(event) {
 			console.log('unknown command:');
 			console.log(d);
 		}
-	} else {
-		%debugOnMessage%
-		console.log('[d.cmd = undefined]:');
-		console.log(d);
-		WebSerialBox.innerHTML =
-			'<p>' +
-				'<span class="' + d.cssClass + '">' + d.msgheader + '</span>' +
-				'<span>' + d.msgbody + '</span>' +
-			'</p>' + WebSerialBox.innerHTML;
 	}
+	if(typeof d.msgheader != 'undefined') {
+		console.log(d);
+		let spanHeader = document.createElement('span');
+		spanHeader.classList.add(d.cssClass);
+		spanHeader.innerHTML = d.msgheader;
+		let spanBody = document.createElement('span');
+		spanBody.innerHTML = d.msgbody;
+		let p = document.createElement('p');
+		p.appendChild(spanHeader);
+		p.appendChild(spanBody);
+		WebSerialBox.prepend(p);
+	}
+}
+function tryParseJSONObject(jsonString) {
+    try {
+        var o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    }
+    catch (e) { }
+    return false;
 }
 function changePumpState(elem, state) {
 	let elemHTML = document.getElementById(elem);
@@ -384,7 +395,10 @@ function changeName() {
 }
 function cmdNewDevicename() {
 	let newName = document.getElementById('SetNewDevicename').value;
-	xmlHttp.open("GET", "/setCmd?cmd=SetDeviceName&newName=" + newName, false);
+	if(newName != '') newName = '&newName=' + newName;
+	let newDescription = document.getElementById('SetNewDeviceDescription').value;
+	if(newDescription != '') newDescription = '&newDescription=' + newDescription;
+	xmlHttp.open("GET", "/setCmd?cmd=SetDeviceName" + newName + newDescription, false);
 	xmlHttp.send(null);
 }
 	</script>

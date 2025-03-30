@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 218                                                     $ #
+//# Revision     : $Rev:: 250                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 218 2024-10-25 21:45:16Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 250 2025-02-27 13:50:21Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -32,8 +32,7 @@ void helperMqtt::init() {
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/MQTT";
 	
 	mqttClient.setServer(wpFZ.mqttServer, wpFZ.mqttServerPort);
-	mqttClient.setCallback(callbackMqtt);
-	lastConnectTry = millis();
+	lastConnectTry = 0;
 	//connectMqtt();
 }
 
@@ -42,9 +41,9 @@ void helperMqtt::init() {
 //###################################################################################
 void helperMqtt::cycle() {
 	if(!mqttClient.connected()) {
-		if((lastConnectTry + 5000) > millis()) {
+		if(lastConnectTry == 0 || (lastConnectTry + 5000) > millis()) {
 			lastConnectTry = millis();
-			Serial.println(mqttClient.state());
+			wpFZ.DebugWS(wpFZ.strINFO, "MQTT cycle", "MQTT State: " + String(mqttClient.state()));
 			connectMqtt();
 		}
 		//connectMqtt();
@@ -54,7 +53,7 @@ void helperMqtt::cycle() {
 }
 
 uint16 helperMqtt::getVersion() {
-	String SVN = "$Rev: 218 $";
+	String SVN = "$Rev: 250 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -64,6 +63,7 @@ void helperMqtt::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
+	wpFZ.DebugSaveBoolToEEPROM("DebugMqtt", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugMqtt: " + String(Debug));
 	wpFZ.SendWSDebug("DebugMqtt", Debug);
@@ -110,6 +110,7 @@ void helperMqtt::connectMqtt() {
 	mqttClient.disconnect();
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
+			mqttClient.setCallback(callbackMqtt);
 			wpModules.publishAllValues();
 			wpModules.publishAllSettings();
 			wpModules.setAllSubscribes();
@@ -120,7 +121,7 @@ void helperMqtt::connectMqtt() {
 		} else {
 			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 5 seconds";
 			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
-			delay(5000);
+			//delay(5000); do this in main loop / cycle
 		}
 	}
 }

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 227                                                     $ #
+//# Revision     : $Rev:: 250                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 227 2024-12-03 08:19:05Z                        $ #
+//# File-ID      : $Id:: main.cpp 250 2025-02-27 13:50:21Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -125,9 +125,9 @@ void setup() {
 		wpRFID.init();
 	}
 	#endif
-	wpModules.publishAllValues();
-	wpModules.publishAllSettings();
-	wpModules.setAllSubscribes();
+	// wpModules.publishAllValues();
+	// wpModules.publishAllSettings();
+	// wpModules.setAllSubscribes();
 
 }
 
@@ -243,7 +243,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 227 $";
+	String SVN = "$Rev: 250 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 10.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 229                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.h 229 2024-12-12 07:52:51Z                   $ #
+//# File-ID      : $Id:: moduleClock.h 246 2025-02-18 16:27:11Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleClock_h
@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <Stepper.h>
 
-class moduleClock {
+class moduleClock : public IModuleBase {
 	public:
 		moduleClock();
 		moduleBase* mb;
@@ -71,6 +71,7 @@ class moduleClock {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -115,7 +116,7 @@ class moduleClock {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 229 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleClock wpClock;
 

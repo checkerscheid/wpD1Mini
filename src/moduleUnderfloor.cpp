@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 221                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 221 2024-11-04 15:10:40Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 246 2025-02-18 16:27:11Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -317,10 +317,20 @@ void moduleUnderfloor::calcOutput() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 221 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleUnderfloor::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("SetPoint"), String(GetSetPoint())) + F(",") +
+		wpFZ.JsonKeyString(F("TempUrl"), String(mqttTopicTemp)) +
+		F("}");
+	return json;
 }
 
 void moduleUnderfloor::changeDebug() {

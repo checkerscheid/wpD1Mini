@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -154,10 +154,20 @@ uint16 moduleRain::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleRain::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("useAvg"), UseAvg() ? "true" : "false") + F(",") +
+		wpFZ.JsonKeyValue(F("Correction"), String(correction)) +
+		F("}");
+	return json;
 }
 
 void moduleRain::changeDebug() {

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 219                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 219 2024-10-29 10:36:32Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 246 2025-02-18 16:27:11Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -20,27 +20,11 @@
 #include <moduleBase.h>
 #include <PID_v1.h>
 
-class moduleAnalogOut {
+class moduleAnalogOut : public IModuleBase {
 	public:
 		moduleAnalogOut();
 		moduleBase* mb;
-		PID* pid;
 		uint8 Pin;
-
-		// section for define
-		uint8 output;
-		uint hardwareoutMax;
-		uint8 autoValue;
-		uint8 handValue;
-		bool handError;
-		bool handSet = false;
-		uint8 handValueSet = 0;
-		static const uint8 pidTypeHeating = 0;
-		static const uint8 pidTypeAirCondition = 1;
-		double Kp = 1.0;
-		double Tv = 0.2;
-		double Tn = 0.0;
-		double SetPoint = 75.0;
 
 		// values
 		String mqttTopicOut;
@@ -73,26 +57,52 @@ class moduleAnalogOut {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
 		uint32 CalcCycle();
 		uint32 CalcCycle(uint32 calcCycle);
-		uint8 GetSetPoint();
 		void InitKp(short kp);
 		void InitTv(short tv);
 		void InitTn(short tn);
 		void InitSetPoint(short setpoint);
 		void resetPID();
-		void SetHandValue(uint8 val);
 		String SetSetPoint(double setpoint);
 		String SetTopicTempUrl(String topic);
+
+		void InitHand(bool hand);
+
+		void InitHandValue(uint8 value);
+		void SetHandValue(uint8 value);
+		void SetHandValueProzent(uint8 value);
+		uint8 GetHandValue();
+
+		bool GetHandError();
+
 		void InitPidType(uint8 t);
 		String SetPidType(uint8 t);
+
 		String GetPidType();
+
 	private:
+		PID* pid;
+		// section for define
+		uint8 output;
+		uint8 autoValue;
+		uint8 handValue;
+		bool handError;
+		bool handSet = false;
+		uint8 handValueSet = 0;
+		static const uint8 pidTypeHeating = DIRECT;
+		static const uint8 pidTypeAirCondition = REVERSE;
+		double Kp = 1.0;
+		double Tv = 0.2;
+		double Tn = 0.0;
+		double SetPoint = 75.0;
+
 		const double minOutput = 0.0;
-		const double maxOutput = 100.0;
+		const double maxOutput = 255.0;
 		uint8 outputLast;
 		unsigned long publishOutputLast;
 		uint8 autoValueLast;
@@ -119,7 +129,7 @@ class moduleAnalogOut {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 219 $";
+		String SVNh = "$Rev: 246 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 };

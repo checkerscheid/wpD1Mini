@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 222                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 222 2024-11-06 08:10:21Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -48,7 +48,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 222 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -58,6 +58,7 @@ void helperWiFi::changeDebug() {
 	Debug = !Debug;
 	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
 	EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
+	wpFZ.DebugSaveBoolToEEPROM("DebugWiFi", wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWiFi: " + String(Debug));
 	wpFZ.SendWSDebug("DebugWiFi", Debug);
@@ -81,7 +82,12 @@ void helperWiFi::setupWiFi() {
 	Serial.print(wpFZ.getOnlineTime());
 	Serial.print(wpFZ.strINFO);
 	Serial.print(wpFZ.funcToString("setupWiFi"));
+	uint16 trys = 0;
 	while(WiFi.status() != WL_CONNECTED) {
+		if(trys++ > 1000) {
+			wpFZ.SetRestartReason(wpFZ.restartReasonWiFi);
+			ESP.restart();
+		}
 		delay(500);
 		Serial.print(".");
 		int led = digitalRead(LED_BUILTIN);

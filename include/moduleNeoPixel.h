@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <Adafruit_NeoPixel.h>
 
-class moduleNeoPixel {
+class moduleNeoPixel : public IModuleBase {
 	public:
 		moduleNeoPixel();
 		moduleBase* mb;
@@ -87,6 +87,7 @@ class moduleNeoPixel {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);

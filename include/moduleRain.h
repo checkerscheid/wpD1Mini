@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.h 207 2024-10-07 12:59:22Z                    $ #
+//# File-ID      : $Id:: moduleRain.h 246 2025-02-18 16:27:11Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRain_h
@@ -19,7 +19,7 @@
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
 
-class moduleRain {
+class moduleRain : public IModuleBase {
 	public:
 		moduleRain();
 		moduleBase* mb;
@@ -46,6 +46,7 @@ class moduleRain {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool UseAvg();
 		bool UseAvg(bool useAvg);
@@ -65,7 +66,7 @@ class moduleRain {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleRain wpRain;
 

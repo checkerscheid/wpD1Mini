@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 207 2024-10-07 12:59:22Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 246 2025-02-18 16:27:11Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -180,10 +180,20 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 207 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleDHT::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
+		wpFZ.JsonKeyValue(F("CalcCycle"), String(CalcCycle())) + F(",") +
+		wpFZ.JsonKeyValue(F("TemperatureCorrection"), String(float(temperatureCorrection / 10.0))) + F(",") +
+		wpFZ.JsonKeyValue(F("HumidityCorrection"), String(float(humidityCorrection / 10.0))) +
+		F("}");
+	return json;
 }
 
 void moduleDHT::changeDebug() {

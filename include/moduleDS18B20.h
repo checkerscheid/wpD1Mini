@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDS18B20.h 228 2024-12-03 08:19:36Z                 $ #
+//# File-ID      : $Id:: moduleDS18B20.h 246 2025-02-18 16:27:11Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDS18B20_h
@@ -24,7 +24,7 @@
 
 /// @brief  forward declaration
 class deviceOneWire;
-class moduleDS18B20 {
+class moduleDS18B20 : public IModuleBase {
 	public:
 		moduleDS18B20();
 		deviceOneWire* devices[10];
@@ -52,6 +52,7 @@ class moduleDS18B20 {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -68,7 +69,7 @@ class moduleDS18B20 {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 228 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleDS18B20 wpDS18B20;
 

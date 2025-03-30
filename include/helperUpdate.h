@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.h 207 2024-10-07 12:59:22Z                  $ #
+//# File-ID      : $Id:: helperUpdate.h 246 2025-02-18 16:27:11Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperUpdate_h
@@ -60,7 +60,7 @@ class helperUpdate {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 246 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		bool newVersionLast;
@@ -68,6 +68,7 @@ class helperUpdate {
 		unsigned long twelveHours;
 		String file;
 		uint8 updateChanel;
+		String jsonsub;
 		void doCheckUpdate();
 		static void started();
 		static void finished();

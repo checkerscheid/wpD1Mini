@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 229                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 229 2024-12-12 07:52:51Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 246 2025-02-18 16:27:11Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -295,10 +295,25 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 229 $";
+	String SVN = "$Rev: 246 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
+}
+
+String moduleClock::GetJsonSettings() {
+	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin1"), String(wpFZ.Pins[Pin1])) + F(",") +
+		wpFZ.JsonKeyString(F("Pin2"), String(wpFZ.Pins[Pin2])) + F(",") +
+		wpFZ.JsonKeyString(F("Pin3"), String(wpFZ.Pins[Pin3])) + F(",") +
+		wpFZ.JsonKeyString(F("Pin4"), String(wpFZ.Pins[Pin4])) + F(",") +
+		wpFZ.JsonKeyValue(F("Hour"), GetColorH()) + F(",") +
+		wpFZ.JsonKeyValue(F("Minute"), GetColorM()) + F(",") +
+		wpFZ.JsonKeyValue(F("Second"), GetColorS()) + F(",") +
+		wpFZ.JsonKeyValue(F("Quarter"), GetColorQ()) + F(",") +
+		wpFZ.JsonKeyValue(F("Five"), GetColor5()) +
+		F("}");
+	return json;
 }
 
 void moduleClock::changeDebug() {

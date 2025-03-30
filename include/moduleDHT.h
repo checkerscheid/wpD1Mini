@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 207                                                     $ #
+//# Revision     : $Rev:: 246                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 207 2024-10-07 12:59:22Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 246 2025-02-18 16:27:11Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -20,7 +20,7 @@
 #include <moduleBase.h>
 #include <DHT.h>
 
-class moduleDHT {
+class moduleDHT : public IModuleBase {
 	public:
 		moduleDHT();
 		moduleBase* mb;
@@ -52,6 +52,7 @@ class moduleDHT {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
+		String GetJsonSettings();
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
@@ -71,7 +72,7 @@ class moduleDHT {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 207 $";
+		String SVNh = "$Rev: 246 $";
 };
 extern moduleDHT wpDHT;
 

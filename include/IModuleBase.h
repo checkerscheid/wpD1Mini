@@ -6,41 +6,34 @@
 //###################################################################################
 //#                                                                                 #
 //# Author       : Christian Scheid                                                 #
-//# Date         : 29.05.2024                                                       #
+//# Date         : 19.12.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 233                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: IModuleBase.h 233 2024-12-19 15:28:34Z                   $ #
 //#                                                                                 #
 //###################################################################################
-#ifndef helperFinder_h
-#define helperFinder_h
+#ifndef IModuleBase_h
+#define IModuleBase_h
 #include <Arduino.h>
-#include <wpFreakaZone.h>
-#include <ESPAsyncUDP.h>
-class helperFinder {
+class IModuleBase {
 	public:
-		bool Debug = false;
-		// commands
-		String mqttTopicDebug;
-
-		helperFinder();
-		void init();
-		void cycle();
-		uint16 getVersion();
-		void changeDebug();
-		void setupFinder();
-
-		void publishSettings();
-		void publishSettings(bool force);
-		void publishValues();
-		void publishValues(bool force);
-		void setSubscribes();
-		void checkSubscribes(char* topic, String msg);
+		virtual ~IModuleBase() {}
+		virtual void init() = 0;
+		virtual void cycle() = 0;
+		virtual uint16 getVersion() = 0;
+		virtual void publishSettings() = 0;
+		virtual void publishSettings(bool force) = 0;
+		virtual void publishValues() = 0;
+		virtual void publishValues(bool force) = 0;
+		virtual void setSubscribes() = 0;
+		virtual void checkSubscribes(char* topic, String msg) = 0;
+		virtual void changeDebug() = 0;
+		virtual String GetJsonSettings() = 0;
+		bool Debug();
+		bool Debug(bool debug);
 	private:
-		String SVNh = "$Rev: 246 $";
-		bool DebugLast = false;
-		unsigned long publishDebugLast = 0;
+		virtual void calc() = 0;
 };
-extern helperFinder wpFinder;
+
 #endif
