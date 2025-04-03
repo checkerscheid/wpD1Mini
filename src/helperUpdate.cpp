@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 254                                                     $ #
+//# Revision     : $Rev:: 255                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 254 2025-03-30 13:01:15Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 255 2025-04-01 12:24:46Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -75,7 +75,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 254 $";
+	String SVN = "$Rev: 255 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
