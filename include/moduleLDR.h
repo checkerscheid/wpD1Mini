@@ -57,7 +57,7 @@ class moduleLDR : public IModuleBase {
 	private:
 		int ldrLast;
 		unsigned long publishLdrLast;
-		const uint16 publishLdrMin = 15000;
+		const uint16 publishLdrMin = 2000;
 		static const uint8 avgLength = 128;
 		int avgValues[avgLength];
 
