@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 254                                                     $ #
+//# Revision     : $Rev:: 257                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 254 2025-03-30 13:01:15Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 257 2025-04-27 16:24:29Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -432,6 +432,12 @@ String moduleNeoPixel::SetOff() {
 	targetR = 0;
 	targetG = 0;
 	targetB = 0;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueR, targetR);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueG, targetG);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueB, targetB);
+	EEPROM.commit();
 	//targetBr = 0;
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -1088,7 +1094,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 254 $";
+	String SVN = "$Rev: 257 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
