@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 256                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.h 246 2025-02-18 16:27:11Z              $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 256 2025-04-25 19:31:36Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleUnderfloor1_h
@@ -39,6 +39,7 @@ class moduleUnderfloor : public IModuleBase {
 		String mqttTopicHandValue;
 		String mqttTopicReadedTemp;
 		String mqttTopicErrorHand;
+		String mqttTopicWartungActive;
 		// settings
 		String mqttTopicSetPoint;
 		String mqttTopicTempUrl;
@@ -48,6 +49,7 @@ class moduleUnderfloor : public IModuleBase {
 		String mqttTopicSetHandValue;
 		String mqttTopicSetSetPoint;
 		String mqttTopicSetTempUrl;
+		String mqttTopicSetWartung;
 
 		// section to copy
 		void init();
@@ -73,6 +75,7 @@ class moduleUnderfloor : public IModuleBase {
 		String SetHandValue(bool val);
 		String SetSetPoint(uint8 setpoint);
 		String SetTopicTempUrl(String topic);
+		String SetWartung();
 	private:
 		uint8 no;
 		bool outputLast;
@@ -89,14 +92,17 @@ class moduleUnderfloor : public IModuleBase {
 		unsigned long publishSetPointLast;
 		String tempUrlLast;
 		unsigned long publishTempUrlLast;
+		bool wartungActiveLast;
+		unsigned long publishWartungActiveLast;
 
 		void publishValue();
 		void calc();
 		void calcOutput();
+		void deactivateWartung();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 256 $";
 
 		uint8 bitDebug;
 		uint8 bitHand;
@@ -105,6 +111,8 @@ class moduleUnderfloor : public IModuleBase {
 		uint16 byteCalcCycle;
 		uint8 setPoint;
 		int temp;
+		bool wartungActive;
+		unsigned long wartungStartedAt;
 };
 extern moduleUnderfloor wpUnderfloor1;
 extern moduleUnderfloor wpUnderfloor2;

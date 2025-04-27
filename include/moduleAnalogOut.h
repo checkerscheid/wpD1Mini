@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 256                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 246 2025-02-18 16:27:11Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 256 2025-04-25 19:31:36Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -32,6 +32,7 @@ class moduleAnalogOut : public IModuleBase {
 		String mqttTopicHandValue;
 		String mqttTopicReadedTemp;
 		String mqttTopicErrorHand;
+		String mqttTopicWartungActive;
 		// settings
 		String mqttTopicKp;
 		String mqttTopicTv;
@@ -44,6 +45,7 @@ class moduleAnalogOut : public IModuleBase {
 		String mqttTopicSetHandValue;
 		String mqttTopicSetSetPoint;
 		String mqttTopicSetTempUrl;
+		String mqttTopicSetWartung;
 
 		// section to copy
 		void init();
@@ -85,6 +87,8 @@ class moduleAnalogOut : public IModuleBase {
 
 		String GetPidType();
 
+		String SetWartung();
+
 	private:
 		PID* pid;
 		// section for define
@@ -121,17 +125,22 @@ class moduleAnalogOut : public IModuleBase {
 		unsigned long publishReadedTempLast;
 		String tempUrlLast;
 		unsigned long publishTempUrlLast;
+		bool wartungActiveLast;
+		unsigned long publishWartungActiveLast;
 
 		void publishValue();
 		void calc();
 		void calcOutput();
 		void savePidType();
+		void deactivateWartung();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 256 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
+		bool wartungActive;
+		unsigned long wartungStartedAt;
 };
 extern moduleAnalogOut wpAnalogOut;
 
