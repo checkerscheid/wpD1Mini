@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 256                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 246 2025-02-18 16:27:11Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 256 2025-04-25 19:31:36Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -69,6 +69,7 @@ void moduleUnderfloor::init() {
 	autoValue = false;
 	handValue = false;
 	handError = false;
+	wartungActive = false;
 
 	// values
 	mqttTopicOut = wpFZ.DeviceName + "/" + ModuleName + "/Output";
@@ -76,6 +77,7 @@ void moduleUnderfloor::init() {
 	mqttTopicHandValue = wpFZ.DeviceName + "/" + ModuleName + "/Hand";
 	mqttTopicReadedTemp = wpFZ.DeviceName + "/" + ModuleName + "/ReadedTemp";
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
+	mqttTopicWartungActive = wpFZ.DeviceName + "/ERROR/" + ModuleName + "WartungActive";
 	// settings
 	mqttTopicSetPoint = wpFZ.DeviceName + "/" + ModuleName + "/SetPoint";
 	mqttTopicTempUrl = wpFZ.DeviceName + "/" + ModuleName + "/TempUrl";
@@ -84,6 +86,7 @@ void moduleUnderfloor::init() {
 	mqttTopicSetHandValue = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHandValue";
 	mqttTopicSetSetPoint = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetPoint";
 	mqttTopicSetTempUrl = wpFZ.DeviceName + "/settings/" + ModuleName + "/TempUrl";
+	mqttTopicSetWartung = wpFZ.DeviceName + "/settings/" + ModuleName + "/Wartung";
 
 	outputLast = false;
 	publishOutputLast = 0;
@@ -99,6 +102,9 @@ void moduleUnderfloor::init() {
 	publishSetPointLast = 0;
 	tempUrlLast = "";
 	publishTempUrlLast = 0;
+	wartungActiveLast = false;
+	publishWartungActiveLast = 0;
+
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules2, wpEEPROM.bitsDebugModules2, bitDebug);
@@ -142,6 +148,7 @@ void moduleUnderfloor::publishValues(bool force) {
 		publishHandErrorLast = 0;
 		publishSetPointLast = 0;
 		publishTempUrlLast = 0;
+		publishWartungActiveLast = 0;
 	}
 	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
@@ -194,6 +201,14 @@ void moduleUnderfloor::publishValues(bool force) {
 		}
 		publishTempUrlLast = wpFZ.loopStartedAt;
 	}
+	if(wartungActiveLast != wartungActive || wpFZ.CheckQoS(publishWartungActiveLast)) {
+		wartungActiveLast = wartungActive;
+		wpMqtt.mqttClient.publish(mqttTopicWartungActive.c_str(), String(wartungActive).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(ModuleName + " WartungActive", String(wartungActive));
+		}
+		publishWartungActiveLast = wpFZ.loopStartedAt;
+	}
 	mb->publishValues(force);
 }
 
@@ -206,6 +221,7 @@ void moduleUnderfloor::setSubscribes() {
 		wpMqtt.mqttClient.subscribe(mqttTopicTemp.c_str());
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetTempUrl.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetWartung.c_str());
 	mb->setSubscribes();
 }
 
@@ -238,6 +254,12 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetTempUrl.c_str()) == 0) {
 		SetTopicTempUrl(msg);
 		wpFZ.DebugcheckSubscribes(mqttTopicSetTempUrl, mqttTopicTemp);
+	}
+	if(strcmp(topic, mqttTopicSetWartung.c_str()) == 0) {
+		if(msg.toInt() != 0) {
+			SetWartung();
+			wpFZ.DebugcheckSubscribes(mqttTopicSetWartung, msg);
+		}
 	}
 	mb->checkSubscribes(topic, msg);
 }
@@ -277,6 +299,12 @@ String moduleUnderfloor::SetTopicTempUrl(String topic) {
 	wpFZ.restartRequired = true;
 	return wpFZ.jsonOK;
 }
+String moduleUnderfloor::SetWartung() {
+	wartungActive = true;
+	wartungStartedAt = wpFZ.loopStartedAt;
+	wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung activated: 'module" + ModuleName);
+	return wpFZ.jsonOK;
+}
 
 //###################################################################################
 // private
@@ -302,6 +330,10 @@ void moduleUnderfloor::calc() {
 	} else {
 		output = autoValue;
 	}
+	if(wartungActive) {
+		output = true;
+		deactivateWartung();
+	}
 	digitalWrite(Pin, !output);
 }
 void moduleUnderfloor::calcOutput() {
@@ -312,12 +344,19 @@ void moduleUnderfloor::calcOutput() {
 		autoValue = true;
 	}
 }
+void moduleUnderfloor::deactivateWartung() {
+	int8 minuten = 5;
+	if(wpFZ.loopStartedAt > wartungStartedAt + (minuten * 60 * 1000)) {
+		wartungActive = false;
+		wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung deactivated: 'module" + ModuleName);
+	}
+}
 
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 256 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

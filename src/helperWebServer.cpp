@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 256                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 253 2025-03-17 19:29:41Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 256 2025-04-25 19:31:36Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 253 $";
+	String SVN = "$Rev: 256 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1049,6 +1049,9 @@ void helperWebServer::setupWebServer() {
 			uint8 setPoint = request->getParam(F("setPoint"))->value().toDouble();
 			request->send(200, F("application/json"), wpAnalogOut.SetSetPoint(setPoint).c_str());
 		}
+		if(request->hasParam(F("wartung"))) {
+			request->send(200, F("application/json"), wpAnalogOut.SetWartung().c_str());
+		}
 		wpWebServer.setBlink();
 	});
 	webServer.on("/setWeight", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -1070,6 +1073,17 @@ void helperWebServer::setupWebServer() {
 	});
 	#endif
 	#if BUILDWITH == 3
+	if(wpModules.useModuleUnderfloor1 && wpModules.useModuleUnderfloor2 && wpModules.useModuleUnderfloor3 && wpModules.useModuleUnderfloor4) {
+		webServer.on("/setWartung", HTTP_GET, [](AsyncWebServerRequest *request) {
+			String json = "{\"erg\":{" +
+				(wpModules.useModuleUnderfloor1 ? "\"Underfloor1\":" + wpUnderfloor1.SetWartung() + "," : "") +
+				(wpModules.useModuleUnderfloor2 ? "\"Underfloor2\":" + wpUnderfloor2.SetWartung() + "," : "") +
+				(wpModules.useModuleUnderfloor3 ? "\"Underfloor3\":" + wpUnderfloor3.SetWartung() + "," : "") +
+				(wpModules.useModuleUnderfloor4 ? "\"Underfloor4\":" + wpUnderfloor4.SetWartung() + "," : "");
+			request->send(200, F("application/json"), (json.substring(0, json.length() - 1) + "}}").c_str());
+			wpWebServer.setBlink();
+		});
+	}
 	if(wpModules.useModuleUnderfloor1) {
 		webServer.on("/setUnderfloor1", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("hand"))) {
@@ -1087,6 +1101,9 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam(F("topic"))) {
 				String topic = request->getParam(F("topic"))->value();
 				request->send(200, F("application/json"), wpUnderfloor1.SetTopicTempUrl(topic).c_str());
+			}
+			if(request->hasParam(F("wartung"))) {
+				request->send(200, F("application/json"), wpUnderfloor1.SetWartung().c_str());
 			}
 			wpWebServer.setBlink();
 		});
@@ -1109,6 +1126,9 @@ void helperWebServer::setupWebServer() {
 				String topic = request->getParam(F("topic"))->value();
 				request->send(200, F("application/json"), wpUnderfloor2.SetTopicTempUrl(topic).c_str());
 			}
+			if(request->hasParam(F("wartung"))) {
+				request->send(200, F("application/json"), wpUnderfloor2.SetWartung().c_str());
+			}
 			wpWebServer.setBlink();
 		});
 	}
@@ -1130,6 +1150,9 @@ void helperWebServer::setupWebServer() {
 				String topic = request->getParam(F("topic"))->value();
 				request->send(200, F("application/json"), wpUnderfloor3.SetTopicTempUrl(topic).c_str());
 			}
+			if(request->hasParam(F("wartung"))) {
+				request->send(200, F("application/json"), wpUnderfloor3.SetWartung().c_str());
+			}
 			wpWebServer.setBlink();
 		});
 	}
@@ -1150,6 +1173,9 @@ void helperWebServer::setupWebServer() {
 			if(request->hasParam(F("topic"))) {
 				String topic = request->getParam(F("topic"))->value();
 				request->send(200, F("application/json"), wpUnderfloor4.SetTopicTempUrl(topic).c_str());
+			}
+			if(request->hasParam(F("wartung"))) {
+				request->send(200, F("application/json"), wpUnderfloor4.SetWartung().c_str());
 			}
 			wpWebServer.setBlink();
 		});
