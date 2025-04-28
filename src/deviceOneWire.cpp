@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: deviceOneWire.cpp 228 2024-12-03 08:19:36Z               $ #
+//# File-ID      : $Id:: deviceOneWire.cpp 258 2025-04-28 13:34:51Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <deviceOneWire.h>
@@ -85,8 +85,7 @@ void deviceOneWire::checkSubscribes(char* topic, String msg) {
 		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteDS18B20Correction[number], correction);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("DS18B20 Correction", wpEEPROM.byteDS18B20Correction[number], correction, false);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetCorrection, String(correction));
 		}
 	}
@@ -140,7 +139,7 @@ void deviceOneWire::calc() {
 // section to copy
 //###################################################################################
 uint16 deviceOneWire::getVersion() {
-	String SVN = "$Rev: 228 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

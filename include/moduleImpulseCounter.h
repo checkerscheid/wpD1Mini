@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.h 246 2025-02-18 16:27:11Z          $ #
+//# File-ID      : $Id:: moduleImpulseCounter.h 258 2025-04-28 13:34:51Z          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleImpulseCounter_h
@@ -34,8 +34,8 @@ class moduleImpulseCounter : public IModuleBase {
 		String mqttTopicSilver;
 		String mqttTopicRed;
 		String mqttTopicUpKWh;
-		unsigned long impulseCounter = 0;
-		unsigned long KWh = 0;
+		uint32 impulseCounter = 0;
+		uint32 KWh = 0;
 		uint16 counterSilver = 50;
 		uint16 counterRed = 255;
 		uint8 UpKWh = 150;
@@ -69,7 +69,7 @@ class moduleImpulseCounter : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 258 $";
 
 };
 extern moduleImpulseCounter wpImpulseCounter;

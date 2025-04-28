@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -172,9 +172,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			bool readSetWaterEmpty = msg.toInt();
 			if(waterEmptySet != readSetWaterEmpty) {
 				waterEmptySet = readSetWaterEmpty;
-				bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
-				EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-				EEPROM.commit();
+				wpEEPROM.WriteBoolToEEPROM("waterEmptySet", wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisWaterEmpty, waterEmptySet);
 				wpFZ.DebugcheckSubscribes(mqttTopicSetWaterEmpty, String(waterEmptySet));
 				wpFZ.SendWSDebug("waterEmpty", waterEmptySet);
 			}
@@ -183,8 +181,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			uint8 readPumpActive = msg.toInt();
 			if(pumpActive != readPumpActive) {
 				pumpActive = readPumpActive;
-				EEPROM.write(wpEEPROM.bytePumpActive, pumpActive);
-				EEPROM.commit();
+				wpEEPROM.WriteByteToEEPROM("pumpActive", wpEEPROM.bytePumpActive, pumpActive);
 				wpFZ.DebugcheckSubscribes(mqttTopicPumpActive, String(pumpActive));
 			}
 		}
@@ -193,8 +190,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			readPumpPause *= 60;
 			if(pumpPause != readPumpPause) {
 				pumpPause = readPumpPause;
-				EEPROM.put(wpEEPROM.bytePumpPause, pumpPause);
-				EEPROM.commit();
+				wpEEPROM.WriteWordToEEPROM("pumpPause", wpEEPROM.bytePumpPause, pumpPause);
 				wpFZ.DebugcheckSubscribes(mqttTopicPumpPause, String(pumpPause));
 			}
 		}
@@ -203,9 +199,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHand = msg.toInt();
 		if(handSet != readSetHand) {
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHand, handSet);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("handSet", wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHand, handSet);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
 	}
@@ -213,9 +207,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 		bool readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
 			handValueSet = readSetHandValue;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHandValue, handValueSet);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("handValueSet", wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitRelaisHandValue, handValueSet);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
@@ -365,7 +357,7 @@ String moduleRelais::getReadableTime(unsigned long time) {
 // section to copy
 //###################################################################################
 uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

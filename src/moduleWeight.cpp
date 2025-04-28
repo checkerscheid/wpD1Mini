@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 253 2025-03-17 19:29:41Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -160,16 +160,14 @@ void moduleWeight::calc() {
 		long raw = -1 * scale->read();
 		if(makeTare) {
 			tareValue = raw;
-			EEPROM.put(wpEEPROM.byteWeightTareValue, (uint32) (tareValue / 1000.0));
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strDEBUG, "calcWeight", "Save to EEPROM: Tare: " + String(tareValue));
+			uint32 tv = (uint32) (tareValue / 1000.0);
+			wpEEPROM.WriteWordToEEPROM("TareValue", wpEEPROM.byteWeightTareValue, tv);
 			makeTare = false;
 		}
 		if(make1kg) {
 			tare1kg = raw;
-			EEPROM.put(wpEEPROM.byteWeightTare1kg, (uint32) (tare1kg / 1000.0));
-			EEPROM.commit();
-			wpFZ.DebugWS(wpFZ.strDEBUG, "calcWeight", "Save to EEPROM: Tare 1 kg: " + String(tare1kg));
+			uint32 t1kg = (uint32) (tare1kg / 1000.0);
+			wpEEPROM.WriteWordToEEPROM("Tare1kg", wpEEPROM.byteWeightTare1kg, t1kg);
 			make1kg = false;
 		}
 		// long correct = tareValue + raw;
@@ -214,7 +212,7 @@ long moduleWeight::calcAvg(long raw) {
 // section to copy
 //###################################################################################
 uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 253 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

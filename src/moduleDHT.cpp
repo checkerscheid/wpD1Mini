@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 246 2025-02-18 16:27:11Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 258 2025-04-28 13:34:51Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -98,8 +98,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		int8 readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
-			EEPROM.put(wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("TemperatureCorrection", wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
 			wpFZ.DebugcheckSubscribes(mqttTopicTemperatureCorrection, String(temperatureCorrection));
 		}
 	}
@@ -107,8 +106,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		int8 readHumidityCorrection = int8_t(msg.toFloat() * 10);
 		if(humidityCorrection != readHumidityCorrection) {
 			humidityCorrection = readHumidityCorrection;
-			EEPROM.put(wpEEPROM.byteHumidityCorrection, humidityCorrection);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("HumidityCorrection", wpEEPROM.byteHumidityCorrection, humidityCorrection);
 			wpFZ.DebugcheckSubscribes(mqttTopicHumidityCorrection, String(humidityCorrection));
 		}
 	}
@@ -180,7 +178,7 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 // section to copy
 //###################################################################################
 uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

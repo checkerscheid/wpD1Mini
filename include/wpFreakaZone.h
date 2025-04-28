@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 252                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 252 2025-03-13 12:49:49Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -160,7 +160,8 @@ class wpFreakaZone {
 		void SetDeviceName(String name);
 		void SetDeviceDescription(String description);
 		void DebugcheckSubscribes(String topic, String value);
-		void DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state);
+		// void DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state);
+		// void DebugWriteByteToEEPROM(String name, uint16 addr, uint8 value);
 
 		void printStart();
 		void printRestored();
@@ -173,9 +174,9 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
 		bool sendRawRest(String target);
-		void InitBootCounter(uint32 bc);
+		void InitBootCounter(uint8 bc);
 		void BootCount();
-		uint32 GetBootCounter();
+		uint8 GetBootCounter();
 		void ResetBootCounter();
 		void InitMaxWorking(bool maxWorking);
 		void SetMaxWorking();
@@ -195,7 +196,7 @@ class wpFreakaZone {
 		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
 		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
 
-		String SVNh = "$Rev: 252 $";
+		String SVNh = "$Rev: 258 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
@@ -203,11 +204,10 @@ class wpFreakaZone {
 		unsigned long publishRestartRequiredLast;
 		uint8 blinkStatus;
 		unsigned long blinkStatsusLast;
-		uint32 bootCounter;
+		uint8 bootCounter;
 		short blinkDelay;
 		bool useMaxWorking = false;
 		unsigned long maxWorkingMillis;
-		void WriteBootCounter();
 		void doBlink();
 		void RestartAfterMaxWorking();
 };

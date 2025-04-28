@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 246 2025-02-18 16:27:11Z                 $ #
+//# File-ID      : $Id:: helperModules.h 258 2025-04-28 13:34:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -104,7 +104,7 @@ class helperModules {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		void SaveBoolToEEPROM(String name, uint16 addr, byte byte, uint8 bit, bool value);
+		//void SaveBoolToEEPROM(String name, uint16 addr, byte byte, uint8 bit, bool value);
 
 		void changeModuleDHT11(bool newValue);
 		void changeModuleDHT22(bool newValue);
@@ -151,7 +151,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 258 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;

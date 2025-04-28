@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 250                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 250 2025-02-27 13:50:21Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -53,7 +53,7 @@ void helperMqtt::cycle() {
 }
 
 uint16 helperMqtt::getVersion() {
-	String SVN = "$Rev: 250 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -61,11 +61,7 @@ uint16 helperMqtt::getVersion() {
 
 void helperMqtt::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugMqtt", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugMqtt: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugMqtt", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, Debug);
 	wpFZ.SendWSDebug("DebugMqtt", Debug);
 	wpFZ.blink();
 }
@@ -160,9 +156,7 @@ void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
 			bool readDebug = msg.toInt();
 			if(wpMqtt.Debug != readDebug) {
 				wpMqtt.Debug = readDebug;
-				bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
-				EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-				EEPROM.commit();
+				wpEEPROM.WriteBoolToEEPROM("DebugMqtt", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugMqtt, wpMqtt.Debug);
 				wpFZ.SendWSDebug("DebugMqtt", wpMqtt.Debug);
 				wpFZ.DebugcheckSubscribes(wpMqtt.mqttTopicDebug, String(wpMqtt.Debug));
 			}

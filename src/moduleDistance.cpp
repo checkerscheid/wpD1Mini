@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 246 2025-02-18 16:27:11Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 258 2025-04-28 13:34:51Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -108,8 +108,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		uint8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.write(wpEEPROM.byteDistanceCorrection, correction);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("DistanceCorrection", wpEEPROM.byteDistanceCorrection, correction);
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
@@ -117,8 +116,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		uint8 readHeight = msg.toInt();
 		if(height != readHeight) {
 			height = readHeight;
-			EEPROM.write(wpEEPROM.byteHeight, height);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("DistanceHeight", wpEEPROM.byteHeight, height);
 			wpFZ.DebugcheckSubscribes(mqttTopicHeight, String(height));
 		}
 	}
@@ -126,8 +124,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		uint16 readMaxVolume = msg.toInt();
 		if(maxVolume != readMaxVolume) {
 			maxVolume = readMaxVolume;
-			EEPROM.put(wpEEPROM.byteMaxVolume, maxVolume);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("DistanceMaxVolume", wpEEPROM.byteMaxVolume, maxVolume);
 			wpFZ.DebugcheckSubscribes(mqttTopicMaxVolume, String(maxVolume));
 		}
 	}
@@ -215,7 +212,7 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsi
 // section to copy
 //###################################################################################
 uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

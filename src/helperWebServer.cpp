@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 256                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 256 2025-04-25 19:31:36Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 258 2025-04-28 13:34:51Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 256 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -49,11 +49,7 @@ uint16 helperWebServer::getVersion() {
 
 void helperWebServer::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugWebServer", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWebServer: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugWebServer", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 	wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
 	wpFZ.blink();
 }
@@ -89,9 +85,7 @@ void helperWebServer::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM(F("DebugWebServer"), wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugWebServer, Debug);
 			wpFZ.SendWSDebug(F("DebugWebServer"), Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
