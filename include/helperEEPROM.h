@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 261                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 258 2025-04-28 13:34:51Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 261 2025-04-28 19:42:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -145,6 +145,8 @@ class helperEEPROM {
 		const uint8 bitAnalogOut2Hand = 1; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelRGB = 2; // include in bitsSettingsModules1
 		const uint8 bitUseWeightAvg = 4; // include in bitsSettingsModules1
+		const uint8 bitNeoPixelUseWW = 5; // include in bitsSettingsModules1
+		const uint8 bitNeoPixelUseCW = 6; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
@@ -288,7 +290,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 258 $";
+		String SVNh = "$Rev: 261 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

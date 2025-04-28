@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 261                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 259 2025-04-28 17:06:12Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 261 2025-04-28 19:42:51Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -209,7 +209,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
 	}
-	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
+	if(useWW && (AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast))) {
 		AnalogOutWWLast = AnalogOutWW;
 		int32 percent = (uint8) AnalogOutWW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
@@ -218,7 +218,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		}
 		publishAnalogOutWWLast = wpFZ.loopStartedAt;
 	}
-	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
+	if(useCW && (AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast))) {
 		AnalogOutCWLast = AnalogOutCW;
 		int32 percent = (uint8) AnalogOutCW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
@@ -282,8 +282,12 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetG.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetB.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
+	if(useWW) {
+		wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
+	}
+	if(useCW) {
+		wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
+	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetDemoMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
@@ -316,14 +320,14 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetB, String(valueB));
 		}
 	}
-	if(strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
+	if(useWW && strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
 		uint8 readWW = msg.toInt();
 		if(targetWW != readWW) {
 			SetWW(readWW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
 		}
 	}
-	if(strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
+	if(useCW && strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
 		uint8 readCW = msg.toInt();
 		if(targetCW != readCW) {
 			SetCW(readCW);
@@ -629,6 +633,14 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 	targetCW = 0;
 	targetWW = 0;
 	staticIsSet = false;
+}
+void moduleNeoPixel::ChangeUseWW() {
+	useWW = !useWW;
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelWW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseWW, useWW);
+}
+void moduleNeoPixel::ChangeUseCW() {
+	useCW = !useCW;
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelCW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseCW, useCW);
 }
 // String moduleNeoPixel::getStripStatus() {
 // 	status = "{";
@@ -1130,7 +1142,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 259 $";
+	String SVN = "$Rev: 261 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1142,6 +1154,15 @@ String moduleNeoPixel::GetJsonSettings() {
 		wpFZ.JsonKeyValue(F("ValueR"), String(GetValueR())) + F(",") +
 		wpFZ.JsonKeyValue(F("ValueG"), String(GetValueG())) + F(",") +
 		wpFZ.JsonKeyValue(F("ValueB"), String(GetValueB())) + F(",") +
+		wpFZ.JsonKeyValue(F("useWW"), useWW ? "true" : "false") + F(",") +
+		wpFZ.JsonKeyValue(F("useCW"), useCW ? "true" : "false") + F(",");
+	if(useWW) {
+		json += wpFZ.JsonKeyValue(F("ValueWW"), String(GetValueB())) + F(",");
+	}
+	if(useCW) {
+		json += wpFZ.JsonKeyValue(F("ValueCW"), String(GetValueB())) + F(",");
+	}
+	json +=
 		wpFZ.JsonKeyValue(F("PixelCount"), String(GetPixelCount())) + F(",") +
 		wpFZ.JsonKeyValue(F("isRGB"), GetRGB() ? "true" : "false") +
 		F("}");
