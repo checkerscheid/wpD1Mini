@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 258 2025-04-28 13:34:51Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 259 2025-04-28 17:06:12Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -171,12 +171,6 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleNeoPixel) {
 			message += wpNeoPixel.GetJsonSettings() + F(",");
 		}
-		if(wpModules.useModuleAnalogOut) {
-			message += wpAnalogOut.GetJsonSettings() + F(",");
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			message += wpAnalogOut2.GetJsonSettings() + F(",");
-		}
 		if(wpModules.useModuleClock) {
 			message += wpClock.GetJsonSettings() + F(",");
 		}
@@ -268,12 +262,6 @@ void helperWebServer::setupWebServer() {
 		}
 		if(wpModules.useModuleNeoPixel) {
 			message += F(",") + wpFZ.JsonKeyValue(F("NeoPixel"), wpNeoPixel.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut) {
-			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut"), wpAnalogOut.Debug() ? "true" : "false");
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			message += F(",") + wpFZ.JsonKeyValue(F("AnalogOut2"), wpAnalogOut2.Debug() ? "true" : "false");
 		}
 		if(wpModules.useModuleClock) {
 			message += F(",") + wpFZ.JsonKeyValue(F("Clock"), wpClock.Debug() ? "true" : "false");
@@ -417,14 +405,6 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Module"))->value() == F("useNeoPixel")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useNeoPixel"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleNeoPixel);
-			}
-			if(request->getParam(F("Module"))->value() == F("useAnalogOut")) {
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut"));
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut);
-			}
-			if(request->getParam(F("Module"))->value() == F("useAnalogOut2")) {
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useAnalogOut2"));
-				wpWebServer.setModuleChange(wpWebServer.cmdModuleAnalogOut2);
 			}
 			if(request->getParam(F("Module"))->value() == F("useClock")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useClock"));
@@ -577,14 +557,6 @@ void helperWebServer::setupWebServer() {
 			if(request->getParam(F("Debug"))->value() == F("DebugNeoPixel")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugNeoPixel"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugNeoPixel);
-			}
-			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut")) {
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut"));
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut);
-			}
-			if(request->getParam(F("Debug"))->value() == F("DebugAnalogOut2")) {
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugAnalogOut2"));
-				wpWebServer.setDebugChange(wpWebServer.cmdDebugAnalogOut2);
 			}
 			if(request->getParam(F("Debug"))->value() == F("DebugClock")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugClock"));
@@ -1275,8 +1247,6 @@ void helperWebServer::doTheModuleChange() {
 		#if BUILDWITH == 1
 		if(doModuleChange == cmdModuleCwWw) wpModules.changeModuleCwWw(!wpModules.useModuleCwWw);
 		if(doModuleChange == cmdModuleNeoPixel) wpModules.changeModuleNeoPixel(!wpModules.useModuleNeoPixel);
-		if(doModuleChange == cmdModuleAnalogOut) wpModules.changeModuleAnalogOut(!wpModules.useModuleAnalogOut);
-		if(doModuleChange == cmdModuleAnalogOut2) wpModules.changeModuleAnalogOut2(!wpModules.useModuleAnalogOut2);
 		if(doModuleChange == cmdModuleClock) wpModules.changemoduleClock(!wpModules.useModuleClock);
 		#endif
 		#if BUILDWITH == 2
@@ -1323,8 +1293,6 @@ void helperWebServer::doTheDebugChange() {
 		#if BUILDWITH == 1
 		if(doDebugChange == cmdDebugCwWw) wpCwWw.changeDebug();
 		if(doDebugChange == cmdDebugNeoPixel) wpNeoPixel.changeDebug();
-		if(doDebugChange == cmdDebugAnalogOut) wpAnalogOut.changeDebug();
-		if(doDebugChange == cmdDebugAnalogOut2) wpAnalogOut2.changeDebug();
 		if(doDebugChange == cmdDebugClock) wpClock.changeDebug();
 		#endif
 		#if BUILDWITH == 2
@@ -1421,8 +1389,6 @@ String processor(const String& var) {
 		returns +=
 			wpWebServer.getchangeModule(F("useCwWw"), F("wpCwWw"), wpModules.useModuleCwWw) +
 			wpWebServer.getchangeModule(F("useNeoPixel"), F("wpNeoPixel"), wpModules.useModuleNeoPixel) +
-			wpWebServer.getchangeModule(F("useAnalogOut"), F("wpAnalogOut"), wpModules.useModuleAnalogOut) +
-			wpWebServer.getchangeModule(F("useAnalogOut2"), F("wpAnalogOut2"), wpModules.useModuleAnalogOut2) +
 			wpWebServer.getchangeModule(F("useClock"), F("wpClock"), wpModules.useModuleClock);
 		#endif
 		#if BUILDWITH == 2
@@ -1502,12 +1468,6 @@ String processor(const String& var) {
 		}
 		if(wpModules.useModuleNeoPixel) {
 			returns += wpWebServer.getChangeDebug(F("DebugNeoPixel"), F("NeoPixel"), wpNeoPixel.Debug());
-		}
-		if(wpModules.useModuleAnalogOut) {
-			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut"), F("AnalogOut"), wpAnalogOut.Debug());
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			returns += wpWebServer.getChangeDebug(F("DebugAnalogOut2"), F("AnalogOut2"), wpAnalogOut2.Debug());
 		}
 		if(wpModules.useModuleClock) {
 			returns += wpWebServer.getChangeDebug(F("DebugClock"), F("Clock"), wpClock.Debug());

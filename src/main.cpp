@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 250                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 250 2025-02-27 13:50:21Z                        $ #
+//# File-ID      : $Id:: main.cpp 259 2025-04-28 17:06:12Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -69,12 +69,6 @@ void setup() {
 	}
 	if(wpModules.useModuleNeoPixel) {
 		wpNeoPixel.init();
-	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.init();
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.init();
 	}
 	if(wpModules.useModuleClock) {
 		wpClock.init();
@@ -180,12 +174,6 @@ void loop() {
 		if(wpModules.useModuleNeoPixel) {
 			wpNeoPixel.cycle();
 		}
-		if(wpModules.useModuleAnalogOut) {
-			wpAnalogOut.cycle();
-		}
-		if(wpModules.useModuleAnalogOut2) {
-			wpAnalogOut2.cycle();
-		}
 		if(wpModules.useModuleClock) {
 			wpClock.cycle();
 		}
@@ -243,7 +231,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16 getVersion() {
-	String SVN = "$Rev: 250 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

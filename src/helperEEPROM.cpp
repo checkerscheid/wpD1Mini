@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 259 2025-04-28 17:06:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -246,8 +246,6 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 1
 	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
 	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);
-	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
-	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleClock = bitRead(bitsModules3, bitUseClock);
 #endif
 #if BUILDWITH == 2
@@ -304,8 +302,6 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 1
 	wpCwWw.Debug(bitRead(bitsDebugModules1, bitDebugCwWw));
 	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));
-	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
-	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpClock.Debug(bitRead(bitsDebugModules2, bitDebugClock));
 #endif
 #if BUILDWITH == 2
@@ -342,8 +338,6 @@ void helperEEPROM::readVars() {
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 #if BUILDWITH == 1
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
-	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
-	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
@@ -383,9 +377,6 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
-	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
-	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
-	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));
 	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
 	
 	wpClock.ColorHR = EEPROM.read(byteClockColorHR);
