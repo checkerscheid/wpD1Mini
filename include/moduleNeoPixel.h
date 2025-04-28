@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 254                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 254 2025-03-30 13:01:15Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 259 2025-04-28 17:06:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -53,6 +53,8 @@ class moduleNeoPixel : public IModuleBase {
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
+		String mqttTopicWW;
+		String mqttTopicCW;
 		//String mqttTopicBrightness;
 		String mqttTopicStatus;
 		String mqttTopicDemoMode;
@@ -66,6 +68,8 @@ class moduleNeoPixel : public IModuleBase {
 		String mqttTopicSetR;
 		String mqttTopicSetG;
 		String mqttTopicSetB;
+		String mqttTopicSetWW;
+		String mqttTopicSetCW;
 		//String mqttTopicSetBrightness;
 		String mqttTopicSetDemoMode;
 		String mqttTopicSetMode;
@@ -122,10 +126,18 @@ class moduleNeoPixel : public IModuleBase {
 		void SetRGB(bool rgb);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
-		String getStripStatus();
+		//String getStripStatus();
 		void setBorder(uint32_t c);
 		unsigned long lastBorderSend;
 	private:
+		uint8 PinWW;
+		uint8 PinCW;
+		uint8 AnalogOutWW = 0;
+		uint8 AnalogOutWWLast = 0;
+		unsigned long publishAnalogOutWWLast;
+		uint8 AnalogOutCW = 0;
+		uint8 AnalogOutCWLast = 0;
+		unsigned long publishAnalogOutCWLast;
 		uint16 pixelCount = 50;
 		uint16 pixelStartForTv = 25;
 		uint maxPercent;
@@ -200,7 +212,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 254 $";
+		String SVNh = "$Rev: 259 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

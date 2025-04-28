@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 258 2025-04-28 13:34:51Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 259 2025-04-28 17:06:12Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -49,6 +49,13 @@ moduleNeoPixel::moduleNeoPixel() {
 	// section to config and copy
 	ModuleName = "NeoPixel";
 	mb = new moduleBase(ModuleName);
+	PinWW = D6;
+	pinMode(PinWW, OUTPUT);
+	analogWrite(PinWW, LOW);
+	
+	PinCW = D5;
+	pinMode(PinCW, OUTPUT);
+	analogWrite(PinCW, LOW);
 
 	piasFavColorR = 137;
 	piasFavColorG = 0;
@@ -98,6 +105,8 @@ void moduleNeoPixel::init() {
 	mqttTopicValueR = wpFZ.DeviceName + "/" + ModuleName + "/R";
 	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
+	mqttTopicWW = wpFZ.DeviceName + "/" + ModuleName + "/WW";
+	mqttTopicCW = wpFZ.DeviceName + "/" + ModuleName + "/CW";
 	mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
@@ -110,6 +119,8 @@ void moduleNeoPixel::init() {
 	mqttTopicSetR = wpFZ.DeviceName + "/settings/" + ModuleName + "/R";
 	mqttTopicSetG = wpFZ.DeviceName + "/settings/" + ModuleName + "/G";
 	mqttTopicSetB = wpFZ.DeviceName + "/settings/" + ModuleName + "/B";
+	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/WW";
+	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/CW";
 	mqttTopicSetDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetEffectSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetEffectSpeed";
@@ -186,6 +197,8 @@ void moduleNeoPixel::publishValues() {
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishValueLast = 0;
+		publishAnalogOutWWLast = 0;
+		publishAnalogOutCWLast = 0;
 		publishStatusLast = 0;
 		publishMaxPercentLast = 0;
 		publishModeLast = 0;
@@ -195,6 +208,24 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB ||
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
+	}
+	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
+		AnalogOutWWLast = AnalogOutWW;
+		int32 percent = (uint8) AnalogOutWW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicWW, String(percent));
+		}
+		publishAnalogOutWWLast = wpFZ.loopStartedAt;
+	}
+	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
+		AnalogOutCWLast = AnalogOutCW;
+		int32 percent = (uint8) AnalogOutCW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicCW, String(percent));
+		}
+		publishAnalogOutCWLast = wpFZ.loopStartedAt;
 	}
 	//if(statusLast != getStripStatus() || wpFZ.CheckQoS(publishStatusLast)) {
 	// if(publishStatusLast + 10000 > wpFZ.loopStartedAt) {
@@ -251,6 +282,8 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetG.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetB.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetDemoMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
@@ -281,6 +314,20 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 		if(valueB != readValueB) {
 			SetValueB(readValueB);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetB, String(valueB));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
+		uint8 readWW = msg.toInt();
+		if(targetWW != readWW) {
+			SetWW(readWW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
+		uint8 readCW = msg.toInt();
+		if(targetCW != readCW) {
+			SetCW(readCW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetDemoMode.c_str()) == 0) {
@@ -410,10 +457,10 @@ String moduleNeoPixel::SetOn() {
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(AnalogOutWW));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(AnalogOutCW));
 	}
 	return returns += "}";
 }
@@ -438,10 +485,10 @@ String moduleNeoPixel::SetOff() {
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(AnalogOutWW));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(AnalogOutCW));
 	}
 	return returns += "}";
 }
@@ -510,8 +557,8 @@ void moduleNeoPixel::setClock(short ph, short pm, short ps) {
 	}
 }
 void moduleNeoPixel::calcDuration() {
-	uint8 distWW = abs(wpAnalogOut.GetHandValue() - targetWW);
-	uint8 distCW = abs(wpAnalogOut2.GetHandValue() - targetCW);
+	uint8 distWW = abs(AnalogOutWW - targetWW);
+	uint8 distCW = abs(AnalogOutCW - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
@@ -583,32 +630,32 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 	targetWW = 0;
 	staticIsSet = false;
 }
-String moduleNeoPixel::getStripStatus() {
-	status = "{";
-	for(uint i = 0; i < pixelCount; i++) {
-		status.concat("\"p");
-		status.concat(i);
-		uint32_t c = strip->getPixelColor(i);
-		uint8_t r = c >> 16;
-		status.concat("\":{\"r\":");
-		status.concat(r);
-		uint8_t g = c >> 8;
-		status.concat(",\"g\":");
-		status.concat(g);
-		uint8_t b = c;
-		status.concat(",\"b\":");
-		status.concat(b);
-		status.concat("},");
-	}
-	status.concat("\"ww\":");
-	status.concat(wpAnalogOut.GetHandValue());
-	status.concat(",\"cw\":");
-	status.concat(wpAnalogOut2.GetHandValue());
-	status.concat(",\"b\":");
-	status.concat(strip->getBrightness());
-	status.concat("}");
-	return status;
-}
+// String moduleNeoPixel::getStripStatus() {
+// 	status = "{";
+// 	for(uint i = 0; i < pixelCount; i++) {
+// 		status.concat("\"p");
+// 		status.concat(i);
+// 		uint32_t c = strip->getPixelColor(i);
+// 		uint8_t r = c >> 16;
+// 		status.concat("\":{\"r\":");
+// 		status.concat(r);
+// 		uint8_t g = c >> 8;
+// 		status.concat(",\"g\":");
+// 		status.concat(g);
+// 		uint8_t b = c;
+// 		status.concat(",\"b\":");
+// 		status.concat(b);
+// 		status.concat("},");
+// 	}
+// 	status.concat("\"ww\":");
+// 	status.concat(AnalogOutWW);
+// 	status.concat(",\"cw\":");
+// 	status.concat(AnalogOutCW);
+// 	status.concat(",\"b\":");
+// 	status.concat(strip->getBrightness());
+// 	status.concat("}");
+// 	return status;
+// }
 //###################################################################################
 // private
 //###################################################################################
@@ -709,6 +756,8 @@ void moduleNeoPixel::calc() {
 				break;
 		}
 	}
+	analogWrite(PinWW, AnalogOutWW);
+	analogWrite(PinCW, AnalogOutCW);
 	maxPercent = GetMaxPercent();
 }
 void moduleNeoPixel::BlenderEffect() {
@@ -725,52 +774,52 @@ void moduleNeoPixel::BlenderEffect() {
 	}
 }
 bool moduleNeoPixel::BlenderWWEffect() {
-	if(wpAnalogOut.GetHandValue() != targetWW) {
-		if(wpAnalogOut.GetHandValue() <= targetWW) {
-			if(wpAnalogOut.GetHandValue() + steps <= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + steps);
+	if(AnalogOutWW != targetWW) {
+		if(AnalogOutWW <= targetWW) {
+			if(AnalogOutWW + steps <= targetWW) {
+				AnalogOutWW = AnalogOutWW + steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() >= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW >= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		} else {
-			if(wpAnalogOut.GetHandValue() - steps >= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
+			if(AnalogOutWW - steps >= targetWW) {
+				AnalogOutWW = AnalogOutWW - steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() <= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW <= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		}
 	}
-	return wpAnalogOut.GetHandValue() == targetWW;
+	return AnalogOutWW == targetWW;
 }
 bool moduleNeoPixel::BlenderCWEffect() {
-	if(wpAnalogOut2.GetHandValue() != targetCW) {
-		if(wpAnalogOut2.GetHandValue() <= targetCW) {
-			if(wpAnalogOut2.GetHandValue() + steps <= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + steps);
+	if(AnalogOutCW != targetCW) {
+		if(AnalogOutCW <= targetCW) {
+			if(AnalogOutCW + steps <= targetCW) {
+				AnalogOutCW = AnalogOutCW + steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() >= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW >= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		} else {
-			if(wpAnalogOut2.GetHandValue() - steps >= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
+			if(AnalogOutCW - steps >= targetCW) {
+				AnalogOutCW = AnalogOutCW - steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() <= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW <= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		}
 	}
-	return wpAnalogOut2.GetHandValue() == targetCW;
+	return AnalogOutCW == targetCW;
 }
 bool moduleNeoPixel::BlenderREffect() {
 	if(valueR != targetR) {
@@ -1000,22 +1049,22 @@ void moduleNeoPixel::OffRunnerEffect(uint wait) {
 	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
 	if(wpModules.useModuleAnalogOut) {
-		if(wpAnalogOut.GetHandValue() >= steps) {
-			wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
+		if(AnalogOutWW >= steps) {
+			AnalogOutWW = AnalogOutWW - steps;
 		} else {
-			wpAnalogOut.InitHandValue(0);
+			AnalogOutWW = 0;
 		}
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		if(wpAnalogOut2.GetHandValue() >= steps) {
-			wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
+		if(AnalogOutCW >= steps) {
+			AnalogOutCW = AnalogOutCW - steps;
 		} else {
-			wpAnalogOut2.InitHandValue(0);
+			AnalogOutCW = 0;
 		}
 	}
 	if(
-		(wpModules.useModuleAnalogOut && wpAnalogOut.GetHandValue() <= 0) &&
-		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.GetHandValue() <= 0)) {            //  Loop the pattern from the first LED
+		(wpModules.useModuleAnalogOut && AnalogOutWW <= 0) &&
+		(wpModules.useModuleAnalogOut2 && AnalogOutCW <= 0)) {            //  Loop the pattern from the first LED
 		staticIsSet = true;
 		modeCurrent = ModeStatic;
 	}
@@ -1072,16 +1121,16 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 	returns = valueG > returns ? valueG : returns;
 	returns = valueB > returns ? valueB : returns;
 	if(wpModules.useModuleAnalogOut)
-		returns = wpAnalogOut.GetHandValue() > returns ? wpAnalogOut.GetHandValue() : returns;
+		returns = AnalogOutWW > returns ? AnalogOutWW : returns;
 	if(wpModules.useModuleAnalogOut2)
-		returns = wpAnalogOut2.GetHandValue() > returns ? wpAnalogOut2.GetHandValue() : returns;
+		returns = AnalogOutCW > returns ? AnalogOutCW : returns;
 	return returns;
 }
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

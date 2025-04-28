@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 258 2025-04-28 13:34:51Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 259 2025-04-28 17:06:12Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -48,8 +48,8 @@ void moduleCwWw::init() {
 	mqttTopicSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
 	// settings
 	// commands
-	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetWW";
-	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetCW";
+	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/WW";
+	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/CW";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 	mqttTopicSetSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/EffectSpeed";
@@ -106,17 +106,19 @@ void moduleCwWw::publishValues(bool force) {
 	}
 	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
 		AnalogOutWWLast = AnalogOutWW;
-		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(AnalogOutWW).c_str());
+		int32 percent = (uint8) AnalogOutWW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug(mqttTopicWW, String(AnalogOutWW));
+			mb->printPublishValueDebug(mqttTopicWW, String(percent));
 		}
 		publishAnalogOutWWLast = wpFZ.loopStartedAt;
 	}
 	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
 		AnalogOutCWLast = AnalogOutCW;
-		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(AnalogOutCW).c_str());
+		int32 percent = (uint8) AnalogOutCW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
-			mb->printPublishValueDebug(mqttTopicCW, String(AnalogOutCW));
+			mb->printPublishValueDebug(mqttTopicCW, String(percent));
 		}
 		publishAnalogOutCWLast = wpFZ.loopStartedAt;
 	}
@@ -169,11 +171,15 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
 		uint8 readWW = msg.toInt();
 		if(targetWW != readWW) {
-			targetWW = readWW;
-			wpEEPROM.Write (wpEEPROM.byteAnalogOutHandValue, targetWW);
-			EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-			EEPROM.commit();
+			SetWW(readWW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
+		uint8 readCW = msg.toInt();
+		if(targetCW != readCW) {
+			SetCW(readCW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetMode.c_str()) == 0) {
@@ -535,7 +541,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
