@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBM.cpp 246 2025-02-18 16:27:11Z                    $ #
+//# File-ID      : $Id:: moduleBM.cpp 258 2025-04-28 13:34:51Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBM.h>
@@ -94,8 +94,7 @@ void moduleBM::checkSubscribes(char* topic, String msg) {
 			uint16 readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
-				EEPROM.put(wpEEPROM.byteBMThreshold, threshold);
-				EEPROM.commit();
+				wpEEPROM.WriteWordToEEPROM("BM Threshold", wpEEPROM.byteBMThreshold, threshold);
 				wpFZ.DebugcheckSubscribes(mqttTopicThreshold, String(threshold));
 			}
 		}
@@ -159,7 +158,7 @@ String moduleBM::SetManual() {
 // section to copy
 //###################################################################################
 uint16 moduleBM::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 253 2025-03-17 19:29:41Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -260,8 +260,8 @@ class helperEEPROM {
 		};
 
 // **********
-		const uint16 addrRestartReason = 495;
-		const uint16 addrBootCounter = 496;
+		const uint16 addrRestartReason = 495; // 1 byte
+		const uint16 addrBootCounter = 496; // 1 byte
 		uint16 byteStartForString; // 500
 
 
@@ -274,7 +274,12 @@ class helperEEPROM {
 		void changeDebug();
 		void readStringsFromEEPROM();
 		void writeStringsToEEPROM();
-		//void saveBool(uint16 &addr, byte &by, uint8 &bi, bool v);
+		void WriteBoolToEEPROM(String name, const uint16 &addr, byte &by, const uint8 &bi, bool &v, bool commit = true);
+		void WriteByteToEEPROM(String name, const uint16 &addr, uint8 &v, bool commit = true);
+		void WriteByteToEEPROM(String name, const uint16 &addr, int8 &v, bool commit = true);
+		void WriteWordToEEPROM(String name, const uint16 &addr, uint16 &v, bool commit = true);
+		void WriteWordToEEPROM(String name, const uint16 &addr, short &v, bool commit = true);
+		void WriteWordToEEPROM(String name, const uint16 &addr, uint32 &v, bool commit = true);
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -283,7 +288,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 253 $";
+		String SVNh = "$Rev: 258 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 255                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 255 2025-04-01 12:24:46Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -35,6 +35,7 @@ void helperUpdate::init() {
 	newVersion = false;
 	updateChanel = 0;
 	jsonsub = "firmware";
+	file = F("firmware.bin");
 	#if BUILDWITH == 99
 		file = F("firmware.bin");
 		updateChanel = 99;
@@ -75,7 +76,7 @@ void helperUpdate::cycle() {
 }
 
 uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 255 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -83,11 +84,7 @@ uint16 helperUpdate::getVersion() {
 
 void helperUpdate::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugUpdate", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugUpdate: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugUpdate", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 	wpFZ.SendWSDebug("DebugUpdate", Debug);
 	wpFZ.blink();
 }
@@ -231,9 +228,7 @@ void helperUpdate::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("DebugUpdate", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugUpdate, Debug);
 			wpFZ.SendWSDebug("DebugUpdate", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

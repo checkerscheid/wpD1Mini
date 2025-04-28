@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 256                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 256 2025-04-25 19:31:36Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 258 2025-04-28 13:34:51Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -131,12 +131,11 @@ class moduleAnalogOut : public IModuleBase {
 		void publishValue();
 		void calc();
 		void calcOutput();
-		void savePidType();
 		void deactivateWartung();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 256 $";
+		String SVNh = "$Rev: 258 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 		bool wartungActive;

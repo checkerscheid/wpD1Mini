@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 257                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 257 2025-04-27 16:24:29Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 258 2025-04-28 13:34:51Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -339,11 +339,9 @@ void moduleNeoPixel::InitValueR(uint8 r) {
 uint8 moduleNeoPixel::GetValueR() { return valueR; }
 void moduleNeoPixel::SetValueR(uint8 r) {
 	targetR = r;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueR, r);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelR", wpEEPROM.byteNeoPixelValueR, targetR);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetRed", "Write Red to EEPROM");
 }
 void moduleNeoPixel::InitValueG(uint8 g) {
 	valueG = g;
@@ -352,11 +350,9 @@ void moduleNeoPixel::InitValueG(uint8 g) {
 uint8 moduleNeoPixel::GetValueG() { return valueG; }
 void moduleNeoPixel::SetValueG(uint8 g) {
 	targetG = g;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueG, g);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelG", wpEEPROM.byteNeoPixelValueG, targetG);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetGreen", "Write Green to EEPROM");
 }
 void moduleNeoPixel::InitValueB(uint8 b) {
 	valueB = b;
@@ -365,11 +361,9 @@ void moduleNeoPixel::InitValueB(uint8 b) {
 uint8 moduleNeoPixel::GetValueB() { return valueB; }
 void moduleNeoPixel::SetValueB(uint8 b) {
 	targetB = b;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueB, b);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelB", wpEEPROM.byteNeoPixelValueB, targetB);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBlue", "Write Blue to EEPROM");
 }
 void moduleNeoPixel::SetEffectSpeed(uint8 es) {
 	if(es > 20) es = 20;
@@ -394,16 +388,13 @@ bool moduleNeoPixel::GetRGB() {
 }
 void moduleNeoPixel::SetRGB(bool rgb) {
 	isRGB = rgb;
-	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
-	EEPROM.write(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1);
-	EEPROM.commit();
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelRGB", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
 	if(isRGB) {
 		strip->updateType(NEO_RGB + NEO_KHZ800);
 	} else {
 		strip->updateType(NEO_GRB + NEO_KHZ800);
 	}
 	strip->clear();
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::isRGB", "Write 'isRGB' to EEPROM");
 }
 String moduleNeoPixel::SetOn() {
 	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
@@ -458,8 +449,7 @@ String moduleNeoPixel::SetWW(uint ww) {
 	//targetCW = wpAnalogOut2.handValue;
 	if(ww + targetCW > 255) ww = 255 - targetCW;
 	targetWW = ww;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
 	calcDuration();
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -472,8 +462,7 @@ String moduleNeoPixel::SetCW(uint cw) {
 	//targetWW = wpAnalogOut.handValue;
 	if(cw + targetWW > 255) cw = 255 - targetWW;
 	targetCW = cw;
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	calcDuration();
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -539,10 +528,8 @@ void moduleNeoPixel::InitPixelCount(uint16 pc) {
 }
 uint16 moduleNeoPixel::GetPixelCount() { return pixelCount; }
 void moduleNeoPixel::SetPixelCount(uint16 pc) {
-	EEPROM.put(wpEEPROM.byteNeoPixelPixelCount, pc);
-	EEPROM.commit();
+	wpEEPROM.WriteWordToEEPROM("NeoPixelPC", wpEEPROM.byteNeoPixelPixelCount, pc);
 	wpFZ.restartRequired = true;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetPixelCount", "Write PixelCount to EEPROM");
 }
 
 String moduleNeoPixel::GetModeName(uint actualMode) {
@@ -1094,7 +1081,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 257 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 246 2025-02-18 16:27:11Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 258 2025-04-28 13:34:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -233,53 +233,48 @@ String moduleClock::GetColor5() {
 
 void moduleClock::SetColorH(uint8 r, uint8 g, uint8 b) {
 	ColorHR = r;
-	EEPROM.write(wpEEPROM.byteClockColorHR, r);
+	wpEEPROM.WriteByteToEEPROM("SetColorHR", wpEEPROM.byteClockColorHR, r, false);
 	ColorHG = g;
-	EEPROM.write(wpEEPROM.byteClockColorHG, g);
+	wpEEPROM.WriteByteToEEPROM("SetColorHG", wpEEPROM.byteClockColorHG, g, false);
 	ColorHB = b;
-	EEPROM.write(wpEEPROM.byteClockColorHB, b);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorH());
+	wpEEPROM.WriteByteToEEPROM("SetColorHB", wpEEPROM.byteClockColorHB, b);
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorH", "New Color, save to EEPROM: " + GetColorH());
 }
 void moduleClock::SetColorM(uint8 r, uint8 g, uint8 b) {
 	ColorMR = r;
-	EEPROM.write(wpEEPROM.byteClockColorMR, r);
+	wpEEPROM.WriteByteToEEPROM("SetColorMR", wpEEPROM.byteClockColorMR, r, false);
 	ColorMG = g;
-	EEPROM.write(wpEEPROM.byteClockColorMG, g);
+	wpEEPROM.WriteByteToEEPROM("SetColorMG", wpEEPROM.byteClockColorMG, g, false);
 	ColorMB = b;
-	EEPROM.write(wpEEPROM.byteClockColorMB, b);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorM());
+	wpEEPROM.WriteByteToEEPROM("SetColorMB", wpEEPROM.byteClockColorMB, b);
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorM", "New Color, save to EEPROM: " + GetColorM());
 }
 void moduleClock::SetColorS(uint8 r, uint8 g, uint8 b) {
 	ColorSR = r;
-	EEPROM.write(wpEEPROM.byteClockColorSR, r);
+	wpEEPROM.WriteByteToEEPROM("SetColorSR", wpEEPROM.byteClockColorSR, r, false);
 	ColorSG = g;
-	EEPROM.write(wpEEPROM.byteClockColorSG, g);
+	wpEEPROM.WriteByteToEEPROM("SetColorSG", wpEEPROM.byteClockColorSG, g, false);
 	ColorSB = b;
-	EEPROM.write(wpEEPROM.byteClockColorSB, b);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorS());
+	wpEEPROM.WriteByteToEEPROM("SetColorSB", wpEEPROM.byteClockColorSB, b);
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorS", "New Color, save to EEPROM: " + GetColorS());
 }
 void moduleClock::SetColorQ(uint8 r, uint8 g, uint8 b) {
 	ColorQR = r;
-	EEPROM.write(wpEEPROM.byteClockColorQR, r);
+	wpEEPROM.WriteByteToEEPROM("SetColorQR", wpEEPROM.byteClockColorQR, r, false);
 	ColorQG = g;
-	EEPROM.write(wpEEPROM.byteClockColorQG, g);
+	wpEEPROM.WriteByteToEEPROM("SetColorQG", wpEEPROM.byteClockColorQG, g, false);
 	ColorQB = b;
-	EEPROM.write(wpEEPROM.byteClockColorQB, b);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColorQ());
+	wpEEPROM.WriteByteToEEPROM("SetColorQB", wpEEPROM.byteClockColorQB, b);
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColorQ", "New Color, save to EEPROM: " + GetColorQ());
 }
 void moduleClock::SetColor5(uint8 r, uint8 g, uint8 b) {
 	Color5R = r;
-	EEPROM.write(wpEEPROM.byteClockColor5R, r);
+	wpEEPROM.WriteByteToEEPROM("SetColor5R", wpEEPROM.byteClockColor5R, r, false);
 	Color5G = g;
-	EEPROM.write(wpEEPROM.byteClockColor5G, g);
+	wpEEPROM.WriteByteToEEPROM("SetColor5G", wpEEPROM.byteClockColor5G, g, false);
 	Color5B = b;
-	EEPROM.write(wpEEPROM.byteClockColor5B, b);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetColorX", "New Color, save to EEPROM: " + GetColor5());
+	wpEEPROM.WriteByteToEEPROM("SetColor5B", wpEEPROM.byteClockColor5B, b);
+	wpFZ.DebugWS(wpFZ.strINFO, "SetColor5", "New Color, save to EEPROM: " + GetColor5());
 }
 
 void moduleClock::SimulateTime() {
@@ -295,7 +290,7 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

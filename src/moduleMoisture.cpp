@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.cpp 246 2025-02-18 16:27:11Z              $ #
+//# File-ID      : $Id:: moduleMoisture.cpp 258 2025-04-28 13:34:51Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleMoisture.h>
@@ -104,9 +104,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		if(readMin > 100) readMin = 100;
 		if(minValue != readMin) {
 			minValue = readMin;
-			EEPROM.write(wpEEPROM.byteMoistureMin, minValue);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicMin, String(minValue));
+			wpEEPROM.WriteByteToEEPROM("MinValue", wpEEPROM.byteMoistureMin, minValue);
 		}
 	}
 	if(strcmp(topic, mqttTopicDry.c_str()) == 0) {
@@ -115,8 +113,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		if(readDry > 1023) readDry = 1023;
 		if(dry != readDry) {
 			dry = readDry;
-			EEPROM.put(wpEEPROM.byteMoistureDry, dry);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("Dry", wpEEPROM.byteMoistureDry, dry);
 			wpFZ.DebugcheckSubscribes(mqttTopicDry, String(dry));
 		}
 	}
@@ -126,8 +123,7 @@ void moduleMoisture::checkSubscribes(char* topic, String msg) {
 		if(readWet > 1023) readWet = 1023;
 		if(wet != readWet) {
 			wet = readWet;
-			EEPROM.put(wpEEPROM.byteMoistureWet, wet);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("Wet", wpEEPROM.byteMoistureWet, wet);
 			wpFZ.DebugcheckSubscribes(mqttTopicWet, String(wet));
 		}
 	}
@@ -203,7 +199,7 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleMoisture::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
