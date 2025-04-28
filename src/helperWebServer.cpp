@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 261                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 259 2025-04-28 17:06:12Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 261 2025-04-28 19:42:51Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 259 $";
+	String SVN = "$Rev: 261 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -857,6 +857,11 @@ void helperWebServer::setupWebServer() {
 				request->send(200, F("application/json"), wpNeoPixel.SetWW(ww).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelWW, '" + String(ww) + "'");
 			}
+			if(request->hasParam(F("changeww"))) {
+				wpNeoPixel.ChangeUseWW();
+				request->send(200, F("application/json"), F("{\"erg\":\"S_OK\",\"useWW\":") + String(wpNeoPixel.GetUseWW() ? F("true") : F("false")) + F("}"));
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelWW useWW, '" + String(wpNeoPixel.GetUseWW()) + "'");
+			}
 			wpWebServer.setBlink();
 		});
 		webServer.on("/setNeoPixelCW", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -864,6 +869,11 @@ void helperWebServer::setupWebServer() {
 				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
 				request->send(200, F("application/json"), wpNeoPixel.SetCW(cw).c_str());
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelCW, '" + String(cw) + "'");
+			}
+			if(request->hasParam(F("changecw"))) {
+				wpNeoPixel.ChangeUseCW();
+				request->send(200, F("application/json"), F("{\"erg\":\"S_OK\",\"useCW\":") + String(wpNeoPixel.GetUseCW()? F("true") : F("false")) + F("}"));
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), "Found setNeoPixelCW useCW, '" + String(wpNeoPixel.GetUseCW()) + "'");
 			}
 			wpWebServer.setBlink();
 		});

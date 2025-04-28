@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 261                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 259 2025-04-28 17:06:12Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 261 2025-04-28 19:42:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -128,10 +128,18 @@ class moduleNeoPixel : public IModuleBase {
 		void SetPixelCount(uint16 pc);
 		//String getStripStatus();
 		void setBorder(uint32_t c);
+		void ChangeUseWW();
+		bool GetUseWW() { return useWW; }
+		void SetUseWW(bool ww) { useWW = ww; }
+		void ChangeUseCW();
+		bool GetUseCW() { return useCW; }
+		void SetUseCW(bool cw) { useWW = cw; }
 		unsigned long lastBorderSend;
 	private:
 		uint8 PinWW;
 		uint8 PinCW;
+		bool useWW = false;
+		bool useCW = false;
 		uint8 AnalogOutWW = 0;
 		uint8 AnalogOutWWLast = 0;
 		unsigned long publishAnalogOutWWLast;
@@ -212,7 +220,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 259 $";
+		String SVNh = "$Rev: 261 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

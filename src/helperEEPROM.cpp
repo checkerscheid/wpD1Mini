@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 261                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 259 2025-04-28 17:06:12Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 261 2025-04-28 19:42:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 259 $";
+	String SVN = "$Rev: 261 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -338,6 +338,8 @@ void helperEEPROM::readVars() {
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 #if BUILDWITH == 1
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
+	wpNeoPixel.SetUseWW(bitRead(bitsSettingsModules1, bitNeoPixelUseWW));
+	wpNeoPixel.SetUseCW(bitRead(bitsSettingsModules1, bitNeoPixelUseCW));
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
