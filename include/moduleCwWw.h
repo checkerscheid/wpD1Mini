@@ -35,6 +35,8 @@ class moduleCwWw : public IModuleBase {
 		static const uint8 ModeBlender = 90; //CW, WW
 
 		// values
+		String mqttTopicWW;
+		String mqttTopicCW;
 		String mqttTopicManual;
 		String mqttTopicMaxPercent;
 		String mqttTopicModeName;
@@ -42,6 +44,8 @@ class moduleCwWw : public IModuleBase {
 		String mqttTopicSpeed;
 		// settings
 		// commands
+		String mqttTopicSetWW;
+		String mqttTopicSetCW;
 		String mqttTopicSetMode;
 		String mqttTopicSetSleep;
 		String mqttTopicSetSpeed;
@@ -74,6 +78,14 @@ class moduleCwWw : public IModuleBase {
 		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
 		String SetEffect(uint8 effect);
 	private:
+		uint8 PinWW;
+		uint8 PinCW;
+		uint8 AnalogOutWW = 0;
+		uint8 AnalogOutWWLast = 0;
+		unsigned long publishAnalogOutWWLast;
+		uint8 AnalogOutCW = 0;
+		uint8 AnalogOutCWLast = 0;
+		unsigned long publishAnalogOutCWLast;
 		bool manual;
 		bool manualLast;
 		unsigned long publishManualLast;
