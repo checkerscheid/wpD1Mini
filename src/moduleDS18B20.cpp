@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDS18B20.cpp 246 2025-02-18 16:27:11Z               $ #
+//# File-ID      : $Id:: moduleDS18B20.cpp 258 2025-04-28 13:34:51Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDS18B20.h>
@@ -139,7 +139,7 @@ String moduleDS18B20::scanBus() {
 	uint8 cds18 = dt->getDS18Count();
 	wpFZ.DebugWS(wpFZ.strINFO, "scanBus", "count ds18: " + String(cds18));
 	count = dt->getDeviceCount();
-	setCount();
+	wpEEPROM.WriteByteToEEPROM("DS18B20Count", wpEEPROM.byteDS18B20Count, count);
 	DeviceAddress address;
 	String adr = "";
 	for(uint8 i = 0;  i < count;  i++) {
@@ -153,16 +153,11 @@ String moduleDS18B20::scanBus() {
 	return "{\"found\":" + String(count) + ",\"adr\":{" + adr + "}}"; //wpFZ.jsonOK;
 }
 
-void moduleDS18B20::setCount() {
-	EEPROM.put(wpEEPROM.byteDS18B20Count, count);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "setCount", "DS18B20 Count: " + String(count));
-}
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleDS18B20::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

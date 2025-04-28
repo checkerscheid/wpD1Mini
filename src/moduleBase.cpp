@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleBase.cpp 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleBase.h>
@@ -126,27 +126,17 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 }
 
 void moduleBase::writeEEPROMuseAvg() {
-	bitWrite(_byteUseAvg, _bitUseAvg, useAvg);
-	EEPROM.write(_addrUseAvg, _byteUseAvg);
-	wpFZ.DebugSaveBoolToEEPROM(_name + F(" useAvg"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useAvg);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " useAvg: " + String(useAvg));
+	wpEEPROM.WriteBoolToEEPROM(_name + F(" useAvg"), _addrUseAvg, _byteUseAvg, _bitUseAvg, useAvg);
 }
 void moduleBase::writeEEPROMdebug() {
-	bitWrite(_byteDebug, _bitDebug, debug);
-	EEPROM.write(_addrDebug, _byteDebug);
-	wpFZ.DebugSaveBoolToEEPROM(_name + F(" debug"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " debug: " + String(debug));
+	wpEEPROM.WriteBoolToEEPROM(_name + F(" debug"), _addrDebug, _byteDebug, _bitDebug, debug);
 }
 void moduleBase::writeEEPROMCalcCycle() {
 	double r = round(calcCycle / 100);
 	if(r < 1) r = 1;
 	if(r > 200) r = 200;
 	uint8 saveCalcCycle = (uint8) r;
-	EEPROM.write(_addrCalcCycle, saveCalcCycle);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", _name + " CalcCycle: " + String(saveCalcCycle));
+	wpEEPROM.WriteByteToEEPROM(_name + F(" CalcCycle"), _addrCalcCycle, saveCalcCycle);
 }
 
 void moduleBase::printPublishValueDebug(String name, String value) {

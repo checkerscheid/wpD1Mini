@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 256                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 256 2025-04-25 19:31:36Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 258 2025-04-28 13:34:51Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -271,25 +271,17 @@ uint8 moduleUnderfloor::GetSetPoint() {
 }
 String moduleUnderfloor::SetHand(bool val) {
 	handSet = val;
-	bitWrite(wpEEPROM.bitsSettingsModules2, bitHand, handSet);
-	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetHand", "save to EEPROM: 'module" + ModuleName + "::handSet' = " + String(handSet) + ", bit: " + String(bitHand) + ", addr: " + String(wpEEPROM.addrBitsSettingsModules2));
+	wpEEPROM.WriteBoolToEEPROM("module" + ModuleName + "::handSet", wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2, bitHand, handSet);
 	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetHandValue(bool val) {
 	handValueSet = val;
-	bitWrite(wpEEPROM.bitsSettingsModules2, bitHandValue, handValueSet);
-	EEPROM.write(wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetHandValueSet", "save to EEPROM: 'module" + ModuleName + "::handValueSet' = " + String(handValueSet) + ", bit: " + String(bitHandValue) + ", addr: " + String(wpEEPROM.addrBitsSettingsModules2));
+	wpEEPROM.WriteBoolToEEPROM("module" + ModuleName + "::handValueSet", wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2, bitHandValue, handValueSet);
 	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetSetPoint(uint8 setpoint) {
 	setPoint = setpoint;
-	EEPROM.write(byteSetpoint, setPoint);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint", "save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPoint) + ", addr: " + String(byteSetpoint));
+	wpEEPROM.WriteByteToEEPROM("module" + ModuleName + "::SetSetPoint", byteSetpoint, setPoint);
 	return wpFZ.jsonOK;
 }
 String moduleUnderfloor::SetTopicTempUrl(String topic) {
@@ -356,7 +348,7 @@ void moduleUnderfloor::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 256 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

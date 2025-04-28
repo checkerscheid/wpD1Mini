@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -201,8 +201,7 @@ String moduleCwWw::SetWW(uint8 ww) {
 	SetSleep(0);
 	targetWW = ww;
 	//targetCW = wpAnalogOut2.handValue;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -214,8 +213,7 @@ String moduleCwWw::SetCW(uint8 cw) {
 	SetSleep(0);
 	//targetWW = wpAnalogOut.handValue;
 	targetCW = cw;
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -486,7 +484,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

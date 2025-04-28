@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDS18B20.h 246 2025-02-18 16:27:11Z                 $ #
+//# File-ID      : $Id:: moduleDS18B20.h 258 2025-04-28 13:34:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDS18B20_h
@@ -65,11 +65,10 @@ class moduleDS18B20 : public IModuleBase {
 
 		void publishValue();
 		void calc();
-		void setCount();
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 258 $";
 };
 extern moduleDS18B20 wpDS18B20;
 

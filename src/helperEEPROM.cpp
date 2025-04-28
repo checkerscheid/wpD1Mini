@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 253 2025-03-17 19:29:41Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 253 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -59,9 +59,7 @@ uint16 helperEEPROM::getVersion() {
 
 void helperEEPROM::changeDebug() {
 	Debug = !Debug;
-	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
-	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugEEPROM", addrBitsDebugBasis0, bitDebugEEPROM, Debug);
+	WriteBoolToEEPROM("DebugEEPROM", addrBitsDebugBasis0, bitsDebugBasis0, bitDebugEEPROM, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugEEPROM: " + String(Debug));
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
@@ -99,11 +97,43 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpAnalogOut.mqttTopicTemp);
 }
 
-// void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
-// 	bitWrite(by, bi, v);
-// 	EEPROM.write(addr, by);
-// 	EEPROM.commit();
-// }
+void helperEEPROM::WriteBoolToEEPROM(String name, const uint16 &addr, byte &by, const uint8 &bi, bool &v, bool commit) {
+	bitWrite(by, bi, v);
+	EEPROM.write(addr, by);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bi) + ", state: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, uint8 &v, bool commit) {
+	EEPROM.write(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, int8 &v, bool commit) {
+	EEPROM.write(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint16 &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, short &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint32 &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
 
 void helperEEPROM::publishSettings() {
 	publishSettings(false);

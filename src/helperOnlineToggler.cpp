@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 251                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperOnlineToggler.cpp 251 2025-03-13 09:20:04Z         $ #
+//# File-ID      : $Id:: helperOnlineToggler.cpp 258 2025-04-28 13:34:51Z         $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperOnlineToggler.h>
@@ -41,7 +41,7 @@ void helperOnlineToggler::cycle() {
 }
 
 uint16 helperOnlineToggler::getVersion() {
-	String SVN = "$Rev: 251 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -49,11 +49,7 @@ uint16 helperOnlineToggler::getVersion() {
 
 void helperOnlineToggler::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugOnlineToggler", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugOnlineToggler: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugOnlineToggler", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
 	wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
 	wpFZ.blink();
 }
@@ -105,9 +101,7 @@ void helperOnlineToggler::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("DebugOnlineToggler", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugOnlineToggler, Debug);
 			wpFZ.SendWSDebug("DebugOnlineToggler", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
