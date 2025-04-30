@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 261                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 261 2025-04-28 19:42:51Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 262 2025-04-30 12:00:50Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -40,10 +40,6 @@ class moduleNeoPixel : public IModuleBase {
 		static const uint8 ModeBlender = 90; //CW, WW
 		static const uint8 ModeOffRunner = 97;
 		static const uint8 ModeComplex = 99;
-		uint32_t piasFavColor;
-		uint8_t piasFavColorR;
-		uint8_t piasFavColorG;
-		uint8_t piasFavColorB;
 
 		bool demoMode;
 		bool useBorder;
@@ -56,7 +52,7 @@ class moduleNeoPixel : public IModuleBase {
 		String mqttTopicWW;
 		String mqttTopicCW;
 		//String mqttTopicBrightness;
-		String mqttTopicStatus;
+		//String mqttTopicStatus;
 		String mqttTopicDemoMode;
 		String mqttTopicModeName;
 		String mqttTopicEffectSpeed;
@@ -117,7 +113,6 @@ class moduleNeoPixel : public IModuleBase {
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
-		void setClock(short ph, short pm, short ps);
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
@@ -159,9 +154,9 @@ class moduleNeoPixel : public IModuleBase {
 		uint8 valueBLast;
 		//uint8 brightness = 0;
 		//uint8 brightnessLast;
-		String status;
-		String statusLast;
-		unsigned long publishStatusLast;
+		//String status;
+		//String statusLast;
+		//unsigned long publishStatusLast;
 		bool useBorderLast;
 		bool staticIsSet;
 		bool isRGB = false;
@@ -220,7 +215,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 261 $";
+		String SVNh = "$Rev: 262 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

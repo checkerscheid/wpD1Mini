@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 261                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 261 2025-04-28 19:42:51Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 262 2025-04-30 12:00:50Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 261 $";
+	String SVN = "$Rev: 262 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -230,8 +230,7 @@ void helperEEPROM::readVars() {
 
 	wpModules.useModuleNeoPixel = false;
 	wpModules.useModuleCwWw = false;
-	wpModules.useModuleAnalogOut = false;
-	wpModules.useModuleAnalogOut2 = false;
+	wpModules.useModuleClock = false;
 	wpModules.useModuleAnalogOut = false;
 	wpModules.useModuleAnalogOut2 = false;
 	wpModules.useModuleRpm = false;
@@ -338,6 +337,7 @@ void helperEEPROM::readVars() {
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 #if BUILDWITH == 1
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
+	wpClock.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
 	wpNeoPixel.SetUseWW(bitRead(bitsSettingsModules1, bitNeoPixelUseWW));
 	wpNeoPixel.SetUseCW(bitRead(bitsSettingsModules1, bitNeoPixelUseCW));
 #endif
@@ -440,6 +440,7 @@ void helperEEPROM::readVars() {
 	uint16 pixelCount;
 	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
 	wpNeoPixel.InitPixelCount(pixelCount);
+	wpClock.InitPixelCount(pixelCount);
 	short outKp;
 	EEPROM.get(byteAnalogOutKp, outKp);
 	wpAnalogOut.InitKp(outKp);

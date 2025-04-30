@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 261                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 261 2025-04-28 19:42:51Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 262 2025-04-30 12:00:50Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -57,9 +57,6 @@ moduleNeoPixel::moduleNeoPixel() {
 	pinMode(PinCW, OUTPUT);
 	analogWrite(PinCW, LOW);
 
-	piasFavColorR = 137;
-	piasFavColorG = 0;
-	piasFavColorB = 183;
 	//wpFZ.loopTime = 100;
 	steps = 5;
 }
@@ -74,7 +71,6 @@ void moduleNeoPixel::init() {
 	} else {
 		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_GRB + NEO_KHZ800);
 	}
-	piasFavColor = strip->Color(piasFavColorR, piasFavColorG, piasFavColorB);
 
 	// Argument 1 = Number of pixels in NeoPixel strip
 	// Argument 2 = Arduino pin number (most are valid)
@@ -98,7 +94,7 @@ void moduleNeoPixel::init() {
 	demoMode = false;
 	useBorder = false;
 	staticIsSet = false;
-	status = "S_OK";
+	//status = "S_OK";
 
 	// values
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
@@ -107,7 +103,7 @@ void moduleNeoPixel::init() {
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
 	mqttTopicWW = wpFZ.DeviceName + "/" + ModuleName + "/WW";
 	mqttTopicCW = wpFZ.DeviceName + "/" + ModuleName + "/CW";
-	mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
+	//mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
 	mqttTopicEffectSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
@@ -158,7 +154,7 @@ void moduleNeoPixel::cycle() {
 	}
 	publishValues();
 
-	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
+	//if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
 		// RGB LED has CW + WW
 		// use AnalogOut for WW or White
 		// use AnalogOut2 for CW with WW
@@ -166,7 +162,7 @@ void moduleNeoPixel::cycle() {
 		// @todo make logik, that CW + WW <= 254
 		//wpAnalogOut.hardwareoutMax = 50;
 		//wpAnalogOut2.hardwareoutMax = 50;
-	}
+	//}
 	//ESP.wdtFeed();
 }
 
@@ -199,7 +195,7 @@ void moduleNeoPixel::publishValues(bool force) {
 		publishValueLast = 0;
 		publishAnalogOutWWLast = 0;
 		publishAnalogOutCWLast = 0;
-		publishStatusLast = 0;
+		//publishStatusLast = 0;
 		publishMaxPercentLast = 0;
 		publishModeLast = 0;
 		publishEffectSpeedLast = 0;
@@ -521,44 +517,6 @@ String moduleNeoPixel::SetCW(uint cw) {
 	return "{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
-}
-void moduleNeoPixel::setClock(short ph, short pm, short ps) {
-	demoMode = false;
-	staticIsSet = true;
-	uint32_t quarter1 = strip->Color(wpClock.ColorQR, wpClock.ColorQG, wpClock.ColorQB);
-	uint32_t quarter2 = strip->Color(wpClock.Color5R, wpClock.Color5G, wpClock.Color5B);
-	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
-	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
-	uint32_t colorh3 = strip->Color(wpClock.ColorHR, wpClock.ColorHG, wpClock.ColorHB);
-	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
-	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
-	uint32_t colorm3 = strip->Color(wpClock.ColorMR, wpClock.ColorMG, wpClock.ColorMB);
-	uint32_t colors = strip->Color(wpClock.ColorSR, wpClock.ColorSG, wpClock.ColorSB);
-	//strip->clear();
-	strip->fill();
-	strip->setPixelColor(0, quarter1);
-	strip->setPixelColor(5, quarter2);
-	strip->setPixelColor(10, quarter2);
-	strip->setPixelColor(15, quarter1);
-	strip->setPixelColor(20, quarter2);
-	strip->setPixelColor(25, quarter2);
-	strip->setPixelColor(30, quarter1);
-	strip->setPixelColor(35, quarter2);
-	strip->setPixelColor(40, quarter2);
-	strip->setPixelColor(45, quarter1);
-	strip->setPixelColor(50, quarter2);
-	strip->setPixelColor(55, quarter2);
-	//strip->setPixelColor(ph - 2, colorh1);
-	//strip->setPixelColor(ph - 1, colorh2);
-	strip->setPixelColor(ph, colorh3);
-	//strip->setPixelColor(pm - 2, colorm1);
-	//strip->setPixelColor(pm - 1, colorm2);
-	strip->setPixelColor(pm, colorm3);
-	strip->setPixelColor(ps, colors);
-	strip->show();
-	if(Debug()) {
-		wpFZ.DebugWS(wpFZ.strINFO, "SetPixel", F("Pixel h: ") + String(ph) + F(", Pixel m: ") + String(pm));
-	}
 }
 void moduleNeoPixel::calcDuration() {
 	uint8 distWW = abs(AnalogOutWW - targetWW);
@@ -1142,7 +1100,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 261 $";
+	String SVN = "$Rev: 262 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
