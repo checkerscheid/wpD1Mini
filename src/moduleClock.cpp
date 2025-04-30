@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 262                                                     $ #
+//# Revision     : $Rev:: 263                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 262 2025-04-30 12:00:50Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 263 2025-04-30 13:46:12Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -173,33 +173,6 @@ void moduleClock::calc() {
 				", round Pixel: " + String(p));
 		}
 	}
-	
-
-	// int read = analogRead(Pin);
-	// int minMax, avg, correct;
-	// if(!isnan(read)) {
-	// 	minMax = read;
-	// 	if(minMax > 1023) minMax = 1023;
-	// 	if(minMax < 0) minMax = 0;
-	// 	avg = minMax;
-	// 	if(mb->useAvg) {
-	// 		avg = calcAvg(avg);
-	// 	}
-	// 	correct = avg;
-	// 	ldr = (1023 - correct) + correction;
-	// 	mb->error = false;
-	// 	if(mb->debug) {
-	// 		String logmessage = "LDR: " + String(ldr) + " ("
-	// 			"Read: " + String(read) + ", "
-	// 			"MinMax: " + String(minMax) + ", "
-	// 			"Avg: " + String(avg) + ")";;
-	// 		wpFZ.DebugWS(wpFZ.strDEBUG, "calcLDR", logmessage);
-	// 	}
-	// } else {
-	// 	mb->error = true;
-	// 	String logmessage = "Sensor Failure";
-	// 	wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
-	// }
 	if(steps > 0) {
 		Motor->step(steps);
 		steps = 0;
@@ -384,7 +357,7 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 262 $";
+	String SVN = "$Rev: 263 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -392,6 +365,7 @@ uint16 moduleClock::getVersion() {
 
 String moduleClock::GetJsonSettings() {
 	String json = F("\"") + ModuleName + F("\":{") +
+		wpFZ.JsonKeyString(F("Pin"), String(wpFZ.Pins[Pin])) + F(",") +
 		wpFZ.JsonKeyString(F("Pin1"), String(wpFZ.Pins[Pin1])) + F(",") +
 		wpFZ.JsonKeyString(F("Pin2"), String(wpFZ.Pins[Pin2])) + F(",") +
 		wpFZ.JsonKeyString(F("Pin3"), String(wpFZ.Pins[Pin3])) + F(",") +
@@ -400,7 +374,9 @@ String moduleClock::GetJsonSettings() {
 		wpFZ.JsonKeyValue(F("Minute"), GetColorM()) + F(",") +
 		wpFZ.JsonKeyValue(F("Second"), GetColorS()) + F(",") +
 		wpFZ.JsonKeyValue(F("Quarter"), GetColorQ()) + F(",") +
-		wpFZ.JsonKeyValue(F("Five"), GetColor5()) +
+		wpFZ.JsonKeyValue(F("Five"), GetColor5()) + F(",") +
+		wpFZ.JsonKeyValue(F("PixelCount"), String(GetPixelCount())) + F(",") +
+		wpFZ.JsonKeyValue(F("isRGB"), GetRGB() ? "true" : "false") +
 		F("}");
 	return json;
 }
