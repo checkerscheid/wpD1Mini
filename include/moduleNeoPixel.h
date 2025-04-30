@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 262                                                     $ #
+//# Revision     : $Rev:: 263                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 262 2025-04-30 12:00:50Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 263 2025-04-30 13:46:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -128,7 +128,7 @@ class moduleNeoPixel : public IModuleBase {
 		void SetUseWW(bool ww) { useWW = ww; }
 		void ChangeUseCW();
 		bool GetUseCW() { return useCW; }
-		void SetUseCW(bool cw) { useWW = cw; }
+		void SetUseCW(bool cw) { useCW = cw; }
 		unsigned long lastBorderSend;
 	private:
 		uint8 PinWW;
@@ -215,7 +215,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 262 $";
+		String SVNh = "$Rev: 263 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 
