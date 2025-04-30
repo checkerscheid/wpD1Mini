@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 258 2025-04-28 13:34:51Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 262 2025-04-30 12:00:50Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -24,11 +24,20 @@ moduleClock::moduleClock() {
 }
 void moduleClock::init() {
 	// section for define
+	Pin = D7; // NeoPixel
 	Pin1 = D1;
 	Pin2 = D2;
 	Pin3 = D5;
 	Pin4 = D6;
-	// D7 = Neopixel
+	if(pixelCount > 10000) {
+		SetPixelCount(0);
+	}
+	// Declare our NeoPixel strip object:
+	if(isRGB) {
+		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_RGB + NEO_KHZ800);
+	} else {
+		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_GRB + NEO_KHZ800);
+	}
 	Motor = new Stepper(spr, Pin1, Pin2, Pin3, Pin4);
 	Motor->setSpeed(rpm);
 
@@ -36,16 +45,19 @@ void moduleClock::init() {
 	mqttTopicSpr = wpFZ.DeviceName + "/" + ModuleName + "/Spr";
 	mqttTopicRpm = wpFZ.DeviceName + "/" + ModuleName + "/Rpm";
 	// settings
+	mqttTopicPixelCount = wpFZ.DeviceName + "/" + ModuleName + "/PixelCount";
 	mqttTopicSetSpr = wpFZ.DeviceName + "/settings/" + ModuleName + "/Spr";
 	mqttTopicSetRpm = wpFZ.DeviceName + "/settings/" + ModuleName + "/Rpm";
+	// commands
+	mqttTopicSetPixelCount = wpFZ.DeviceName + "/settings/" + ModuleName + "/PixelCount";
+	mqttTopicSetIsRGB = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetRGB";
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules2, wpEEPROM.bitsDebugModules2, wpEEPROM.bitDebugClock);
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleClock);
 
-	wpNeoPixel.InitValueR(0);
-	wpNeoPixel.InitValueG(0);
-	wpNeoPixel.InitValueB(0);
+	strip->begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+	strip->show();            // Turn OFF all pixels ASAP
 }
 
 //###################################################################################
@@ -63,8 +75,13 @@ void moduleClock::publishSettings() {
 	publishSettings(false);
 }
 void moduleClock::publishSettings(bool force) {
+	wpMqtt.mqttClient.publish(mqttTopicPixelCount.c_str(), String(pixelCount).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicSetSpr.c_str(), String(spr).c_str());
 	wpMqtt.mqttClient.publish(mqttTopicSetRpm.c_str(), String(rpm).c_str());
+	if(force) {
+		wpMqtt.mqttClient.publish(mqttTopicSetPixelCount.c_str(), String(pixelCount).c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetIsRGB.c_str(), String(isRGB).c_str());
+	}
 	mb->publishSettings(force);
 }
 
@@ -96,12 +113,28 @@ void moduleClock::publishValues(bool force) {
 }
 
 void moduleClock::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSetPixelCount.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetIsRGB.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSpr.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetRpm.c_str());
 	mb->setSubscribes();
 }
 
 void moduleClock::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSetPixelCount.c_str()) == 0) {
+		uint16 readPixelCount = msg.toInt();
+		if(pixelCount != readPixelCount) {
+			SetPixelCount(readPixelCount);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetPixelCount, String(readPixelCount));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetIsRGB.c_str()) == 0) {
+		bool readIsRGB = msg.toInt();
+		if(isRGB != readIsRGB) {
+			SetRGB(readIsRGB);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetIsRGB, String(isRGB));
+		}
+	}
 	if(strcmp(topic, mqttTopicSetSpr.c_str()) == 0) {
 		uint16 readSpr = msg.toInt();
 		SetSpr(readSpr);
@@ -112,6 +145,7 @@ void moduleClock::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
+
 
 //###################################################################################
 // private
@@ -130,7 +164,7 @@ void moduleClock::calc() {
 		double pixel = him * pg / gm;
 		short p = round(pixel);
 		
-		wpNeoPixel.setClock(60 + p, minute, second);
+		setClock(60 + p, minute, second);
 		if(mb->debug) {
 			wpFZ.DebugWS(wpFZ.strDEBUG, "Clock::calc", "set Minute: " + String(minute));
 			wpFZ.DebugWS(wpFZ.strDEBUG, "Clock::calc", "set Hour: " + String(hour) +
@@ -170,6 +204,30 @@ void moduleClock::calc() {
 		Motor->step(steps);
 		steps = 0;
 	}
+}
+void moduleClock::InitRGB(bool rgb) {
+	isRGB = rgb;
+}
+bool moduleClock::GetRGB() {
+	return isRGB;
+}
+void moduleClock::SetRGB(bool rgb) {
+	isRGB = rgb;
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelRGB", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
+	if(isRGB) {
+		strip->updateType(NEO_RGB + NEO_KHZ800);
+	} else {
+		strip->updateType(NEO_GRB + NEO_KHZ800);
+	}
+	strip->clear();
+}
+void moduleClock::InitPixelCount(uint16 pc) {
+	pixelCount = pc;
+}
+uint16 moduleClock::GetPixelCount() { return pixelCount; }
+void moduleClock::SetPixelCount(uint16 pc) {
+	wpEEPROM.WriteWordToEEPROM("NeoPixelPC", wpEEPROM.byteNeoPixelPixelCount, pc);
+	wpFZ.restartRequired = true;
 }
 uint16 moduleClock::GetSpr() {
 	return spr;
@@ -276,6 +334,42 @@ void moduleClock::SetColor5(uint8 r, uint8 g, uint8 b) {
 	wpEEPROM.WriteByteToEEPROM("SetColor5B", wpEEPROM.byteClockColor5B, b);
 	wpFZ.DebugWS(wpFZ.strINFO, "SetColor5", "New Color, save to EEPROM: " + GetColor5());
 }
+void moduleClock::setClock(short ph, short pm, short ps) {
+	uint32_t quarter1 = strip->Color(wpClock.ColorQR, wpClock.ColorQG, wpClock.ColorQB);
+	uint32_t quarter2 = strip->Color(wpClock.Color5R, wpClock.Color5G, wpClock.Color5B);
+	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
+	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
+	uint32_t colorh3 = strip->Color(wpClock.ColorHR, wpClock.ColorHG, wpClock.ColorHB);
+	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
+	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
+	uint32_t colorm3 = strip->Color(wpClock.ColorMR, wpClock.ColorMG, wpClock.ColorMB);
+	uint32_t colors = strip->Color(wpClock.ColorSR, wpClock.ColorSG, wpClock.ColorSB);
+	//strip->clear();
+	strip->fill();
+	strip->setPixelColor(0, quarter1);
+	strip->setPixelColor(5, quarter2);
+	strip->setPixelColor(10, quarter2);
+	strip->setPixelColor(15, quarter1);
+	strip->setPixelColor(20, quarter2);
+	strip->setPixelColor(25, quarter2);
+	strip->setPixelColor(30, quarter1);
+	strip->setPixelColor(35, quarter2);
+	strip->setPixelColor(40, quarter2);
+	strip->setPixelColor(45, quarter1);
+	strip->setPixelColor(50, quarter2);
+	strip->setPixelColor(55, quarter2);
+	//strip->setPixelColor(ph - 2, colorh1);
+	//strip->setPixelColor(ph - 1, colorh2);
+	strip->setPixelColor(ph, colorh3);
+	//strip->setPixelColor(pm - 2, colorm1);
+	//strip->setPixelColor(pm - 1, colorm2);
+	strip->setPixelColor(pm, colorm3);
+	strip->setPixelColor(ps, colors);
+	strip->show();
+	if(Debug()) {
+		wpFZ.DebugWS(wpFZ.strINFO, "SetPixel", F("Pixel h: ") + String(ph) + F(", Pixel m: ") + String(pm));
+	}
+}
 
 void moduleClock::SimulateTime() {
 	simulateTime = false;
@@ -290,7 +384,7 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 262 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
