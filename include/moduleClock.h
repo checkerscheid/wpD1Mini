@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 10.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.h 246 2025-02-18 16:27:11Z                   $ #
+//# File-ID      : $Id:: moduleClock.h 262 2025-04-30 12:00:50Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleClock_h
@@ -18,12 +18,15 @@
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 #include <moduleBase.h>
+#include <Adafruit_NeoPixel.h>
 #include <Stepper.h>
 
 class moduleClock : public IModuleBase {
 	public:
 		moduleClock();
 		moduleBase* mb;
+		Adafruit_NeoPixel* strip;
+		uint8 Pin;
 		uint8 Pin1;
 		uint8 Pin2;
 		uint8 Pin3;
@@ -56,8 +59,12 @@ class moduleClock : public IModuleBase {
 		String mqttTopicSpr;
 		String mqttTopicRpm;
 		// settings
+		String mqttTopicPixelCount;
 		String mqttTopicSetSpr;
 		String mqttTopicSetRpm;
+		// commands
+		String mqttTopicSetPixelCount;
+		String mqttTopicSetIsRGB;
 
 		// section to copy
 		void init();
@@ -82,6 +89,12 @@ class moduleClock : public IModuleBase {
 		uint16 GetRpm();
 		void SetRpm(uint16 RoundsPerMinute);
 		void SetSteps(short StepsToRun);
+		void InitPixelCount(uint16 pc);
+		void InitRGB(bool rgb);
+		bool GetRGB();
+		void SetRGB(bool rgb);
+		uint16 GetPixelCount();
+		void SetPixelCount(uint16 pc);
 		String GetColorH();
 		String GetColorM();
 		String GetColorS();
@@ -92,6 +105,7 @@ class moduleClock : public IModuleBase {
 		void SetColorS(uint8 r, uint8 g, uint8 b);
 		void SetColorQ(uint8 r, uint8 g, uint8 b);
 		void SetColor5(uint8 r, uint8 g, uint8 b);
+		void setClock(short ph, short pm, short ps);
 
 		void SimulateTime();
 		void SimulateTime(short h, short m, short s);
@@ -102,6 +116,8 @@ class moduleClock : public IModuleBase {
 		uint8 second;
 		uint8 secondLast;
 		bool simulateTime;
+		uint16 pixelCount = 50;
+		bool isRGB = false;
 		short steps;
 		// Steps per Round
 		uint16 spr = 2048;
@@ -116,7 +132,7 @@ class moduleClock : public IModuleBase {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 262 $";
 };
 extern moduleClock wpClock;
 

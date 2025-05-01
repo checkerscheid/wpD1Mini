@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 251                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.cpp 251 2025-03-13 09:20:04Z            $ #
+//# File-ID      : $Id:: moduleAnalogOut2.cpp 258 2025-04-28 13:34:51Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut2.h>
@@ -128,9 +128,7 @@ void moduleAnalogOut2::checkSubscribes(char* topic, String msg) {
 		bool readSetHand = msg.toInt();
 		if(handSet != readSetHand) {
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitAnalogOut2Hand, handSet);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("handSet", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitAnalogOut2Hand, handSet);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
 	}
@@ -151,9 +149,7 @@ void moduleAnalogOut2::InitHandValue(uint8 value) {
 }
 void moduleAnalogOut2::SetHandValue(uint8 value) {
 	handValueSet = value;
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, handValueSet);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut2::handValueSet' = " + String(handValueSet));
+	wpEEPROM.WriteByteToEEPROM("handValueSet", wpEEPROM.byteAnalogOut2HandValue, handValueSet);
 }
 void moduleAnalogOut2::SetHandValueProzent(uint8 value) {
 	SetHandValue((uint8)(value * 2.55));
@@ -202,7 +198,7 @@ void moduleAnalogOut2::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut2::getVersion() {
-	String SVN = "$Rev: 251 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

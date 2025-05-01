@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 254                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 254 2025-03-30 13:01:15Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 262 2025-04-30 12:00:50Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -49,10 +49,14 @@ moduleNeoPixel::moduleNeoPixel() {
 	// section to config and copy
 	ModuleName = "NeoPixel";
 	mb = new moduleBase(ModuleName);
+	PinWW = D6;
+	pinMode(PinWW, OUTPUT);
+	analogWrite(PinWW, LOW);
+	
+	PinCW = D5;
+	pinMode(PinCW, OUTPUT);
+	analogWrite(PinCW, LOW);
 
-	piasFavColorR = 137;
-	piasFavColorG = 0;
-	piasFavColorB = 183;
 	//wpFZ.loopTime = 100;
 	steps = 5;
 }
@@ -67,7 +71,6 @@ void moduleNeoPixel::init() {
 	} else {
 		strip = new Adafruit_NeoPixel(pixelCount, Pin, NEO_GRB + NEO_KHZ800);
 	}
-	piasFavColor = strip->Color(piasFavColorR, piasFavColorG, piasFavColorB);
 
 	// Argument 1 = Number of pixels in NeoPixel strip
 	// Argument 2 = Arduino pin number (most are valid)
@@ -91,14 +94,16 @@ void moduleNeoPixel::init() {
 	demoMode = false;
 	useBorder = false;
 	staticIsSet = false;
-	status = "S_OK";
+	//status = "S_OK";
 
 	// values
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicValueR = wpFZ.DeviceName + "/" + ModuleName + "/R";
 	mqttTopicValueG = wpFZ.DeviceName + "/" + ModuleName + "/G";
 	mqttTopicValueB = wpFZ.DeviceName + "/" + ModuleName + "/B";
-	mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
+	mqttTopicWW = wpFZ.DeviceName + "/" + ModuleName + "/WW";
+	mqttTopicCW = wpFZ.DeviceName + "/" + ModuleName + "/CW";
+	//mqttTopicStatus = wpFZ.DeviceName + "/" + ModuleName + "/Status";
 	mqttTopicDemoMode = wpFZ.DeviceName + "/" + ModuleName + "/DemoMode";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
 	mqttTopicEffectSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
@@ -110,6 +115,8 @@ void moduleNeoPixel::init() {
 	mqttTopicSetR = wpFZ.DeviceName + "/settings/" + ModuleName + "/R";
 	mqttTopicSetG = wpFZ.DeviceName + "/settings/" + ModuleName + "/G";
 	mqttTopicSetB = wpFZ.DeviceName + "/settings/" + ModuleName + "/B";
+	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/WW";
+	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/CW";
 	mqttTopicSetDemoMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/DemoMode";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetEffectSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetEffectSpeed";
@@ -147,7 +154,7 @@ void moduleNeoPixel::cycle() {
 	}
 	publishValues();
 
-	if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
+	//if(wpModules.useModuleAnalogOut && wpModules.useModuleAnalogOut2) {
 		// RGB LED has CW + WW
 		// use AnalogOut for WW or White
 		// use AnalogOut2 for CW with WW
@@ -155,7 +162,7 @@ void moduleNeoPixel::cycle() {
 		// @todo make logik, that CW + WW <= 254
 		//wpAnalogOut.hardwareoutMax = 50;
 		//wpAnalogOut2.hardwareoutMax = 50;
-	}
+	//}
 	//ESP.wdtFeed();
 }
 
@@ -186,7 +193,9 @@ void moduleNeoPixel::publishValues() {
 void moduleNeoPixel::publishValues(bool force) {
 	if(force) {
 		publishValueLast = 0;
-		publishStatusLast = 0;
+		publishAnalogOutWWLast = 0;
+		publishAnalogOutCWLast = 0;
+		//publishStatusLast = 0;
 		publishMaxPercentLast = 0;
 		publishModeLast = 0;
 		publishEffectSpeedLast = 0;
@@ -195,6 +204,24 @@ void moduleNeoPixel::publishValues(bool force) {
 	if(valueRLast != valueR || valueGLast != valueG || valueBLast != valueB ||
 		wpFZ.CheckQoS(publishValueLast)) {
 		publishValue();
+	}
+	if(useWW && (AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast))) {
+		AnalogOutWWLast = AnalogOutWW;
+		int32 percent = (uint8) AnalogOutWW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicWW, String(percent));
+		}
+		publishAnalogOutWWLast = wpFZ.loopStartedAt;
+	}
+	if(useCW && (AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast))) {
+		AnalogOutCWLast = AnalogOutCW;
+		int32 percent = (uint8) AnalogOutCW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicCW, String(percent));
+		}
+		publishAnalogOutCWLast = wpFZ.loopStartedAt;
 	}
 	//if(statusLast != getStripStatus() || wpFZ.CheckQoS(publishStatusLast)) {
 	// if(publishStatusLast + 10000 > wpFZ.loopStartedAt) {
@@ -251,6 +278,12 @@ void moduleNeoPixel::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetR.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetG.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetB.c_str());
+	if(useWW) {
+		wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
+	}
+	if(useCW) {
+		wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
+	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetDemoMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
@@ -281,6 +314,20 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 		if(valueB != readValueB) {
 			SetValueB(readValueB);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetB, String(valueB));
+		}
+	}
+	if(useWW && strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
+		uint8 readWW = msg.toInt();
+		if(targetWW != readWW) {
+			SetWW(readWW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
+		}
+	}
+	if(useCW && strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
+		uint8 readCW = msg.toInt();
+		if(targetCW != readCW) {
+			SetCW(readCW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetDemoMode.c_str()) == 0) {
@@ -339,11 +386,9 @@ void moduleNeoPixel::InitValueR(uint8 r) {
 uint8 moduleNeoPixel::GetValueR() { return valueR; }
 void moduleNeoPixel::SetValueR(uint8 r) {
 	targetR = r;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueR, r);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelR", wpEEPROM.byteNeoPixelValueR, targetR);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetRed", "Write Red to EEPROM");
 }
 void moduleNeoPixel::InitValueG(uint8 g) {
 	valueG = g;
@@ -352,11 +397,9 @@ void moduleNeoPixel::InitValueG(uint8 g) {
 uint8 moduleNeoPixel::GetValueG() { return valueG; }
 void moduleNeoPixel::SetValueG(uint8 g) {
 	targetG = g;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueG, g);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelG", wpEEPROM.byteNeoPixelValueG, targetG);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetGreen", "Write Green to EEPROM");
 }
 void moduleNeoPixel::InitValueB(uint8 b) {
 	valueB = b;
@@ -365,11 +408,9 @@ void moduleNeoPixel::InitValueB(uint8 b) {
 uint8 moduleNeoPixel::GetValueB() { return valueB; }
 void moduleNeoPixel::SetValueB(uint8 b) {
 	targetB = b;
-	EEPROM.write(wpEEPROM.byteNeoPixelValueB, b);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelB", wpEEPROM.byteNeoPixelValueB, targetB);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetBlue", "Write Blue to EEPROM");
 }
 void moduleNeoPixel::SetEffectSpeed(uint8 es) {
 	if(es > 20) es = 20;
@@ -394,16 +435,13 @@ bool moduleNeoPixel::GetRGB() {
 }
 void moduleNeoPixel::SetRGB(bool rgb) {
 	isRGB = rgb;
-	bitWrite(wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
-	EEPROM.write(wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1);
-	EEPROM.commit();
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelRGB", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelRGB, isRGB);
 	if(isRGB) {
 		strip->updateType(NEO_RGB + NEO_KHZ800);
 	} else {
 		strip->updateType(NEO_GRB + NEO_KHZ800);
 	}
 	strip->clear();
-	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::isRGB", "Write 'isRGB' to EEPROM");
 }
 String moduleNeoPixel::SetOn() {
 	targetWW = EEPROM.read(wpEEPROM.byteAnalogOutHandValue);
@@ -419,10 +457,10 @@ String moduleNeoPixel::SetOn() {
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(AnalogOutWW));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(AnalogOutCW));
 	}
 	return returns += "}";
 }
@@ -432,6 +470,12 @@ String moduleNeoPixel::SetOff() {
 	targetR = 0;
 	targetG = 0;
 	targetB = 0;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueR, targetR);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueG, targetG);
+	EEPROM.write(wpEEPROM.byteNeoPixelValueB, targetB);
+	EEPROM.commit();
 	//targetBr = 0;
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -441,10 +485,10 @@ String moduleNeoPixel::SetOff() {
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
 	if(wpModules.useModuleAnalogOut) {
-		returns += "," + wpFZ.JsonKeyValue("WW", String(wpAnalogOut.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("WW", String(AnalogOutWW));
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		returns += "," + wpFZ.JsonKeyValue("CW", String(wpAnalogOut2.GetHandValue()));
+		returns += "," + wpFZ.JsonKeyValue("CW", String(AnalogOutCW));
 	}
 	return returns += "}";
 }
@@ -452,8 +496,7 @@ String moduleNeoPixel::SetWW(uint ww) {
 	//targetCW = wpAnalogOut2.handValue;
 	if(ww + targetCW > 255) ww = 255 - targetCW;
 	targetWW = ww;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
 	calcDuration();
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -466,8 +509,7 @@ String moduleNeoPixel::SetCW(uint cw) {
 	//targetWW = wpAnalogOut.handValue;
 	if(cw + targetWW > 255) cw = 255 - targetWW;
 	targetCW = cw;
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("NeoPixelCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	calcDuration();
 	demoMode = false;
 	modeCurrent = ModeBlender;
@@ -476,47 +518,9 @@ String moduleNeoPixel::SetCW(uint cw) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-void moduleNeoPixel::setClock(short ph, short pm, short ps) {
-	demoMode = false;
-	staticIsSet = true;
-	uint32_t quarter1 = strip->Color(wpClock.ColorQR, wpClock.ColorQG, wpClock.ColorQB);
-	uint32_t quarter2 = strip->Color(wpClock.Color5R, wpClock.Color5G, wpClock.Color5B);
-	//uint32_t colorh1 = strip->Color((16 * hr / 255), (16 * hg / 255), (16 * hb / 255));
-	//uint32_t colorh2 = strip->Color((32 * hr / 255), (32 * hg / 255), (32 * hb / 255));
-	uint32_t colorh3 = strip->Color(wpClock.ColorHR, wpClock.ColorHG, wpClock.ColorHB);
-	//uint32_t colorm1 = strip->Color((16 * mr / 255), (16 * mg / 255), (16 * mb / 255));
-	//uint32_t colorm2 = strip->Color((32 * mr / 255), (32 * mg / 255), (32 * mb / 255));
-	uint32_t colorm3 = strip->Color(wpClock.ColorMR, wpClock.ColorMG, wpClock.ColorMB);
-	uint32_t colors = strip->Color(wpClock.ColorSR, wpClock.ColorSG, wpClock.ColorSB);
-	//strip->clear();
-	strip->fill();
-	strip->setPixelColor(0, quarter1);
-	strip->setPixelColor(5, quarter2);
-	strip->setPixelColor(10, quarter2);
-	strip->setPixelColor(15, quarter1);
-	strip->setPixelColor(20, quarter2);
-	strip->setPixelColor(25, quarter2);
-	strip->setPixelColor(30, quarter1);
-	strip->setPixelColor(35, quarter2);
-	strip->setPixelColor(40, quarter2);
-	strip->setPixelColor(45, quarter1);
-	strip->setPixelColor(50, quarter2);
-	strip->setPixelColor(55, quarter2);
-	//strip->setPixelColor(ph - 2, colorh1);
-	//strip->setPixelColor(ph - 1, colorh2);
-	strip->setPixelColor(ph, colorh3);
-	//strip->setPixelColor(pm - 2, colorm1);
-	//strip->setPixelColor(pm - 1, colorm2);
-	strip->setPixelColor(pm, colorm3);
-	strip->setPixelColor(ps, colors);
-	strip->show();
-	if(Debug()) {
-		wpFZ.DebugWS(wpFZ.strINFO, "SetPixel", F("Pixel h: ") + String(ph) + F(", Pixel m: ") + String(pm));
-	}
-}
 void moduleNeoPixel::calcDuration() {
-	uint8 distWW = abs(wpAnalogOut.GetHandValue() - targetWW);
-	uint8 distCW = abs(wpAnalogOut2.GetHandValue() - targetCW);
+	uint8 distWW = abs(AnalogOutWW - targetWW);
+	uint8 distCW = abs(AnalogOutCW - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
@@ -533,10 +537,8 @@ void moduleNeoPixel::InitPixelCount(uint16 pc) {
 }
 uint16 moduleNeoPixel::GetPixelCount() { return pixelCount; }
 void moduleNeoPixel::SetPixelCount(uint16 pc) {
-	EEPROM.put(wpEEPROM.byteNeoPixelPixelCount, pc);
-	EEPROM.commit();
+	wpEEPROM.WriteWordToEEPROM("NeoPixelPC", wpEEPROM.byteNeoPixelPixelCount, pc);
 	wpFZ.restartRequired = true;
-	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetPixelCount", "Write PixelCount to EEPROM");
 }
 
 String moduleNeoPixel::GetModeName(uint actualMode) {
@@ -590,32 +592,40 @@ void moduleNeoPixel::SetMode(uint8 newMode) {
 	targetWW = 0;
 	staticIsSet = false;
 }
-String moduleNeoPixel::getStripStatus() {
-	status = "{";
-	for(uint i = 0; i < pixelCount; i++) {
-		status.concat("\"p");
-		status.concat(i);
-		uint32_t c = strip->getPixelColor(i);
-		uint8_t r = c >> 16;
-		status.concat("\":{\"r\":");
-		status.concat(r);
-		uint8_t g = c >> 8;
-		status.concat(",\"g\":");
-		status.concat(g);
-		uint8_t b = c;
-		status.concat(",\"b\":");
-		status.concat(b);
-		status.concat("},");
-	}
-	status.concat("\"ww\":");
-	status.concat(wpAnalogOut.GetHandValue());
-	status.concat(",\"cw\":");
-	status.concat(wpAnalogOut2.GetHandValue());
-	status.concat(",\"b\":");
-	status.concat(strip->getBrightness());
-	status.concat("}");
-	return status;
+void moduleNeoPixel::ChangeUseWW() {
+	useWW = !useWW;
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelWW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseWW, useWW);
 }
+void moduleNeoPixel::ChangeUseCW() {
+	useCW = !useCW;
+	wpEEPROM.WriteBoolToEEPROM("NeoPixelCW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseCW, useCW);
+}
+// String moduleNeoPixel::getStripStatus() {
+// 	status = "{";
+// 	for(uint i = 0; i < pixelCount; i++) {
+// 		status.concat("\"p");
+// 		status.concat(i);
+// 		uint32_t c = strip->getPixelColor(i);
+// 		uint8_t r = c >> 16;
+// 		status.concat("\":{\"r\":");
+// 		status.concat(r);
+// 		uint8_t g = c >> 8;
+// 		status.concat(",\"g\":");
+// 		status.concat(g);
+// 		uint8_t b = c;
+// 		status.concat(",\"b\":");
+// 		status.concat(b);
+// 		status.concat("},");
+// 	}
+// 	status.concat("\"ww\":");
+// 	status.concat(AnalogOutWW);
+// 	status.concat(",\"cw\":");
+// 	status.concat(AnalogOutCW);
+// 	status.concat(",\"b\":");
+// 	status.concat(strip->getBrightness());
+// 	status.concat("}");
+// 	return status;
+// }
 //###################################################################################
 // private
 //###################################################################################
@@ -716,6 +726,8 @@ void moduleNeoPixel::calc() {
 				break;
 		}
 	}
+	analogWrite(PinWW, AnalogOutWW);
+	analogWrite(PinCW, AnalogOutCW);
 	maxPercent = GetMaxPercent();
 }
 void moduleNeoPixel::BlenderEffect() {
@@ -732,52 +744,52 @@ void moduleNeoPixel::BlenderEffect() {
 	}
 }
 bool moduleNeoPixel::BlenderWWEffect() {
-	if(wpAnalogOut.GetHandValue() != targetWW) {
-		if(wpAnalogOut.GetHandValue() <= targetWW) {
-			if(wpAnalogOut.GetHandValue() + steps <= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + steps);
+	if(AnalogOutWW != targetWW) {
+		if(AnalogOutWW <= targetWW) {
+			if(AnalogOutWW + steps <= targetWW) {
+				AnalogOutWW = AnalogOutWW + steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() >= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW >= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		} else {
-			if(wpAnalogOut.GetHandValue() - steps >= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
+			if(AnalogOutWW - steps >= targetWW) {
+				AnalogOutWW = AnalogOutWW - steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() <= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW <= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		}
 	}
-	return wpAnalogOut.GetHandValue() == targetWW;
+	return AnalogOutWW == targetWW;
 }
 bool moduleNeoPixel::BlenderCWEffect() {
-	if(wpAnalogOut2.GetHandValue() != targetCW) {
-		if(wpAnalogOut2.GetHandValue() <= targetCW) {
-			if(wpAnalogOut2.GetHandValue() + steps <= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + steps);
+	if(AnalogOutCW != targetCW) {
+		if(AnalogOutCW <= targetCW) {
+			if(AnalogOutCW + steps <= targetCW) {
+				AnalogOutCW = AnalogOutCW + steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() >= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW >= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		} else {
-			if(wpAnalogOut2.GetHandValue() - steps >= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
+			if(AnalogOutCW - steps >= targetCW) {
+				AnalogOutCW = AnalogOutCW - steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() <= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW <= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		}
 	}
-	return wpAnalogOut2.GetHandValue() == targetCW;
+	return AnalogOutCW == targetCW;
 }
 bool moduleNeoPixel::BlenderREffect() {
 	if(valueR != targetR) {
@@ -1007,22 +1019,22 @@ void moduleNeoPixel::OffRunnerEffect(uint wait) {
 	strip->setPixelColor(current_pixel--, color); //  Set pixel's color (in RAM)
 	strip->show();                                //  Update strip to match
 	if(wpModules.useModuleAnalogOut) {
-		if(wpAnalogOut.GetHandValue() >= steps) {
-			wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
+		if(AnalogOutWW >= steps) {
+			AnalogOutWW = AnalogOutWW - steps;
 		} else {
-			wpAnalogOut.InitHandValue(0);
+			AnalogOutWW = 0;
 		}
 	}
 	if(wpModules.useModuleAnalogOut2) {
-		if(wpAnalogOut2.GetHandValue() >= steps) {
-			wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
+		if(AnalogOutCW >= steps) {
+			AnalogOutCW = AnalogOutCW - steps;
 		} else {
-			wpAnalogOut2.InitHandValue(0);
+			AnalogOutCW = 0;
 		}
 	}
 	if(
-		(wpModules.useModuleAnalogOut && wpAnalogOut.GetHandValue() <= 0) &&
-		(wpModules.useModuleAnalogOut2 && wpAnalogOut2.GetHandValue() <= 0)) {            //  Loop the pattern from the first LED
+		(wpModules.useModuleAnalogOut && AnalogOutWW <= 0) &&
+		(wpModules.useModuleAnalogOut2 && AnalogOutCW <= 0)) {            //  Loop the pattern from the first LED
 		staticIsSet = true;
 		modeCurrent = ModeStatic;
 	}
@@ -1079,16 +1091,16 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 	returns = valueG > returns ? valueG : returns;
 	returns = valueB > returns ? valueB : returns;
 	if(wpModules.useModuleAnalogOut)
-		returns = wpAnalogOut.GetHandValue() > returns ? wpAnalogOut.GetHandValue() : returns;
+		returns = AnalogOutWW > returns ? AnalogOutWW : returns;
 	if(wpModules.useModuleAnalogOut2)
-		returns = wpAnalogOut2.GetHandValue() > returns ? wpAnalogOut2.GetHandValue() : returns;
+		returns = AnalogOutCW > returns ? AnalogOutCW : returns;
 	return returns;
 }
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 254 $";
+	String SVN = "$Rev: 262 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -1100,6 +1112,15 @@ String moduleNeoPixel::GetJsonSettings() {
 		wpFZ.JsonKeyValue(F("ValueR"), String(GetValueR())) + F(",") +
 		wpFZ.JsonKeyValue(F("ValueG"), String(GetValueG())) + F(",") +
 		wpFZ.JsonKeyValue(F("ValueB"), String(GetValueB())) + F(",") +
+		wpFZ.JsonKeyValue(F("useWW"), useWW ? "true" : "false") + F(",") +
+		wpFZ.JsonKeyValue(F("useCW"), useCW ? "true" : "false") + F(",");
+	if(useWW) {
+		json += wpFZ.JsonKeyValue(F("ValueWW"), String(GetValueB())) + F(",");
+	}
+	if(useCW) {
+		json += wpFZ.JsonKeyValue(F("ValueCW"), String(GetValueB())) + F(",");
+	}
+	json +=
 		wpFZ.JsonKeyValue(F("PixelCount"), String(GetPixelCount())) + F(",") +
 		wpFZ.JsonKeyValue(F("isRGB"), GetRGB() ? "true" : "false") +
 		F("}");

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 254                                                     $ #
+//# Revision     : $Rev:: 263                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 254 2025-03-30 13:01:15Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 263 2025-04-30 13:46:12Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -40,10 +40,6 @@ class moduleNeoPixel : public IModuleBase {
 		static const uint8 ModeBlender = 90; //CW, WW
 		static const uint8 ModeOffRunner = 97;
 		static const uint8 ModeComplex = 99;
-		uint32_t piasFavColor;
-		uint8_t piasFavColorR;
-		uint8_t piasFavColorG;
-		uint8_t piasFavColorB;
 
 		bool demoMode;
 		bool useBorder;
@@ -53,8 +49,10 @@ class moduleNeoPixel : public IModuleBase {
 		String mqttTopicValueR;
 		String mqttTopicValueG;
 		String mqttTopicValueB;
+		String mqttTopicWW;
+		String mqttTopicCW;
 		//String mqttTopicBrightness;
-		String mqttTopicStatus;
+		//String mqttTopicStatus;
 		String mqttTopicDemoMode;
 		String mqttTopicModeName;
 		String mqttTopicEffectSpeed;
@@ -66,6 +64,8 @@ class moduleNeoPixel : public IModuleBase {
 		String mqttTopicSetR;
 		String mqttTopicSetG;
 		String mqttTopicSetB;
+		String mqttTopicSetWW;
+		String mqttTopicSetCW;
 		//String mqttTopicSetBrightness;
 		String mqttTopicSetDemoMode;
 		String mqttTopicSetMode;
@@ -113,7 +113,6 @@ class moduleNeoPixel : public IModuleBase {
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
-		void setClock(short ph, short pm, short ps);
 		void SetOffBlender(uint8 steps);
 		void SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
@@ -122,10 +121,26 @@ class moduleNeoPixel : public IModuleBase {
 		void SetRGB(bool rgb);
 		uint16 GetPixelCount();
 		void SetPixelCount(uint16 pc);
-		String getStripStatus();
+		//String getStripStatus();
 		void setBorder(uint32_t c);
+		void ChangeUseWW();
+		bool GetUseWW() { return useWW; }
+		void SetUseWW(bool ww) { useWW = ww; }
+		void ChangeUseCW();
+		bool GetUseCW() { return useCW; }
+		void SetUseCW(bool cw) { useCW = cw; }
 		unsigned long lastBorderSend;
 	private:
+		uint8 PinWW;
+		uint8 PinCW;
+		bool useWW = false;
+		bool useCW = false;
+		uint8 AnalogOutWW = 0;
+		uint8 AnalogOutWWLast = 0;
+		unsigned long publishAnalogOutWWLast;
+		uint8 AnalogOutCW = 0;
+		uint8 AnalogOutCWLast = 0;
+		unsigned long publishAnalogOutCWLast;
 		uint16 pixelCount = 50;
 		uint16 pixelStartForTv = 25;
 		uint maxPercent;
@@ -139,9 +154,9 @@ class moduleNeoPixel : public IModuleBase {
 		uint8 valueBLast;
 		//uint8 brightness = 0;
 		//uint8 brightnessLast;
-		String status;
-		String statusLast;
-		unsigned long publishStatusLast;
+		//String status;
+		//String statusLast;
+		//unsigned long publishStatusLast;
 		bool useBorderLast;
 		bool staticIsSet;
 		bool isRGB = false;
@@ -200,7 +215,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 254 $";
+		String SVNh = "$Rev: 263 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 

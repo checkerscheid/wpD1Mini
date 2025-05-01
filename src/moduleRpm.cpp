@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 246 2025-02-18 16:27:11Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 258 2025-04-28 13:34:51Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -86,8 +86,7 @@ void moduleRpm::checkSubscribes(char* topic, String msg) {
 		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteRpmCorrection, correction);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("RpmCorrection", wpEEPROM.byteRpmCorrection, correction);
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
@@ -150,7 +149,7 @@ uint16 moduleRpm::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

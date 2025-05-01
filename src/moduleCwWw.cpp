@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 259 2025-04-28 17:06:12Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -22,6 +22,13 @@ moduleCwWw::moduleCwWw() {
 	// section to config and copy
 	ModuleName = "CwWw";
 	mb = new moduleBase(ModuleName);
+	PinWW = D6;
+	pinMode(PinWW, OUTPUT);
+	analogWrite(PinWW, LOW);
+	
+	PinCW = D5;
+	pinMode(PinCW, OUTPUT);
+	analogWrite(PinCW, LOW);
 
 	loopTime = 25;
 	steps = 1;
@@ -32,6 +39,8 @@ void moduleCwWw::init() {
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
+	mqttTopicWW = wpFZ.DeviceName + "/" + ModuleName + "/WW";
+	mqttTopicCW = wpFZ.DeviceName + "/" + ModuleName + "/CW";
 	mqttTopicManual = wpFZ.DeviceName + "/" + ModuleName + "/Manual";
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
@@ -39,6 +48,8 @@ void moduleCwWw::init() {
 	mqttTopicSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
 	// settings
 	// commands
+	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/WW";
+	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/CW";
 	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
 	mqttTopicSetSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/EffectSpeed";
@@ -60,8 +71,9 @@ void moduleCwWw::cycle() {
 	}
 	publishValues();
 
-	wpModules.useModuleAnalogOut = true;
-	wpModules.useModuleAnalogOut2 = true;
+	// wpModules.useModuleAnalogOut = true;
+	// wpModules.useModuleAnalogOut2 = true;
+
 	// RGB LED has CW + WW
 	// use AnalogOut for WW or White
 	// use AnalogOut2 for CW with WW
@@ -86,9 +98,29 @@ void moduleCwWw::publishValues() {
 }
 void moduleCwWw::publishValues(bool force) {
 	if(force) {
+		publishAnalogOutWWLast = 0;
+		publishAnalogOutCWLast = 0;
 		publishManualLast = 0;
 		publishModeLast = 0;
 		publishMaxPercent = 0;
+	}
+	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
+		AnalogOutWWLast = AnalogOutWW;
+		int32 percent = (uint8) AnalogOutWW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicWW, String(percent));
+		}
+		publishAnalogOutWWLast = wpFZ.loopStartedAt;
+	}
+	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
+		AnalogOutCWLast = AnalogOutCW;
+		int32 percent = (uint8) AnalogOutCW / 2.55;
+		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicCW, String(percent));
+		}
+		publishAnalogOutCWLast = wpFZ.loopStartedAt;
 	}
 	if(manualLast != manual || wpFZ.CheckQoS(publishManualLast)) {
 		manualLast = manual;
@@ -128,12 +160,28 @@ void moduleCwWw::publishValues(bool force) {
 }
 
 void moduleCwWw::setSubscribes() {
+	wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSleep.c_str());
 	mb->setSubscribes();
 }
 
 void moduleCwWw::checkSubscribes(char* topic, String msg) {
+	if(strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
+		uint8 readWW = msg.toInt();
+		if(targetWW != readWW) {
+			SetWW(readWW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
+		}
+	}
+	if(strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
+		uint8 readCW = msg.toInt();
+		if(targetCW != readCW) {
+			SetCW(readCW);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
+		}
+	}
 	if(strcmp(topic, mqttTopicSetMode.c_str()) == 0) {
 		uint readSetMode = msg.toInt();
 		if(modeCurrent != readSetMode) {
@@ -179,6 +227,9 @@ String moduleCwWw::SetOff() {
 	manual = false;
 	targetWW = 0;
 	targetCW = 0;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.commit();
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -190,6 +241,9 @@ String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
 	SetSleep(0);
 	targetWW = ww;
 	targetCW = cw;
+	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
+	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	EEPROM.commit();
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -201,8 +255,7 @@ String moduleCwWw::SetWW(uint8 ww) {
 	SetSleep(0);
 	targetWW = ww;
 	//targetCW = wpAnalogOut2.handValue;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -214,8 +267,7 @@ String moduleCwWw::SetCW(uint8 cw) {
 	SetSleep(0);
 	//targetWW = wpAnalogOut.handValue;
 	targetCW = cw;
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
 	calcDuration();
 	modeCurrent = ModeBlender;
 	return "{"
@@ -238,8 +290,8 @@ String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 	}
 }
 void moduleCwWw::calcDuration() {
-	uint8 distWW = abs(wpAnalogOut.GetHandValue() - targetWW);
-	uint8 distCW = abs(wpAnalogOut2.GetHandValue() - targetCW);
+	uint8 distWW = abs(AnalogOutWW - targetWW);
+	uint8 distCW = abs(AnalogOutCW - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 50.0);
 	steps = s == 0 ? 1 : s;
@@ -330,56 +382,59 @@ void moduleCwWw::calc() {
 				break;
 		}
 	}
+	
+	analogWrite(PinWW, AnalogOutWW);
+	analogWrite(PinCW, AnalogOutCW);
 	maxPercent = GetMaxPercent();
 }
 
 bool moduleCwWw::BlenderWWEffect() {
-	if(wpAnalogOut.GetHandValue() != targetWW) {
-		if(wpAnalogOut.GetHandValue() <= targetWW) {
-			if(wpAnalogOut.GetHandValue() + steps <= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + steps);
+	if(AnalogOutWW != targetWW) {
+		if(AnalogOutWW <= targetWW) {
+			if(AnalogOutWW + steps <= targetWW) {
+				AnalogOutWW = AnalogOutWW + steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() >= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW >= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		} else {
-			if(wpAnalogOut.GetHandValue() - steps >= targetWW) {
-				wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - steps);
+			if(AnalogOutWW - steps >= targetWW) {
+				AnalogOutWW = AnalogOutWW - steps;
 			} else {
-				wpAnalogOut.InitHandValue(targetWW);
+				AnalogOutWW = targetWW;
 			}
-			if(wpAnalogOut.GetHandValue() <= targetWW) {
-				wpAnalogOut.InitHandValue(targetWW);
+			if(AnalogOutWW <= targetWW) {
+				AnalogOutWW = targetWW;
 			}
 		}
 	}
-	return wpAnalogOut.GetHandValue() == targetWW;
+	return AnalogOutWW == targetWW;
 }
 bool moduleCwWw::BlenderCWEffect() {
-	if(wpAnalogOut2.GetHandValue() != targetCW) {
-		if(wpAnalogOut2.GetHandValue() <= targetCW) {
-			if(wpAnalogOut2.GetHandValue() + steps <= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + steps);
+	if(AnalogOutCW != targetCW) {
+		if(AnalogOutCW <= targetCW) {
+			if(AnalogOutCW + steps <= targetCW) {
+				AnalogOutCW = AnalogOutCW + steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() >= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW >= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		} else {
-			if(wpAnalogOut2.GetHandValue() - steps >= targetCW) {
-				wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - steps);
+			if(AnalogOutCW - steps >= targetCW) {
+				AnalogOutCW = AnalogOutCW - steps;
 			} else {
-				wpAnalogOut2.InitHandValue(targetCW);
+				AnalogOutCW = targetCW;
 			}
-			if(wpAnalogOut2.GetHandValue() <= targetCW) {
-				wpAnalogOut2.InitHandValue(targetCW);
+			if(AnalogOutCW <= targetCW) {
+				AnalogOutCW = targetCW;
 			}
 		}
 	}
-	return wpAnalogOut2.GetHandValue() == targetCW;
+	return AnalogOutCW == targetCW;
 }
 void moduleCwWw::BlenderEffect() {
 	bool bwwe = BlenderWWEffect();
@@ -389,51 +444,51 @@ void moduleCwWw::BlenderEffect() {
 	}
 }
 void moduleCwWw::PulseEffect() {
-	if(wpAnalogOut.GetHandValue() >= 255 ||
-		wpAnalogOut2.GetHandValue() <= 0) {
-		wpAnalogOut.InitHandValue(255);
-		wpAnalogOut2.InitHandValue(0);
+	if(AnalogOutWW >= 255 ||
+		AnalogOutCW <= 0) {
+		AnalogOutWW = 255;
+		AnalogOutCW = 0;
 		smoothDirection = true;
 	}
-	if(wpAnalogOut.GetHandValue() <= 0 ||
-		wpAnalogOut2.GetHandValue() >= 255) {
-		wpAnalogOut.InitHandValue(0);
-		wpAnalogOut2.InitHandValue(255);
+	if(AnalogOutWW <= 0 ||
+		AnalogOutCW >= 255) {
+		AnalogOutWW = 0;
+		AnalogOutCW = 255;
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - effectSpeed);
-		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + effectSpeed);
+		AnalogOutWW = AnalogOutWW - effectSpeed;
+		AnalogOutCW = AnalogOutCW + effectSpeed;
 	} else {
-		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + effectSpeed);
-		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - effectSpeed);
+		AnalogOutWW = AnalogOutWW + effectSpeed;
+		AnalogOutCW = AnalogOutCW - effectSpeed;
 	}
 }
 
 void moduleCwWw::WwPulseEffect() {
-	if(wpAnalogOut.GetHandValue() >= 255) {
+	if(AnalogOutWW >= 255) {
 		smoothDirection = true;
 	}
-	if(wpAnalogOut.GetHandValue() <= 10) {
+	if(AnalogOutWW <= 10) {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() - effectSpeed);
+		AnalogOutWW = AnalogOutWW - effectSpeed;
 	} else {
-		wpAnalogOut.InitHandValue(wpAnalogOut.GetHandValue() + effectSpeed);
+		AnalogOutWW = AnalogOutWW + effectSpeed;
 	}
 }
 void moduleCwWw::CwPulseEffect() {
-	if(wpAnalogOut2.GetHandValue() >= 100) {
+	if(AnalogOutCW >= 100) {
 		smoothDirection = true;
 	}
-	if(wpAnalogOut2.GetHandValue() <= 10) {
+	if(AnalogOutCW <= 10) {
 		smoothDirection = false;
 	}
 	if(smoothDirection) {
-		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() - effectSpeed);
+		AnalogOutCW = AnalogOutCW - effectSpeed;
 	} else {
-		wpAnalogOut2.InitHandValue(wpAnalogOut2.GetHandValue() + effectSpeed);
+		AnalogOutCW = AnalogOutCW + effectSpeed;
 	}
 }
 void moduleCwWw::SmoothEffect() {
@@ -447,12 +502,12 @@ void moduleCwWw::SmoothEffect() {
 	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
 	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
-	wpAnalogOut.InitHandValue(sinWWByte);
+	AnalogOutWW = sinWWByte;
 	float sinCW = sin(winkelCW);
 	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
 	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
-	wpAnalogOut2.InitHandValue(sinCWByte);
+	AnalogOutCW = sinCWByte;
 }
 void moduleCwWw::WwSmoothEffect() {
 	winkelWW += effectSpeed / 100.0;
@@ -463,7 +518,7 @@ void moduleCwWw::WwSmoothEffect() {
 	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
 	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
-	wpAnalogOut.InitHandValue(sinWWByte);
+	AnalogOutWW = sinWWByte;
 }
 void moduleCwWw::CwSmoothEffect() {
 	winkelCW += effectSpeed / 100.0;
@@ -474,19 +529,19 @@ void moduleCwWw::CwSmoothEffect() {
 	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
 	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
-	wpAnalogOut2.InitHandValue(sinCWByte);
+	AnalogOutCW = sinCWByte;
 }
 uint8 moduleCwWw::GetMaxPercent() {
 	uint8 returns = 0;
-	returns = wpAnalogOut.GetHandValue() > returns ? wpAnalogOut.GetHandValue() : returns;
-	returns = wpAnalogOut2.GetHandValue() > returns ? wpAnalogOut2.GetHandValue() : returns;
+	returns = AnalogOutWW > returns ? AnalogOutWW : returns;
+	returns = AnalogOutCW > returns ? AnalogOutCW : returns;
 	return returns;
 }
 //###################################################################################
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 259                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.cpp 246 2025-02-18 16:27:11Z               $ #
+//# File-ID      : $Id:: helperModules.cpp 259 2025-04-28 17:06:12Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperModules.h>
@@ -37,8 +37,6 @@ void helperModules::init() {
 	#if BUILDWITH == 1
 	mqttTopicUseCwWw = wpFZ.DeviceName + "/settings/useModule/CwWw";
 	mqttTopicUseNeoPixel = wpFZ.DeviceName + "/settings/useModule/NeoPixel";
-	mqttTopicUseAnalogOut = wpFZ.DeviceName + "/settings/useModule/AnalogOut";
-	mqttTopicUseAnalogOut2 = wpFZ.DeviceName + "/settings/useModule/AnalogOut2";
 	mqttTopicUseClock = wpFZ.DeviceName + "/settings/useModule/Clock";
 	#endif
 	#if BUILDWITH == 2
@@ -78,7 +76,7 @@ void helperModules::cycle() {
 }
 
 uint16 helperModules::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 259 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -86,10 +84,7 @@ uint16 helperModules::getVersion() {
 
 void helperModules::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugModules: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugModules", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
 	wpFZ.SendWSDebug("DebugModules", Debug);
 	wpFZ.blink();
 }
@@ -122,8 +117,6 @@ void helperModules::publishValues(bool force) {
 		#if BUILDWITH == 1
 		publishUseCwWwLast = 0;
 		publishUseNeoPixelLast = 0;
-		publishUseAnalogOutLast = 0;
-		publishUseAnalogOut2Last = 0;
 		publishUseClockLast = 0;
 		#endif
 		#if BUILDWITH == 2
@@ -225,18 +218,6 @@ void helperModules::publishValues(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicUseNeoPixel.c_str(), String(useModuleNeoPixel).c_str());
 		wpFZ.SendWSModule("useNeoPixel", useModuleNeoPixel);
 		publishUseNeoPixelLast = wpFZ.loopStartedAt;
-	}
-	if(useAnalogOutLast != useModuleAnalogOut || wpFZ.CheckQoS(publishUseAnalogOutLast)) {
-		useAnalogOutLast = useModuleAnalogOut;
-		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut.c_str(), String(useModuleAnalogOut).c_str());
-		wpFZ.SendWSModule("useAnalogOut", useModuleAnalogOut);
-		publishUseAnalogOutLast = wpFZ.loopStartedAt;
-	}
-	if(useAnalogOut2Last != useModuleAnalogOut2 || wpFZ.CheckQoS(publishUseAnalogOut2Last)) {
-		useAnalogOut2Last = useModuleAnalogOut2;
-		wpMqtt.mqttClient.publish(mqttTopicUseAnalogOut2.c_str(), String(useModuleAnalogOut2).c_str());
-		wpFZ.SendWSModule("useAnalogOut2", useModuleAnalogOut2);
-		publishUseAnalogOut2Last = wpFZ.loopStartedAt;
 	}
 	if(useClockLast != useModuleClock || wpFZ.CheckQoS(publishUseClockLast)) {
 		useClockLast = useModuleClock;
@@ -351,8 +332,6 @@ void helperModules::setSubscribes() {
 	#if BUILDWITH == 1
 	wpMqtt.mqttClient.subscribe(mqttTopicUseCwWw.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseNeoPixel.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicUseAnalogOut2.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicUseClock.c_str());
 	#endif
 	#if BUILDWITH == 2
@@ -418,12 +397,6 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicUseNeoPixel.c_str()) == 0) {
 		changeModuleNeoPixel(readUseModule);
 	}
-	if(strcmp(topic, mqttTopicUseAnalogOut.c_str()) == 0) {
-		changeModuleAnalogOut(readUseModule);
-	}
-	if(strcmp(topic, mqttTopicUseAnalogOut2.c_str()) == 0) {
-		changeModuleAnalogOut2(readUseModule);
-	}
 	if(strcmp(topic, mqttTopicUseClock.c_str()) == 0) {
 		changemoduleClock(readUseModule);
 	}
@@ -476,22 +449,16 @@ void helperModules::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicDebug.c_str()) == 0) {
 		if(Debug != readUseModule) {
 			Debug = readUseModule;
-			SaveBoolToEEPROM("DebugModules", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
+			wpEEPROM.WriteBoolToEEPROM("DebugModules", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugModules, Debug);
 			wpFZ.SendWSDebug("DebugModules", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}
 	}
 }
-void helperModules::SaveBoolToEEPROM(String name, uint16 addr, uint8 byte, uint8 bit, bool state) {
-	bitWrite(byte, bit, state);
-	EEPROM.write(addr, byte);
-	wpFZ.DebugSaveBoolToEEPROM(name, addr, bit, state);
-	EEPROM.commit();
-}
 void helperModules::changeModuleDHT11(bool newValue) {
 	if(useModuleDHT11 != newValue) {
 		useModuleDHT11 = newValue;
-		SaveBoolToEEPROM("useModuleDHT11", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT11, useModuleDHT11);
+		wpEEPROM.WriteBoolToEEPROM("useModuleDHT11", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT11, useModuleDHT11);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleDHT11", useModuleDHT11);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseDHT11, String(Debug));
@@ -500,7 +467,7 @@ void helperModules::changeModuleDHT11(bool newValue) {
 void helperModules::changeModuleDHT22(bool newValue) {
 	if(useModuleDHT22 != newValue) {
 		useModuleDHT22 = newValue;
-		SaveBoolToEEPROM("useModuleDHT22", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT22, useModuleDHT22);
+		wpEEPROM.WriteBoolToEEPROM("useModuleDHT22", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseDHT22, useModuleDHT22);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleDHT22", useModuleDHT22);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseDHT22, String(Debug));
@@ -509,7 +476,7 @@ void helperModules::changeModuleDHT22(bool newValue) {
 void helperModules::changeModuleLDR(bool newValue) {
 	if(useModuleLDR != newValue) {
 		useModuleLDR = newValue;
-		SaveBoolToEEPROM("useModuleLDR", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseLDR, useModuleLDR);
+		wpEEPROM.WriteBoolToEEPROM("useModuleLDR", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseLDR, useModuleLDR);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleLDR", useModuleLDR);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseLDR, String(Debug));
@@ -518,7 +485,7 @@ void helperModules::changeModuleLDR(bool newValue) {
 void helperModules::changeModuleLight(bool newValue) {
 	if(useModuleLight != newValue) {
 		useModuleLight = newValue;
-		SaveBoolToEEPROM("useModuleLight", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseLight, useModuleLight);
+		wpEEPROM.WriteBoolToEEPROM("useModuleLight", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseLight, useModuleLight);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleLight", useModuleLight);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseLight, String(Debug));
@@ -527,7 +494,7 @@ void helperModules::changeModuleLight(bool newValue) {
 void helperModules::changeModuleBM(bool newValue) {
 	if(useModuleBM != newValue) {
 		useModuleBM = newValue;
-		SaveBoolToEEPROM("useModuleBM", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
+		wpEEPROM.WriteBoolToEEPROM("useModuleBM", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseBM, useModuleBM);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleBM", useModuleBM);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseBM, String(useModuleBM));
@@ -536,7 +503,7 @@ void helperModules::changeModuleBM(bool newValue) {
 void helperModules::changeModuleWindow(bool newValue) {
 	if(useModuleWindow != newValue) {
 		useModuleWindow = newValue;
-		SaveBoolToEEPROM("useModuleWindow", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseWindow, useModuleWindow);
+		wpEEPROM.WriteBoolToEEPROM("useModuleWindow", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseWindow, useModuleWindow);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleWindow", useModuleWindow);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow, String(useModuleWindow));
@@ -545,7 +512,7 @@ void helperModules::changeModuleWindow(bool newValue) {
 void helperModules::changeModuleRelais(bool newValue) {
 	if(useModuleRelais != newValue) {
 		useModuleRelais = newValue;
-		SaveBoolToEEPROM("useModuleRelais", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRelais, useModuleRelais);
+		wpEEPROM.WriteBoolToEEPROM("useModuleRelais", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRelais, useModuleRelais);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRelais", useModuleRelais);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRelais, String(useModuleRelais));
@@ -554,7 +521,7 @@ void helperModules::changeModuleRelais(bool newValue) {
 void helperModules::changeModuleRelaisShield(bool newValue) {
 	if(useModuleRelaisShield != newValue) {
 		useModuleRelaisShield = newValue;
-		SaveBoolToEEPROM("useModuleRelaisShield", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRelaisShield, useModuleRelaisShield);
+		wpEEPROM.WriteBoolToEEPROM("useModuleRelaisShield", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRelaisShield, useModuleRelaisShield);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRelaisShield", useModuleRelaisShield);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRelaisShield, String(useModuleRelaisShield));
@@ -563,7 +530,7 @@ void helperModules::changeModuleRelaisShield(bool newValue) {
 void helperModules::changeModuleRain(bool newValue) {
 	if(useModuleRain != newValue) {
 		useModuleRain = newValue;
-		SaveBoolToEEPROM("useModuleRain", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRain, useModuleRain);
+		wpEEPROM.WriteBoolToEEPROM("useModuleRain", wpEEPROM.addrBitsModules0, wpEEPROM.bitsModules0, wpEEPROM.bitUseRain, useModuleRain);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRain", useModuleRain);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRain, String(useModuleRain));
@@ -572,7 +539,7 @@ void helperModules::changeModuleRain(bool newValue) {
 void helperModules::changeModuleMoisture(bool newValue) {
 	if(useModuleMoisture != newValue) {
 		useModuleMoisture = newValue;
-		SaveBoolToEEPROM("useModuleMoisture", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
+		wpEEPROM.WriteBoolToEEPROM("useModuleMoisture", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseMoisture, useModuleMoisture);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleMoisture", useModuleMoisture);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseMoisture, String(useModuleMoisture));
@@ -581,7 +548,7 @@ void helperModules::changeModuleMoisture(bool newValue) {
 void helperModules::changeModuleDistance(bool newValue) {
 	if(useModuleDistance != newValue) {
 		useModuleDistance = newValue;
-		SaveBoolToEEPROM("useModuleDistance", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseDistance, useModuleDistance);
+		wpEEPROM.WriteBoolToEEPROM("useModuleDistance", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseDistance, useModuleDistance);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleDistance", useModuleDistance);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseDistance, String(useModuleDistance));
@@ -591,11 +558,7 @@ void helperModules::changeModuleDistance(bool newValue) {
 void helperModules::changeModuleCwWw(bool newValue) {
 	if(useModuleCwWw != newValue) {
 		useModuleCwWw = newValue;
-		if(newValue) {
-			changeModuleAnalogOut(true);
-			changeModuleAnalogOut2(true);
-		}
-		SaveBoolToEEPROM("useModuleCwWw", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseCwWw, useModuleCwWw);
+		wpEEPROM.WriteBoolToEEPROM("useModuleCwWw", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseCwWw, useModuleCwWw);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleCwWw", useModuleCwWw);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseCwWw, String(useModuleCwWw));
@@ -604,34 +567,16 @@ void helperModules::changeModuleCwWw(bool newValue) {
 void helperModules::changeModuleNeoPixel(bool newValue) {
 	if(useModuleNeoPixel != newValue) {
 		useModuleNeoPixel = newValue;
-		SaveBoolToEEPROM("useModuleNeoPixel", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseNeoPixel, useModuleNeoPixel);
+		wpEEPROM.WriteBoolToEEPROM("useModuleNeoPixel", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseNeoPixel, useModuleNeoPixel);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleNeoPixel", useModuleNeoPixel);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseNeoPixel, String(useModuleNeoPixel));
 	}
 }
-void helperModules::changeModuleAnalogOut(bool newValue) {
-	if(useModuleAnalogOut != newValue) {
-		useModuleAnalogOut = newValue;
-		SaveBoolToEEPROM("useModuleAnalogOut", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut, useModuleAnalogOut);
-		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleAnalogOut", useModuleAnalogOut);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut, String(useModuleAnalogOut));
-	}
-}
-void helperModules::changeModuleAnalogOut2(bool newValue) {
-	if(useModuleAnalogOut2 != newValue) {
-		useModuleAnalogOut2 = newValue;
-		SaveBoolToEEPROM("useModuleAnalogOut2", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut2, useModuleAnalogOut2);
-		wpFZ.restartRequired = true;
-		wpFZ.SendWSDebug("useModuleAnalogOut2", useModuleAnalogOut2);
-		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut2, String(useModuleAnalogOut2));
-	}
-}
 void helperModules::changemoduleClock(bool newValue) {
 	if(useModuleClock != newValue) {
 		useModuleClock = newValue;
-		SaveBoolToEEPROM("useClock", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseClock, useModuleClock);
+		wpEEPROM.WriteBoolToEEPROM("useClock", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseClock, useModuleClock);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useClock", useModuleClock);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseClock, String(useModuleClock));
@@ -642,7 +587,7 @@ void helperModules::changemoduleClock(bool newValue) {
 void helperModules::changeModuleAnalogOut(bool newValue) {
 	if(useModuleAnalogOut != newValue) {
 		useModuleAnalogOut = newValue;
-		SaveBoolToEEPROM("useModuleAnalogOut", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut, useModuleAnalogOut);
+		wpEEPROM.WriteBoolToEEPROM("useModuleAnalogOut", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut, useModuleAnalogOut);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleAnalogOut", useModuleAnalogOut);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut, String(useModuleAnalogOut));
@@ -651,7 +596,7 @@ void helperModules::changeModuleAnalogOut(bool newValue) {
 void helperModules::changeModuleAnalogOut2(bool newValue) {
 	if(useModuleAnalogOut2 != newValue) {
 		useModuleAnalogOut2 = newValue;
-		SaveBoolToEEPROM("useModuleAnalogOut2", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut2, useModuleAnalogOut2);
+		wpEEPROM.WriteBoolToEEPROM("useModuleAnalogOut2", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseAnalogOut2, useModuleAnalogOut2);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleAnalogOut2", useModuleAnalogOut2);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseAnalogOut2, String(useModuleAnalogOut2));
@@ -660,7 +605,7 @@ void helperModules::changeModuleAnalogOut2(bool newValue) {
 void helperModules::changeModuleRpm(bool newValue) {
 	if(useModuleRpm != newValue) {
 		useModuleRpm = newValue;
-		SaveBoolToEEPROM("useModuleRpm", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseRpm, useModuleRpm);
+		wpEEPROM.WriteBoolToEEPROM("useModuleRpm", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseRpm, useModuleRpm);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleRpm", useModuleRpm);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRpm, String(useModuleRpm));
@@ -669,7 +614,7 @@ void helperModules::changeModuleRpm(bool newValue) {
 void helperModules::changemoduleImpulseCounter(bool newValue) {
 	if(useModuleImpulseCounter != newValue) {
 		useModuleImpulseCounter = newValue;
-		SaveBoolToEEPROM("useModuleImpulseCounter", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseImpulseCounter, useModuleImpulseCounter);
+		wpEEPROM.WriteBoolToEEPROM("useModuleImpulseCounter", wpEEPROM.addrBitsModules1, wpEEPROM.bitsModules1, wpEEPROM.bitUseImpulseCounter, useModuleImpulseCounter);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleImpulseCounter", useModuleImpulseCounter);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseImpulseCounter, String(useModuleImpulseCounter));
@@ -678,7 +623,7 @@ void helperModules::changemoduleImpulseCounter(bool newValue) {
 void helperModules::changeModuleWindow2(bool newValue) {
 	if(useModuleWindow2 != newValue) {
 		useModuleWindow2 = newValue;
-		SaveBoolToEEPROM("useModuleWindow2", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWindow2, useModuleWindow2);
+		wpEEPROM.WriteBoolToEEPROM("useModuleWindow2", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWindow2, useModuleWindow2);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleWindow2", useModuleWindow2);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow2, String(useModuleWindow2));
@@ -687,7 +632,7 @@ void helperModules::changeModuleWindow2(bool newValue) {
 void helperModules::changeModuleWindow3(bool newValue) {
 	if(useModuleWindow3 != newValue) {
 		useModuleWindow3 = newValue;
-		SaveBoolToEEPROM("useModuleWindow3", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWindow3, useModuleWindow3);
+		wpEEPROM.WriteBoolToEEPROM("useModuleWindow3", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWindow3, useModuleWindow3);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleWindow3", useModuleWindow3);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWindow3, String(useModuleWindow3));
@@ -696,7 +641,7 @@ void helperModules::changeModuleWindow3(bool newValue) {
 void helperModules::changeModuleWeight(bool newValue) {
 	if(useModuleWeight != newValue) {
 		useModuleWeight = newValue;
-		SaveBoolToEEPROM("useModuleWeight", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWeight, useModuleWeight);
+		wpEEPROM.WriteBoolToEEPROM("useModuleWeight", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseWeight, useModuleWeight);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useModuleWeight", useModuleWeight);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseWeight, String(useModuleWeight));
@@ -707,7 +652,7 @@ void helperModules::changeModuleWeight(bool newValue) {
 void helperModules::changemoduleUnderfloor1(bool newValue) {
 	if(useModuleUnderfloor1 != newValue) {
 		useModuleUnderfloor1 = newValue;
-		SaveBoolToEEPROM("useUnderfloor1", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor1, useModuleUnderfloor1);
+		wpEEPROM.WriteBoolToEEPROM("useUnderfloor1", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor1, useModuleUnderfloor1);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor1", useModuleUnderfloor1);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor1, String(useModuleUnderfloor1));
@@ -716,10 +661,7 @@ void helperModules::changemoduleUnderfloor1(bool newValue) {
 void helperModules::changemoduleUnderfloor2(bool newValue) {
 	if(useModuleUnderfloor2 != newValue) {
 		useModuleUnderfloor2 = newValue;
-		SaveBoolToEEPROM("useUnderfloor2", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor2, useModuleUnderfloor2);
-		bitWrite(wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor2, useModuleUnderfloor2);
-		EEPROM.write(wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2);
-		EEPROM.commit();
+		wpEEPROM.WriteBoolToEEPROM("useUnderfloor2", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor2, useModuleUnderfloor2);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor2", useModuleUnderfloor2);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor2, String(useModuleUnderfloor2));
@@ -728,7 +670,7 @@ void helperModules::changemoduleUnderfloor2(bool newValue) {
 void helperModules::changemoduleUnderfloor3(bool newValue) {
 	if(useModuleUnderfloor3 != newValue) {
 		useModuleUnderfloor3 = newValue;
-		SaveBoolToEEPROM("useUnderfloor3", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor3, useModuleUnderfloor3);
+		wpEEPROM.WriteBoolToEEPROM("useUnderfloor3", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor3, useModuleUnderfloor3);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor3", useModuleUnderfloor3);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor3, String(useModuleUnderfloor3));
@@ -737,7 +679,7 @@ void helperModules::changemoduleUnderfloor3(bool newValue) {
 void helperModules::changemoduleUnderfloor4(bool newValue) {
 	if(useModuleUnderfloor4 != newValue) {
 		useModuleUnderfloor4 = newValue;
-		SaveBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor4, useModuleUnderfloor4);
+		wpEEPROM.WriteBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules2, wpEEPROM.bitsModules2, wpEEPROM.bitUseUnderfloor4, useModuleUnderfloor4);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useUnderfloor4", useModuleUnderfloor4);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseUnderfloor4, String(useModuleUnderfloor4));
@@ -746,7 +688,7 @@ void helperModules::changemoduleUnderfloor4(bool newValue) {
 void helperModules::changemoduleDS18B20(bool newValue) {
 	if(useModuleDS18B20 != newValue) {
 		useModuleDS18B20 = newValue;
-		SaveBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseDS18B20, useModuleDS18B20);
+		wpEEPROM.WriteBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseDS18B20, useModuleDS18B20);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useDS18B20", useModuleDS18B20);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseDS18B20, String(useModuleDS18B20));
@@ -757,7 +699,7 @@ void helperModules::changemoduleDS18B20(bool newValue) {
 void helperModules::changemoduleRFID(bool newValue) {
 	if(useModuleRFID != newValue) {
 		useModuleRFID = newValue;
-		SaveBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseRFID, useModuleRFID);
+		wpEEPROM.WriteBoolToEEPROM("useRFID", wpEEPROM.addrBitsModules3, wpEEPROM.bitsModules3, wpEEPROM.bitUseRFID, useModuleRFID);
 		wpFZ.restartRequired = true;
 		wpFZ.SendWSDebug("useRFID", useModuleRFID);
 		wpFZ.DebugcheckSubscribes(mqttTopicUseRFID, String(useModuleRFID));
@@ -813,12 +755,6 @@ void helperModules::publishAllSettings(bool force) {
 	}
 	if(wpModules.useModuleNeoPixel) {
 		wpNeoPixel.publishSettings(force);
-	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.publishSettings(force);
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.publishSettings(force);
 	}
 	if(wpModules.useModuleClock) {
 		wpClock.publishSettings(force);
@@ -920,12 +856,6 @@ void helperModules::publishAllValues(bool force) {
 	if(wpModules.useModuleNeoPixel) {
 		wpNeoPixel.publishValues(force);
 	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.publishValues(force);
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.publishValues(force);
-	}
 	if(wpModules.useModuleClock) {
 		wpClock.publishValues(force);
 	}
@@ -1022,12 +952,6 @@ void helperModules::setAllSubscribes() {
 	if(wpModules.useModuleNeoPixel) {
 		wpNeoPixel.setSubscribes();
 	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.setSubscribes();
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.setSubscribes();
-	}
 	if(wpModules.useModuleClock) {
 		wpClock.setSubscribes();
 	}
@@ -1121,12 +1045,6 @@ void helperModules::checkAllSubscribes(char* topic, String msg) {
 	}
 	if(wpModules.useModuleNeoPixel) {
 		wpNeoPixel.checkSubscribes(topic, msg);
-	}
-	if(wpModules.useModuleAnalogOut) {
-		wpAnalogOut.checkSubscribes(topic, msg);
-	}
-	if(wpModules.useModuleAnalogOut2) {
-		wpAnalogOut2.checkSubscribes(topic, msg);
 	}
 	if(wpModules.useModuleClock) {
 		wpClock.checkSubscribes(topic, msg);

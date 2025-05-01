@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.cpp 246 2025-02-18 16:27:11Z        $ #
+//# File-ID      : $Id:: moduleImpulseCounter.cpp 258 2025-04-28 13:34:51Z        $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleImpulseCounter.h>
@@ -81,11 +81,10 @@ void moduleImpulseCounter::setSubscribes() {
 void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
 	if(strcmp(topic, mqttTopicSetKWh.c_str()) == 0) {
-		uint16 readSetKWh = msg.toInt();
+		uint32 readSetKWh = msg.toInt();
 		if(KWh != readSetKWh) {
 			KWh = readSetKWh;
-			EEPROM.put(wpEEPROM.byteImpulseCounterKWh, KWh);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("KWh", wpEEPROM.byteImpulseCounterKWh, KWh);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetKWh, String(KWh));
 		}
 	}
@@ -93,17 +92,14 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		uint8 readUpKWh = msg.toInt();
 		if(UpKWh != readUpKWh) {
 			UpKWh = readUpKWh;
-			EEPROM.write(wpEEPROM.byteImpulseCounterUpKWh, UpKWh);
-			EEPROM.commit();
-			wpFZ.DebugcheckSubscribes(mqttTopicUpKWh, String(UpKWh));
+			wpEEPROM.WriteByteToEEPROM("UpKWh", wpEEPROM.byteImpulseCounterUpKWh, UpKWh);
 		}
 	}
 	if(strcmp(topic, mqttTopicSilver.c_str()) == 0) {
 		int8 readSilver = msg.toInt();
 		if(counterSilver != readSilver) {
 			counterSilver = readSilver;
-			EEPROM.put(wpEEPROM.byteImpulseCounterSilver, counterSilver);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("Silver", wpEEPROM.byteImpulseCounterSilver, counterSilver);
 			wpFZ.DebugcheckSubscribes(mqttTopicSilver, String(counterSilver));
 		}
 	}
@@ -111,8 +107,7 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		int8 readRed = msg.toInt();
 		if(counterRed != readRed) {
 			counterRed = readRed;
-			EEPROM.put(wpEEPROM.byteImpulseCounterRed, counterRed);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("Red", wpEEPROM.byteImpulseCounterRed, counterRed);
 			wpFZ.DebugcheckSubscribes(mqttTopicRed, String(counterRed));
 		}
 	}
@@ -158,7 +153,7 @@ void moduleImpulseCounter::calc() {
 // section to copy
 //###################################################################################
 uint16 moduleImpulseCounter::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

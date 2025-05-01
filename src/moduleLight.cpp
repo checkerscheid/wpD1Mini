@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 246 2025-02-18 16:27:11Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 258 2025-04-28 13:34:51Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -87,11 +87,10 @@ void moduleLight::setSubscribes() {
 
 void moduleLight::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		short readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteLightCorrection, correction);
-			EEPROM.commit();
+			wpEEPROM.WriteWordToEEPROM("LightCorrection", wpEEPROM.byteLightCorrection, correction);
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
@@ -153,7 +152,7 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

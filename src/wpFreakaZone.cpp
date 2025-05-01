@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 253 2025-03-17 19:29:41Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -59,7 +59,7 @@ void wpFreakaZone::cycle() {
 }
 
 uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 253 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -195,10 +195,7 @@ void wpFreakaZone::InitMaxWorking(bool maxWorking) {
 }
 void wpFreakaZone::SetMaxWorking() {
 	useMaxWorking = !useMaxWorking;
-	bitWrite(wpEEPROM.bitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useMaxWorking);
-	EEPROM.write(wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitsSettingsBasis0);
-	DebugSaveBoolToEEPROM(F("useMaxWorking"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useMaxWorking);
-	EEPROM.commit();
+	wpEEPROM.WriteBoolToEEPROM(F("useMaxWorking"), wpEEPROM.addrBitsSettingsBasis0, wpEEPROM.bitsSettingsBasis0, wpEEPROM.bitUseMaxWorking, useMaxWorking);
 	SendWSDebug(F("useMaxWorking"), useMaxWorking);
 }
 bool wpFreakaZone::GetMaxWorking() {
@@ -340,8 +337,7 @@ String wpFreakaZone::getLastRestartReason() {
 	return "Unknown: " + String(_restartReason);
 }
 void wpFreakaZone::SetRestartReason(uint8 restartReason) {
-	EEPROM.write(wpEEPROM.addrRestartReason, restartReason);
-	EEPROM.commit();
+	wpEEPROM.WriteByteToEEPROM(F("SetRestartReason"), wpEEPROM.addrRestartReason, restartReason);
 }
 //###################################################################################
 // Debug Messages
@@ -399,10 +395,14 @@ void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	wpFZ.DebugWS(wpFZ.strINFO, F("checkSubscripes"), logmessage);
 	wpFZ.blink();
 }
-void wpFreakaZone::DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state) {
-	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bit) + ", state: " + String(state);
-	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
-}
+// void wpFreakaZone::DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state) {
+// 	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bit) + ", state: " + String(state);
+// 	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
+// }
+// void wpFreakaZone::DebugWriteByteToEEPROM(String name, uint16 addr, uint8 value) {
+// 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(value);
+// 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
+// }
 
 void wpFreakaZone::SetDeviceName(String name) {
 	wpFZ.DeviceName = name;
@@ -441,27 +441,23 @@ void wpFreakaZone::printRestored() {
 	Serial.print(funcToString("StartDevice"));
 	Serial.println(Version);
 }
-void wpFreakaZone::InitBootCounter(uint32 bc) {
+void wpFreakaZone::InitBootCounter(uint8 bc) {
 	bootCounter = bc;
 }
 void wpFreakaZone::BootCount() {
 	bootCounter++;
-	WriteBootCounter();
+	wpEEPROM.WriteByteToEEPROM(F("BootCounter"), wpEEPROM.addrBootCounter, bootCounter);
 }
-uint32 wpFreakaZone::GetBootCounter() {
+uint8 wpFreakaZone::GetBootCounter() {
 	return bootCounter;
 }
 void wpFreakaZone::ResetBootCounter() {
 	bootCounter = 0;
-	WriteBootCounter();
+	wpEEPROM.WriteByteToEEPROM(F("BootCounter"), wpEEPROM.addrBootCounter, bootCounter);
 }
 //###################################################################################
 // private
 //###################################################################################
-void wpFreakaZone::WriteBootCounter() {
-	EEPROM.put(wpEEPROM.addrBootCounter, bootCounter);
-	DebugWS(strINFO, F("WriteBootCounter"), F("new bootCounter: ") + String(bootCounter));
-}
 void wpFreakaZone::doBlink() {
 	if(blinkStatus != blinkStatusNothing && loopStartedAt > (blinkStatsusLast + blinkDelay)) {
 		blinkStatus++;

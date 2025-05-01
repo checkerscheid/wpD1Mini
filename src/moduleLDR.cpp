@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 246 2025-02-18 16:27:11Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 258 2025-04-28 13:34:51Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -85,8 +85,7 @@ void moduleLDR::checkSubscribes(char* topic, String msg) {
 		int8 readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
-			EEPROM.put(wpEEPROM.byteLDRCorrection, correction);
-			EEPROM.commit();
+			wpEEPROM.WriteByteToEEPROM("LDRCorrection", wpEEPROM.byteLDRCorrection, correction);
 			wpFZ.DebugcheckSubscribes(mqttTopicCorrection, String(correction));
 		}
 	}
@@ -153,7 +152,7 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 // section to copy
 //###################################################################################
 uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.cpp 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: helperFinder.cpp 258 2025-04-28 13:34:51Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperFinder.h>
@@ -32,7 +32,7 @@ void helperFinder::cycle() {
 }
 
 uint16 helperFinder::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -40,10 +40,7 @@ uint16 helperFinder::getVersion() {
 
 void helperFinder::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugFinder", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
-	EEPROM.commit();
+	wpEEPROM.WriteBoolToEEPROM("DebugFinder", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugFinder: " + String(Debug));
 	wpFZ.SendWSDebug("DebugFinder", Debug);
 	wpFZ.blink();
@@ -78,9 +75,7 @@ void helperFinder::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("DebugFinder", wpEEPROM.addrBitsDebugBasis0, wpEEPROM.bitsDebugBasis0, wpEEPROM.bitDebugFinder, Debug);
 			wpFZ.SendWSDebug("DebugFinder", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

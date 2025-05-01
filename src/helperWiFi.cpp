@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 258 2025-04-28 13:34:51Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -48,7 +48,7 @@ void helperWiFi::cycle() {
 }
 
 uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 246 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -56,11 +56,7 @@ uint16 helperWiFi::getVersion() {
 
 void helperWiFi::changeDebug() {
 	Debug = !Debug;
-	bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
-	EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
-	wpFZ.DebugSaveBoolToEEPROM("DebugWiFi", wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugWiFi: " + String(Debug));
+	wpEEPROM.WriteBoolToEEPROM("DebugWiFi", wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
 	wpFZ.SendWSDebug("DebugWiFi", Debug);
 	wpFZ.blink();
 }
@@ -181,9 +177,7 @@ void helperWiFi::checkSubscribes(char* topic, String msg) {
 		bool readDebug = msg.toInt();
 		if(Debug != readDebug) {
 			Debug = readDebug;
-			bitWrite(wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
-			EEPROM.write(wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("DebugWiFi", wpEEPROM.addrBitsDebugBasis1, wpEEPROM.bitsDebugBasis1, wpEEPROM.bitDebugWiFi, Debug);
 			wpFZ.SendWSDebug("DebugWiFi", Debug);
 			wpFZ.DebugcheckSubscribes(mqttTopicDebug, String(Debug));
 		}

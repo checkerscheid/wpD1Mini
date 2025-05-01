@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 256                                                     $ #
+//# Revision     : $Rev:: 258                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 256 2025-04-25 19:31:36Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 258 2025-04-28 13:34:51Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -225,9 +225,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		if(handSet != readSetHand) {
 			resetPID();
 			handSet = readSetHand;
-			bitWrite(wpEEPROM.bitsSettingsModules0, wpEEPROM.bitAnalogOutHand, handSet);
-			EEPROM.write(wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0);
-			EEPROM.commit();
+			wpEEPROM.WriteBoolToEEPROM("AnalogOut::HandSet", wpEEPROM.addrBitsSettingsModules0, wpEEPROM.bitsSettingsModules0, wpEEPROM.bitAnalogOutHand, handSet);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHand, String(handSet));
 		}
 	}
@@ -244,9 +242,8 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 			if(Kp != readKp) {
 				Kp = readKp;
 				pid->SetTunings(Kp, Tv, Tn);
-				EEPROM.put(wpEEPROM.byteAnalogOutKp, (short) (Kp * 10));
-				EEPROM.commit();
-				wpFZ.DebugcheckSubscribes(mqttTopicKp, String(Kp));
+				short kpValue = (short)(Kp * 10);
+				wpEEPROM.WriteWordToEEPROM("AnalogOut::Kp", wpEEPROM.byteAnalogOutKp, kpValue);
 			}
 		}
 		if(strcmp(topic, mqttTopicTv.c_str()) == 0) {
@@ -254,9 +251,8 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 			if(Tv != readTv) {
 				Tv = readTv;
 				pid->SetTunings(Kp, Tv, Tn);
-				EEPROM.put(wpEEPROM.byteAnalogOutTv, (short) (Tv * 10));
-				EEPROM.commit();
-				wpFZ.DebugcheckSubscribes(mqttTopicTv, String(Tv));
+				short tvValue = (short)(Tv * 10);
+				wpEEPROM.WriteWordToEEPROM("AnalogOut::Tv", wpEEPROM.byteAnalogOutTv, tvValue);
 			}
 		}
 		if(strcmp(topic, mqttTopicTn.c_str()) == 0) {
@@ -264,9 +260,8 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 			if(Tn != readTn) {
 				Tn = readTn;
 				pid->SetTunings(Kp, Tv, Tn);
-				EEPROM.put(wpEEPROM.byteAnalogOutTn, (short) (Tn * 10));
-				EEPROM.commit();
-				wpFZ.DebugcheckSubscribes(mqttTopicTn, String(Tn));
+				short tnValue = (short)(Tn * 10);
+				wpEEPROM.WriteWordToEEPROM("AnalogOut::Tn", wpEEPROM.byteAnalogOutTn, tnValue);
 			}
 		}
 		if(strcmp(topic, mqttTopicSetSetPoint.c_str()) == 0) {
@@ -296,11 +291,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 String moduleAnalogOut::SetSetPoint(double sp) {
 	SetPoint = sp;
 	uint8 setPointToSave = (uint8) (SetPoint * 10);
-	EEPROM.write(wpEEPROM.byteAnalogOutSetPoint, setPointToSave);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "SetSetPoint",
-		"save to EEPROM: 'module" + ModuleName + "::SetSetPoint' = " + String(setPointToSave) + ", " +
-		"addr: " + String(wpEEPROM.byteAnalogOutSetPoint));
+	wpEEPROM.WriteByteToEEPROM("AnalogOut::SetPoint", wpEEPROM.byteAnalogOutSetPoint, setPointToSave);
 	return wpFZ.jsonOK;
 }
 String moduleAnalogOut::SetTopicTempUrl(String topic) {
@@ -318,9 +309,7 @@ void moduleAnalogOut::InitHandValue(uint8 value) {
 }
 void moduleAnalogOut::SetHandValue(uint8 value) {
 	handValueSet = value;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, handValueSet);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "SetHandValueSet", "save to EEPROM: 'moduleAnalogOut::handValueSet' = " + String(handValueSet));
+	wpEEPROM.WriteByteToEEPROM("AnalogOut::handValueSet", wpEEPROM.byteAnalogOutHandValue, handValueSet);
 }
 void moduleAnalogOut::SetHandValueProzent(uint8 value) {
 	SetHandValue((uint8)(value * 2.55));
@@ -362,13 +351,13 @@ String moduleAnalogOut::SetPidType(uint8 t) {
 		case pidTypeHeating:
 			pidType = pidTypeHeating;
 			pid->SetControllerDirection(pidType);
-			savePidType();
+			wpEEPROM.WriteByteToEEPROM("AnalogOut::pidType", wpEEPROM.byteAnalogOutPidType, pidType);
 			return F("{\"erg\":\"S_OK\",\"pidType\":\"Heating\"}");
 			break;
 		case pidTypeAirCondition:
 			pidType = pidTypeAirCondition;
 			pid->SetControllerDirection(pidType);
-			savePidType();
+			wpEEPROM.WriteByteToEEPROM("AnalogOut::pidType", wpEEPROM.byteAnalogOutPidType, pidType);
 			return F("{\"erg\":\"S_OK\",\"pidType\":\"AirCondition\"}");
 			break;
 		default:
@@ -444,12 +433,6 @@ void moduleAnalogOut::calcOutput() {
 	}
 }
 
-void moduleAnalogOut::savePidType() {
-	EEPROM.write(wpEEPROM.byteAnalogOutPidType, pidType);
-	EEPROM.commit();
-	wpFZ.DebugWS(wpFZ.strINFO, "savePidType",
-		"save to EEPROM: 'module" + ModuleName + "::savePidType' = " + GetPidType());
-}
 void moduleAnalogOut::resetPID() {
 	pid->SetOutputLimits(0.0, 1.0);
 	pid->SetOutputLimits(-1.0, 0.0);
@@ -466,7 +449,7 @@ void moduleAnalogOut::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 256 $";
+	String SVN = "$Rev: 258 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

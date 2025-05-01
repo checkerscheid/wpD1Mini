@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 262                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 253 2025-03-17 19:29:41Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 262 2025-04-30 12:00:50Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 253 $";
+	String SVN = "$Rev: 262 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -59,9 +59,7 @@ uint16 helperEEPROM::getVersion() {
 
 void helperEEPROM::changeDebug() {
 	Debug = !Debug;
-	bitWrite(bitsDebugBasis0, bitDebugEEPROM, Debug);
-	EEPROM.write(addrBitsDebugBasis0, bitsDebugBasis0);
-	wpFZ.DebugSaveBoolToEEPROM("DebugEEPROM", addrBitsDebugBasis0, bitDebugEEPROM, Debug);
+	WriteBoolToEEPROM("DebugEEPROM", addrBitsDebugBasis0, bitsDebugBasis0, bitDebugEEPROM, Debug);
 	EEPROM.commit();
 	wpFZ.DebugWS(wpFZ.strINFO, "writeEEPROM", "DebugEEPROM: " + String(Debug));
 	wpFZ.SendWSDebug("DebugEEPROM", Debug);
@@ -99,11 +97,43 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpAnalogOut.mqttTopicTemp);
 }
 
-// void helperEEPROM::saveBool(uint16 &addr, byte &by, uint8 &bi, bool v) {
-// 	bitWrite(by, bi, v);
-// 	EEPROM.write(addr, by);
-// 	EEPROM.commit();
-// }
+void helperEEPROM::WriteBoolToEEPROM(String name, const uint16 &addr, byte &by, const uint8 &bi, bool &v, bool commit) {
+	bitWrite(by, bi, v);
+	EEPROM.write(addr, by);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bi) + ", state: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, uint8 &v, bool commit) {
+	EEPROM.write(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, int8 &v, bool commit) {
+	EEPROM.write(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint16 &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, short &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint32 &v, bool commit) {
+	EEPROM.put(addr, v);
+	if(commit) EEPROM.commit();
+	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
+	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
+}
 
 void helperEEPROM::publishSettings() {
 	publishSettings(false);
@@ -200,8 +230,7 @@ void helperEEPROM::readVars() {
 
 	wpModules.useModuleNeoPixel = false;
 	wpModules.useModuleCwWw = false;
-	wpModules.useModuleAnalogOut = false;
-	wpModules.useModuleAnalogOut2 = false;
+	wpModules.useModuleClock = false;
 	wpModules.useModuleAnalogOut = false;
 	wpModules.useModuleAnalogOut2 = false;
 	wpModules.useModuleRpm = false;
@@ -216,8 +245,6 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 1
 	wpModules.useModuleNeoPixel = bitRead(bitsModules1, bitUseNeoPixel);
 	wpModules.useModuleCwWw = bitRead(bitsModules2, bitUseCwWw);
-	wpModules.useModuleAnalogOut = bitRead(bitsModules1, bitUseAnalogOut);
-	wpModules.useModuleAnalogOut2 = bitRead(bitsModules1, bitUseAnalogOut2);
 	wpModules.useModuleClock = bitRead(bitsModules3, bitUseClock);
 #endif
 #if BUILDWITH == 2
@@ -274,8 +301,6 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 1
 	wpCwWw.Debug(bitRead(bitsDebugModules1, bitDebugCwWw));
 	wpNeoPixel.Debug(bitRead(bitsDebugModules1, bitDebugNeoPixel));
-	wpAnalogOut.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut));
-	wpAnalogOut2.Debug(bitRead(bitsDebugModules1, bitDebugAnalogOut2));
 	wpClock.Debug(bitRead(bitsDebugModules2, bitDebugClock));
 #endif
 #if BUILDWITH == 2
@@ -312,8 +337,9 @@ void helperEEPROM::readVars() {
 	wpMoisture.UseAvg(bitRead(bitsSettingsModules0, bitUseMoistureAvg));
 #if BUILDWITH == 1
 	wpNeoPixel.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
-	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
-	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
+	wpClock.InitRGB(bitRead(bitsSettingsModules1, bitNeoPixelRGB));
+	wpNeoPixel.SetUseWW(bitRead(bitsSettingsModules1, bitNeoPixelUseWW));
+	wpNeoPixel.SetUseCW(bitRead(bitsSettingsModules1, bitNeoPixelUseCW));
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
@@ -353,9 +379,6 @@ void helperEEPROM::readVars() {
 	wpNeoPixel.InitValueR(EEPROM.read(byteNeoPixelValueR));
 	wpNeoPixel.InitValueG(EEPROM.read(byteNeoPixelValueG));
 	wpNeoPixel.InitValueB(EEPROM.read(byteNeoPixelValueB));
-	wpAnalogOut.InitHandValue(EEPROM.read(byteAnalogOutHandValue));
-	wpAnalogOut.CalcCycle(EEPROM.read(byteCalcCycleAnalogOut) * 100);
-	wpAnalogOut2.InitHandValue(EEPROM.read(byteAnalogOut2HandValue));
 	wpClock.CalcCycle(EEPROM.read(byteCalcCycleClock) * 100);
 	
 	wpClock.ColorHR = EEPROM.read(byteClockColorHR);
@@ -417,6 +440,7 @@ void helperEEPROM::readVars() {
 	uint16 pixelCount;
 	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
 	wpNeoPixel.InitPixelCount(pixelCount);
+	wpClock.InitPixelCount(pixelCount);
 	short outKp;
 	EEPROM.get(byteAnalogOutKp, outKp);
 	wpAnalogOut.InitKp(outKp);
