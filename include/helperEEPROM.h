@@ -147,6 +147,7 @@ class helperEEPROM {
 		const uint8 bitUseWeightAvg = 4; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelUseWW = 5; // include in bitsSettingsModules1
 		const uint8 bitNeoPixelUseCW = 6; // include in bitsSettingsModules1
+		const uint8 bitAnalogOutSummer = 7; // include in bitsSettingsModules1
 
 		const uint16 addrBitsSettingsModules2 = 14;
 		byte bitsSettingsModules2;
