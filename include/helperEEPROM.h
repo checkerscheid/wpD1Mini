@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 261                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 261 2025-04-28 19:42:51Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 264 2025-05-01 17:27:44Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -158,6 +158,13 @@ class helperEEPROM {
 		const uint8 bitUnderfloor2HandValue = 5; // include in bitsSettingsModules2
 		const uint8 bitUnderfloor3HandValue = 6; // include in bitsSettingsModules2
 		const uint8 bitUnderfloor4HandValue = 7; // include in bitsSettingsModules2
+
+		const uint16 addrBitsSettingsModules3 = 15;
+		byte bitsSettingsModules3;
+		const uint8 bitUnderfloor1Summer = 0; // include in bitsSettingsModules3
+		const uint8 bitUnderfloor2Summer = 1; // include in bitsSettingsModules3
+		const uint8 bitUnderfloor3Summer = 2; // include in bitsSettingsModules3
+		const uint8 bitUnderfloor4Summer = 3; // include in bitsSettingsModules3
 		
 //###################################################################################
 /// byte values: byte 20 - 49
@@ -290,7 +297,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 261 $";
+		String SVNh = "$Rev: 264 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16 addrStartForString0 = 500;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 262                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 262 2025-04-30 12:00:50Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 264 2025-05-01 17:27:44Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 262 $";
+	String SVN = "$Rev: 264 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -328,6 +328,7 @@ void helperEEPROM::readVars() {
 	bitsSettingsModules0 = EEPROM.read(addrBitsSettingsModules0);
 	bitsSettingsModules1 = EEPROM.read(addrBitsSettingsModules1);
 	bitsSettingsModules2 = EEPROM.read(addrBitsSettingsModules2);
+	bitsSettingsModules3 = EEPROM.read(addrBitsSettingsModules3);
 	wpLDR.UseAvg(bitRead(bitsSettingsModules0, bitUseLdrAvg));
 	wpLight.UseAvg(bitRead(bitsSettingsModules0, bitUseLightAvg));
 	wpRelais.handSet = bitRead(bitsSettingsModules0, bitRelaisHand);
@@ -355,6 +356,10 @@ void helperEEPROM::readVars() {
 	wpUnderfloor2.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor2HandValue);
 	wpUnderfloor3.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor3HandValue);
 	wpUnderfloor4.handValueSet = bitRead(bitsSettingsModules2, bitUnderfloor4HandValue);
+	wpUnderfloor1.InitSummer(bitRead(bitsSettingsModules3, bitUnderfloor1Summer));
+	wpUnderfloor2.InitSummer(bitRead(bitsSettingsModules3, bitUnderfloor2Summer));
+	wpUnderfloor3.InitSummer(bitRead(bitsSettingsModules3, bitUnderfloor3Summer));
+	wpUnderfloor4.InitSummer(bitRead(bitsSettingsModules3, bitUnderfloor4Summer));
 #endif
 #if BUILDWITH == 4
 #endif
