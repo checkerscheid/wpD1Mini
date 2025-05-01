@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 256                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.h 256 2025-04-25 19:31:36Z              $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 264 2025-05-01 17:27:44Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleUnderfloor1_h
@@ -44,12 +44,14 @@ class moduleUnderfloor : public IModuleBase {
 		String mqttTopicSetPoint;
 		String mqttTopicTempUrl;
 		String mqttTopicTemp = "_";
+		String mqttTopicSummer;
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
 		String mqttTopicSetSetPoint;
 		String mqttTopicSetTempUrl;
 		String mqttTopicSetWartung;
+		String mqttTopicSetSummer;
 
 		// section to copy
 		void init();
@@ -76,7 +78,11 @@ class moduleUnderfloor : public IModuleBase {
 		String SetSetPoint(uint8 setpoint);
 		String SetTopicTempUrl(String topic);
 		String SetWartung();
+		void InitSummer(bool summer) { this->summer = summer; };
+		String SetSummer(bool summer);
+		bool GetSummer() { return summer; }
 	private:
+		const uint8 SUMMERTEMP = 12;
 		uint8 no;
 		bool outputLast;
 		unsigned long publishOutputLast;
@@ -94,6 +100,8 @@ class moduleUnderfloor : public IModuleBase {
 		unsigned long publishTempUrlLast;
 		bool wartungActiveLast;
 		unsigned long publishWartungActiveLast;
+		bool summerLast;
+		unsigned long publishSummerLast;
 
 		void publishValue();
 		void calc();
@@ -102,17 +110,19 @@ class moduleUnderfloor : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 256 $";
+		String SVNh = "$Rev: 264 $";
 
 		uint8 bitDebug;
 		uint8 bitHand;
 		uint8 bitHandValue;
+		uint8 bitSummer;
 		uint16 byteSetpoint;
 		uint16 byteCalcCycle;
 		uint8 setPoint;
 		int temp;
 		bool wartungActive;
 		unsigned long wartungStartedAt;
+		bool summer = false;
 };
 extern moduleUnderfloor wpUnderfloor1;
 extern moduleUnderfloor wpUnderfloor2;

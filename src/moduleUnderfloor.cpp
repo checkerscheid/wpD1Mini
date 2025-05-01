@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 258 2025-04-28 13:34:51Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 264 2025-05-01 17:27:44Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -32,6 +32,7 @@ void moduleUnderfloor::init() {
 			bitDebug = wpEEPROM.bitDebugUnderfloor1;
 			bitHand = wpEEPROM.bitUnderfloor1Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor1HandValue;
+			bitSummer = wpEEPROM.bitUnderfloor1Summer;
 			byteSetpoint = wpEEPROM.byteUnderfloor1Setpoint;
 			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor1;
 			break;
@@ -40,6 +41,7 @@ void moduleUnderfloor::init() {
 			bitDebug = wpEEPROM.bitDebugUnderfloor2;
 			bitHand = wpEEPROM.bitUnderfloor2Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor2HandValue;
+			bitSummer = wpEEPROM.bitUnderfloor2Summer;
 			byteSetpoint = wpEEPROM.byteUnderfloor2Setpoint;
 			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor2;
 			break;
@@ -48,6 +50,7 @@ void moduleUnderfloor::init() {
 			bitDebug = wpEEPROM.bitDebugUnderfloor3;
 			bitHand = wpEEPROM.bitUnderfloor3Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor3HandValue;
+			bitSummer = wpEEPROM.bitUnderfloor3Summer;
 			byteSetpoint = wpEEPROM.byteUnderfloor3Setpoint;
 			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor3;
 			break;
@@ -56,11 +59,12 @@ void moduleUnderfloor::init() {
 			bitDebug = wpEEPROM.bitDebugUnderfloor4;
 			bitHand = wpEEPROM.bitUnderfloor4Hand;
 			bitHandValue = wpEEPROM.bitUnderfloor4HandValue;
+			bitSummer = wpEEPROM.bitUnderfloor4Summer;
 			byteSetpoint = wpEEPROM.byteUnderfloor4Setpoint;
 			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor4;
 			break;
 		default:
-			wpFZ.DebugWS(wpFZ.strERRROR, "Underfloor::init", "FatalError: unknown Underfloor no: " + String(no));
+			wpFZ.DebugWS(wpFZ.strERRROR, F("Underfloor::init"), F("FatalError: unknown Underfloor no: ") + String(no));
 			break;
 	}
 
@@ -78,6 +82,7 @@ void moduleUnderfloor::init() {
 	mqttTopicReadedTemp = wpFZ.DeviceName + "/" + ModuleName + "/ReadedTemp";
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
 	mqttTopicWartungActive = wpFZ.DeviceName + "/ERROR/" + ModuleName + "WartungActive";
+	mqttTopicSummer = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Summer";
 	// settings
 	mqttTopicSetPoint = wpFZ.DeviceName + "/" + ModuleName + "/SetPoint";
 	mqttTopicTempUrl = wpFZ.DeviceName + "/" + ModuleName + "/TempUrl";
@@ -87,6 +92,7 @@ void moduleUnderfloor::init() {
 	mqttTopicSetSetPoint = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetPoint";
 	mqttTopicSetTempUrl = wpFZ.DeviceName + "/settings/" + ModuleName + "/TempUrl";
 	mqttTopicSetWartung = wpFZ.DeviceName + "/settings/" + ModuleName + "/Wartung";
+	mqttTopicSetSummer = F("WebAutomation/Sommer");
 
 	outputLast = false;
 	publishOutputLast = 0;
@@ -104,6 +110,8 @@ void moduleUnderfloor::init() {
 	publishTempUrlLast = 0;
 	wartungActiveLast = false;
 	publishWartungActiveLast = 0;
+	summerLast = false;
+	publishSummerLast = 0;
 
 
 	// section to copy
@@ -132,6 +140,7 @@ void moduleUnderfloor::publishSettings(bool force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetHandValue.c_str(), String(handValueSet).c_str());
 		//wpMqtt.mqttClient.publish(mqttTopicSetSetPoint.c_str(), String(setPoint).c_str());
 		//wpMqtt.mqttClient.publish(mqttTopicSetTempUrl.c_str(), mqttTopicTemp.c_str());
+		wpMqtt.mqttClient.publish(mqttTopicSetWartung.c_str(), String(wartungActive).c_str());
 	}
 	mb->publishSettings(force);
 }
@@ -149,6 +158,7 @@ void moduleUnderfloor::publishValues(bool force) {
 		publishSetPointLast = 0;
 		publishTempUrlLast = 0;
 		publishWartungActiveLast = 0;
+		publishSummerLast = 0;
 	}
 	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
@@ -187,7 +197,11 @@ void moduleUnderfloor::publishValues(bool force) {
 	}
 	if(setPointLast != setPoint || wpFZ.CheckQoS(publishSetPointLast)) {
 		setPointLast = setPoint;
-		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10.0).c_str());
+		if(summer) {
+			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SUMMERTEMP).c_str());
+		} else {
+			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10.0).c_str());
+		}
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(ModuleName + " setPoint", String(setPoint));
 		}
@@ -209,6 +223,14 @@ void moduleUnderfloor::publishValues(bool force) {
 		}
 		publishWartungActiveLast = wpFZ.loopStartedAt;
 	}
+	if(summerLast != summer || wpFZ.CheckQoS(publishSummerLast)) {
+		summerLast = summer;
+		wpMqtt.mqttClient.publish(mqttTopicSummer.c_str(), String(summer).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(ModuleName + " Summer", String(summer));
+		}
+		publishSummerLast = wpFZ.loopStartedAt;
+	}
 	mb->publishValues(force);
 }
 
@@ -222,6 +244,7 @@ void moduleUnderfloor::setSubscribes() {
 	}
 	wpMqtt.mqttClient.subscribe(mqttTopicSetTempUrl.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetWartung.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetSummer.c_str());
 	mb->setSubscribes();
 }
 
@@ -261,6 +284,13 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetWartung, msg);
 		}
 	}
+	if(strcmp(topic, mqttTopicSetSummer.c_str()) == 0) {
+		bool readSetSummer = msg.toInt();
+		if(summer != readSetSummer) {
+			SetSummer(readSetSummer);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetSummer, String(summer));
+		}
+	}
 	mb->checkSubscribes(topic, msg);
 }
 void moduleUnderfloor::InitSetPoint(uint8 setpoint) {
@@ -297,6 +327,12 @@ String moduleUnderfloor::SetWartung() {
 	wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung activated: 'module" + ModuleName);
 	return wpFZ.jsonOK;
 }
+String moduleUnderfloor::SetSummer(bool summer) {
+	this->summer = summer;
+	wpEEPROM.WriteBoolToEEPROM("module" + ModuleName + "::summer", wpEEPROM.addrBitsSettingsModules3, wpEEPROM.bitsSettingsModules3, bitSummer, this->summer);
+	publishSetPointLast = 0;
+	return wpFZ.jsonOK;
+}
 
 //###################################################################################
 // private
@@ -329,10 +365,14 @@ void moduleUnderfloor::calc() {
 	digitalWrite(Pin, !output);
 }
 void moduleUnderfloor::calcOutput() {
-	if(setPoint < temp) {
+	uint8 aktSetPoint = setPoint;
+	if(summer) {
+		aktSetPoint = SUMMERTEMP * 10;
+	}
+	if(aktSetPoint < temp) {
 		autoValue = false;
 	}
-	if(setPoint > temp) {
+	if(aktSetPoint > temp) {
 		autoValue = true;
 	}
 }
@@ -348,7 +388,7 @@ void moduleUnderfloor::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 264 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
