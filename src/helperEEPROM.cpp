@@ -343,6 +343,7 @@ void helperEEPROM::readVars() {
 #endif
 #if BUILDWITH == 2
 	wpAnalogOut.InitHand(bitRead(bitsSettingsModules0, bitAnalogOutHand));
+	wpAnalogOut.InitSummer(bitRead(bitsSettingsModules1, bitAnalogOutSummer));
 	wpAnalogOut2.InitHand(bitRead(bitsSettingsModules1, bitAnalogOut2Hand));
 	wpWeight.UseAvg(bitRead(bitsSettingsModules1, bitUseWeightAvg));
 #endif

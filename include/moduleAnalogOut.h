@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 258 2025-04-28 13:34:51Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 264 2025-05-01 17:27:44Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -40,12 +40,14 @@ class moduleAnalogOut : public IModuleBase {
 		String mqttTopicSetPoint;
 		String mqttTopicTempUrl;
 		String mqttTopicTemp = "_";
+		String mqttTopicSummer;
 		// commands
 		String mqttTopicSetHand;
 		String mqttTopicSetHandValue;
 		String mqttTopicSetSetPoint;
 		String mqttTopicSetTempUrl;
 		String mqttTopicSetWartung;
+		String mqttTopicSetSummer;
 
 		// section to copy
 		void init();
@@ -84,12 +86,16 @@ class moduleAnalogOut : public IModuleBase {
 
 		void InitPidType(uint8 t);
 		String SetPidType(uint8 t);
-
 		String GetPidType();
 
 		String SetWartung();
 
+		void InitSummer(bool summer) { this->summer = summer; };
+		String SetSummer(bool summer);
+		bool GetSummer() { return summer; }
+
 	private:
+		const uint8 SUMMERTEMP = 12;
 		PID* pid;
 		// section for define
 		uint8 output;
@@ -104,6 +110,7 @@ class moduleAnalogOut : public IModuleBase {
 		double Tv = 0.2;
 		double Tn = 0.0;
 		double SetPoint = 75.0;
+		bool summer = false;
 
 		const double minOutput = 0.0;
 		const double maxOutput = 255.0;
@@ -127,6 +134,8 @@ class moduleAnalogOut : public IModuleBase {
 		unsigned long publishTempUrlLast;
 		bool wartungActiveLast;
 		unsigned long publishWartungActiveLast;
+		bool summerLast;
+		unsigned long publishSummerLast;
 
 		void publishValue();
 		void calc();
@@ -135,7 +144,7 @@ class moduleAnalogOut : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 258 $";
+		String SVNh = "$Rev: 264 $";
 		int temp;
 		uint8 pidType = pidTypeHeating;
 		bool wartungActive;

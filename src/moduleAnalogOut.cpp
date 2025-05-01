@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 264                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 258 2025-04-28 13:34:51Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 264 2025-05-01 17:27:44Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -50,6 +50,7 @@ void moduleAnalogOut::init() {
 	mqttTopicErrorHand = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Hand";
 	if(wpModules.useModuleDHT11 || wpModules.useModuleDHT22 || mqttTopicTemp != "_") {
 		mqttTopicWartungActive = wpFZ.DeviceName + "/ERROR/" + ModuleName + "WartungActive";
+		mqttTopicSummer = wpFZ.DeviceName + "/ERROR/" + ModuleName + "Summer";
 	}
 	// settings
 	mqttTopicTempUrl = wpFZ.DeviceName + "/" + ModuleName + "/TempUrl";
@@ -60,6 +61,7 @@ void moduleAnalogOut::init() {
 		mqttTopicSetPoint = wpFZ.DeviceName + "/" + ModuleName + "/SetPoint";
 		mqttTopicSetSetPoint = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetPoint";
 		mqttTopicSetWartung = wpFZ.DeviceName + "/settings/" + ModuleName + "/Wartung";
+		mqttTopicSetSummer = F("WebAutomation/Sommer");
 	}
 	// commands
 	mqttTopicSetHand = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetHand";
@@ -81,6 +83,8 @@ void moduleAnalogOut::init() {
 	publishTempUrlLast = 0;
 	wartungActiveLast = false;
 	publishWartungActiveLast = 0;
+	summerLast = false;
+	publishSummerLast = 0;
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugAnalogOut);
@@ -129,6 +133,7 @@ void moduleAnalogOut::publishValues(bool force) {
 		publishPIDLast = 0;
 		publishTempUrlLast = 0;
 		publishWartungActiveLast = 0;
+		publishSummerLast = 0;
 	}
 	if(outputLast != output || wpFZ.CheckQoS(publishOutputLast)) {
 		publishValue();
@@ -174,12 +179,24 @@ void moduleAnalogOut::publishValues(bool force) {
 			wpMqtt.mqttClient.publish(mqttTopicKp.c_str(), String(Kp).c_str());
 			wpMqtt.mqttClient.publish(mqttTopicTv.c_str(), String(Tv).c_str());
 			wpMqtt.mqttClient.publish(mqttTopicTn.c_str(), String(Tn).c_str());
-			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SetPoint).c_str());
+			if(summer && pidType == pidTypeHeating) {
+				wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SUMMERTEMP).c_str());
+			} else {
+				wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SetPoint).c_str());
+			}
 			if(wpMqtt.Debug) {
 				mb->printPublishValueDebug("AnalogOut Kp, Tv, Tn, SetPoint",
 					String(Kp) + ", " + String(Tv) + ", " + String(Tn) + ", " + String(SetPoint));
 			}
 			publishPIDLast = wpFZ.loopStartedAt;
+		}
+		if(summerLast != summer || wpFZ.CheckQoS(publishSummerLast)) {
+			summerLast = summer;
+			wpMqtt.mqttClient.publish(mqttTopicSummer.c_str(), String(summer).c_str());
+			if(wpMqtt.Debug) {
+				mb->printPublishValueDebug(ModuleName + " Summer", String(summer));
+			}
+			publishSummerLast = wpFZ.loopStartedAt;
 		}
 	}
 	if(tempUrlLast != mqttTopicTemp || wpFZ.CheckQoS(publishTempUrlLast)) {
@@ -210,6 +227,7 @@ void moduleAnalogOut::setSubscribes() {
 		wpMqtt.mqttClient.subscribe(mqttTopicTn.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicSetSetPoint.c_str());
 		wpMqtt.mqttClient.subscribe(mqttTopicSetWartung.c_str());
+		wpMqtt.mqttClient.subscribe(mqttTopicSetSummer.c_str());
 	}
 	if(mqttTopicTemp != "_") {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "setSubscribes", ModuleName + " subscribe: " + mqttTopicTemp);
@@ -275,6 +293,13 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 			if(msg.toInt() != 0) {
 				SetWartung();
 				wpFZ.DebugcheckSubscribes(mqttTopicSetWartung, msg);
+			}
+		}
+		if(strcmp(topic, mqttTopicSetSummer.c_str()) == 0) {
+			bool readSetSummer = msg.toInt();
+			if(summer != readSetSummer) {
+				SetSummer(readSetSummer);
+				wpFZ.DebugcheckSubscribes(mqttTopicSetSummer, String(summer));
 			}
 		}
 	}
@@ -372,6 +397,12 @@ String moduleAnalogOut::SetWartung() {
 	wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung activated: 'module" + ModuleName);
 	return wpFZ.jsonOK;
 }
+String moduleAnalogOut::SetSummer(bool summer) {
+	this->summer = summer;
+	wpEEPROM.WriteBoolToEEPROM("module" + ModuleName + "::summer", wpEEPROM.addrBitsSettingsModules3, wpEEPROM.bitsSettingsModules3, wpEEPROM.bitAnalogOutSummer, this->summer);
+	publishPIDLast = 0;
+	return wpFZ.jsonOK;
+}
 
 //###################################################################################
 // private
@@ -417,14 +448,17 @@ void moduleAnalogOut::calc() {
 }
 
 void moduleAnalogOut::calcOutput() {
-	// @ the moment is configured as Ventilator with Humidity
-	if(temp == 0) temp = (short) (SetPoint * 10);
+	double aktSetPoint = SetPoint;
+	if(summer && pidType == pidTypeHeating) {
+		aktSetPoint = (double)SUMMERTEMP;
+	}
+	if(temp == 0) temp = (short) (aktSetPoint * 10);
 	if(mqttTopicTemp == "_") {
 		if(pidType == pidTypeHeating) temp = wpDHT.temperature / 10.0;
 		if(pidType == pidTypeAirCondition) temp = wpDHT.humidity / 10.0;
 	}
 	PIDinput = (double) (temp / 10.0);
-	PIDsetPoint = (double) SetPoint;
+	PIDsetPoint = (double) aktSetPoint;
 	pid->Compute();
 	autoValue = PIDoutput;
 	if(mb->debug) {
@@ -449,7 +483,7 @@ void moduleAnalogOut::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16 moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 264 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
