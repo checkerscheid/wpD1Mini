@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 265                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 259 2025-04-28 17:06:12Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 265 2025-05-25 13:08:17Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -196,12 +196,29 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleCwWw::SetEffectSpeed(uint8 speed) {
-	if(speed < 1) speed = 1;
-	if(speed > 9) speed = 9;
-	effectSpeed = speed;
+
+
+String moduleCwWw::SetWW(uint8 ww) {
+	manual = true;
+	SetSleep(0);
+	targetWW = ww;
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return wpFZ.JsonKeyValue("WW", String(targetWW));
 }
-void moduleCwWw::SetSleep(uint seconds) {
+
+String moduleCwWw::SetCW(uint8 cw) {
+	manual = true;
+	SetSleep(0);
+	targetCW = cw;
+	wpEEPROM.WriteByteToEEPROM("CwWw::SetCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
+	calcDuration();
+	modeCurrent = ModeBlender;
+	return wpFZ.JsonKeyValue("CW", String(targetCW));
+}
+
+String moduleCwWw::SetSleep(uint seconds) {
 	if(seconds == 0) {
 		sleep = 0;
 		sleepAt = 0;
@@ -211,7 +228,21 @@ void moduleCwWw::SetSleep(uint seconds) {
 	}
 	if(mb->debug)
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw::SetSleep", "Off in " + String(sleep) + " sec");
+	return wpFZ.JsonKeyValue("sleep", String(sleep));
 }
+
+String moduleCwWw::SetEffect(uint8 effect) {
+	manual = true;
+	modeCurrent = effect;
+	return wpFZ.JsonKeyString("effect", GetModeName(modeCurrent));
+}
+String moduleCwWw::SetEffectSpeed(uint8 speed) {
+	if(speed < 1) speed = 1;
+	if(speed > 9) speed = 9;
+	effectSpeed = speed;
+	return wpFZ.JsonKeyValue("effectSpeed", String(effectSpeed));
+}
+
 String moduleCwWw::SetOn() {
 	manual = true;
 	SetSleep(0);
@@ -219,10 +250,11 @@ String moduleCwWw::SetOn() {
 	targetCW = EEPROM.read(wpEEPROM.byteAnalogOut2HandValue);
 	calcDuration();
 	modeCurrent = ModeBlender;
-	return "{"
+	return F("\"turn\":\"on\",\"turnvalues\":{")
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
+
 String moduleCwWw::SetOff() {
 	manual = false;
 	targetWW = 0;
@@ -232,10 +264,11 @@ String moduleCwWw::SetOff() {
 	EEPROM.commit();
 	calcDuration();
 	modeCurrent = ModeBlender;
-	return "{"
+	return F("\"turn\":\"off\",\"turnvalues\":{")
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
+
 String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
 	manual = true;
 	SetSleep(0);
@@ -250,30 +283,7 @@ String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
-String moduleCwWw::SetWW(uint8 ww) {
-	manual = true;
-	SetSleep(0);
-	targetWW = ww;
-	//targetCW = wpAnalogOut2.handValue;
-	wpEEPROM.WriteByteToEEPROM("CwWw::SetWW", wpEEPROM.byteAnalogOutHandValue, targetWW);
-	calcDuration();
-	modeCurrent = ModeBlender;
-	return "{"
-		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
-		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
-}
-String moduleCwWw::SetCW(uint8 cw) {
-	manual = true;
-	SetSleep(0);
-	//targetWW = wpAnalogOut.handValue;
-	targetCW = cw;
-	wpEEPROM.WriteByteToEEPROM("CwWw::SetCW", wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	calcDuration();
-	modeCurrent = ModeBlender;
-	return "{"
-		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
-		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
-}
+
 String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 	if(!manual) {
 		targetWW = ww;
@@ -289,6 +299,7 @@ String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 		return "{\"erg\":\"S_OK\",\"mode\":\"isManuell\"}";
 	}
 }
+
 void moduleCwWw::calcDuration() {
 	uint8 distWW = abs(AnalogOutWW - targetWW);
 	uint8 distCW = abs(AnalogOutCW - targetCW);
@@ -297,11 +308,6 @@ void moduleCwWw::calcDuration() {
 	steps = s == 0 ? 1 : s;
 	//if(mb->debug)
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
-}
-String moduleCwWw::SetEffect(uint8 effect) {
-	manual = true;
-	modeCurrent = effect;
-	return "{\"erg\":\"S_OK\",\"effect\":\"" + GetModeName(modeCurrent) + "\"}";
 }
 
 String moduleCwWw::GetModeName(uint8 actualMode) {
@@ -541,7 +547,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 259 $";
+	String SVN = "$Rev: 265 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
