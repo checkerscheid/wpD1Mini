@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 265                                                     $ #
+//# Revision     : $Rev:: 266                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 265 2025-05-25 13:08:17Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 266 2025-05-25 18:08:35Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 265 $";
+	String SVN = "$Rev: 266 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -819,16 +819,16 @@ void helperWebServer::setupWebServer() {
 					if(request->hasParam(F("pixel"))) {
 						pixel = request->getParam(F("pixel"))->value().toInt();
 					}
-					if(request->hasParam(F("r"))) {
-						r = request->getParam(F("r"))->value().toInt();
+					if(request->hasParam(F("cr"))) {
+						r = request->getParam(F("cr"))->value().toInt();
 					}
-					if(request->hasParam(F("g"))) {
-						g = request->getParam(F("g"))->value().toInt();
+					if(request->hasParam(F("cg"))) {
+						g = request->getParam(F("cg"))->value().toInt();
 					}
-					if(request->hasParam(F("b"))) {
-						b = request->getParam(F("b"))->value().toInt();
+					if(request->hasParam(F("cb"))) {
+						b = request->getParam(F("cb"))->value().toInt();
 					}
-					erg += wpNeoPixel.ComplexEffect(pixel, r, g, b);
+					erg += F(",") + wpNeoPixel.ComplexEffect(pixel, r, g, b);
 				} else {
 					wpNeoPixel.demoMode = false;
 					erg += F(",") + wpNeoPixel.SetMode(effect);
