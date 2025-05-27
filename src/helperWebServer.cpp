@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 266                                                     $ #
+//# Revision     : $Rev:: 267                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 266 2025-05-25 18:08:35Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 267 2025-05-27 14:14:36Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16 helperWebServer::getVersion() {
-	String SVN = "$Rev: 266 $";
+	String SVN = "$Rev: 267 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -733,20 +733,42 @@ void helperWebServer::setupWebServer() {
 				}
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setCwWw, turn: '") + request->getParam(F("turn"))->value() + F("'"));
 			}
-			if(request->hasParam(F("ww"))) {
-				byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
-				erg += F(",") + wpCwWw.SetWW(ww);
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, WW: '") + String(ww) + F("'"));
-			}
-			if(request->hasParam(F("cw"))) {
-				byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
-				erg += F(",") + wpCwWw.SetCW(cw);
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, CW: '") + String(cw) + F("'"));
-			}
-			if(request->hasParam(F("sleep"))) {
-				uint seconds = request->getParam(F("sleep"))->value().toInt();
-				erg += F(",") + wpCwWw.SetSleep(seconds);
-				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, Sleep: '") + String(seconds) + F("'"));
+			if(request->hasParam(F("auto"))) {
+				byte ww;
+				if(request->hasParam(F("ww"))) {
+					ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
+				} else {
+					ww = (uint8)(45 * 2.55);
+				}
+				byte cw;
+				if(request->hasParam(F("cw"))) {
+					cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
+				} else {
+					cw = (uint8)(5 * 2.55);
+				}
+				uint seconds;
+				if(request->hasParam(F("sleep"))) {
+					seconds = request->getParam(F("sleep"))->value().toInt();
+				} else {
+					seconds = 90;
+				}
+				erg += F(",") + wpCwWw.SetWwCwAuto(ww, cw, seconds);
+			} else {
+				if(request->hasParam(F("ww"))) {
+					byte ww = (uint8)(request->getParam(F("ww"))->value().toInt() * 2.55);
+					erg += F(",") + wpCwWw.SetWW(ww);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, WW: '") + String(ww) + F("'"));
+				}
+				if(request->hasParam(F("cw"))) {
+					byte cw = (uint8)(request->getParam(F("cw"))->value().toInt() * 2.55);
+					erg += F(",") + wpCwWw.SetCW(cw);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, CW: '") + String(cw) + F("'"));
+				}
+				if(request->hasParam(F("sleep"))) {
+					uint seconds = request->getParam(F("sleep"))->value().toInt();
+					erg += F(",") + wpCwWw.SetSleep(seconds);
+					wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, Sleep: '") + String(seconds) + F("'"));
+				}
 			}
 			if(request->hasParam(F("effect"))) {
 				uint effect = request->getParam(F("effect"))->value().toInt();

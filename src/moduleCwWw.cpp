@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 265                                                     $ #
+//# Revision     : $Rev:: 267                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 265 2025-05-25 13:08:17Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 267 2025-05-27 14:14:36Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -33,6 +33,7 @@ moduleCwWw::moduleCwWw() {
 	loopTime = 25;
 	steps = 1;
 }
+
 void moduleCwWw::init() {
 	sleep = 0;
 	effectSpeed = 1;
@@ -64,27 +65,17 @@ void moduleCwWw::init() {
 	mb->initDebug(wpEEPROM.addrBitsDebugModules1, wpEEPROM.bitsDebugModules1, wpEEPROM.bitDebugCwWw);
 }
 
-// loop() function -- runs repeatedly as long as board is on ---------------
 void moduleCwWw::cycle() {
 	if(wpFZ.calcValues) {
 		calc();
 	}
 	publishValues();
-
-	// wpModules.useModuleAnalogOut = true;
-	// wpModules.useModuleAnalogOut2 = true;
-
-	// RGB LED has CW + WW
-	// use AnalogOut for WW or White
-	// use AnalogOut2 for CW with WW
-	// must have output limitations?
-	//wpAnalogOut.hardwareoutMax = 50;
-	//wpAnalogOut2.hardwareoutMax = 50;
 }
 
 void moduleCwWw::publishSettings() {
 	publishSettings(false);
 }
+
 void moduleCwWw::publishSettings(bool force) {
 	if(force) {
 		wpMqtt.mqttClient.publish(mqttTopicSetMode.c_str(), String(modeCurrent).c_str());
@@ -96,6 +87,7 @@ void moduleCwWw::publishSettings(bool force) {
 void moduleCwWw::publishValues() {
 	publishValues(false);
 }
+
 void moduleCwWw::publishValues(bool force) {
 	if(force) {
 		publishAnalogOutWWLast = 0;
@@ -197,7 +189,6 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
 }
 
-
 String moduleCwWw::SetWW(uint8 ww) {
 	manual = true;
 	SetSleep(0);
@@ -236,6 +227,7 @@ String moduleCwWw::SetEffect(uint8 effect) {
 	modeCurrent = effect;
 	return wpFZ.JsonKeyString("effect", GetModeName(modeCurrent));
 }
+
 String moduleCwWw::SetEffectSpeed(uint8 speed) {
 	if(speed < 1) speed = 1;
 	if(speed > 9) speed = 9;
@@ -269,21 +261,6 @@ String moduleCwWw::SetOff() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 
-String moduleCwWw::SetWwCw(uint8 ww, uint8 cw) {
-	manual = true;
-	SetSleep(0);
-	targetWW = ww;
-	targetCW = cw;
-	EEPROM.write(wpEEPROM.byteAnalogOutHandValue, targetWW);
-	EEPROM.write(wpEEPROM.byteAnalogOut2HandValue, targetCW);
-	EEPROM.commit();
-	calcDuration();
-	modeCurrent = ModeBlender;
-	return "{"
-		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
-		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
-}
-
 String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 	if(!manual) {
 		targetWW = ww;
@@ -291,12 +268,11 @@ String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 		calcDuration();
 		modeCurrent = ModeBlender;
 		SetSleep(sleep);
-		return "{"
-			+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
+		return wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 			+ wpFZ.JsonKeyValue("CW", String(targetCW)) + ","
-			+ wpFZ.JsonKeyValue("sleep", String(sleep)) + "}";
+			+ wpFZ.JsonKeyValue("sleep", String(sleep));
 	} else {
-		return "{\"erg\":\"S_OK\",\"mode\":\"isManuell\"}";
+		return wpFZ.JsonKeyString("mode", "isManuell");
 	}
 }
 
@@ -418,6 +394,7 @@ bool moduleCwWw::BlenderWWEffect() {
 	}
 	return AnalogOutWW == targetWW;
 }
+
 bool moduleCwWw::BlenderCWEffect() {
 	if(AnalogOutCW != targetCW) {
 		if(AnalogOutCW <= targetCW) {
@@ -442,6 +419,7 @@ bool moduleCwWw::BlenderCWEffect() {
 	}
 	return AnalogOutCW == targetCW;
 }
+
 void moduleCwWw::BlenderEffect() {
 	bool bwwe = BlenderWWEffect();
 	bool bcwe = BlenderCWEffect();
@@ -449,6 +427,7 @@ void moduleCwWw::BlenderEffect() {
 		modeCurrent = ModeStatic;
 	}
 }
+
 void moduleCwWw::PulseEffect() {
 	if(AnalogOutWW >= 255 ||
 		AnalogOutCW <= 0) {
@@ -484,6 +463,7 @@ void moduleCwWw::WwPulseEffect() {
 		AnalogOutWW = AnalogOutWW + effectSpeed;
 	}
 }
+
 void moduleCwWw::CwPulseEffect() {
 	if(AnalogOutCW >= 100) {
 		smoothDirection = true;
@@ -497,6 +477,7 @@ void moduleCwWw::CwPulseEffect() {
 		AnalogOutCW = AnalogOutCW + effectSpeed;
 	}
 }
+
 void moduleCwWw::SmoothEffect() {
 	winkelWW += effectSpeed / 100.0;
 	winkelCW += effectSpeed / 100.0;
@@ -515,6 +496,7 @@ void moduleCwWw::SmoothEffect() {
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	AnalogOutCW = sinCWByte;
 }
+
 void moduleCwWw::WwSmoothEffect() {
 	winkelWW += effectSpeed / 100.0;
 	if(winkelWW >= 2 * pi) {
@@ -526,6 +508,7 @@ void moduleCwWw::WwSmoothEffect() {
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
 	AnalogOutWW = sinWWByte;
 }
+
 void moduleCwWw::CwSmoothEffect() {
 	winkelCW += effectSpeed / 100.0;
 	if(winkelCW >= 2 * pi) {
@@ -537,6 +520,7 @@ void moduleCwWw::CwSmoothEffect() {
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	AnalogOutCW = sinCWByte;
 }
+
 uint8 moduleCwWw::GetMaxPercent() {
 	uint8 returns = 0;
 	returns = AnalogOutWW > returns ? AnalogOutWW : returns;
@@ -547,7 +531,7 @@ uint8 moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleCwWw::getVersion() {
-	String SVN = "$Rev: 265 $";
+	String SVN = "$Rev: 267 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -561,9 +545,11 @@ String moduleCwWw::GetJsonSettings() {
 void moduleCwWw::changeDebug() {
 	mb->changeDebug();
 }
+
 bool moduleCwWw::Debug() {
 	return mb->debug;
 }
+
 bool moduleCwWw::Debug(bool debug) {
 	mb->debug = debug;
 	return true;

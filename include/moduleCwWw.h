@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 265                                                     $ #
+//# Revision     : $Rev:: 267                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 265 2025-05-25 13:08:17Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 267 2025-05-27 14:14:36Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -74,7 +74,6 @@ class moduleCwWw : public IModuleBase {
 		String SetEffectSpeed(uint8 speed);
 		String SetOn();
 		String SetOff();
-		String SetWwCw(uint8 ww, uint8 cw);
 		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
 		String GetModeName(uint8 actualMode);
 	private:
@@ -128,7 +127,7 @@ class moduleCwWw : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 265 $";
+		String SVNh = "$Rev: 267 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;
