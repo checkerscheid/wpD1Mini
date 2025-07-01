@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 263                                                     $ #
+//# Revision     : $Rev:: 265                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.h 263 2025-04-30 13:46:12Z                $ #
+//# File-ID      : $Id:: moduleNeoPixel.h 265 2025-05-25 13:08:17Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleNeoPixel_h
@@ -93,28 +93,27 @@ class moduleNeoPixel : public IModuleBase {
 		bool Debug(bool debug);
 		void InitValueR(uint8 r);
 		uint8 GetValueR();
-		void SetValueR(uint8 r);
+		String SetValueR(uint8 r);
 		void InitValueG(uint8 g);
 		uint8 GetValueG();
-		void SetValueG(uint8 g);
+		String SetValueG(uint8 g);
 		void InitValueB(uint8 b);
 		uint8 GetValueB();
-		void SetValueB(uint8 b);
+		String SetValueB(uint8 b);
 		//void InitBrightness(uint8 bn);
 		//uint8 GetBrightness();
 		//void SetBrightness(uint8 bn);
-		void SetEffectSpeed(uint8 es);
-		void ComplexEffect(uint pixel, byte r, byte g, byte b);
-		void ComplexEffect(uint pixel, uint32_t color);
+		String SetEffectSpeed(uint8 es);
+		String ComplexEffect(uint pixel, byte r, byte g, byte b);
+		String ComplexEffect(uint pixel, uint32_t color);
 		String GetModeName(uint actualMode);
-		void SetMode(uint8 newMode);
-		void SetSleep(uint seconds);
+		String SetMode(uint8 newMode);
+		String SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
-		void SetOffBlender(uint8 steps);
-		void SetOffRunner(uint8 steps);
+		String SetOffRunner(uint8 steps);
 		void InitPixelCount(uint16 pc);
 		void InitRGB(bool rgb);
 		bool GetRGB();
@@ -123,10 +122,10 @@ class moduleNeoPixel : public IModuleBase {
 		void SetPixelCount(uint16 pc);
 		//String getStripStatus();
 		void setBorder(uint32_t c);
-		void ChangeUseWW();
+		String ChangeUseWW();
 		bool GetUseWW() { return useWW; }
 		void SetUseWW(bool ww) { useWW = ww; }
-		void ChangeUseCW();
+		String ChangeUseCW();
 		bool GetUseCW() { return useCW; }
 		void SetUseCW(bool cw) { useCW = cw; }
 		unsigned long lastBorderSend;
@@ -215,7 +214,7 @@ class moduleNeoPixel : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 263 $";
+		String SVNh = "$Rev: 265 $";
 };
 extern moduleNeoPixel wpNeoPixel;
 
