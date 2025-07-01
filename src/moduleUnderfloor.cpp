@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 264                                                     $ #
+//# Revision     : $Rev:: 268                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 264 2025-05-01 17:27:44Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 268 2025-06-29 16:21:44Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -285,7 +285,7 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetSummer.c_str()) == 0) {
-		bool readSetSummer = msg.toInt();
+		bool readSetSummer = !(msg == "False");
 		if(summer != readSetSummer) {
 			SetSummer(readSetSummer);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetSummer, String(summer));
@@ -388,7 +388,7 @@ void moduleUnderfloor::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 264 $";
+	String SVN = "$Rev: 268 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
