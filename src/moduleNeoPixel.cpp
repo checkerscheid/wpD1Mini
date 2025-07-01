@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 265                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 265 2025-05-25 13:08:17Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 269 2025-07-01 19:25:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -1114,7 +1114,7 @@ uint8_t moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16_t moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 265 $";
+	String SVN = "$Rev: 269 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

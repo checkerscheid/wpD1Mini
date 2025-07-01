@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.h 258 2025-04-28 13:34:51Z          $ #
+//# File-ID      : $Id:: moduleImpulseCounter.h 269 2025-07-01 19:25:14Z          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleImpulseCounter_h
@@ -69,7 +69,7 @@ class moduleImpulseCounter : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 258 $";
+		String SVNh = "$Rev: 269 $";
 
 };
 extern moduleImpulseCounter wpImpulseCounter;

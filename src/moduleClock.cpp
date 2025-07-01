@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 263                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 263 2025-04-30 13:46:12Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 269 2025-07-01 19:25:14Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -357,7 +357,7 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 // section to copy
 //###################################################################################
 uint16_t moduleClock::getVersion() {
-	String SVN = "$Rev: 263 $";
+	String SVN = "$Rev: 269 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

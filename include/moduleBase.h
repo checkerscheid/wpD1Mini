@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 09.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleBase.h 246 2025-02-18 16:27:11Z                    $ #
+//# File-ID      : $Id:: moduleBase.h 269 2025-07-01 19:25:14Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleBase_h

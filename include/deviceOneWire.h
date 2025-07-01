@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: deviceOneWire.h 228 2024-12-03 08:19:36Z                 $ #
+//# File-ID      : $Id:: deviceOneWire.h 269 2025-07-01 19:25:14Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef deviceOneWire_h
@@ -65,7 +65,7 @@ class deviceOneWire {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 228 $";
+		String SVNh = "$Rev: 269 $";
 };
 
 #endif

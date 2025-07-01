@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 267                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 267 2025-05-27 14:14:36Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 269 2025-07-01 19:25:14Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -127,7 +127,7 @@ class moduleCwWw : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 267 $";
+		String SVNh = "$Rev: 269 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 268                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 268 2025-06-29 16:21:44Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 269 2025-07-01 19:25:14Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -388,7 +388,7 @@ void moduleUnderfloor::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16_t moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 268 $";
+	String SVN = "$Rev: 269 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

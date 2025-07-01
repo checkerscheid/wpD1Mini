@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 253                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.h 253 2025-03-17 19:29:41Z                  $ #
+//# File-ID      : $Id:: moduleWeight.h 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWeight_h
@@ -83,7 +83,7 @@ class moduleWeight : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 253 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleWeight wpWeight;
 
