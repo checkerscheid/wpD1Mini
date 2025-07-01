@@ -170,8 +170,8 @@ class helperEEPROM {
 //###################################################################################
 /// byte values: byte 20 - 49
 		const uint16_t byteCalcCycleDHT = 20;
-		const uint16_t byteTemperatureCorrection = 21; // int8 * 10
-		const uint16_t byteHumidityCorrection = 22; // int8 * 10
+		const uint16_t byteTemperatureCorrection = 21; // int8_t * 10
+		const uint16_t byteHumidityCorrection = 22; // int8_t * 10
 		const uint16_t byteCalcCycleLDR = 23;
 		const uint16_t byteLDRCorrection = 24; // int8
 		const uint16_t byteCalcCycleLight = 25;
@@ -286,7 +286,7 @@ class helperEEPROM {
 		void writeStringsToEEPROM();
 		void WriteBoolToEEPROM(String name, const uint16_t &addr, byte &by, const uint8_t &bi, bool &v, bool commit = true);
 		void WriteByteToEEPROM(String name, const uint16_t &addr, uint8_t &v, bool commit = true);
-		void WriteByteToEEPROM(String name, const uint16_t &addr, int8 &v, bool commit = true);
+		void WriteByteToEEPROM(String name, const uint16_t &addr, int8_t &v, bool commit = true);
 		void WriteWordToEEPROM(String name, const uint16_t &addr, uint16_t &v, bool commit = true);
 		void WriteWordToEEPROM(String name, const uint16_t &addr, short &v, bool commit = true);
 		void WriteWordToEEPROM(String name, const uint16_t &addr, uint32_t &v, bool commit = true);

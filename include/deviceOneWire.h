@@ -26,7 +26,7 @@ class deviceOneWire {
 
 		// section for define
 		int temperature;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicTemperature;
@@ -56,7 +56,7 @@ class deviceOneWire {
 		uint8_t address[8];
 		int temperatureLast;
 		unsigned long publishTemperatureLast;
-		int8 correctionLast;
+		int8_t correctionLast;
 		unsigned long publishCorrectionLast;
 
 		void calc();

@@ -27,7 +27,7 @@ class moduleRain : public IModuleBase {
 
 		// section for define
 		uint16_t rain;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicRain;

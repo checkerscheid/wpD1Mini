@@ -33,7 +33,7 @@ class moduleDistance : public IModuleBase {
 
 		uint8_t height = 120;
 		uint16_t maxVolume = 6000;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicVolume;

@@ -98,7 +98,7 @@ void moduleCwWw::publishValues(bool force) {
 	}
 	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
 		AnalogOutWWLast = AnalogOutWW;
-		int32 percent = (uint8) AnalogOutWW / 2.55;
+		int32_t percent = (uint8) AnalogOutWW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicWW, String(percent));
@@ -107,7 +107,7 @@ void moduleCwWw::publishValues(bool force) {
 	}
 	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
 		AnalogOutCWLast = AnalogOutCW;
-		int32 percent = (uint8) AnalogOutCW / 2.55;
+		int32_t percent = (uint8) AnalogOutCW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicCW, String(percent));

@@ -95,7 +95,7 @@ void moduleDHT::setSubscribes() {
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
-		int8 readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
+		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
 			wpEEPROM.WriteByteToEEPROM("TemperatureCorrection", wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
@@ -103,7 +103,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicHumidityCorrection.c_str()) == 0) {
-		int8 readHumidityCorrection = int8_t(msg.toFloat() * 10);
+		int8_t readHumidityCorrection = int8_t(msg.toFloat() * 10);
 		if(humidityCorrection != readHumidityCorrection) {
 			humidityCorrection = readHumidityCorrection;
 			wpEEPROM.WriteByteToEEPROM("HumidityCorrection", wpEEPROM.byteHumidityCorrection, humidityCorrection);

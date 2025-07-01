@@ -30,8 +30,8 @@ class moduleDHT : public IModuleBase {
 		// section for define
 		int temperature;
 		int humidity;
-		int8 temperatureCorrection = 0;
-		int8 humidityCorrection = 0;
+		int8_t temperatureCorrection = 0;
+		int8_t humidityCorrection = 0;
 
 		String mqttTopicTemperature;
 		String mqttTopicHumidity;

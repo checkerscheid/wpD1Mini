@@ -473,7 +473,7 @@ void moduleAnalogOut::resetPID() {
 	pid->SetOutputLimits(minOutput, maxOutput);
 }
 void moduleAnalogOut::deactivateWartung() {
-	int8 minuten = 5;
+	int8_t minuten = 5;
 	if(wpFZ.loopStartedAt > wartungStartedAt + (minuten * 60 * 1000)) {
 		wartungActive = false;
 		wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung deactivated: 'module" + ModuleName);

@@ -82,7 +82,7 @@ void deviceOneWire::setSubscribes() {
 
 void deviceOneWire::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("DS18B20 Correction", wpEEPROM.byteDS18B20Correction[number], correction, false);
@@ -139,7 +139,7 @@ void deviceOneWire::calc() {
 // section to copy
 //###################################################################################
 uint16_t deviceOneWire::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 258 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

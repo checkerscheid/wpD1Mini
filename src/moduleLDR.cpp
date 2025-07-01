@@ -82,7 +82,7 @@ void moduleLDR::setSubscribes() {
 
 void moduleLDR::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("LDRCorrection", wpEEPROM.byteLDRCorrection, correction);

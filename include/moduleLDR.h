@@ -27,7 +27,7 @@ class moduleLDR : public IModuleBase {
 
 		// section for define
 		int ldr;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicLdr;

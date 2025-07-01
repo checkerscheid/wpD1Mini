@@ -110,7 +110,7 @@ void helperEEPROM::WriteByteToEEPROM(String name, const uint16_t &addr, uint8_t 
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteByteToEEPROM(String name, const uint16_t &addr, int8 &v, bool commit) {
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16_t &addr, int8_t &v, bool commit) {
 	EEPROM.write(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);

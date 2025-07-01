@@ -96,7 +96,7 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSilver.c_str()) == 0) {
-		int8 readSilver = msg.toInt();
+		int8_t readSilver = msg.toInt();
 		if(counterSilver != readSilver) {
 			counterSilver = readSilver;
 			wpEEPROM.WriteWordToEEPROM("Silver", wpEEPROM.byteImpulseCounterSilver, counterSilver);
@@ -104,7 +104,7 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicRed.c_str()) == 0) {
-		int8 readRed = msg.toInt();
+		int8_t readRed = msg.toInt();
 		if(counterRed != readRed) {
 			counterRed = readRed;
 			wpEEPROM.WriteWordToEEPROM("Red", wpEEPROM.byteImpulseCounterRed, counterRed);

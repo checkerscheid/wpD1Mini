@@ -377,7 +377,7 @@ void moduleUnderfloor::calcOutput() {
 	}
 }
 void moduleUnderfloor::deactivateWartung() {
-	int8 minuten = 5;
+	int8_t minuten = 5;
 	if(wpFZ.loopStartedAt > wartungStartedAt + (minuten * 60 * 1000)) {
 		wartungActive = false;
 		wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung deactivated: 'module" + ModuleName);
