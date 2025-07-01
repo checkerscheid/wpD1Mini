@@ -47,10 +47,10 @@ void helperWiFi::cycle() {
 	publishValues();
 }
 
-uint16 helperWiFi::getVersion() {
+uint16_t helperWiFi::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -78,7 +78,7 @@ void helperWiFi::setupWiFi() {
 	Serial.print(wpFZ.getOnlineTime());
 	Serial.print(wpFZ.strINFO);
 	Serial.print(wpFZ.funcToString("setupWiFi"));
-	uint16 trys = 0;
+	uint16_t trys = 0;
 	while(WiFi.status() != WL_CONNECTED) {
 		if(trys++ > 1000) {
 			wpFZ.SetRestartReason(wpFZ.restartReasonWiFi);

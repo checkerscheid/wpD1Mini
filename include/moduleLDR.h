@@ -23,11 +23,11 @@ class moduleLDR : public IModuleBase {
 	public:
 		moduleLDR();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		int ldr;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicLdr;
@@ -37,7 +37,7 @@ class moduleLDR : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -52,18 +52,18 @@ class moduleLDR : public IModuleBase {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int ldrLast;
 		unsigned long publishLdrLast;
-		const uint16 publishLdrMin = 2000;
-		static const uint8 avgLength = 128;
+		const uint16_t publishLdrMin = 2000;
+		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint16 calcAvg(uint16 raw);
+		uint16_t calcAvg(uint16_t raw);
 
 	
 		// section to config and copy

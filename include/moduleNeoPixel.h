@@ -25,21 +25,21 @@ class moduleNeoPixel : public IModuleBase {
 		moduleNeoPixel();
 		moduleBase* mb;
 		Adafruit_NeoPixel* strip;
-		uint8 Pin;
+		uint8_t Pin;
 
-		static const uint8 ModeStatic = 0;
-		static const uint8 ModeColorWipe = 1;
-		static const uint8 ModeTheaterChase = 2;
-		static const uint8 ModeRainbow = 3;
-		static const uint8 ModeWheelRainbow = 4;
-		static const uint8 ModeTheaterChaseRainbow = 5;
-		static const uint8 ModeRunner = 6;
-		static const uint8 ModeDisco = 7;
-		static const uint8 ModeRainbowTv = 8;
+		static const uint8_t ModeStatic = 0;
+		static const uint8_t ModeColorWipe = 1;
+		static const uint8_t ModeTheaterChase = 2;
+		static const uint8_t ModeRainbow = 3;
+		static const uint8_t ModeWheelRainbow = 4;
+		static const uint8_t ModeTheaterChaseRainbow = 5;
+		static const uint8_t ModeRunner = 6;
+		static const uint8_t ModeDisco = 7;
+		static const uint8_t ModeRainbowTv = 8;
 
-		static const uint8 ModeBlender = 90; //CW, WW
-		static const uint8 ModeOffRunner = 97;
-		static const uint8 ModeComplex = 99;
+		static const uint8_t ModeBlender = 90; //CW, WW
+		static const uint8_t ModeOffRunner = 97;
+		static const uint8_t ModeComplex = 99;
 
 		bool demoMode;
 		bool useBorder;
@@ -78,7 +78,7 @@ class moduleNeoPixel : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -91,35 +91,35 @@ class moduleNeoPixel : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		void InitValueR(uint8 r);
-		uint8 GetValueR();
-		String SetValueR(uint8 r);
-		void InitValueG(uint8 g);
-		uint8 GetValueG();
-		String SetValueG(uint8 g);
-		void InitValueB(uint8 b);
-		uint8 GetValueB();
-		String SetValueB(uint8 b);
-		//void InitBrightness(uint8 bn);
-		//uint8 GetBrightness();
-		//void SetBrightness(uint8 bn);
-		String SetEffectSpeed(uint8 es);
+		void InitValueR(uint8_t r);
+		uint8_t GetValueR();
+		String SetValueR(uint8_t r);
+		void InitValueG(uint8_t g);
+		uint8_t GetValueG();
+		String SetValueG(uint8_t g);
+		void InitValueB(uint8_t b);
+		uint8_t GetValueB();
+		String SetValueB(uint8_t b);
+		//void InitBrightness(uint8_t bn);
+		//uint8_t GetBrightness();
+		//void SetBrightness(uint8_t bn);
+		String SetEffectSpeed(uint8_t es);
 		String ComplexEffect(uint pixel, byte r, byte g, byte b);
 		String ComplexEffect(uint pixel, uint32_t color);
 		String GetModeName(uint actualMode);
-		String SetMode(uint8 newMode);
+		String SetMode(uint8_t newMode);
 		String SetSleep(uint seconds);
 		String SetOn();
 		String SetOff();
 		String SetWW(uint ww);
 		String SetCW(uint cw);
-		String SetOffRunner(uint8 steps);
-		void InitPixelCount(uint16 pc);
+		String SetOffRunner(uint8_t steps);
+		void InitPixelCount(uint16_t pc);
 		void InitRGB(bool rgb);
 		bool GetRGB();
 		void SetRGB(bool rgb);
-		uint16 GetPixelCount();
-		void SetPixelCount(uint16 pc);
+		uint16_t GetPixelCount();
+		void SetPixelCount(uint16_t pc);
 		//String getStripStatus();
 		void setBorder(uint32_t c);
 		String ChangeUseWW();
@@ -130,29 +130,29 @@ class moduleNeoPixel : public IModuleBase {
 		void SetUseCW(bool cw) { useCW = cw; }
 		unsigned long lastBorderSend;
 	private:
-		uint8 PinWW;
-		uint8 PinCW;
+		uint8_t PinWW;
+		uint8_t PinCW;
 		bool useWW = false;
 		bool useCW = false;
-		uint8 AnalogOutWW = 0;
-		uint8 AnalogOutWWLast = 0;
+		uint8_t AnalogOutWW = 0;
+		uint8_t AnalogOutWWLast = 0;
 		unsigned long publishAnalogOutWWLast;
-		uint8 AnalogOutCW = 0;
-		uint8 AnalogOutCWLast = 0;
+		uint8_t AnalogOutCW = 0;
+		uint8_t AnalogOutCWLast = 0;
 		unsigned long publishAnalogOutCWLast;
-		uint16 pixelCount = 50;
-		uint16 pixelStartForTv = 25;
+		uint16_t pixelCount = 50;
+		uint16_t pixelStartForTv = 25;
 		uint maxPercent;
 		uint maxPercentLast;
 		unsigned long publishMaxPercentLast;
-		uint8 valueR = 255;
-		uint8 valueRLast;
-		uint8 valueG = 75;
-		uint8 valueGLast;
-		uint8 valueB = 0;
-		uint8 valueBLast;
-		//uint8 brightness = 0;
-		//uint8 brightnessLast;
+		uint8_t valueR = 255;
+		uint8_t valueRLast;
+		uint8_t valueG = 75;
+		uint8_t valueGLast;
+		uint8_t valueB = 0;
+		uint8_t valueBLast;
+		//uint8_t brightness = 0;
+		//uint8_t brightnessLast;
 		//String status;
 		//String statusLast;
 		//unsigned long publishStatusLast;
@@ -163,8 +163,8 @@ class moduleNeoPixel : public IModuleBase {
 		uint modeCurrent;
 		uint modeCurrentLast;
 		unsigned long publishModeLast;
-		uint8 effectSpeed; // 1 x = 25 ms
-		uint8 effectSpeedLast;
+		uint8_t effectSpeed; // 1 x = 25 ms
+		uint8_t effectSpeedLast;
 		unsigned long publishEffectSpeedLast;
 		uint sleep;
 		uint sleepLast;
@@ -179,17 +179,17 @@ class moduleNeoPixel : public IModuleBase {
 		uint pixelInterval;				// Pixel Interval (ms)
 		int pixelQueue;					// Pattern Pixel Queue
 		int pixelCycle;					// Pattern Pixel Cycle
-		uint8 steps;
+		uint8_t steps;
 
 		void publishValue();
 		void calc();
 		
-		uint8 targetR;
-		uint8 targetG;
-		uint8 targetB;
-		//uint8 targetBr;
-		uint8 targetWW;
-		uint8 targetCW;
+		uint8_t targetR;
+		uint8_t targetG;
+		uint8_t targetB;
+		//uint8_t targetBr;
+		uint8_t targetWW;
+		uint8_t targetCW;
 		void calcDuration();
 		void BlenderEffect();
 		bool BlenderWWEffect();
@@ -210,7 +210,7 @@ class moduleNeoPixel : public IModuleBase {
 		void OffRunnerEffect(uint wait);
 		void StaticEffect();
 		uint32_t Wheel(byte WheelPos);
-		uint8 GetMaxPercent();
+		uint8_t GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;

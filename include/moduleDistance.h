@@ -23,17 +23,17 @@ class moduleDistance : public IModuleBase {
 	public:
 		moduleDistance();
 		moduleBase* mb;
-		uint8 PinTrig;
-		uint8 PinEcho;
+		uint8_t PinTrig;
+		uint8_t PinEcho;
 
 		// section for define
-		uint16 volume;
-		uint16 distanceRaw;
-		uint16 distanceAvg;
+		uint16_t volume;
+		uint16_t distanceRaw;
+		uint16_t distanceAvg;
 
-		uint8 height = 120;
-		uint16 maxVolume = 6000;
-		int8 correction = 0;
+		uint8_t height = 120;
+		uint16_t maxVolume = 6000;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicVolume;
@@ -48,7 +48,7 @@ class moduleDistance : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -61,25 +61,25 @@ class moduleDistance : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
-		uint16 volumeLast;
+		uint16_t volumeLast;
 		unsigned long publishVolumeLast;
-		uint16 distanceRawLast;
+		uint16_t distanceRawLast;
 		unsigned long publishDistanceRawLast;
-		uint16 distanceAvgLast;
+		uint16_t distanceAvgLast;
 		unsigned long publishDistanceAvgLast;
 		
-		static const uint8 avgLength = 128;
+		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void publishDistanceRaw();
 		void publishDistanceAvg();
 		void calc();
-		uint16 calcAvg(uint16 raw);
-		void calcDistanceDebug(String name, uint16 avg, uint16 raw, unsigned long duration);
+		uint16_t calcAvg(uint16_t raw);
+		void calcDistanceDebug(String name, uint16_t avg, uint16_t raw, unsigned long duration);
 
 		// section to config and copy
 		String ModuleName;

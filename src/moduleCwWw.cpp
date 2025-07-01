@@ -98,7 +98,7 @@ void moduleCwWw::publishValues(bool force) {
 	}
 	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
 		AnalogOutWWLast = AnalogOutWW;
-		int32 percent = (uint8) AnalogOutWW / 2.55;
+		int32_t percent = (uint8) AnalogOutWW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicWW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicWW, String(percent));
@@ -107,7 +107,7 @@ void moduleCwWw::publishValues(bool force) {
 	}
 	if(AnalogOutCWLast != AnalogOutCW || wpFZ.CheckQoS(publishAnalogOutCWLast)) {
 		AnalogOutCWLast = AnalogOutCW;
-		int32 percent = (uint8) AnalogOutCW / 2.55;
+		int32_t percent = (uint8) AnalogOutCW / 2.55;
 		wpMqtt.mqttClient.publish(mqttTopicCW.c_str(), String(percent).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(mqttTopicCW, String(percent));
@@ -161,14 +161,14 @@ void moduleCwWw::setSubscribes() {
 
 void moduleCwWw::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
-		uint8 readWW = msg.toInt();
+		uint8_t readWW = msg.toInt();
 		if(targetWW != readWW) {
 			SetWW(readWW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
-		uint8 readCW = msg.toInt();
+		uint8_t readCW = msg.toInt();
 		if(targetCW != readCW) {
 			SetCW(readCW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
@@ -189,7 +189,7 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
 }
 
-String moduleCwWw::SetWW(uint8 ww) {
+String moduleCwWw::SetWW(uint8_t ww) {
 	manual = true;
 	SetSleep(0);
 	targetWW = ww;
@@ -199,7 +199,7 @@ String moduleCwWw::SetWW(uint8 ww) {
 	return wpFZ.JsonKeyValue("WW", String(targetWW));
 }
 
-String moduleCwWw::SetCW(uint8 cw) {
+String moduleCwWw::SetCW(uint8_t cw) {
 	manual = true;
 	SetSleep(0);
 	targetCW = cw;
@@ -222,13 +222,13 @@ String moduleCwWw::SetSleep(uint seconds) {
 	return wpFZ.JsonKeyValue("sleep", String(sleep));
 }
 
-String moduleCwWw::SetEffect(uint8 effect) {
+String moduleCwWw::SetEffect(uint8_t effect) {
 	manual = true;
 	modeCurrent = effect;
 	return wpFZ.JsonKeyString("effect", GetModeName(modeCurrent));
 }
 
-String moduleCwWw::SetEffectSpeed(uint8 speed) {
+String moduleCwWw::SetEffectSpeed(uint8_t speed) {
 	if(speed < 1) speed = 1;
 	if(speed > 9) speed = 9;
 	effectSpeed = speed;
@@ -261,7 +261,7 @@ String moduleCwWw::SetOff() {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 
-String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
+String moduleCwWw::SetWwCwAuto(uint8_t ww, uint8_t cw, uint sleep) {
 	if(!manual) {
 		targetWW = ww;
 		targetCW = cw;
@@ -277,8 +277,8 @@ String moduleCwWw::SetWwCwAuto(uint8 ww, uint8 cw, uint sleep) {
 }
 
 void moduleCwWw::calcDuration() {
-	uint8 distWW = abs(AnalogOutWW - targetWW);
-	uint8 distCW = abs(AnalogOutCW - targetCW);
+	uint8_t distWW = abs(AnalogOutWW - targetWW);
+	uint8_t distCW = abs(AnalogOutCW - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 50.0);
 	steps = s == 0 ? 1 : s;
@@ -286,7 +286,7 @@ void moduleCwWw::calcDuration() {
 		wpFZ.DebugWS(wpFZ.strDEBUG, "CwWw.calcDuration", "calculated steps: '" + String(steps) + "'");
 }
 
-String moduleCwWw::GetModeName(uint8 actualMode) {
+String moduleCwWw::GetModeName(uint8_t actualMode) {
 	String returns;
 	switch(actualMode) {
 		case ModeStatic:
@@ -486,12 +486,12 @@ void moduleCwWw::SmoothEffect() {
 		winkelCW = pi;
 	}
 	float sinWW = sin(winkelWW);
-	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	uint8_t sinWWByte = (uint8)(127.0 * (sinWW + 1));
 	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
 	AnalogOutWW = sinWWByte;
 	float sinCW = sin(winkelCW);
-	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	uint8_t sinCWByte = (uint8)(127.0 * (sinCW + 1));
 	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	AnalogOutCW = sinCWByte;
@@ -503,7 +503,7 @@ void moduleCwWw::WwSmoothEffect() {
 		winkelWW = 0;
 	}
 	float sinWW = sin(winkelWW);
-	uint8 sinWWByte = (uint8)(127.0 * (sinWW + 1));
+	uint8_t sinWWByte = (uint8)(127.0 * (sinWW + 1));
 	if(sinWWByte < 10) sinWWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "WWPulseEffekt", "ByteWW: '" + String(sinWWByte) + "', sinWW: '" + String(sinWW) + "' von Bogen: '" + String(winkelWW) + "'");
 	AnalogOutWW = sinWWByte;
@@ -515,14 +515,14 @@ void moduleCwWw::CwSmoothEffect() {
 		winkelCW = 0;
 	}
 	float sinCW = sin(winkelCW);
-	uint8 sinCWByte = (uint8)(127.0 * (sinCW + 1));
+	uint8_t sinCWByte = (uint8)(127.0 * (sinCW + 1));
 	if(sinCWByte < 10) sinCWByte = 10;
 	if(mb->debug) wpFZ.DebugWS(wpFZ.strDEBUG, "CWPulseEffekt", "ByteCW: '" + String(sinCWByte) + "', sinCW: '" + String(sinCW) + "' von Bogen: '" + String(winkelCW) + "'");
 	AnalogOutCW = sinCWByte;
 }
 
-uint8 moduleCwWw::GetMaxPercent() {
-	uint8 returns = 0;
+uint8_t moduleCwWw::GetMaxPercent() {
+	uint8_t returns = 0;
 	returns = AnalogOutWW > returns ? AnalogOutWW : returns;
 	returns = AnalogOutCW > returns ? AnalogOutCW : returns;
 	return returns;
@@ -530,10 +530,10 @@ uint8 moduleCwWw::GetMaxPercent() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleCwWw::getVersion() {
+uint16_t moduleCwWw::getVersion() {
 	String SVN = "$Rev: 267 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

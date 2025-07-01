@@ -23,7 +23,7 @@ class helperModules {
 
 		bool useModuleDHT11 = false;
 		bool useModuleDHT22 = false;
-		uint8 choosenDHTmodul;
+		uint8_t choosenDHTmodul;
 		bool useModuleLDR = false;
 		bool useModuleLight = false;
 		bool useModuleBM = false;
@@ -92,7 +92,7 @@ class helperModules {
 		helperModules();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 		void setupModules();
 
@@ -102,7 +102,7 @@ class helperModules {
 		void publishValues(bool force);
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
-		//void SaveBoolToEEPROM(String name, uint16 addr, byte byte, uint8 bit, bool value);
+		//void SaveBoolToEEPROM(String name, uint16_t addr, byte byte, uint8_t bit, bool value);
 
 		void changeModuleDHT11(bool newValue);
 		void changeModuleDHT22(bool newValue);

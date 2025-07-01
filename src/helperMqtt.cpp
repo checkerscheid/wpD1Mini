@@ -52,10 +52,10 @@ void helperMqtt::cycle() {
 	}
 }
 
-uint16 helperMqtt::getVersion() {
+uint16_t helperMqtt::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

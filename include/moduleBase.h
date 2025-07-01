@@ -23,17 +23,17 @@ class moduleBase {
 		bool useAvg = false;
 		bool debug = false;
 		bool error = false;
-		uint32 calcCycle = 1000 * 5;
+		uint32_t calcCycle = 1000 * 5;
 		unsigned long calcLast;
 
 		String mqttTopicUseAvg;
 		String mqttTopicDebug;
 		String mqttTopicError;
 		String mqttTopicCalcCycle;
-		void initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg);
-		void initDebug(uint16 addrDebug, byte& byteDebug, uint8 bitDebug);
+		void initUseAvg(uint16_t addrUseAvg, byte& byteUseAvg, uint8_t bitUseAvg);
+		void initDebug(uint16_t addrDebug, byte& byteDebug, uint8_t bitDebug);
 		void initError();
-		void initCalcCycle(uint16 addrCalcCycle);
+		void initCalcCycle(uint16_t addrCalcCycle);
 		void changeDebug();
 
 		void publishSettings(bool force);
@@ -44,13 +44,13 @@ class moduleBase {
 	private:
 		String _name;
 
-		uint16 _addrUseAvg;
+		uint16_t _addrUseAvg;
 		byte _byteUseAvg;
-		uint8 _bitUseAvg;
-		uint16 _addrDebug;
+		uint8_t _bitUseAvg;
+		uint16_t _addrDebug;
 		byte _byteDebug;
-		uint8 _bitDebug;
-		uint16 _addrCalcCycle;
+		uint8_t _bitDebug;
+		uint16_t _addrCalcCycle;
 		bool _useUseAvg;
 		bool _useCalcCycle;
 		bool _useError;

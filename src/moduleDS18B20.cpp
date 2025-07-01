@@ -28,7 +28,7 @@ moduleDS18B20::moduleDS18B20() {
 void moduleDS18B20::init() {
 	// section for define
 	Pin = D7;
-	for(uint8 i = 0; i < count; i++) {
+	for(uint8_t i = 0; i < count; i++) {
 		devices[i] = new deviceOneWire(i);
 		devices[i]->init();
 	}
@@ -44,7 +44,7 @@ void moduleDS18B20::init() {
 	mb->initDebug(wpEEPROM.addrBitsDebugModules3, wpEEPROM.bitsDebugModules3, wpEEPROM.bitDebugDS18B20);
 	mb->initCalcCycle(wpEEPROM.byteCalcCycleDS18B20);
 	
-	for(uint8 i = 0; i < count; i++) {
+	for(uint8_t i = 0; i < count; i++) {
 		if(devices[i] != NULL)
 			devices[i]->debug = mb->debug;
 	}
@@ -136,13 +136,13 @@ void moduleDS18B20::calc() {
 }
 
 String moduleDS18B20::scanBus() {
-	uint8 cds18 = dt->getDS18Count();
+	uint8_t cds18 = dt->getDS18Count();
 	wpFZ.DebugWS(wpFZ.strINFO, "scanBus", "count ds18: " + String(cds18));
 	count = dt->getDeviceCount();
 	wpEEPROM.WriteByteToEEPROM("DS18B20Count", wpEEPROM.byteDS18B20Count, count);
 	DeviceAddress address;
 	String adr = "";
-	for(uint8 i = 0;  i < count;  i++) {
+	for(uint8_t i = 0;  i < count;  i++) {
 		dt->getAddress(address, i);
 		if(devices[i] != NULL) {
 			devices[i]->setAddress(address);
@@ -156,10 +156,10 @@ String moduleDS18B20::scanBus() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleDS18B20::getVersion() {
+uint16_t moduleDS18B20::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -185,16 +185,16 @@ bool moduleDS18B20::Debug() {
 }
 bool moduleDS18B20::Debug(bool debug) {
 	mb->debug = debug;
-	for(uint8 i = 0; i < count; i++) {
+	for(uint8_t i = 0; i < count; i++) {
 		if(devices[i] != NULL)
 			devices[i]->debug = mb->debug;
 	}
 	return true;
 }
-uint32 moduleDS18B20::CalcCycle(){
+uint32_t moduleDS18B20::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleDS18B20::CalcCycle(uint32 calcCycle){
+uint32_t moduleDS18B20::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

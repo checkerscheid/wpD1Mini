@@ -25,11 +25,11 @@ class moduleLight : public IModuleBase {
 	public:
 		moduleLight();
 		moduleBase* mb;
-		uint8 PinSCL;
-		uint8 PinSDA;
+		uint8_t PinSCL;
+		uint8_t PinSDA;
 
 		// section for define
-		uint32 light;
+		uint32_t light;
 		short correction = 0;
 
 		// values
@@ -42,7 +42,7 @@ class moduleLight : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -57,19 +57,19 @@ class moduleLight : public IModuleBase {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
-		uint32 lightLast;
+		uint32_t lightLast;
 		unsigned long publishLightLast;
-		static const uint8 avgLength = 128;
-		uint32 avgValues[avgLength];
+		static const uint8_t avgLength = 128;
+		uint32_t avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint32 calcAvg(uint32 raw);
+		uint32_t calcAvg(uint32_t raw);
 		void printCalcError(String name);
-		void printCalcDebug(String name, uint32 value, float raw);
+		void printCalcDebug(String name, uint32_t value, float raw);
 
 		// section to config and copy
 		String ModuleName;

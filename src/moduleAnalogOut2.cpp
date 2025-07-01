@@ -133,7 +133,7 @@ void moduleAnalogOut2::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8 readSetHandValue = (uint8)(msg.toInt() * 2.55);
+		uint8_t readSetHandValue = (uint8)(msg.toInt() * 2.55);
 		if(handValueSet != readSetHandValue) {
 			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
@@ -144,17 +144,17 @@ void moduleAnalogOut2::checkSubscribes(char* topic, String msg) {
 void moduleAnalogOut2::InitHand(bool hand) {
 	handSet = hand;
 }
-void moduleAnalogOut2::InitHandValue(uint8 value) {
+void moduleAnalogOut2::InitHandValue(uint8_t value) {
 	handValueSet = value;
 }
-void moduleAnalogOut2::SetHandValue(uint8 value) {
+void moduleAnalogOut2::SetHandValue(uint8_t value) {
 	handValueSet = value;
 	wpEEPROM.WriteByteToEEPROM("handValueSet", wpEEPROM.byteAnalogOut2HandValue, handValueSet);
 }
-void moduleAnalogOut2::SetHandValueProzent(uint8 value) {
+void moduleAnalogOut2::SetHandValueProzent(uint8_t value) {
 	SetHandValue((uint8)(value * 2.55));
 }
-uint8 moduleAnalogOut2::GetHandValue() {
+uint8_t moduleAnalogOut2::GetHandValue() {
 	return handValue;
 }
 bool moduleAnalogOut2::GetHandError() {
@@ -190,17 +190,17 @@ void moduleAnalogOut2::calc() {
 			output = autoValue;
 		}
 	}
-	uint16 hardwareout = output;
+	uint16_t hardwareout = output;
 	analogWrite(Pin, hardwareout);
 }
 
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleAnalogOut2::getVersion() {
+uint16_t moduleAnalogOut2::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

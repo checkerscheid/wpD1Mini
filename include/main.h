@@ -18,18 +18,18 @@
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 
-uint16 getVersion();
-void buildChecker(uint16 &v, uint16 moduleBuild);
-uint16 getBuild();
+uint16_t getVersion();
+void buildChecker(uint16_t &v, uint16_t moduleBuild);
+uint16_t getBuild();
 String getStringVersion();
-uint16 getGlobalBuild();
-void BuildChecker(uint16 &v, uint16 moduleBuild);
+uint16_t getGlobalBuild();
+void BuildChecker(uint16_t &v, uint16_t moduleBuild);
 
 //void publishValuesSystem();
 
 String SVNh = "$Rev: 203 $";
 // counter
-uint32 publishForceRssi = 0;
+uint32_t publishForceRssi = 0;
 
 // value stores for Com
 int rssi = 0;

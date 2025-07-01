@@ -19,7 +19,7 @@ moduleWindow wpWindow1(1);
 moduleWindow wpWindow2(2);
 moduleWindow wpWindow3(3);
 
-moduleWindow::moduleWindow(uint8 n) {
+moduleWindow::moduleWindow(uint8_t n) {
 	no = n;
 	ModuleName = "Window" + String(no);
 	mb = new moduleBase(ModuleName);
@@ -119,10 +119,10 @@ void moduleWindow::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleWindow::getVersion() {
+uint16_t moduleWindow::getVersion() {
 	String SVN = "$Rev: 246 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

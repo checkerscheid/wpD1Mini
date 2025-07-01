@@ -45,13 +45,13 @@ class helperUpdate {
 		helperUpdate();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 		bool setupOta();
 		void check();
 		void start();
 		String GetUpdateChanel();
-		void SetUpdateChanel(uint8 uc);
+		void SetUpdateChanel(uint8_t uc);
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -67,7 +67,7 @@ class helperUpdate {
 		unsigned long publishNewVersionLast;
 		unsigned long twelveHours;
 		String file;
-		uint8 updateChanel;
+		uint8_t updateChanel;
 		String jsonsub;
 		void doCheckUpdate();
 		static void started();

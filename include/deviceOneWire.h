@@ -20,13 +20,13 @@
 
 class deviceOneWire {
 	public:
-		deviceOneWire(uint8 no);
-		uint8 number;
+		deviceOneWire(uint8_t no);
+		uint8_t number;
 		bool debug;
 
 		// section for define
 		int temperature;
-		int8 correction = 0;
+		int8_t correction = 0;
 
 		// values
 		String mqttTopicTemperature;
@@ -37,7 +37,7 @@ class deviceOneWire {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -47,16 +47,16 @@ class deviceOneWire {
 		void checkSubscribes(char* topic, String msg);
 		// getter / setter
 
-		void setAddress(uint8 adr[8]);
+		void setAddress(uint8_t adr[8]);
 		uint8_t* getAddress();
 		String getStringAddress();
 
 		void setTemperature(float t);
 	private:
-		uint8 address[8];
+		uint8_t address[8];
 		int temperatureLast;
 		unsigned long publishTemperatureLast;
-		int8 correctionLast;
+		int8_t correctionLast;
 		unsigned long publishCorrectionLast;
 
 		void calc();

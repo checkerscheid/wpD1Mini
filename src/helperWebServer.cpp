@@ -40,10 +40,10 @@ void helperWebServer::cycle() {
 	publishValues();
 }
 
-uint16 helperWebServer::getVersion() {
+uint16_t helperWebServer::getVersion() {
 	String SVN = "$Rev: 267 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -776,7 +776,7 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setCwWw, Effect: '") + String(effect) + F("'"));
 			}
 			if(request->hasParam(F("effectSpeed"))) {
-				uint8 effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
+				uint8_t effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
 				erg += F(",") + wpCwWw.SetEffectSpeed(effectSpeed);
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setCwWw, EffectSpeed, '") + String(effectSpeed) + F("'"));
 			}
@@ -858,7 +858,7 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found setNeoPixel, Effect: '") + String(effect) + F("'"));
 			}
 			if(request->hasParam(F("effectSpeed"))) {
-				uint8 effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
+				uint8_t effectSpeed = request->getParam(F("effectSpeed"))->value().toInt();
 				erg += F(",") + wpNeoPixel.SetEffectSpeed(effectSpeed);
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebserver"), F("Found setNeoPixel, EffectSpeed: '") + String(effectSpeed) + F("'"));
 			}
@@ -872,7 +872,7 @@ void helperWebServer::setupWebServer() {
 					erg += F(",") + wpNeoPixel.SetOn();
 				}
 				if(request->getParam(F("turn"))->value() == F("offrunner")) {
-					uint8 steps = 5;
+					uint8_t steps = 5;
 					if(request->hasParam(F("steps"))) {
 						steps = request->getParam(F("steps"))->value().toInt();
 					}
@@ -963,11 +963,11 @@ void helperWebServer::setupWebServer() {
 	#if BUILDWITH == 2
 	webServer.on("/setAnalogOut", HTTP_GET, [](AsyncWebServerRequest *request) {
 		if(request->hasParam(F("PidType"))) {
-			uint8 pidType = request->getParam(F("PidType"))->value().toInt();
+			uint8_t pidType = request->getParam(F("PidType"))->value().toInt();
 			request->send(200, F("application/json"), wpAnalogOut.SetPidType(pidType).c_str());
 		}
 		if(request->hasParam(F("setPoint"))) {
-			uint8 setPoint = request->getParam(F("setPoint"))->value().toDouble();
+			uint8_t setPoint = request->getParam(F("setPoint"))->value().toDouble();
 			request->send(200, F("application/json"), wpAnalogOut.SetSetPoint(setPoint).c_str());
 		}
 		if(request->hasParam(F("wartung"))) {
@@ -1008,15 +1008,15 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleUnderfloor1) {
 		webServer.on("/setUnderfloor1", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("hand"))) {
-				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				uint8_t hand = request->getParam(F("hand"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor1.SetHand(hand == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("handValue"))) {
-				uint8 handValue = request->getParam(F("handValue"))->value().toInt();
+				uint8_t handValue = request->getParam(F("handValue"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor1.SetHandValue(handValue == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("setPoint"))) {
-				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				uint8_t setPoint = request->getParam(F("setPoint"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor1.SetSetPoint(setPoint).c_str());
 			}
 			if(request->hasParam(F("topic"))) {
@@ -1032,15 +1032,15 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleUnderfloor2) {
 		webServer.on("/setUnderfloor2", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("hand"))) {
-				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				uint8_t hand = request->getParam(F("hand"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor2.SetHand(hand == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("handValue"))) {
-				uint8 handValue = request->getParam(F("handValue"))->value().toInt();
+				uint8_t handValue = request->getParam(F("handValue"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor2.SetHandValue(handValue == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("setPoint"))) {
-				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				uint8_t setPoint = request->getParam(F("setPoint"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor2.SetSetPoint(setPoint).c_str());
 			}
 			if(request->hasParam(F("topic"))) {
@@ -1056,15 +1056,15 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleUnderfloor3) {
 		webServer.on("/setUnderfloor3", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("hand"))) {
-				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				uint8_t hand = request->getParam(F("hand"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor3.SetHand(hand == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("handValue"))) {
-				uint8 handValue = request->getParam(F("handValue"))->value().toInt();
+				uint8_t handValue = request->getParam(F("handValue"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor3.SetHandValue(handValue == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("setPoint"))) {
-				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				uint8_t setPoint = request->getParam(F("setPoint"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor3.SetSetPoint(setPoint).c_str());
 			}
 			if(request->hasParam(F("topic"))) {
@@ -1080,15 +1080,15 @@ void helperWebServer::setupWebServer() {
 	if(wpModules.useModuleUnderfloor4) {
 		webServer.on("/setUnderfloor4", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("hand"))) {
-				uint8 hand = request->getParam(F("hand"))->value().toInt();
+				uint8_t hand = request->getParam(F("hand"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor4.SetHand(hand == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("handValue"))) {
-				uint8 handValue = request->getParam(F("handValue"))->value().toInt();
+				uint8_t handValue = request->getParam(F("handValue"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor4.SetHandValue(handValue == 0 ? false : true).c_str());
 			}
 			if(request->hasParam(F("setPoint"))) {
-				uint8 setPoint = request->getParam(F("setPoint"))->value().toInt();
+				uint8_t setPoint = request->getParam(F("setPoint"))->value().toInt();
 				request->send(200, F("application/json"), wpUnderfloor4.SetSetPoint(setPoint).c_str());
 			}
 			if(request->hasParam(F("topic"))) {
@@ -1114,7 +1114,7 @@ void helperWebServer::setupWebServer() {
 	// if(wpModules.useModuleRFID) {
 	// 	webServer.on("/setRFID", HTTP_GET, [](AsyncWebServerRequest *request) {
 	// 		if(request->hasParam(F("hand"))) {
-	// 			uint8 hand = request->getParam(F("hand"))->value().toInt();
+	// 			uint8_t hand = request->getParam(F("hand"))->value().toInt();
 	// 			request->send(200, F("application/json"), wpUnderfloor1.SetHand(hand == 0 ? false : true).c_str());
 	// 		}
 	// 		wpWebServer.setBlink();
@@ -1127,13 +1127,13 @@ void helperWebServer::setupWebServer() {
 //###################################################################################
 // do the commands
 //###################################################################################
-void helperWebServer::setCommand(uint8 command) {
+void helperWebServer::setCommand(uint8_t command) {
 	doCommand = command;
 }
-void helperWebServer::setModuleChange(uint8 module) {
+void helperWebServer::setModuleChange(uint8_t module) {
 	doModuleChange = module;
 }
-void helperWebServer::setDebugChange(uint8 debug) {
+void helperWebServer::setDebugChange(uint8_t debug) {
 	doDebugChange = debug;
 }
 void helperWebServer::setBlink() {

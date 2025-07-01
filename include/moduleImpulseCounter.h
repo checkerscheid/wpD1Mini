@@ -23,7 +23,7 @@ class moduleImpulseCounter : public IModuleBase {
 	public:
 		moduleImpulseCounter();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool bm;
@@ -34,16 +34,16 @@ class moduleImpulseCounter : public IModuleBase {
 		String mqttTopicSilver;
 		String mqttTopicRed;
 		String mqttTopicUpKWh;
-		uint32 impulseCounter = 0;
-		uint32 KWh = 0;
-		uint16 counterSilver = 50;
-		uint16 counterRed = 255;
-		uint8 UpKWh = 150;
+		uint32_t impulseCounter = 0;
+		uint32_t KWh = 0;
+		uint16_t counterSilver = 50;
+		uint16_t counterRed = 255;
+		uint8_t UpKWh = 150;
 
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -56,8 +56,8 @@ class moduleImpulseCounter : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		bool redIsNow;
 		bool redIsNowLast;

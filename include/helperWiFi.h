@@ -36,7 +36,7 @@ class helperWiFi {
 		helperWiFi();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 		void setupWiFi();
 		void scanWiFi();

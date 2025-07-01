@@ -26,31 +26,31 @@ class moduleClock : public IModuleBase {
 		moduleClock();
 		moduleBase* mb;
 		Adafruit_NeoPixel* strip;
-		uint8 Pin;
-		uint8 Pin1;
-		uint8 Pin2;
-		uint8 Pin3;
-		uint8 Pin4;
+		uint8_t Pin;
+		uint8_t Pin1;
+		uint8_t Pin2;
+		uint8_t Pin3;
+		uint8_t Pin4;
 
-		uint8 ColorHR;
-		uint8 ColorHG;
-		uint8 ColorHB;
+		uint8_t ColorHR;
+		uint8_t ColorHG;
+		uint8_t ColorHB;
 
-		uint8 ColorMR;
-		uint8 ColorMG;
-		uint8 ColorMB;
+		uint8_t ColorMR;
+		uint8_t ColorMG;
+		uint8_t ColorMB;
 
-		uint8 ColorSR;
-		uint8 ColorSG;
-		uint8 ColorSB;
+		uint8_t ColorSR;
+		uint8_t ColorSG;
+		uint8_t ColorSB;
 
-		uint8 ColorQR = 16;
-		uint8 ColorQG = 0;
-		uint8 ColorQB = 8;
+		uint8_t ColorQR = 16;
+		uint8_t ColorQG = 0;
+		uint8_t ColorQB = 8;
 
-		uint8 Color5R = 8;
-		uint8 Color5G = 0;
-		uint8 Color5B = 8;
+		uint8_t Color5R = 8;
+		uint8_t Color5G = 0;
+		uint8_t Color5B = 8;
 
 		// section for define
 		Stepper* Motor;
@@ -69,7 +69,7 @@ class moduleClock : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -82,50 +82,50 @@ class moduleClock : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
-		uint16 GetSpr();
-		void SetSpr(uint16 StepsPerRound);
-		uint16 GetRpm();
-		void SetRpm(uint16 RoundsPerMinute);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
+		uint16_t GetSpr();
+		void SetSpr(uint16_t StepsPerRound);
+		uint16_t GetRpm();
+		void SetRpm(uint16_t RoundsPerMinute);
 		void SetSteps(short StepsToRun);
-		void InitPixelCount(uint16 pc);
+		void InitPixelCount(uint16_t pc);
 		void InitRGB(bool rgb);
 		bool GetRGB();
 		void SetRGB(bool rgb);
-		uint16 GetPixelCount();
-		void SetPixelCount(uint16 pc);
+		uint16_t GetPixelCount();
+		void SetPixelCount(uint16_t pc);
 		String GetColorH();
 		String GetColorM();
 		String GetColorS();
 		String GetColorQ();
 		String GetColor5();
-		void SetColorH(uint8 r, uint8 g, uint8 b);
-		void SetColorM(uint8 r, uint8 g, uint8 b);
-		void SetColorS(uint8 r, uint8 g, uint8 b);
-		void SetColorQ(uint8 r, uint8 g, uint8 b);
-		void SetColor5(uint8 r, uint8 g, uint8 b);
+		void SetColorH(uint8_t r, uint8_t g, uint8_t b);
+		void SetColorM(uint8_t r, uint8_t g, uint8_t b);
+		void SetColorS(uint8_t r, uint8_t g, uint8_t b);
+		void SetColorQ(uint8_t r, uint8_t g, uint8_t b);
+		void SetColor5(uint8_t r, uint8_t g, uint8_t b);
 		void setClock(short ph, short pm, short ps);
 
 		void SimulateTime();
 		void SimulateTime(short h, short m, short s);
 	private:
-		uint8 hour;
-		uint8 minute;
-		uint8 minuteLast;
-		uint8 second;
-		uint8 secondLast;
+		uint8_t hour;
+		uint8_t minute;
+		uint8_t minuteLast;
+		uint8_t second;
+		uint8_t secondLast;
 		bool simulateTime;
-		uint16 pixelCount = 50;
+		uint16_t pixelCount = 50;
 		bool isRGB = false;
 		short steps;
 		// Steps per Round
-		uint16 spr = 2048;
-		uint16 sprLast;
+		uint16_t spr = 2048;
+		uint16_t sprLast;
 		unsigned long publishSprLast;
 		// Rounds per Minute
-		uint16 rpm = 5;
-		uint16 rpmLast;
+		uint16_t rpm = 5;
+		uint16_t rpmLast;
 		unsigned long publishRpmLast;
 		void calc();
 

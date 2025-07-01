@@ -91,7 +91,7 @@ void moduleBM::setSubscribes() {
 void moduleBM::checkSubscribes(char* topic, String msg) {
 	if(wpModules.useModuleLDR) {
 		if(strcmp(topic, mqttTopicThreshold.c_str()) == 0) {
-			uint16 readThreshold = msg.toInt();
+			uint16_t readThreshold = msg.toInt();
 			if(threshold != readThreshold) {
 				threshold = readThreshold;
 				wpEEPROM.WriteWordToEEPROM("BM Threshold", wpEEPROM.byteBMThreshold, threshold);
@@ -157,10 +157,10 @@ String moduleBM::SetManual() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleBM::getVersion() {
+uint16_t moduleBM::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

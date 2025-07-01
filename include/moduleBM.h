@@ -23,11 +23,11 @@ class moduleBM : public IModuleBase {
 	public:
 		moduleBM();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool bm;
-		uint16 threshold = 500;
+		uint16_t threshold = 500;
 		String lightToTurnOn = "_";
 		String mqttTopicBM;
 		String mqttTopicManual;
@@ -37,7 +37,7 @@ class moduleBM : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);

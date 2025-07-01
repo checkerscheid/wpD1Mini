@@ -21,9 +21,9 @@
 
 class moduleWindow : public IModuleBase {
 	public:
-		moduleWindow(uint8 n);
+		moduleWindow(uint8_t n);
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool bm;
@@ -32,7 +32,7 @@ class moduleWindow : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -46,7 +46,7 @@ class moduleWindow : public IModuleBase {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
-		uint8 no;
+		uint8_t no;
 		bool bmLast;
 		unsigned long publishBMLast;
 		void publishValue();
@@ -56,9 +56,9 @@ class moduleWindow : public IModuleBase {
 		String ModuleName;
 		String SVNh = "$Rev: 246 $";
 
-		uint8 bitDebug;
+		uint8_t bitDebug;
 		byte bitsDebug;
-		uint16 addrDebug;
+		uint16_t addrDebug;
 
 };
 extern moduleWindow wpWindow1;

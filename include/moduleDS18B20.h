@@ -29,8 +29,8 @@ class moduleDS18B20 : public IModuleBase {
 		moduleDS18B20();
 		deviceOneWire* devices[10];
 		moduleBase* mb;
-		uint8 Pin;
-		uint8 count = 0;
+		uint8_t Pin;
+		uint8_t count = 0;
 		OneWire* ow;
 		DallasTemperature * dt;
 
@@ -43,7 +43,7 @@ class moduleDS18B20 : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -56,11 +56,11 @@ class moduleDS18B20 : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 		String scanBus();
 	private:
-		uint8 countLast;
+		uint8_t countLast;
 		unsigned long publishCountLast;
 
 		void publishValue();

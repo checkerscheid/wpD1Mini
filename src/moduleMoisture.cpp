@@ -180,7 +180,7 @@ void moduleMoisture::calc() {
 	}
 }
 
-uint16 moduleMoisture::calcAvg(uint16 raw) {
+uint16_t moduleMoisture::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -198,10 +198,10 @@ uint16 moduleMoisture::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleMoisture::getVersion() {
+uint16_t moduleMoisture::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -234,10 +234,10 @@ bool moduleMoisture::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleMoisture::CalcCycle(){
+uint32_t moduleMoisture::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleMoisture::CalcCycle(uint32 calcCycle){
+uint32_t moduleMoisture::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

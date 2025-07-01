@@ -39,7 +39,7 @@ class helperMqtt {
 		helperMqtt();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 
 		void publishSettings();

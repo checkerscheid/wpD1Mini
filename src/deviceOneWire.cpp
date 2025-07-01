@@ -19,7 +19,7 @@
  * Device DS18B20
  * hold the settings for one Device in the OneWire Bus
  */
-deviceOneWire::deviceOneWire(uint8 no) {
+deviceOneWire::deviceOneWire(uint8_t no) {
 	// section to config and copy
 	number = no;
 	ModuleName = "DS18B20/deviceOneWire" + String(no + 1);
@@ -82,7 +82,7 @@ void deviceOneWire::setSubscribes() {
 
 void deviceOneWire::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("DS18B20 Correction", wpEEPROM.byteDS18B20Correction[number], correction, false);
@@ -100,9 +100,9 @@ void deviceOneWire::initAddress() {
 	address[6] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][6]);
 	address[7] = EEPROM.read(wpEEPROM.byteDS18B20adr[number][7]);
 }
-void deviceOneWire::setAddress(uint8 adr[8]) {
+void deviceOneWire::setAddress(uint8_t adr[8]) {
 	String print = "save Address: ";
-	for(uint8 i = 0; i < 8; i++) {
+	for(uint8_t i = 0; i < 8; i++) {
 		address[i] = adr[i];
 		EEPROM.write(wpEEPROM.byteDS18B20adr[number][i], adr[i]);
 		print += String(adr[i], HEX);
@@ -116,7 +116,7 @@ uint8_t* deviceOneWire::getAddress() {
 }
 String deviceOneWire::getStringAddress() {
 	String printadr = "";
-	for(uint8 i = 0; i < 8; i++) {
+	for(uint8_t i = 0; i < 8; i++) {
 		printadr += String(address[i], HEX);
 		if(i < 7) printadr += ":";
 	}
@@ -138,10 +138,10 @@ void deviceOneWire::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 deviceOneWire::getVersion() {
+uint16_t deviceOneWire::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

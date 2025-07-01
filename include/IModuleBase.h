@@ -21,7 +21,7 @@ class IModuleBase {
 		virtual ~IModuleBase() {}
 		virtual void init() = 0;
 		virtual void cycle() = 0;
-		virtual uint16 getVersion() = 0;
+		virtual uint16_t getVersion() = 0;
 		virtual void publishSettings() = 0;
 		virtual void publishSettings(bool force) = 0;
 		virtual void publishValues() = 0;

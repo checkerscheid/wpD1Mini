@@ -95,7 +95,7 @@ void moduleDHT::setSubscribes() {
 
 void moduleDHT::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicTemperatureCorrection.c_str()) == 0) {
-		int8 readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
+		int8_t readTemperatureCorrection = int8_t(msg.toFloat() * 10.0);
 		if(temperatureCorrection != readTemperatureCorrection) {
 			temperatureCorrection = readTemperatureCorrection;
 			wpEEPROM.WriteByteToEEPROM("TemperatureCorrection", wpEEPROM.byteTemperatureCorrection, temperatureCorrection);
@@ -103,7 +103,7 @@ void moduleDHT::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicHumidityCorrection.c_str()) == 0) {
-		int8 readHumidityCorrection = int8_t(msg.toFloat() * 10);
+		int8_t readHumidityCorrection = int8_t(msg.toFloat() * 10);
 		if(humidityCorrection != readHumidityCorrection) {
 			humidityCorrection = readHumidityCorrection;
 			wpEEPROM.WriteByteToEEPROM("HumidityCorrection", wpEEPROM.byteHumidityCorrection, humidityCorrection);
@@ -177,10 +177,10 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleDHT::getVersion() {
+uint16_t moduleDHT::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -204,10 +204,10 @@ bool moduleDHT::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleDHT::CalcCycle() {
+uint32_t moduleDHT::CalcCycle() {
 	return mb->calcCycle;
 }
-uint32 moduleDHT::CalcCycle(uint32 calcCycle){
+uint32_t moduleDHT::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

@@ -27,14 +27,14 @@ moduleBase::moduleBase(String moduleName) {
 	_useCalcCycle = false;
 	_useError = false;
 }
-void moduleBase::initUseAvg(uint16 addrUseAvg, byte& byteUseAvg, uint8 bitUseAvg) {
+void moduleBase::initUseAvg(uint16_t addrUseAvg, byte& byteUseAvg, uint8_t bitUseAvg) {
 	_useUseAvg = true;
 	_addrUseAvg = addrUseAvg;
 	_byteUseAvg = byteUseAvg;
 	_bitUseAvg = bitUseAvg;
 	mqttTopicUseAvg = wpFZ.DeviceName + "/settings/" + _name + "/useAvg";
 }
-void moduleBase::initDebug(uint16 addrDebug, byte& byteDebug, uint8 bitDebug) {
+void moduleBase::initDebug(uint16_t addrDebug, byte& byteDebug, uint8_t bitDebug) {
 	_addrDebug = addrDebug;
 	_byteDebug = byteDebug;
 	_bitDebug = bitDebug;
@@ -44,7 +44,7 @@ void moduleBase::initError() {
 	_useError = true;
 	mqttTopicError = wpFZ.DeviceName + "/ERROR/" + _name;
 }
-void moduleBase::initCalcCycle(uint16 addrCalcCycle) {
+void moduleBase::initCalcCycle(uint16_t addrCalcCycle) {
 	_useCalcCycle = true;
 	_addrCalcCycle = addrCalcCycle;
 	mqttTopicCalcCycle = wpFZ.DeviceName + "/settings/" + _name + "/CalcCycle";
@@ -116,7 +116,7 @@ void moduleBase::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicCalcCycle.c_str()) == 0) {
-		uint32 readCalcCycle = msg.toInt();
+		uint32_t readCalcCycle = msg.toInt();
 		if(calcCycle != readCalcCycle) {
 			calcCycle = readCalcCycle;
 			writeEEPROMCalcCycle();
@@ -135,7 +135,7 @@ void moduleBase::writeEEPROMCalcCycle() {
 	double r = round(calcCycle / 100);
 	if(r < 1) r = 1;
 	if(r > 200) r = 200;
-	uint8 saveCalcCycle = (uint8) r;
+	uint8_t saveCalcCycle = (uint8) r;
 	wpEEPROM.WriteByteToEEPROM(_name + F(" CalcCycle"), _addrCalcCycle, saveCalcCycle);
 }
 

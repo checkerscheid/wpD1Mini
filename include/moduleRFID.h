@@ -26,8 +26,8 @@ class moduleRFID : public IModuleBase {
 		moduleRFID();
 		moduleBase* mb;
 		MFRC522* rfid;
-		uint8 PinSS;
-		uint8 PinRST;
+		uint8_t PinSS;
+		uint8_t PinRST;
 
 		long chipID;
 
@@ -40,7 +40,7 @@ class moduleRFID : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -53,8 +53,8 @@ class moduleRFID : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int chipIDLast;
 		unsigned long publishChipIDLast;

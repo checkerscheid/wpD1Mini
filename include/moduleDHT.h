@@ -25,13 +25,13 @@ class moduleDHT : public IModuleBase {
 		moduleDHT();
 		moduleBase* mb;
 		DHT* dht;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		int temperature;
 		int humidity;
-		int8 temperatureCorrection = 0;
-		int8 humidityCorrection = 0;
+		int8_t temperatureCorrection = 0;
+		int8_t humidityCorrection = 0;
 
 		String mqttTopicTemperature;
 		String mqttTopicHumidity;
@@ -43,7 +43,7 @@ class moduleDHT : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -56,8 +56,8 @@ class moduleDHT : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int temperatureLast;
 		unsigned long publishTemperatureLast;

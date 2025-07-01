@@ -248,7 +248,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8 readSetHandValue = (uint8)(msg.toInt() * 2.55);
+		uint8_t readSetHandValue = (uint8)(msg.toInt() * 2.55);
 		if(handValueSet != readSetHandValue) {
 			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
@@ -315,7 +315,7 @@ void moduleAnalogOut::checkSubscribes(char* topic, String msg) {
 }
 String moduleAnalogOut::SetSetPoint(double sp) {
 	SetPoint = sp;
-	uint8 setPointToSave = (uint8) (SetPoint * 10);
+	uint8_t setPointToSave = (uint8) (SetPoint * 10);
 	wpEEPROM.WriteByteToEEPROM("AnalogOut::SetPoint", wpEEPROM.byteAnalogOutSetPoint, setPointToSave);
 	return wpFZ.jsonOK;
 }
@@ -329,17 +329,17 @@ String moduleAnalogOut::SetTopicTempUrl(String topic) {
 void moduleAnalogOut::InitHand(bool hand) {
 	handSet = hand;
 }
-void moduleAnalogOut::InitHandValue(uint8 value) {
+void moduleAnalogOut::InitHandValue(uint8_t value) {
 	handValueSet = value;
 }
-void moduleAnalogOut::SetHandValue(uint8 value) {
+void moduleAnalogOut::SetHandValue(uint8_t value) {
 	handValueSet = value;
 	wpEEPROM.WriteByteToEEPROM("AnalogOut::handValueSet", wpEEPROM.byteAnalogOutHandValue, handValueSet);
 }
-void moduleAnalogOut::SetHandValueProzent(uint8 value) {
+void moduleAnalogOut::SetHandValueProzent(uint8_t value) {
 	SetHandValue((uint8)(value * 2.55));
 }
-uint8 moduleAnalogOut::GetHandValue() {
+uint8_t moduleAnalogOut::GetHandValue() {
 	return handValue;
 }
 bool moduleAnalogOut::GetHandError() {
@@ -357,7 +357,7 @@ void moduleAnalogOut::InitTn(short tn) {
 void moduleAnalogOut::InitSetPoint(short setpoint) {
 	SetPoint = (double) (setpoint / 10.0);
 }
-void moduleAnalogOut::InitPidType(uint8 t) {
+void moduleAnalogOut::InitPidType(uint8_t t) {
 	pidType = t;
 	wpFZ.DebugWS(wpFZ.strINFO, "startPidType",
 		"start PID Type from EEPROM: 'module" + ModuleName + "::loadPidType' = " + GetPidType());
@@ -371,7 +371,7 @@ String moduleAnalogOut::GetPidType() {
 	}
 	return F("unknown Type");
 }
-String moduleAnalogOut::SetPidType(uint8 t) {
+String moduleAnalogOut::SetPidType(uint8_t t) {
 	switch(t) {
 		case pidTypeHeating:
 			pidType = pidTypeHeating;
@@ -473,7 +473,7 @@ void moduleAnalogOut::resetPID() {
 	pid->SetOutputLimits(minOutput, maxOutput);
 }
 void moduleAnalogOut::deactivateWartung() {
-	int8 minuten = 5;
+	int8_t minuten = 5;
 	if(wpFZ.loopStartedAt > wartungStartedAt + (minuten * 60 * 1000)) {
 		wartungActive = false;
 		wpFZ.DebugWS(wpFZ.strINFO, "SetWartung", "Wartung deactivated: 'module" + ModuleName);
@@ -482,10 +482,10 @@ void moduleAnalogOut::deactivateWartung() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleAnalogOut::getVersion() {
+uint16_t moduleAnalogOut::getVersion() {
 	String SVN = "$Rev: 268 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -523,10 +523,10 @@ bool moduleAnalogOut::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleAnalogOut::CalcCycle() {
+uint32_t moduleAnalogOut::CalcCycle() {
 	return mb->calcCycle;
 }
-uint32 moduleAnalogOut::CalcCycle(uint32 calcCycle){
+uint32_t moduleAnalogOut::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

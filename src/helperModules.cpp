@@ -75,10 +75,10 @@ void helperModules::cycle() {
 	publishValues();
 }
 
-uint16 helperModules::getVersion() {
+uint16_t helperModules::getVersion() {
 	String SVN = "$Rev: 259 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

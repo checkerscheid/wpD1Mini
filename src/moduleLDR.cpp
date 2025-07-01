@@ -82,7 +82,7 @@ void moduleLDR::setSubscribes() {
 
 void moduleLDR::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("LDRCorrection", wpEEPROM.byteLDRCorrection, correction);
@@ -133,7 +133,7 @@ void moduleLDR::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 	}
 }
-uint16 moduleLDR::calcAvg(uint16 raw) {
+uint16_t moduleLDR::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -151,10 +151,10 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleLDR::getVersion() {
+uint16_t moduleLDR::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -185,10 +185,10 @@ bool moduleLDR::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleLDR::CalcCycle(){
+uint32_t moduleLDR::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleLDR::CalcCycle(uint32 calcCycle){
+uint32_t moduleLDR::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

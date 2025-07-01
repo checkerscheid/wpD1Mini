@@ -81,7 +81,7 @@ void moduleImpulseCounter::setSubscribes() {
 void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
 	if(strcmp(topic, mqttTopicSetKWh.c_str()) == 0) {
-		uint32 readSetKWh = msg.toInt();
+		uint32_t readSetKWh = msg.toInt();
 		if(KWh != readSetKWh) {
 			KWh = readSetKWh;
 			wpEEPROM.WriteWordToEEPROM("KWh", wpEEPROM.byteImpulseCounterKWh, KWh);
@@ -89,14 +89,14 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicUpKWh.c_str()) == 0) {
-		uint8 readUpKWh = msg.toInt();
+		uint8_t readUpKWh = msg.toInt();
 		if(UpKWh != readUpKWh) {
 			UpKWh = readUpKWh;
 			wpEEPROM.WriteByteToEEPROM("UpKWh", wpEEPROM.byteImpulseCounterUpKWh, UpKWh);
 		}
 	}
 	if(strcmp(topic, mqttTopicSilver.c_str()) == 0) {
-		int8 readSilver = msg.toInt();
+		int8_t readSilver = msg.toInt();
 		if(counterSilver != readSilver) {
 			counterSilver = readSilver;
 			wpEEPROM.WriteWordToEEPROM("Silver", wpEEPROM.byteImpulseCounterSilver, counterSilver);
@@ -104,7 +104,7 @@ void moduleImpulseCounter::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicRed.c_str()) == 0) {
-		int8 readRed = msg.toInt();
+		int8_t readRed = msg.toInt();
 		if(counterRed != readRed) {
 			counterRed = readRed;
 			wpEEPROM.WriteWordToEEPROM("Red", wpEEPROM.byteImpulseCounterRed, counterRed);
@@ -152,10 +152,10 @@ void moduleImpulseCounter::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleImpulseCounter::getVersion() {
+uint16_t moduleImpulseCounter::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -180,10 +180,10 @@ bool moduleImpulseCounter::Debug(bool debug) {
 void moduleImpulseCounter::changeDebug() {
 	mb->changeDebug();
 }
-uint32 moduleImpulseCounter::CalcCycle(){
+uint32_t moduleImpulseCounter::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleImpulseCounter::CalcCycle(uint32 calcCycle){
+uint32_t moduleImpulseCounter::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

@@ -82,7 +82,7 @@ void moduleRain::setSubscribes() {
 
 void moduleRain::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		int8 readCorrection = msg.toInt();
+		int8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("RainCorrection", wpEEPROM.byteRainCorrection, correction);
@@ -134,7 +134,7 @@ void moduleRain::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 	}
 }
-uint16 moduleRain::calcAvg(uint16 raw) {
+uint16_t moduleRain::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -152,10 +152,10 @@ uint16 moduleRain::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleRain::getVersion() {
+uint16_t moduleRain::getVersion() {
 	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -186,10 +186,10 @@ bool moduleRain::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleRain::CalcCycle(){
+uint32_t moduleRain::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRain::CalcCycle(uint32 calcCycle){
+uint32_t moduleRain::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }
