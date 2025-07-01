@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 267                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 259 2025-04-28 17:06:12Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 267 2025-05-27 14:14:36Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -67,16 +67,15 @@ class moduleCwWw : public IModuleBase {
 		bool Debug();
 		bool Debug(bool debug);
 
-		String GetModeName(uint8 actualMode);
-		void SetEffectSpeed(uint8 speed);
-		void SetSleep(uint seconds);
-		String SetOn();
-		String SetOff();
-		String SetWwCw(uint8 ww, uint8 cw);
 		String SetWW(uint8 ww);
 		String SetCW(uint8 cw);
-		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
+		String SetSleep(uint seconds);
 		String SetEffect(uint8 effect);
+		String SetEffectSpeed(uint8 speed);
+		String SetOn();
+		String SetOff();
+		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
+		String GetModeName(uint8 actualMode);
 	private:
 		uint8 PinWW;
 		uint8 PinCW;
@@ -128,7 +127,7 @@ class moduleCwWw : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 259 $";
+		String SVNh = "$Rev: 267 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;

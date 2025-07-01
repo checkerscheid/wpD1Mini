@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 262                                                     $ #
+//# Revision     : $Rev:: 265                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 262 2025-04-30 12:00:50Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 265 2025-05-25 13:08:17Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -384,40 +384,44 @@ void moduleNeoPixel::InitValueR(uint8 r) {
 	staticIsSet = false;
 }
 uint8 moduleNeoPixel::GetValueR() { return valueR; }
-void moduleNeoPixel::SetValueR(uint8 r) {
+String moduleNeoPixel::SetValueR(uint8 r) {
 	targetR = r;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelR", wpEEPROM.byteNeoPixelValueR, targetR);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
+	return wpFZ.JsonKeyValue("R", String(targetR));
 }
 void moduleNeoPixel::InitValueG(uint8 g) {
 	valueG = g;
 	staticIsSet = false;
 }
 uint8 moduleNeoPixel::GetValueG() { return valueG; }
-void moduleNeoPixel::SetValueG(uint8 g) {
+String moduleNeoPixel::SetValueG(uint8 g) {
 	targetG = g;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelG", wpEEPROM.byteNeoPixelValueG, targetG);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
+	return wpFZ.JsonKeyValue("G", String(targetG));
 }
 void moduleNeoPixel::InitValueB(uint8 b) {
 	valueB = b;
 	staticIsSet = false;
 }
 uint8 moduleNeoPixel::GetValueB() { return valueB; }
-void moduleNeoPixel::SetValueB(uint8 b) {
+String moduleNeoPixel::SetValueB(uint8 b) {
 	targetB = b;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelB", wpEEPROM.byteNeoPixelValueB, targetB);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
+	return wpFZ.JsonKeyValue("B", String(targetB));
 }
-void moduleNeoPixel::SetEffectSpeed(uint8 es) {
+String moduleNeoPixel::SetEffectSpeed(uint8 es) {
 	if(es > 20) es = 20;
 	if(es < 1) es = 1;
 	effectSpeed = es;
+	return wpFZ.JsonKeyValue("EffectSpeed", String(effectSpeed));
 }
-void moduleNeoPixel::SetSleep(uint seconds) {
+String moduleNeoPixel::SetSleep(uint seconds) {
 	if(seconds == 0) {
 		sleep = 0;
 		sleepAt = 0;
@@ -426,6 +430,7 @@ void moduleNeoPixel::SetSleep(uint seconds) {
 		sleepAt = wpFZ.loopStartedAt + (seconds * 1000);
 	}
 	wpFZ.DebugWS(wpFZ.strDEBUG, "NeoPixel::SetSleep", "Off in " + String(sleep) + " sec");
+	return wpFZ.JsonKeyValue("Sleep", String(sleep));
 }
 void moduleNeoPixel::InitRGB(bool rgb) {
 	isRGB = rgb;
@@ -525,12 +530,13 @@ void moduleNeoPixel::calcDuration() {
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
 }
-void moduleNeoPixel::SetOffRunner(uint8 setSteps) {
+String moduleNeoPixel::SetOffRunner(uint8 setSteps) {
 	steps = setSteps;
 	demoMode = false;
 	modeCurrent = ModeOffRunner;
 	staticIsSet = true;
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
+	return wpFZ.JsonKeyValue("Mode", GetModeName(modeCurrent));
 }
 void moduleNeoPixel::InitPixelCount(uint16 pc) {
 	pixelCount = pc;
@@ -586,19 +592,22 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 	}
 	return returns;
 }
-void moduleNeoPixel::SetMode(uint8 newMode) {
+String moduleNeoPixel::SetMode(uint8 newMode) {
 	modeCurrent = newMode;
 	targetCW = 0;
 	targetWW = 0;
 	staticIsSet = false;
+	return wpFZ.JsonKeyString("Mode", GetModeName(modeCurrent));
 }
-void moduleNeoPixel::ChangeUseWW() {
+String moduleNeoPixel::ChangeUseWW() {
 	useWW = !useWW;
 	wpEEPROM.WriteBoolToEEPROM("NeoPixelWW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseWW, useWW);
+	return wpFZ.JsonKeyValue("UseWW", useWW ? "true" : "false");
 }
-void moduleNeoPixel::ChangeUseCW() {
+String moduleNeoPixel::ChangeUseCW() {
 	useCW = !useCW;
 	wpEEPROM.WriteBoolToEEPROM("NeoPixelCW", wpEEPROM.addrBitsSettingsModules1, wpEEPROM.bitsSettingsModules1, wpEEPROM.bitNeoPixelUseCW, useCW);
+	return wpFZ.JsonKeyValue("UseCW", useCW ? "true" : "false");
 }
 // String moduleNeoPixel::getStripStatus() {
 // 	status = "{";
@@ -1052,15 +1061,20 @@ void moduleNeoPixel::StaticEffect() {
 		}
 	}
 }
-void moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
+String moduleNeoPixel::ComplexEffect(uint pixel, byte r, byte g, byte b) {
 	if(pixel > pixelCount) pixel = pixelCount;
-	ComplexEffect(pixel, strip->Color(r, g, b));
+	return ComplexEffect(pixel, strip->Color(r, g, b));
 }
-void moduleNeoPixel::ComplexEffect(uint pixel, uint32_t color) {
+String moduleNeoPixel::ComplexEffect(uint pixel, uint32_t color) {
 	demoMode = false;
 	modeCurrent = ModeComplex;
 	strip->setPixelColor(pixel, color);
 	strip->show();
+	return F("\"effect\":{") + 
+		wpFZ.JsonKeyValue("Pixel", String(pixel)) + F(",") +
+		wpFZ.JsonKeyValue("R", String((uint8_t)(color >> 16))) + F(",") +
+		wpFZ.JsonKeyValue("G", String((uint8_t)(color >>  8))) + F(",") +
+		wpFZ.JsonKeyValue("B", String((uint8_t)(color >>  0))) + F("}");
 }
 
 // Input a value 0 to 255 to get a color value.
@@ -1100,7 +1114,7 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 262 $";
+	String SVN = "$Rev: 265 $";
 	uint16 v = wpFZ.getBuild(SVN);
 	uint16 vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
