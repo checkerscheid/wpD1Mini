@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 268                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.cpp 268 2025-06-29 16:21:44Z            $ #
+//# File-ID      : $Id:: moduleUnderfloor.cpp 269 2025-07-01 19:25:14Z            $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleUnderfloor.h>
@@ -20,7 +20,7 @@ moduleUnderfloor wpUnderfloor2(2);
 moduleUnderfloor wpUnderfloor3(3);
 moduleUnderfloor wpUnderfloor4(4);
 
-moduleUnderfloor::moduleUnderfloor(uint8 n) {
+moduleUnderfloor::moduleUnderfloor(uint8_t n) {
 	no = n;
 	ModuleName = "Underfloor" + String(no);
 	mb = new moduleBase(ModuleName);
@@ -257,14 +257,14 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetHandValue.c_str()) == 0) {
-		uint8 readSetHandValue = msg.toInt();
+		uint8_t readSetHandValue = msg.toInt();
 		if(handValueSet != readSetHandValue) {
 			SetHandValue(readSetHandValue);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetHandValue, String(handValueSet));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetSetPoint.c_str()) == 0) {
-		uint8 readSetPoint = (uint8)(msg.toDouble() * 10.0);
+		uint8_t readSetPoint = (uint8)(msg.toDouble() * 10.0);
 		if(setPoint != readSetPoint) {
 			SetSetPoint(readSetPoint);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetSetPoint, String(setPoint));
@@ -293,10 +293,10 @@ void moduleUnderfloor::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleUnderfloor::InitSetPoint(uint8 setpoint) {
+void moduleUnderfloor::InitSetPoint(uint8_t setpoint) {
 	setPoint = setpoint;
 }
-uint8 moduleUnderfloor::GetSetPoint() {
+uint8_t moduleUnderfloor::GetSetPoint() {
 	return setPoint;
 }
 String moduleUnderfloor::SetHand(bool val) {
@@ -309,7 +309,7 @@ String moduleUnderfloor::SetHandValue(bool val) {
 	wpEEPROM.WriteBoolToEEPROM("module" + ModuleName + "::handValueSet", wpEEPROM.addrBitsSettingsModules2, wpEEPROM.bitsSettingsModules2, bitHandValue, handValueSet);
 	return wpFZ.jsonOK;
 }
-String moduleUnderfloor::SetSetPoint(uint8 setpoint) {
+String moduleUnderfloor::SetSetPoint(uint8_t setpoint) {
 	setPoint = setpoint;
 	wpEEPROM.WriteByteToEEPROM("module" + ModuleName + "::SetSetPoint", byteSetpoint, setPoint);
 	return wpFZ.jsonOK;
@@ -365,7 +365,7 @@ void moduleUnderfloor::calc() {
 	digitalWrite(Pin, !output);
 }
 void moduleUnderfloor::calcOutput() {
-	uint8 aktSetPoint = setPoint;
+	uint8_t aktSetPoint = setPoint;
 	if(summer) {
 		aktSetPoint = SUMMERTEMP * 10;
 	}
@@ -387,10 +387,10 @@ void moduleUnderfloor::deactivateWartung() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleUnderfloor::getVersion() {
-	String SVN = "$Rev: 268 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleUnderfloor::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -414,10 +414,10 @@ bool moduleUnderfloor::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleUnderfloor::CalcCycle(){
+uint32_t moduleUnderfloor::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleUnderfloor::CalcCycle(uint32 calcCycle){
+uint32_t moduleUnderfloor::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRain.cpp 258 2025-04-28 13:34:51Z                  $ #
+//# File-ID      : $Id:: moduleRain.cpp 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRain.h>
@@ -134,7 +134,7 @@ void moduleRain::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRain", logmessage);
 	}
 }
-uint16 moduleRain::calcAvg(uint16 raw) {
+uint16_t moduleRain::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -152,10 +152,10 @@ uint16 moduleRain::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleRain::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleRain::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -186,10 +186,10 @@ bool moduleRain::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleRain::CalcCycle(){
+uint32_t moduleRain::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRain::CalcCycle(uint32 calcCycle){
+uint32_t moduleRain::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

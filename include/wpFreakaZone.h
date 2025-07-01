@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 258 2025-04-28 13:34:51Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -64,22 +64,22 @@ class wpFreakaZone {
 		const char* password = "Welc0me@wp-Scheid.com";
 
 		const char* mqttServer = "mqtt.freakazone.com";
-		const uint16 mqttServerPort = 1883;
+		const uint16_t mqttServerPort = 1883;
 		const char* updateServer = "d1miniupdate.freakazone.com";
-		const uint16 finderListenPort = 51346;
-		const uint32 minute10  = 1000 * 60 * 10;
-		const uint32 minute5 = 1000 * 60 * 5;
-		const uint32 minute2 = 1000 * 60 * 2;
-		const uint32 sekunde30 = 1000 * 30;
-		const uint32 sekunde10 = 1000 * 10;
+		const uint16_t finderListenPort = 51346;
+		const uint32_t minute10  = 1000 * 60 * 10;
+		const uint32_t minute5 = 1000 * 60 * 5;
+		const uint32_t minute2 = 1000 * 60 * 2;
+		const uint32_t sekunde30 = 1000 * 30;
+		const uint32_t sekunde10 = 1000 * 10;
 		const unsigned long maxWorkingDays = 1000 * 60 * 60 * 24 * 14;
-		const uint32 publishQoS = minute10; // 10 minutes in ms
+		const uint32_t publishQoS = minute10; // 10 minutes in ms
 
 		unsigned long loopStartedAt;
 
-		uint16 MajorVersion = 3;
-		uint16 MinorVersion = 4;
-		uint16 Build;
+		uint16_t MajorVersion = 3;
+		uint16_t MinorVersion = 4;
+		uint16_t Build;
 		String Version;
 
 		String OnSince;
@@ -98,11 +98,11 @@ class wpFreakaZone {
 			"6", "7", "8", "9", "10", "11",
 			"D6", "D7", "D5", "D8", "D0", "A0"};
 
-		const uint8 restartReasonCmd = 1;
-		const uint8 restartReasonMaxWorking = 2;
-		const uint8 restartReasonUpdate = 3;
-		const uint8 restartReasonWiFi = 4;
-		const uint8 restartReasonOnlineToggler = 5;
+		const uint8_t restartReasonCmd = 1;
+		const uint8_t restartReasonMaxWorking = 2;
+		const uint8_t restartReasonUpdate = 3;
+		const uint8_t restartReasonWiFi = 4;
+		const uint8_t restartReasonOnlineToggler = 5;
 
 		String DeviceName = "BasisEmpty";
 		String DeviceDescription = "BasisEmpty";
@@ -128,13 +128,13 @@ class wpFreakaZone {
 		void cycle();
 		/// @brief Extract the version from the SVN string
 		/// @return SVN version
-		uint16 getVersion();
+		uint16_t getVersion();
 		/// @brief Extract the build from the SVN string
 		/// @param Rev SVN string
 		/// @return SVN build
-		uint16 getBuild(String);
+		uint16_t getBuild(String);
 		String getTime();
-		void getTime(uint8 &h, uint8 &m, uint8 &s);
+		void getTime(uint8_t &h, uint8_t &m, uint8_t &s);
 		String getDateTime();
 		String getOnlineTime();
 		String getOnlineTime(bool forDebug);
@@ -160,8 +160,8 @@ class wpFreakaZone {
 		void SetDeviceName(String name);
 		void SetDeviceDescription(String description);
 		void DebugcheckSubscribes(String topic, String value);
-		// void DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state);
-		// void DebugWriteByteToEEPROM(String name, uint16 addr, uint8 value);
+		// void DebugSaveBoolToEEPROM(String name, uint16_t addr, uint8_t bit, bool state);
+		// void DebugWriteByteToEEPROM(String name, uint16_t addr, uint8_t value);
 
 		void printStart();
 		void printRestored();
@@ -174,37 +174,37 @@ class wpFreakaZone {
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
 		bool sendRawRest(String target);
-		void InitBootCounter(uint8 bc);
+		void InitBootCounter(uint8_t bc);
 		void BootCount();
-		uint8 GetBootCounter();
+		uint8_t GetBootCounter();
 		void ResetBootCounter();
 		void InitMaxWorking(bool maxWorking);
 		void SetMaxWorking();
 		bool GetMaxWorking();
-		void InitLastRestartReason(uint8 restartReason);
+		void InitLastRestartReason(uint8_t restartReason);
 		String getLastRestartReason();
-		void SetRestartReason(uint8 restartReason);
+		void SetRestartReason(uint8_t restartReason);
 	private:
-		const uint8 blinkStatusNothing = 0;
-		const uint8 blinkStatusStart = 1;
-		const uint16 maxWorkingDelay = 1000;
+		const uint8_t blinkStatusNothing = 0;
+		const uint8_t blinkStatusStart = 1;
+		const uint16_t maxWorkingDelay = 1000;
 		
-		uint8 _restartReason = 0;
+		uint8_t _restartReason = 0;
 		const String restartReasonStringCmd = "Cmd";
 		const String restartReasonStringMaxWorking = "Max Working Counter occurd";
 		const String restartReasonStringUpdate = "Update";
 		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
 		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
 
-		String SVNh = "$Rev: 258 $";
+		String SVNh = "$Rev: 269 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
 		bool restartRequiredLast;
 		unsigned long publishRestartRequiredLast;
-		uint8 blinkStatus;
+		uint8_t blinkStatus;
 		unsigned long blinkStatsusLast;
-		uint8 bootCounter;
+		uint8_t bootCounter;
 		short blinkDelay;
 		bool useMaxWorking = false;
 		unsigned long maxWorkingMillis;

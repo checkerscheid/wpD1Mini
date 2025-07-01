@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: wpFreakaZone.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <wpFreakaZone.h>
@@ -58,17 +58,17 @@ void wpFreakaZone::cycle() {
 	RestartAfterMaxWorking();
 }
 
-uint16 wpFreakaZone::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t wpFreakaZone::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
-uint16 wpFreakaZone::getBuild(String Rev) {
+uint16_t wpFreakaZone::getBuild(String Rev) {
 	Rev.remove(0, 6);
 	Rev.remove(Rev.length() - 2, 2);
-	uint16 returns = Rev.toInt();
+	uint16_t returns = Rev.toInt();
 	return returns;
 }
 
@@ -84,7 +84,7 @@ String wpFreakaZone::getTime() {
 	return "[" + timeNow + "]";
 }
 
-void wpFreakaZone::getTime(uint8 &h, uint8 &m, uint8 &s) {
+void wpFreakaZone::getTime(uint8_t &h, uint8_t &m, uint8_t &s) {
 	time_t now;
 	tm tm;
 	time(&now);
@@ -325,7 +325,7 @@ bool wpFreakaZone::sendRawRest(String target) {
 	http.end();
 	return returns;
 }
-void wpFreakaZone::InitLastRestartReason(uint8 restartReason) {
+void wpFreakaZone::InitLastRestartReason(uint8_t restartReason) {
 	_restartReason = restartReason;
 }
 String wpFreakaZone::getLastRestartReason() {
@@ -336,7 +336,7 @@ String wpFreakaZone::getLastRestartReason() {
 	if(_restartReason == restartReasonOnlineToggler) return restartReasonStringOnlineToggler;
 	return "Unknown: " + String(_restartReason);
 }
-void wpFreakaZone::SetRestartReason(uint8 restartReason) {
+void wpFreakaZone::SetRestartReason(uint8_t restartReason) {
 	wpEEPROM.WriteByteToEEPROM(F("SetRestartReason"), wpEEPROM.addrRestartReason, restartReason);
 }
 //###################################################################################
@@ -395,11 +395,11 @@ void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	wpFZ.DebugWS(wpFZ.strINFO, F("checkSubscripes"), logmessage);
 	wpFZ.blink();
 }
-// void wpFreakaZone::DebugSaveBoolToEEPROM(String name, uint16 addr, uint8 bit, bool state) {
+// void wpFreakaZone::DebugSaveBoolToEEPROM(String name, uint16_t addr, uint8_t bit, bool state) {
 // 	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bit) + ", state: " + String(state);
 // 	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
 // }
-// void wpFreakaZone::DebugWriteByteToEEPROM(String name, uint16 addr, uint8 value) {
+// void wpFreakaZone::DebugWriteByteToEEPROM(String name, uint16_t addr, uint8_t value) {
 // 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(value);
 // 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
 // }
@@ -441,14 +441,14 @@ void wpFreakaZone::printRestored() {
 	Serial.print(funcToString("StartDevice"));
 	Serial.println(Version);
 }
-void wpFreakaZone::InitBootCounter(uint8 bc) {
+void wpFreakaZone::InitBootCounter(uint8_t bc) {
 	bootCounter = bc;
 }
 void wpFreakaZone::BootCount() {
 	bootCounter++;
 	wpEEPROM.WriteByteToEEPROM(F("BootCounter"), wpEEPROM.addrBootCounter, bootCounter);
 }
-uint8 wpFreakaZone::GetBootCounter() {
+uint8_t wpFreakaZone::GetBootCounter() {
 	return bootCounter;
 }
 void wpFreakaZone::ResetBootCounter() {

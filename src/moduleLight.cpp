@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLight.cpp 258 2025-04-28 13:34:51Z                 $ #
+//# File-ID      : $Id:: moduleLight.cpp 269 2025-07-01 19:25:14Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLight.h>
@@ -111,8 +111,8 @@ void moduleLight::publishValue() {
 
 void moduleLight::calc() {
 	float ar = lightMeter->readLightLevel();
-	uint32 read = (uint32_t)ar;
-	uint32 avg;
+	uint32_t read = (uint32_t)ar;
+	uint32_t avg;
 	if(!isnan(ar) || ar < 0) {
 		avg = read;
 		if(mb->useAvg) {
@@ -133,7 +133,7 @@ void moduleLight::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "wpLight::calc", logmessage);
 	}
 }
-uint32 moduleLight::calcAvg(uint32 raw) {
+uint32_t moduleLight::calcAvg(uint32_t raw) {
 	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -151,10 +151,10 @@ uint32 moduleLight::calcAvg(uint32 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleLight::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleLight::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -186,10 +186,10 @@ bool moduleLight::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleLight::CalcCycle(){
+uint32_t moduleLight::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleLight::CalcCycle(uint32 calcCycle){
+uint32_t moduleLight::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

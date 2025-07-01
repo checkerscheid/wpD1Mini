@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 252                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 252 2025-03-13 12:49:49Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 269 2025-07-01 19:25:14Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -23,101 +23,101 @@ class helperWebServer {
 		bool Debug = false;
 		// commands
 		String mqttTopicDebug;
-		const uint8 cmdDoNothing = 0;
+		const uint8_t cmdDoNothing = 0;
 
-		const uint8 cmdBlink = 1;
-		const uint8 cmdForceMqttUpdate = 2;
-		const uint8 cmdForceRenewValue = 3;
-		const uint8 cmdUpdateFW = 4;
-		const uint8 cmdUpdateCheck = 5;
-		const uint8 cmdUpdateHTTP = 6;
-		const uint8 cmdRestartESP = 7;
-		const uint8 cmdScanWiFi = 8;
-		const uint8 cmdCheckDns = 9;
-		const uint8 cmdSetName = 10;
-		const uint8 cmdMaxWorking = 11;
-		uint8 doCommand;
+		const uint8_t cmdBlink = 1;
+		const uint8_t cmdForceMqttUpdate = 2;
+		const uint8_t cmdForceRenewValue = 3;
+		const uint8_t cmdUpdateFW = 4;
+		const uint8_t cmdUpdateCheck = 5;
+		const uint8_t cmdUpdateHTTP = 6;
+		const uint8_t cmdRestartESP = 7;
+		const uint8_t cmdScanWiFi = 8;
+		const uint8_t cmdCheckDns = 9;
+		const uint8_t cmdSetName = 10;
+		const uint8_t cmdMaxWorking = 11;
+		uint8_t doCommand;
 
-		const uint8 cmdDebugEEPROM = 1;
-		const uint8 cmdDebugFinder = 2;
-		const uint8 cmdDebugModules = 3;
-		const uint8 cmdDebugMqtt = 4;
-		const uint8 cmdDebugOnlineToggler = 5;
-		const uint8 cmdDebugUpdate = 7;
-		const uint8 cmdDebugWebServer = 8;
-		const uint8 cmdDebugWiFi = 9;
+		const uint8_t cmdDebugEEPROM = 1;
+		const uint8_t cmdDebugFinder = 2;
+		const uint8_t cmdDebugModules = 3;
+		const uint8_t cmdDebugMqtt = 4;
+		const uint8_t cmdDebugOnlineToggler = 5;
+		const uint8_t cmdDebugUpdate = 7;
+		const uint8_t cmdDebugWebServer = 8;
+		const uint8_t cmdDebugWiFi = 9;
 
-		const uint8 cmdDebugDHT = 20;
-		const uint8 cmdDebugLDR = 21;
-		const uint8 cmdDebugLight = 22;
-		const uint8 cmdDebugBM = 23;
-		const uint8 cmdDebugWindow = 24;
-		const uint8 cmdDebugRelais = 25;
-		const uint8 cmdDebugRain = 26;
-		const uint8 cmdDebugMoisture = 27;
-		const uint8 cmdDebugDistance = 28;
-		const uint8 cmdDebugCwWw = 29;
-		const uint8 cmdDebugAnalogOut = 30;
-		const uint8 cmdDebugAnalogOut2 = 31;
-		const uint8 cmdDebugNeoPixel = 32;
-		const uint8 cmdDebugRpm = 33;
-		const uint8 cmdDebugImpulseCounter = 34;
-		const uint8 cmdDebugUnderfloor1 = 35;
-		const uint8 cmdDebugUnderfloor2 = 36;
-		const uint8 cmdDebugUnderfloor3 = 37;
-		const uint8 cmdDebugUnderfloor4 = 38;
-		const uint8 cmdDebugWindow2 = 39;
-		const uint8 cmdDebugWindow3 = 40;
-		const uint8 cmdDebugWeight = 41;
-		const uint8 cmdDebugRFID = 42;
-		const uint8 cmdDebugClock = 43;
-		const uint8 cmdDebugDS18B20 = 44;
-		uint8 doDebugChange;
+		const uint8_t cmdDebugDHT = 20;
+		const uint8_t cmdDebugLDR = 21;
+		const uint8_t cmdDebugLight = 22;
+		const uint8_t cmdDebugBM = 23;
+		const uint8_t cmdDebugWindow = 24;
+		const uint8_t cmdDebugRelais = 25;
+		const uint8_t cmdDebugRain = 26;
+		const uint8_t cmdDebugMoisture = 27;
+		const uint8_t cmdDebugDistance = 28;
+		const uint8_t cmdDebugCwWw = 29;
+		const uint8_t cmdDebugAnalogOut = 30;
+		const uint8_t cmdDebugAnalogOut2 = 31;
+		const uint8_t cmdDebugNeoPixel = 32;
+		const uint8_t cmdDebugRpm = 33;
+		const uint8_t cmdDebugImpulseCounter = 34;
+		const uint8_t cmdDebugUnderfloor1 = 35;
+		const uint8_t cmdDebugUnderfloor2 = 36;
+		const uint8_t cmdDebugUnderfloor3 = 37;
+		const uint8_t cmdDebugUnderfloor4 = 38;
+		const uint8_t cmdDebugWindow2 = 39;
+		const uint8_t cmdDebugWindow3 = 40;
+		const uint8_t cmdDebugWeight = 41;
+		const uint8_t cmdDebugRFID = 42;
+		const uint8_t cmdDebugClock = 43;
+		const uint8_t cmdDebugDS18B20 = 44;
+		uint8_t doDebugChange;
 
-		const uint8 cmdModuleDHT11 = 1;
-		const uint8 cmdModuleDHT22 = 2;
-		const uint8 cmdModuleLDR = 3;
-		const uint8 cmdModuleLight = 4;
-		const uint8 cmdModuleBM = 5;
-		const uint8 cmdModuleWindow = 6;
-		const uint8 cmdModuleRelais = 7;
-		const uint8 cmdModuleRelaisShield = 8;
-		const uint8 cmdModuleRain = 9;
-		const uint8 cmdModuleMoisture = 10;
-		const uint8 cmdModuleDistance = 11;
-		const uint8 cmdModuleCwWw = 12;
-		const uint8 cmdModuleAnalogOut = 13;
-		const uint8 cmdModuleAnalogOut2 = 14;
-		const uint8 cmdModuleNeoPixel = 15;
-		const uint8 cmdModuleRpm = 16;
-		const uint8 cmdmoduleImpulseCounter = 17;
-		const uint8 cmdmoduleUnderfloor1 = 18;
-		const uint8 cmdmoduleUnderfloor2 = 19;
-		const uint8 cmdmoduleUnderfloor3 = 20;
-		const uint8 cmdmoduleUnderfloor4 = 21;
-		const uint8 cmdModuleWindow2 = 22;
-		const uint8 cmdModuleWindow3 = 23;
-		const uint8 cmdModuleWeight = 24;
-		const uint8 cmdModuleRFID = 25;
-		const uint8 cmdModuleClock = 26;
-		const uint8 cmdmoduleDS18B20 = 27;
-		uint8 doModuleChange;
+		const uint8_t cmdModuleDHT11 = 1;
+		const uint8_t cmdModuleDHT22 = 2;
+		const uint8_t cmdModuleLDR = 3;
+		const uint8_t cmdModuleLight = 4;
+		const uint8_t cmdModuleBM = 5;
+		const uint8_t cmdModuleWindow = 6;
+		const uint8_t cmdModuleRelais = 7;
+		const uint8_t cmdModuleRelaisShield = 8;
+		const uint8_t cmdModuleRain = 9;
+		const uint8_t cmdModuleMoisture = 10;
+		const uint8_t cmdModuleDistance = 11;
+		const uint8_t cmdModuleCwWw = 12;
+		const uint8_t cmdModuleAnalogOut = 13;
+		const uint8_t cmdModuleAnalogOut2 = 14;
+		const uint8_t cmdModuleNeoPixel = 15;
+		const uint8_t cmdModuleRpm = 16;
+		const uint8_t cmdmoduleImpulseCounter = 17;
+		const uint8_t cmdmoduleUnderfloor1 = 18;
+		const uint8_t cmdmoduleUnderfloor2 = 19;
+		const uint8_t cmdmoduleUnderfloor3 = 20;
+		const uint8_t cmdmoduleUnderfloor4 = 21;
+		const uint8_t cmdModuleWindow2 = 22;
+		const uint8_t cmdModuleWindow3 = 23;
+		const uint8_t cmdModuleWeight = 24;
+		const uint8_t cmdModuleRFID = 25;
+		const uint8_t cmdModuleClock = 26;
+		const uint8_t cmdmoduleDS18B20 = 27;
+		uint8_t doModuleChange;
 
-		uint8 doBlink;
+		uint8_t doBlink;
 
 		helperWebServer();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 
 		AsyncWebServer webServer = AsyncWebServer(80);
 		AsyncWebSocket webSocket = AsyncWebSocket("/ws");
 
 		void setupWebServer();
-		void setCommand(uint8 command);
-		void setModuleChange(uint8 modul);
-		void setDebugChange(uint8 debug);
+		void setCommand(uint8_t command);
+		void setModuleChange(uint8_t modul);
+		void setDebugChange(uint8_t debug);
 		void setBlink();
 		void doTheCommand();
 		void doTheModuleChange();
@@ -134,7 +134,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 252 $";
+		String SVNh = "$Rev: 269 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;

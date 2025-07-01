@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: helperFinder.h 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperFinder_h
@@ -27,7 +27,7 @@ class helperFinder {
 		helperFinder();
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 		void changeDebug();
 		void setupFinder();
 
@@ -38,7 +38,7 @@ class helperFinder {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 };

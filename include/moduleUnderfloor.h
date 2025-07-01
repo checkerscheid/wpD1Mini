@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.09.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 264                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleUnderfloor.h 264 2025-05-01 17:27:44Z              $ #
+//# File-ID      : $Id:: moduleUnderfloor.h 269 2025-07-01 19:25:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleUnderfloor1_h
@@ -21,9 +21,9 @@
 
 class moduleUnderfloor : public IModuleBase {
 	public:
-		moduleUnderfloor(uint8 n);
+		moduleUnderfloor(uint8_t n);
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool output;
@@ -56,7 +56,7 @@ class moduleUnderfloor : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -66,24 +66,24 @@ class moduleUnderfloor : public IModuleBase {
 		void checkSubscribes(char* topic, String msg);
 		void changeDebug();
 		String GetJsonSettings();
-		void InitSetPoint(uint8 setpoint);
+		void InitSetPoint(uint8_t setpoint);
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
-		uint8 GetSetPoint();
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
+		uint8_t GetSetPoint();
 		String SetHand(bool val);
 		String SetHandValue(bool val);
-		String SetSetPoint(uint8 setpoint);
+		String SetSetPoint(uint8_t setpoint);
 		String SetTopicTempUrl(String topic);
 		String SetWartung();
 		void InitSummer(bool summer) { this->summer = summer; };
 		String SetSummer(bool summer);
 		bool GetSummer() { return summer; }
 	private:
-		const uint8 SUMMERTEMP = 12;
-		uint8 no;
+		const uint8_t SUMMERTEMP = 12;
+		uint8_t no;
 		bool outputLast;
 		unsigned long publishOutputLast;
 		bool autoValueLast;
@@ -94,7 +94,7 @@ class moduleUnderfloor : public IModuleBase {
 		unsigned long publishReadedTempLast;
 		bool handErrorLast;
 		unsigned long publishHandErrorLast;
-		uint8 setPointLast;
+		uint8_t setPointLast;
 		unsigned long publishSetPointLast;
 		String tempUrlLast;
 		unsigned long publishTempUrlLast;
@@ -110,15 +110,15 @@ class moduleUnderfloor : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 264 $";
+		String SVNh = "$Rev: 269 $";
 
-		uint8 bitDebug;
-		uint8 bitHand;
-		uint8 bitHandValue;
-		uint8 bitSummer;
-		uint16 byteSetpoint;
-		uint16 byteCalcCycle;
-		uint8 setPoint;
+		uint8_t bitDebug;
+		uint8_t bitHand;
+		uint8_t bitHandValue;
+		uint8_t bitSummer;
+		uint16_t byteSetpoint;
+		uint16_t byteCalcCycle;
+		uint8_t setPoint;
 		int temp;
 		bool wartungActive;
 		unsigned long wartungStartedAt;

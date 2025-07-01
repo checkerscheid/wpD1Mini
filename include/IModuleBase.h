@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 19.12.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 233                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: IModuleBase.h 233 2024-12-19 15:28:34Z                   $ #
+//# File-ID      : $Id:: IModuleBase.h 269 2025-07-01 19:25:14Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef IModuleBase_h
@@ -21,7 +21,7 @@ class IModuleBase {
 		virtual ~IModuleBase() {}
 		virtual void init() = 0;
 		virtual void cycle() = 0;
-		virtual uint16 getVersion() = 0;
+		virtual uint16_t getVersion() = 0;
 		virtual void publishSettings() = 0;
 		virtual void publishSettings(bool force) = 0;
 		virtual void publishValues() = 0;

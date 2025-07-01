@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleLDR.cpp 258 2025-04-28 13:34:51Z                   $ #
+//# File-ID      : $Id:: moduleLDR.cpp 269 2025-07-01 19:25:14Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleLDR.h>
@@ -133,7 +133,7 @@ void moduleLDR::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcLDR", logmessage);
 	}
 }
-uint16 moduleLDR::calcAvg(uint16 raw) {
+uint16_t moduleLDR::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -151,10 +151,10 @@ uint16 moduleLDR::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleLDR::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleLDR::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -185,10 +185,10 @@ bool moduleLDR::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleLDR::CalcCycle(){
+uint32_t moduleLDR::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleLDR::CalcCycle(uint32 calcCycle){
+uint32_t moduleLDR::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

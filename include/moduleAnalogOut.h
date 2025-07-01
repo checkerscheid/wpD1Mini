@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 264                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.h 264 2025-05-01 17:27:44Z               $ #
+//# File-ID      : $Id:: moduleAnalogOut.h 269 2025-07-01 19:25:14Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut_h
@@ -24,7 +24,7 @@ class moduleAnalogOut : public IModuleBase {
 	public:
 		moduleAnalogOut();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// values
 		String mqttTopicOut;
@@ -52,7 +52,7 @@ class moduleAnalogOut : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -65,8 +65,8 @@ class moduleAnalogOut : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 		void InitKp(short kp);
 		void InitTv(short tv);
 		void InitTn(short tn);
@@ -77,15 +77,15 @@ class moduleAnalogOut : public IModuleBase {
 
 		void InitHand(bool hand);
 
-		void InitHandValue(uint8 value);
-		void SetHandValue(uint8 value);
-		void SetHandValueProzent(uint8 value);
-		uint8 GetHandValue();
+		void InitHandValue(uint8_t value);
+		void SetHandValue(uint8_t value);
+		void SetHandValueProzent(uint8_t value);
+		uint8_t GetHandValue();
 
 		bool GetHandError();
 
-		void InitPidType(uint8 t);
-		String SetPidType(uint8 t);
+		void InitPidType(uint8_t t);
+		String SetPidType(uint8_t t);
 		String GetPidType();
 
 		String SetWartung();
@@ -95,17 +95,17 @@ class moduleAnalogOut : public IModuleBase {
 		bool GetSummer() { return summer; }
 
 	private:
-		const uint8 SUMMERTEMP = 12;
+		const uint8_t SUMMERTEMP = 12;
 		PID* pid;
 		// section for define
-		uint8 output;
-		uint8 autoValue;
-		uint8 handValue;
+		uint8_t output;
+		uint8_t autoValue;
+		uint8_t handValue;
 		bool handError;
 		bool handSet = false;
-		uint8 handValueSet = 0;
-		static const uint8 pidTypeHeating = DIRECT;
-		static const uint8 pidTypeAirCondition = REVERSE;
+		uint8_t handValueSet = 0;
+		static const uint8_t pidTypeHeating = DIRECT;
+		static const uint8_t pidTypeAirCondition = REVERSE;
 		double Kp = 1.0;
 		double Tv = 0.2;
 		double Tn = 0.0;
@@ -114,11 +114,11 @@ class moduleAnalogOut : public IModuleBase {
 
 		const double minOutput = 0.0;
 		const double maxOutput = 255.0;
-		uint8 outputLast;
+		uint8_t outputLast;
 		unsigned long publishOutputLast;
-		uint8 autoValueLast;
+		uint8_t autoValueLast;
 		unsigned long publishAutoValueLast;
-		uint8 handValueLast;
+		uint8_t handValueLast;
 		unsigned long publishHandValueLast;
 		bool handErrorLast;
 		unsigned long publishHandErrorLast;
@@ -144,9 +144,9 @@ class moduleAnalogOut : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 264 $";
+		String SVNh = "$Rev: 269 $";
 		int temp;
-		uint8 pidType = pidTypeHeating;
+		uint8_t pidType = pidTypeHeating;
 		bool wartungActive;
 		unsigned long wartungStartedAt;
 };

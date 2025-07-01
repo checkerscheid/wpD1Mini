@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleRelais.h 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRelais_h
@@ -23,7 +23,7 @@ class moduleRelais : public IModuleBase {
 	public:
 		moduleRelais();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool output;
@@ -35,8 +35,8 @@ class moduleRelais : public IModuleBase {
 		// wpModules.useModuleMoisture {
 		bool waterEmptySet = false;
 		bool waterEmptyError;
-		uint8 pumpActive; // in seconds
-		uint16 pumpPause; // show in minutes, save in seconds
+		uint8_t pumpActive; // in seconds
+		uint16_t pumpPause; // show in minutes, save in seconds
 		// }
 
 		// values
@@ -59,7 +59,7 @@ class moduleRelais : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -89,7 +89,7 @@ class moduleRelais : public IModuleBase {
 		unsigned long pumpTimeStart;
 		unsigned long pumpTimePause;
 
-		uint8 debugCalcPumpCounter;
+		uint8_t debugCalcPumpCounter;
 		unsigned long remainPumpTimePause;
 		// }
 		bool startPumpTestActive;
@@ -107,7 +107,7 @@ class moduleRelais : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleRelais wpRelais;
 

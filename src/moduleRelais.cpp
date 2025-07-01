@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRelais.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: moduleRelais.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRelais.h>
@@ -178,7 +178,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpActive.c_str()) == 0) {
-			uint8 readPumpActive = msg.toInt();
+			uint8_t readPumpActive = msg.toInt();
 			if(pumpActive != readPumpActive) {
 				pumpActive = readPumpActive;
 				wpEEPROM.WriteByteToEEPROM("pumpActive", wpEEPROM.bytePumpActive, pumpActive);
@@ -186,7 +186,7 @@ void moduleRelais::checkSubscribes(char* topic, String msg) {
 			}
 		}
 		if(strcmp(topic, mqttTopicPumpPause.c_str()) == 0) {
-			uint16 readPumpPause = msg.toInt();
+			uint16_t readPumpPause = msg.toInt();
 			readPumpPause *= 60;
 			if(pumpPause != readPumpPause) {
 				pumpPause = readPumpPause;
@@ -356,10 +356,10 @@ String moduleRelais::getReadableTime(unsigned long time) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleRelais::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleRelais::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

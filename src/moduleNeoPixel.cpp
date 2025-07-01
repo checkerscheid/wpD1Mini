@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 265                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 265 2025-05-25 13:08:17Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 269 2025-07-01 19:25:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -296,35 +296,35 @@ void moduleNeoPixel::setSubscribes() {
 
 void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetR.c_str()) == 0) {
-		uint8 readValueR = msg.toInt();
+		uint8_t readValueR = msg.toInt();
 		if(valueR != readValueR) {
 			SetValueR(readValueR);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetR, String(valueR));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetG.c_str()) == 0) {
-		uint8 readValueG = msg.toInt();
+		uint8_t readValueG = msg.toInt();
 		if(valueG != readValueG) {
 			SetValueG(readValueG);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetG, String(valueG));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetB.c_str()) == 0) {
-		uint8 readValueB = msg.toInt();
+		uint8_t readValueB = msg.toInt();
 		if(valueB != readValueB) {
 			SetValueB(readValueB);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetB, String(valueB));
 		}
 	}
 	if(useWW && strcmp(topic, mqttTopicSetWW.c_str()) == 0) {
-		uint8 readWW = msg.toInt();
+		uint8_t readWW = msg.toInt();
 		if(targetWW != readWW) {
 			SetWW(readWW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetWW, String(targetWW));
 		}
 	}
 	if(useCW && strcmp(topic, mqttTopicSetCW.c_str()) == 0) {
-		uint8 readCW = msg.toInt();
+		uint8_t readCW = msg.toInt();
 		if(targetCW != readCW) {
 			SetCW(readCW);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
@@ -345,14 +345,14 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetEffectSpeed.c_str()) == 0) {
-		uint8 readSetEffectSpeed = msg.toInt();
+		uint8_t readSetEffectSpeed = msg.toInt();
 		if(effectSpeed != readSetEffectSpeed) {
 			SetEffectSpeed(readSetEffectSpeed);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetEffectSpeed, String(effectSpeed));
 		}
 	}
 	if(strcmp(topic, mqttTopicSetPixelCount.c_str()) == 0) {
-		uint16 readPixelCount = msg.toInt();
+		uint16_t readPixelCount = msg.toInt();
 		if(pixelCount != readPixelCount) {
 			SetPixelCount(readPixelCount);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetPixelCount, String(readPixelCount));
@@ -379,43 +379,43 @@ void moduleNeoPixel::checkSubscribes(char* topic, String msg) {
 	}
 	mb->checkSubscribes(topic, msg);
 }
-void moduleNeoPixel::InitValueR(uint8 r) {
+void moduleNeoPixel::InitValueR(uint8_t r) {
 	valueR = r;
 	staticIsSet = false;
 }
-uint8 moduleNeoPixel::GetValueR() { return valueR; }
-String moduleNeoPixel::SetValueR(uint8 r) {
+uint8_t moduleNeoPixel::GetValueR() { return valueR; }
+String moduleNeoPixel::SetValueR(uint8_t r) {
 	targetR = r;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelR", wpEEPROM.byteNeoPixelValueR, targetR);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
 	return wpFZ.JsonKeyValue("R", String(targetR));
 }
-void moduleNeoPixel::InitValueG(uint8 g) {
+void moduleNeoPixel::InitValueG(uint8_t g) {
 	valueG = g;
 	staticIsSet = false;
 }
-uint8 moduleNeoPixel::GetValueG() { return valueG; }
-String moduleNeoPixel::SetValueG(uint8 g) {
+uint8_t moduleNeoPixel::GetValueG() { return valueG; }
+String moduleNeoPixel::SetValueG(uint8_t g) {
 	targetG = g;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelG", wpEEPROM.byteNeoPixelValueG, targetG);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
 	return wpFZ.JsonKeyValue("G", String(targetG));
 }
-void moduleNeoPixel::InitValueB(uint8 b) {
+void moduleNeoPixel::InitValueB(uint8_t b) {
 	valueB = b;
 	staticIsSet = false;
 }
-uint8 moduleNeoPixel::GetValueB() { return valueB; }
-String moduleNeoPixel::SetValueB(uint8 b) {
+uint8_t moduleNeoPixel::GetValueB() { return valueB; }
+String moduleNeoPixel::SetValueB(uint8_t b) {
 	targetB = b;
 	wpEEPROM.WriteByteToEEPROM("NeoPixelB", wpEEPROM.byteNeoPixelValueB, targetB);
 	staticIsSet = false;
 	modeCurrent = ModeBlender;
 	return wpFZ.JsonKeyValue("B", String(targetB));
 }
-String moduleNeoPixel::SetEffectSpeed(uint8 es) {
+String moduleNeoPixel::SetEffectSpeed(uint8_t es) {
 	if(es > 20) es = 20;
 	if(es < 1) es = 1;
 	effectSpeed = es;
@@ -524,13 +524,13 @@ String moduleNeoPixel::SetCW(uint cw) {
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
 void moduleNeoPixel::calcDuration() {
-	uint8 distWW = abs(AnalogOutWW - targetWW);
-	uint8 distCW = abs(AnalogOutCW - targetCW);
+	uint8_t distWW = abs(AnalogOutWW - targetWW);
+	uint8_t distCW = abs(AnalogOutCW - targetCW);
 	uint dist = distWW >= distCW ? distWW : distCW;
 	uint s = (int)(dist / 80.0);
 	steps = s == 0 ? 1 : s;
 }
-String moduleNeoPixel::SetOffRunner(uint8 setSteps) {
+String moduleNeoPixel::SetOffRunner(uint8_t setSteps) {
 	steps = setSteps;
 	demoMode = false;
 	modeCurrent = ModeOffRunner;
@@ -538,11 +538,11 @@ String moduleNeoPixel::SetOffRunner(uint8 setSteps) {
 	wpFZ.DebugWS(wpFZ.strINFO, "NeoPixel::SetOff", "Color, '0'");
 	return wpFZ.JsonKeyValue("Mode", GetModeName(modeCurrent));
 }
-void moduleNeoPixel::InitPixelCount(uint16 pc) {
+void moduleNeoPixel::InitPixelCount(uint16_t pc) {
 	pixelCount = pc;
 }
-uint16 moduleNeoPixel::GetPixelCount() { return pixelCount; }
-void moduleNeoPixel::SetPixelCount(uint16 pc) {
+uint16_t moduleNeoPixel::GetPixelCount() { return pixelCount; }
+void moduleNeoPixel::SetPixelCount(uint16_t pc) {
 	wpEEPROM.WriteWordToEEPROM("NeoPixelPC", wpEEPROM.byteNeoPixelPixelCount, pc);
 	wpFZ.restartRequired = true;
 }
@@ -592,7 +592,7 @@ String moduleNeoPixel::GetModeName(uint actualMode) {
 	}
 	return returns;
 }
-String moduleNeoPixel::SetMode(uint8 newMode) {
+String moduleNeoPixel::SetMode(uint8_t newMode) {
 	modeCurrent = newMode;
 	targetCW = 0;
 	targetWW = 0;
@@ -1099,8 +1099,8 @@ void moduleNeoPixel::setBorder(uint32_t c) {
 	wpFZ.sendRawRest(target);
 	lastBorderSend = wpFZ.loopStartedAt;
 }
-uint8 moduleNeoPixel::GetMaxPercent() {
-	uint8 returns = 0;
+uint8_t moduleNeoPixel::GetMaxPercent() {
+	uint8_t returns = 0;
 	returns = valueR > returns ? valueR : returns;
 	returns = valueG > returns ? valueG : returns;
 	returns = valueB > returns ? valueB : returns;
@@ -1113,10 +1113,10 @@ uint8 moduleNeoPixel::GetMaxPercent() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 265 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleNeoPixel::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

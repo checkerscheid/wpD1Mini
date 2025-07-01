@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 259                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 259 2025-04-28 17:06:12Z                        $ #
+//# File-ID      : $Id:: main.cpp 269 2025-07-01 19:25:14Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -230,16 +230,16 @@ void loop() {
 //###################################################################################
 // Allgemein
 //###################################################################################
-uint16 getVersion() {
-	String SVN = "$Rev: 259 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
 String getStringVersion() {
-	uint16 globalBuild = getGlobalBuild();
-	uint16 Build = getVersion();
+	uint16_t globalBuild = getGlobalBuild();
+	uint16_t Build = getVersion();
 
 	String returns = "V " +
 		String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) +
@@ -247,8 +247,8 @@ String getStringVersion() {
 	return returns;
 }
 
-uint16 getGlobalBuild() {
- 	uint16 v = 0;
+uint16_t getGlobalBuild() {
+ 	uint16_t v = 0;
 	buildChecker(v, wpEEPROM.getVersion());
 	buildChecker(v, wpFinder.getVersion());
 	buildChecker(v, wpModules.getVersion());
@@ -288,13 +288,13 @@ uint16 getGlobalBuild() {
 	buildChecker(v, wpClock.getVersion());
 	return v;
 }
-void buildChecker(uint16 &v, uint16 moduleBuild) {
+void buildChecker(uint16_t &v, uint16_t moduleBuild) {
 	v = v > moduleBuild ? v : moduleBuild;
 }
 
-uint16 getBuild() {
-	uint16 globalBuild = getGlobalBuild();
-	uint16 Build = getVersion();
+uint16_t getBuild() {
+	uint16_t globalBuild = getGlobalBuild();
+	uint16_t Build = getVersion();
 	return globalBuild > Build ? globalBuild : Build;
 }
 

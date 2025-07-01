@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.h 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: moduleDistance.h 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDistance_h
@@ -23,16 +23,16 @@ class moduleDistance : public IModuleBase {
 	public:
 		moduleDistance();
 		moduleBase* mb;
-		uint8 PinTrig;
-		uint8 PinEcho;
+		uint8_t PinTrig;
+		uint8_t PinEcho;
 
 		// section for define
-		uint16 volume;
-		uint16 distanceRaw;
-		uint16 distanceAvg;
+		uint16_t volume;
+		uint16_t distanceRaw;
+		uint16_t distanceAvg;
 
-		uint8 height = 120;
-		uint16 maxVolume = 6000;
+		uint8_t height = 120;
+		uint16_t maxVolume = 6000;
 		int8 correction = 0;
 
 		// values
@@ -48,7 +48,7 @@ class moduleDistance : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -61,29 +61,29 @@ class moduleDistance : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
-		uint16 volumeLast;
+		uint16_t volumeLast;
 		unsigned long publishVolumeLast;
-		uint16 distanceRawLast;
+		uint16_t distanceRawLast;
 		unsigned long publishDistanceRawLast;
-		uint16 distanceAvgLast;
+		uint16_t distanceAvgLast;
 		unsigned long publishDistanceAvgLast;
 		
-		static const uint8 avgLength = 128;
+		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void publishDistanceRaw();
 		void publishDistanceAvg();
 		void calc();
-		uint16 calcAvg(uint16 raw);
-		void calcDistanceDebug(String name, uint16 avg, uint16 raw, unsigned long duration);
+		uint16_t calcAvg(uint16_t raw);
+		void calcDistanceDebug(String name, uint16_t avg, uint16_t raw, unsigned long duration);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleDistance wpDistance;
 

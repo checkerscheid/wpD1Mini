@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 263                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleClock.cpp 263 2025-04-30 13:46:12Z                 $ #
+//# File-ID      : $Id:: moduleClock.cpp 269 2025-07-01 19:25:14Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleClock.h>
@@ -122,7 +122,7 @@ void moduleClock::setSubscribes() {
 
 void moduleClock::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetPixelCount.c_str()) == 0) {
-		uint16 readPixelCount = msg.toInt();
+		uint16_t readPixelCount = msg.toInt();
 		if(pixelCount != readPixelCount) {
 			SetPixelCount(readPixelCount);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetPixelCount, String(readPixelCount));
@@ -136,11 +136,11 @@ void moduleClock::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicSetSpr.c_str()) == 0) {
-		uint16 readSpr = msg.toInt();
+		uint16_t readSpr = msg.toInt();
 		SetSpr(readSpr);
 	}
 	if(strcmp(topic, mqttTopicSetRpm.c_str()) == 0) {
-		uint16 readRpm = msg.toInt();
+		uint16_t readRpm = msg.toInt();
 		SetRpm(readRpm);
 	}
 	mb->checkSubscribes(topic, msg);
@@ -151,7 +151,7 @@ void moduleClock::checkSubscribes(char* topic, String msg) {
 // private
 //###################################################################################
 void moduleClock::calc() {
-	//uint16 millis = wpFZ.loopStartedAt  % 1000;
+	//uint16_t millis = wpFZ.loopStartedAt  % 1000;
 	if(!simulateTime) {
 		wpFZ.getTime(hour, minute, second);
 	}
@@ -194,18 +194,18 @@ void moduleClock::SetRGB(bool rgb) {
 	}
 	strip->clear();
 }
-void moduleClock::InitPixelCount(uint16 pc) {
+void moduleClock::InitPixelCount(uint16_t pc) {
 	pixelCount = pc;
 }
-uint16 moduleClock::GetPixelCount() { return pixelCount; }
-void moduleClock::SetPixelCount(uint16 pc) {
+uint16_t moduleClock::GetPixelCount() { return pixelCount; }
+void moduleClock::SetPixelCount(uint16_t pc) {
 	wpEEPROM.WriteWordToEEPROM("NeoPixelPC", wpEEPROM.byteNeoPixelPixelCount, pc);
 	wpFZ.restartRequired = true;
 }
-uint16 moduleClock::GetSpr() {
+uint16_t moduleClock::GetSpr() {
 	return spr;
 }
-void moduleClock::SetSpr(uint16 StepsPerRound) {
+void moduleClock::SetSpr(uint16_t StepsPerRound) {
 	if(spr != StepsPerRound) {
 		spr = StepsPerRound;
 		//EEPROM.put(wpEEPROM.byteClockSpr, spr);
@@ -214,10 +214,10 @@ void moduleClock::SetSpr(uint16 StepsPerRound) {
 		wpFZ.DebugcheckSubscribes(mqttTopicSetSpr, String(spr));
 	}
 }
-uint16 moduleClock::GetRpm() {
+uint16_t moduleClock::GetRpm() {
 	return rpm;
 }
-void moduleClock::SetRpm(uint16 RoundsPerMinute) {
+void moduleClock::SetRpm(uint16_t RoundsPerMinute) {
 	if(rpm != RoundsPerMinute) {
 		rpm = RoundsPerMinute;
 		//EEPROM.put(wpEEPROM.byteClockRpm, rpm);
@@ -262,7 +262,7 @@ String moduleClock::GetColor5() {
 	wpFZ.JsonKeyValue("B", String(Color5B)) + F("}");
 }
 
-void moduleClock::SetColorH(uint8 r, uint8 g, uint8 b) {
+void moduleClock::SetColorH(uint8_t r, uint8_t g, uint8_t b) {
 	ColorHR = r;
 	wpEEPROM.WriteByteToEEPROM("SetColorHR", wpEEPROM.byteClockColorHR, r, false);
 	ColorHG = g;
@@ -271,7 +271,7 @@ void moduleClock::SetColorH(uint8 r, uint8 g, uint8 b) {
 	wpEEPROM.WriteByteToEEPROM("SetColorHB", wpEEPROM.byteClockColorHB, b);
 	wpFZ.DebugWS(wpFZ.strINFO, "SetColorH", "New Color, save to EEPROM: " + GetColorH());
 }
-void moduleClock::SetColorM(uint8 r, uint8 g, uint8 b) {
+void moduleClock::SetColorM(uint8_t r, uint8_t g, uint8_t b) {
 	ColorMR = r;
 	wpEEPROM.WriteByteToEEPROM("SetColorMR", wpEEPROM.byteClockColorMR, r, false);
 	ColorMG = g;
@@ -280,7 +280,7 @@ void moduleClock::SetColorM(uint8 r, uint8 g, uint8 b) {
 	wpEEPROM.WriteByteToEEPROM("SetColorMB", wpEEPROM.byteClockColorMB, b);
 	wpFZ.DebugWS(wpFZ.strINFO, "SetColorM", "New Color, save to EEPROM: " + GetColorM());
 }
-void moduleClock::SetColorS(uint8 r, uint8 g, uint8 b) {
+void moduleClock::SetColorS(uint8_t r, uint8_t g, uint8_t b) {
 	ColorSR = r;
 	wpEEPROM.WriteByteToEEPROM("SetColorSR", wpEEPROM.byteClockColorSR, r, false);
 	ColorSG = g;
@@ -289,7 +289,7 @@ void moduleClock::SetColorS(uint8 r, uint8 g, uint8 b) {
 	wpEEPROM.WriteByteToEEPROM("SetColorSB", wpEEPROM.byteClockColorSB, b);
 	wpFZ.DebugWS(wpFZ.strINFO, "SetColorS", "New Color, save to EEPROM: " + GetColorS());
 }
-void moduleClock::SetColorQ(uint8 r, uint8 g, uint8 b) {
+void moduleClock::SetColorQ(uint8_t r, uint8_t g, uint8_t b) {
 	ColorQR = r;
 	wpEEPROM.WriteByteToEEPROM("SetColorQR", wpEEPROM.byteClockColorQR, r, false);
 	ColorQG = g;
@@ -298,7 +298,7 @@ void moduleClock::SetColorQ(uint8 r, uint8 g, uint8 b) {
 	wpEEPROM.WriteByteToEEPROM("SetColorQB", wpEEPROM.byteClockColorQB, b);
 	wpFZ.DebugWS(wpFZ.strINFO, "SetColorQ", "New Color, save to EEPROM: " + GetColorQ());
 }
-void moduleClock::SetColor5(uint8 r, uint8 g, uint8 b) {
+void moduleClock::SetColor5(uint8_t r, uint8_t g, uint8_t b) {
 	Color5R = r;
 	wpEEPROM.WriteByteToEEPROM("SetColor5R", wpEEPROM.byteClockColor5R, r, false);
 	Color5G = g;
@@ -356,10 +356,10 @@ void moduleClock::SimulateTime(short h, short m, short s) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleClock::getVersion() {
-	String SVN = "$Rev: 263 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleClock::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -391,10 +391,10 @@ bool moduleClock::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleClock::CalcCycle(){
+uint32_t moduleClock::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleClock::CalcCycle(uint32 calcCycle){
+uint32_t moduleClock::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

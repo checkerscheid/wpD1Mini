@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.cpp 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: moduleWindow.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWindow.h>
@@ -19,7 +19,7 @@ moduleWindow wpWindow1(1);
 moduleWindow wpWindow2(2);
 moduleWindow wpWindow3(3);
 
-moduleWindow::moduleWindow(uint8 n) {
+moduleWindow::moduleWindow(uint8_t n) {
 	no = n;
 	ModuleName = "Window" + String(no);
 	mb = new moduleBase(ModuleName);
@@ -119,10 +119,10 @@ void moduleWindow::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleWindow::getVersion() {
-	String SVN = "$Rev: 246 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleWindow::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

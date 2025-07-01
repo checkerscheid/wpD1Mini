@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 21.11.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 228                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: deviceOneWire.h 228 2024-12-03 08:19:36Z                 $ #
+//# File-ID      : $Id:: deviceOneWire.h 269 2025-07-01 19:25:14Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef deviceOneWire_h
@@ -20,8 +20,8 @@
 
 class deviceOneWire {
 	public:
-		deviceOneWire(uint8 no);
-		uint8 number;
+		deviceOneWire(uint8_t no);
+		uint8_t number;
 		bool debug;
 
 		// section for define
@@ -37,7 +37,7 @@ class deviceOneWire {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -47,13 +47,13 @@ class deviceOneWire {
 		void checkSubscribes(char* topic, String msg);
 		// getter / setter
 
-		void setAddress(uint8 adr[8]);
+		void setAddress(uint8_t adr[8]);
 		uint8_t* getAddress();
 		String getStringAddress();
 
 		void setTemperature(float t);
 	private:
-		uint8 address[8];
+		uint8_t address[8];
 		int temperatureLast;
 		unsigned long publishTemperatureLast;
 		int8 correctionLast;
@@ -65,7 +65,7 @@ class deviceOneWire {
 	
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 228 $";
+		String SVNh = "$Rev: 269 $";
 };
 
 #endif

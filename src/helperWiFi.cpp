@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 258 2025-04-28 13:34:51Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -47,10 +47,10 @@ void helperWiFi::cycle() {
 	publishValues();
 }
 
-uint16 helperWiFi::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t helperWiFi::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -78,7 +78,7 @@ void helperWiFi::setupWiFi() {
 	Serial.print(wpFZ.getOnlineTime());
 	Serial.print(wpFZ.strINFO);
 	Serial.print(wpFZ.funcToString("setupWiFi"));
-	uint16 trys = 0;
+	uint16_t trys = 0;
 	while(WiFi.status() != WL_CONNECTED) {
 		if(trys++ > 1000) {
 			wpFZ.SetRestartReason(wpFZ.restartReasonWiFi);

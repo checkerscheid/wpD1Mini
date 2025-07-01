@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 258 2025-04-28 13:34:51Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 269 2025-07-01 19:25:14Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -177,10 +177,10 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleDHT::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleDHT::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -204,10 +204,10 @@ bool moduleDHT::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleDHT::CalcCycle() {
+uint32_t moduleDHT::CalcCycle() {
 	return mb->calcCycle;
 }
-uint32 moduleDHT::CalcCycle(uint32 calcCycle){
+uint32_t moduleDHT::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

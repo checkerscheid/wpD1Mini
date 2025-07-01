@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDistance.cpp 258 2025-04-28 13:34:51Z              $ #
+//# File-ID      : $Id:: moduleDistance.cpp 269 2025-07-01 19:25:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDistance.h>
@@ -105,7 +105,7 @@ void moduleDistance::setSubscribes() {
 
 void moduleDistance::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicCorrection.c_str()) == 0) {
-		uint8 readCorrection = msg.toInt();
+		uint8_t readCorrection = msg.toInt();
 		if(correction != readCorrection) {
 			correction = readCorrection;
 			wpEEPROM.WriteByteToEEPROM("DistanceCorrection", wpEEPROM.byteDistanceCorrection, correction);
@@ -113,7 +113,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicHeight.c_str()) == 0) {
-		uint8 readHeight = msg.toInt();
+		uint8_t readHeight = msg.toInt();
 		if(height != readHeight) {
 			height = readHeight;
 			wpEEPROM.WriteByteToEEPROM("DistanceHeight", wpEEPROM.byteHeight, height);
@@ -121,7 +121,7 @@ void moduleDistance::checkSubscribes(char* topic, String msg) {
 		}
 	}
 	if(strcmp(topic, mqttTopicMaxVolume.c_str()) == 0) {
-		uint16 readMaxVolume = msg.toInt();
+		uint16_t readMaxVolume = msg.toInt();
 		if(maxVolume != readMaxVolume) {
 			maxVolume = readMaxVolume;
 			wpEEPROM.WriteWordToEEPROM("DistanceMaxVolume", wpEEPROM.byteMaxVolume, maxVolume);
@@ -189,7 +189,7 @@ void moduleDistance::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcDistance", logmessage);
 	}
 }
-uint16 moduleDistance::calcAvg(uint16 raw) {
+uint16_t moduleDistance::calcAvg(uint16_t raw) {
 	unsigned long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -203,7 +203,7 @@ uint16 moduleDistance::calcAvg(uint16 raw) {
 	avg += raw * avgLength;
 	return round(avg / avgCount);
 }
-void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsigned long duration) {
+void moduleDistance::calcDistanceDebug(String name, uint16_t avg, uint16_t raw, unsigned long duration) {
 	String logmessage = name + " (avg): " + String(avg) + " (raw: " + String(raw) + ", duration: " + String(duration) + ")";
 	wpFZ.DebugWS(wpFZ.strDEBUG, "calcDistance", logmessage);
 }
@@ -211,10 +211,10 @@ void moduleDistance::calcDistanceDebug(String name, uint16 avg, uint16 raw, unsi
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleDistance::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleDistance::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -240,10 +240,10 @@ bool moduleDistance::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleDistance::CalcCycle(){
+uint32_t moduleDistance::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleDistance::CalcCycle(uint32 calcCycle){
+uint32_t moduleDistance::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

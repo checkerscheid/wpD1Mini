@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 264                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 264 2025-05-01 17:27:44Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -25,7 +25,7 @@ helperEEPROM::helperEEPROM() {
 		EEPROM.write(addrBitsModules2, 0);
 		EEPROM.write(addrBitsModules3, 0);
 		EEPROM.write(byteDS18B20Count, 0);	
-		uint16 pixelCountReset = 0;
+		uint16_t pixelCountReset = 0;
 		EEPROM.put(byteNeoPixelPixelCount, pixelCountReset);
 		readStringsFromEEPROM();
 		wpBM.lightToTurnOn = "_";
@@ -50,10 +50,10 @@ void helperEEPROM::cycle() {
 	publishValues();
 }
 
-uint16 helperEEPROM::getVersion() {
-	String SVN = "$Rev: 264 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t helperEEPROM::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -97,38 +97,38 @@ void helperEEPROM::writeStringsToEEPROM() {
 	byteStartForString = writeStringToEEPROM(byteStartForString, wpAnalogOut.mqttTopicTemp);
 }
 
-void helperEEPROM::WriteBoolToEEPROM(String name, const uint16 &addr, byte &by, const uint8 &bi, bool &v, bool commit) {
+void helperEEPROM::WriteBoolToEEPROM(String name, const uint16_t &addr, byte &by, const uint8_t &bi, bool &v, bool commit) {
 	bitWrite(by, bi, v);
 	EEPROM.write(addr, by);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", bit: " + String(bi) + ", state: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("SaveBoolToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, uint8 &v, bool commit) {
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16_t &addr, uint8_t &v, bool commit) {
 	EEPROM.write(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteByteToEEPROM(String name, const uint16 &addr, int8 &v, bool commit) {
+void helperEEPROM::WriteByteToEEPROM(String name, const uint16_t &addr, int8 &v, bool commit) {
 	EEPROM.write(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteByteToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint16 &v, bool commit) {
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16_t &addr, uint16_t &v, bool commit) {
 	EEPROM.put(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, short &v, bool commit) {
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16_t &addr, short &v, bool commit) {
 	EEPROM.put(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
 	wpFZ.DebugWS(wpFZ.strINFO, F("WriteWordToEEPROM"), logmessage);
 }
-void helperEEPROM::WriteWordToEEPROM(String name, const uint16 &addr, uint32 &v, bool commit) {
+void helperEEPROM::WriteWordToEEPROM(String name, const uint16_t &addr, uint32_t &v, bool commit) {
 	EEPROM.put(addr, v);
 	if(commit) EEPROM.commit();
 	String logmessage = name + ": addr: " + String(addr) + ", value: " + String(v);
@@ -443,7 +443,7 @@ void helperEEPROM::readVars() {
 	EEPROM.get(byteMoistureWet, wpMoisture.wet);
 	EEPROM.get(byteMaxVolume, wpDistance.volume);
 #if BUILDWITH == 1
-	uint16 pixelCount;
+	uint16_t pixelCount;
 	EEPROM.get(byteNeoPixelPixelCount, pixelCount);
 	wpNeoPixel.InitPixelCount(pixelCount);
 	wpClock.InitPixelCount(pixelCount);
@@ -480,14 +480,14 @@ void helperEEPROM::readVars() {
 #if BUILDWITH == 3
 	// wird lokal gemacht
 	// for(int i = 0; i < wpDS18B20.count; i++) {
-	// 	uint8 b0 = EEPROM.read(byteDS18B20adr[i][0]);
-	// 	uint8 b1 = EEPROM.read(byteDS18B20adr[i][1]);
-	// 	uint8 b2 = EEPROM.read(byteDS18B20adr[i][2]);
-	// 	uint8 b3 = EEPROM.read(byteDS18B20adr[i][3]);
-	// 	uint8 b4 = EEPROM.read(byteDS18B20adr[i][4]);
-	// 	uint8 b5 = EEPROM.read(byteDS18B20adr[i][5]);
-	// 	uint8 b6 = EEPROM.read(byteDS18B20adr[i][6]);
-	// 	uint8 b7 = EEPROM.read(byteDS18B20adr[i][7]);
+	// 	uint8_t b0 = EEPROM.read(byteDS18B20adr[i][0]);
+	// 	uint8_t b1 = EEPROM.read(byteDS18B20adr[i][1]);
+	// 	uint8_t b2 = EEPROM.read(byteDS18B20adr[i][2]);
+	// 	uint8_t b3 = EEPROM.read(byteDS18B20adr[i][3]);
+	// 	uint8_t b4 = EEPROM.read(byteDS18B20adr[i][4]);
+	// 	uint8_t b5 = EEPROM.read(byteDS18B20adr[i][5]);
+	// 	uint8_t b6 = EEPROM.read(byteDS18B20adr[i][6]);
+	// 	uint8_t b7 = EEPROM.read(byteDS18B20adr[i][7]);
 	// 	if(wpDS18B20.devices[i] != NULL)
 	// 		wpDS18B20.devices[i]->initAddress(b0, b1, b2, b3, b4, b5, b6, b7);
 	// }
@@ -497,17 +497,17 @@ void helperEEPROM::readVars() {
 
 //###################################################################################
 /// byte values: 4byte 80 - 99
-	uint32 tareValueRead = 0;
+	uint32_t tareValueRead = 0;
 	EEPROM.get(byteWeightTareValue, tareValueRead);
 	wpWeight.InitTareValue(tareValueRead);
 
-	uint32 tare1kgRead = 0;
+	uint32_t tare1kgRead = 0;
 	EEPROM.get(byteWeightTare1kg, tare1kgRead);
 	wpWeight.InitTare1kg(tare1kgRead);
 
 	wpFZ.InitLastRestartReason(EEPROM.read(addrRestartReason));
 
-	uint32 bc = 0;
+	uint32_t bc = 0;
 	EEPROM.get(addrBootCounter, bc);
 	wpFZ.InitBootCounter(bc);
 	readStringsFromEEPROM();

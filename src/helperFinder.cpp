@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 30.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperFinder.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: helperFinder.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperFinder.h>
@@ -31,10 +31,10 @@ void helperFinder::cycle() {
 	publishValues();
 }
 
-uint16 helperFinder::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t helperFinder::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 

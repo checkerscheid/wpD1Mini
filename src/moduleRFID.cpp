@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRFID.cpp 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleRFID.cpp 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRFID.h>
@@ -115,10 +115,10 @@ void moduleRFID::calc() {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleRFID::getVersion() {
-	String SVN = "$Rev: 246 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleRFID::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -141,10 +141,10 @@ bool moduleRFID::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleRFID::CalcCycle(){
+uint32_t moduleRFID::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRFID::CalcCycle(uint32 calcCycle){
+uint32_t moduleRFID::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

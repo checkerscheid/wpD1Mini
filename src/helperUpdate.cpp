@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -75,10 +75,10 @@ void helperUpdate::cycle() {
 	doCheckUpdate();
 }
 
-uint16 helperUpdate::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t helperUpdate::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -218,7 +218,7 @@ void helperUpdate::setSubscribes() {
 }
 void helperUpdate::checkSubscribes(char* topic, String msg) {
 	if(strcmp(topic, mqttTopicSetUpdateChanel.c_str()) == 0) {
-		uint8 readUpdateChanel = msg.toInt();
+		uint8_t readUpdateChanel = msg.toInt();
 		if(updateChanel != readUpdateChanel) {
 			SetUpdateChanel(updateChanel);
 			wpFZ.DebugcheckSubscribes(mqttTopicSetUpdateChanel, GetUpdateChanel());
@@ -266,7 +266,7 @@ String helperUpdate::GetUpdateChanel() {
 			break;
 	}
 }
-void helperUpdate::SetUpdateChanel(uint8 uc) {
+void helperUpdate::SetUpdateChanel(uint8_t uc) {
 	switch(uc) {
 		case 99:
 			file = F("firmwarecleaner.bin");

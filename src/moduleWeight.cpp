@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWeight.cpp 258 2025-04-28 13:34:51Z                $ #
+//# File-ID      : $Id:: moduleWeight.cpp 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleWeight.h>
@@ -129,14 +129,14 @@ void moduleWeight::checkSubscribes(char* topic, String msg) {
 	mb->checkSubscribes(topic, msg);
 }
 
-void moduleWeight::InitTareValue(uint32 tv) {
+void moduleWeight::InitTareValue(uint32_t tv) {
 	tareValue = tv * 1000;
 }
 void moduleWeight::SetTare() {
 	makeTare = true;
 	calc();
 }
-void moduleWeight::InitTare1kg(uint32 t1kg) {
+void moduleWeight::InitTare1kg(uint32_t t1kg) {
 	tare1kg = t1kg * 1000;
 }
 void moduleWeight::Set1kg() {
@@ -160,13 +160,13 @@ void moduleWeight::calc() {
 		long raw = -1 * scale->read();
 		if(makeTare) {
 			tareValue = raw;
-			uint32 tv = (uint32) (tareValue / 1000.0);
+			uint32_t tv = (uint32) (tareValue / 1000.0);
 			wpEEPROM.WriteWordToEEPROM("TareValue", wpEEPROM.byteWeightTareValue, tv);
 			makeTare = false;
 		}
 		if(make1kg) {
 			tare1kg = raw;
-			uint32 t1kg = (uint32) (tare1kg / 1000.0);
+			uint32_t t1kg = (uint32) (tare1kg / 1000.0);
 			wpEEPROM.WriteWordToEEPROM("Tare1kg", wpEEPROM.byteWeightTare1kg, t1kg);
 			make1kg = false;
 		}
@@ -211,10 +211,10 @@ long moduleWeight::calcAvg(long raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleWeight::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleWeight::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -247,10 +247,10 @@ bool moduleWeight::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleWeight::CalcCycle(){
+uint32_t moduleWeight::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleWeight::CalcCycle(uint32 calcCycle){
+uint32_t moduleWeight::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

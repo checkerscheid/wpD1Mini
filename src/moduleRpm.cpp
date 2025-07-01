@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 258                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.cpp 258 2025-04-28 13:34:51Z                   $ #
+//# File-ID      : $Id:: moduleRpm.cpp 269 2025-07-01 19:25:14Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleRpm.h>
@@ -106,15 +106,15 @@ void moduleRpm::publishValue() {
 }
 
 void moduleRpm::calc() {
-	uint32 raw = pulseIn(Pin, HIGH, 200 * 1000);
+	uint32_t raw = pulseIn(Pin, HIGH, 200 * 1000);
 	if(raw > 0) {
-		uint32 duration = raw / 1000;
-		uint32 read = 1000 / duration / 4 * 60;
-		uint32 avg = read;
+		uint32_t duration = raw / 1000;
+		uint32_t read = 1000 / duration / 4 * 60;
+		uint32_t avg = read;
 		if(mb->useAvg) {
 			avg = calcAvg(avg);
 		}
-		uint32 correct = avg + correction;
+		uint32_t correct = avg + correction;
 		rpm = correct;
 		mb->error = false;
 		if(mb->debug) {
@@ -130,7 +130,7 @@ void moduleRpm::calc() {
 		wpFZ.DebugWS(wpFZ.strERRROR, "calcRpm", logmessage);
 	}
 }
-uint16 moduleRpm::calcAvg(uint16 raw) {
+uint16_t moduleRpm::calcAvg(uint16_t raw) {
 	long avg = 0;
 	long avgCount = avgLength;
 	avgValues[avgLength - 1] = raw;
@@ -148,10 +148,10 @@ uint16 moduleRpm::calcAvg(uint16 raw) {
 //###################################################################################
 // section to copy
 //###################################################################################
-uint16 moduleRpm::getVersion() {
-	String SVN = "$Rev: 258 $";
-	uint16 v = wpFZ.getBuild(SVN);
-	uint16 vh = wpFZ.getBuild(SVNh);
+uint16_t moduleRpm::getVersion() {
+	String SVN = "$Rev: 269 $";
+	uint16_t v = wpFZ.getBuild(SVN);
+	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
 }
 
@@ -182,10 +182,10 @@ bool moduleRpm::Debug(bool debug) {
 	mb->debug = debug;
 	return true;
 }
-uint32 moduleRpm::CalcCycle(){
+uint32_t moduleRpm::CalcCycle(){
 	return mb->calcCycle;
 }
-uint32 moduleRpm::CalcCycle(uint32 calcCycle){
+uint32_t moduleRpm::CalcCycle(uint32_t calcCycle){
 	mb->calcCycle = calcCycle;
 	return 0;
 }

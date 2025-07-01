@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 18.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleWindow.h 246 2025-02-18 16:27:11Z                  $ #
+//# File-ID      : $Id:: moduleWindow.h 269 2025-07-01 19:25:14Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleWindow_h
@@ -21,9 +21,9 @@
 
 class moduleWindow : public IModuleBase {
 	public:
-		moduleWindow(uint8 n);
+		moduleWindow(uint8_t n);
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		bool bm;
@@ -32,7 +32,7 @@ class moduleWindow : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -46,7 +46,7 @@ class moduleWindow : public IModuleBase {
 		bool Debug();
 		bool Debug(bool debug);
 	private:
-		uint8 no;
+		uint8_t no;
 		bool bmLast;
 		unsigned long publishBMLast;
 		void publishValue();
@@ -54,11 +54,11 @@ class moduleWindow : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 
-		uint8 bitDebug;
+		uint8_t bitDebug;
 		byte bitsDebug;
-		uint16 addrDebug;
+		uint16_t addrDebug;
 
 };
 extern moduleWindow wpWindow1;

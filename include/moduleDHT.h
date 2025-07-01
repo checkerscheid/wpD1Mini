@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 246 2025-02-18 16:27:11Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 269 2025-07-01 19:25:14Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -25,7 +25,7 @@ class moduleDHT : public IModuleBase {
 		moduleDHT();
 		moduleBase* mb;
 		DHT* dht;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		int temperature;
@@ -43,7 +43,7 @@ class moduleDHT : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -56,8 +56,8 @@ class moduleDHT : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int temperatureLast;
 		unsigned long publishTemperatureLast;
@@ -72,7 +72,7 @@ class moduleDHT : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleDHT wpDHT;
 

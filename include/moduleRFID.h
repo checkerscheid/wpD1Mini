@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 28.10.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRFID.h 246 2025-02-18 16:27:11Z                    $ #
+//# File-ID      : $Id:: moduleRFID.h 269 2025-07-01 19:25:14Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRFID_h
@@ -26,8 +26,8 @@ class moduleRFID : public IModuleBase {
 		moduleRFID();
 		moduleBase* mb;
 		MFRC522* rfid;
-		uint8 PinSS;
-		uint8 PinRST;
+		uint8_t PinSS;
+		uint8_t PinRST;
 
 		long chipID;
 
@@ -40,7 +40,7 @@ class moduleRFID : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -53,8 +53,8 @@ class moduleRFID : public IModuleBase {
 		// getter / setter
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int chipIDLast;
 		unsigned long publishChipIDLast;
@@ -64,7 +64,7 @@ class moduleRFID : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleRFID wpRFID;
 

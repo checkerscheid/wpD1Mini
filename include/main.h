@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 203                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.h 203 2024-10-04 07:32:26Z                          $ #
+//# File-ID      : $Id:: main.h 269 2025-07-01 19:25:14Z                          $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef BasisEmpty_h
@@ -18,18 +18,18 @@
 #include <Arduino.h>
 #include <wpFreakaZone.h>
 
-uint16 getVersion();
-void buildChecker(uint16 &v, uint16 moduleBuild);
-uint16 getBuild();
+uint16_t getVersion();
+void buildChecker(uint16_t &v, uint16_t moduleBuild);
+uint16_t getBuild();
 String getStringVersion();
-uint16 getGlobalBuild();
-void BuildChecker(uint16 &v, uint16 moduleBuild);
+uint16_t getGlobalBuild();
+void BuildChecker(uint16_t &v, uint16_t moduleBuild);
 
 //void publishValuesSystem();
 
-String SVNh = "$Rev: 203 $";
+String SVNh = "$Rev: 269 $";
 // counter
-uint32 publishForceRssi = 0;
+uint32_t publishForceRssi = 0;
 
 // value stores for Com
 int rssi = 0;

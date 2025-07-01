@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut2.h 246 2025-02-18 16:27:11Z              $ #
+//# File-ID      : $Id:: moduleAnalogOut2.h 269 2025-07-01 19:25:14Z              $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleAnalogOut2_h
@@ -23,7 +23,7 @@ class moduleAnalogOut2 : public IModuleBase {
 	public:
 		moduleAnalogOut2();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// values
 		String mqttTopicOut;
@@ -38,7 +38,7 @@ class moduleAnalogOut2 : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -54,28 +54,28 @@ class moduleAnalogOut2 : public IModuleBase {
 
 		void InitHand(bool hand);
 
-		void InitHandValue(uint8 value);
-		void SetHandValue(uint8 value);
-		void SetHandValueProzent(uint8 value);
-		uint8 GetHandValue();
+		void InitHandValue(uint8_t value);
+		void SetHandValue(uint8_t value);
+		void SetHandValueProzent(uint8_t value);
+		uint8_t GetHandValue();
 
 		bool GetHandError();
 
 	private:
 
 		// section for define
-		uint8 output;
-		uint8 autoValue;
-		uint8 handValue;
+		uint8_t output;
+		uint8_t autoValue;
+		uint8_t handValue;
 		bool handError;
 		bool handSet = false;
-		uint8 handValueSet = 0;
+		uint8_t handValueSet = 0;
 
-		uint8 outputLast;
+		uint8_t outputLast;
 		unsigned long publishOutputLast;
-		uint8 autoValueLast;
+		uint8_t autoValueLast;
 		unsigned long publishAutoValueLast;
-		uint8 handValueLast;
+		uint8_t handValueLast;
 		unsigned long publishHandValueLast;
 		bool handErrorLast;
 		unsigned long publishHandErrorLast;
@@ -85,7 +85,7 @@ class moduleAnalogOut2 : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleAnalogOut2 wpAnalogOut2;
 

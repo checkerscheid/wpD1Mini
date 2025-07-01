@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 246                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleMoisture.h 246 2025-02-18 16:27:11Z                $ #
+//# File-ID      : $Id:: moduleMoisture.h 269 2025-07-01 19:25:14Z                $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleMoisture_h
@@ -23,14 +23,14 @@ class moduleMoisture : public IModuleBase {
 	public:
 		moduleMoisture();
 		moduleBase* mb;
-		uint8 Pin;
+		uint8_t Pin;
 
 		// section for define
 		int moisture;
 		bool errorMin;
 		byte minValue = 30;
-		uint16 dry = 1023; // high value
-		uint16 wet = 0; // low value
+		uint16_t dry = 1023; // high value
+		uint16_t wet = 0; // low value
 
 		// values
 		String mqttTopicMoisture;
@@ -43,7 +43,7 @@ class moduleMoisture : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -58,23 +58,23 @@ class moduleMoisture : public IModuleBase {
 		bool UseAvg(bool useAvg);
 		bool Debug();
 		bool Debug(bool debug);
-		uint32 CalcCycle();
-		uint32 CalcCycle(uint32 calcCycle);
+		uint32_t CalcCycle();
+		uint32_t CalcCycle(uint32_t calcCycle);
 	private:
 		int moistureLast;
 		unsigned long publishMoistureLast;
 		bool errorMinLast;
 		unsigned long publishErrorMinLast;
-		static const uint8 avgLength = 128;
+		static const uint8_t avgLength = 128;
 		int avgValues[avgLength];
 
 		void publishValue();
 		void calc();
-		uint16 calcAvg(uint16 raw);
+		uint16_t calcAvg(uint16_t raw);
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 246 $";
+		String SVNh = "$Rev: 269 $";
 };
 extern moduleMoisture wpMoisture;
 

@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 267                                                     $ #
+//# Revision     : $Rev:: 269                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 267 2025-05-27 14:14:36Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 269 2025-07-01 19:25:14Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -24,15 +24,15 @@ class moduleCwWw : public IModuleBase {
 		moduleCwWw();
 		moduleBase* mb;
 		
-		static const uint8 ModeStatic = 0;
-		static const uint8 ModePulse = 4;
-		static const uint8 ModeWwPulse = 5;
-		static const uint8 ModeCwPulse = 6;
-		static const uint8 ModeSmooth = 7;
-		static const uint8 ModeWwSmooth = 8;
-		static const uint8 ModeCwSmooth = 9;
+		static const uint8_t ModeStatic = 0;
+		static const uint8_t ModePulse = 4;
+		static const uint8_t ModeWwPulse = 5;
+		static const uint8_t ModeCwPulse = 6;
+		static const uint8_t ModeSmooth = 7;
+		static const uint8_t ModeWwSmooth = 8;
+		static const uint8_t ModeCwSmooth = 9;
 		
-		static const uint8 ModeBlender = 90; //CW, WW
+		static const uint8_t ModeBlender = 90; //CW, WW
 
 		// values
 		String mqttTopicWW;
@@ -53,7 +53,7 @@ class moduleCwWw : public IModuleBase {
 		// section to copy
 		void init();
 		void cycle();
-		uint16 getVersion();
+		uint16_t getVersion();
 
 		void publishSettings();
 		void publishSettings(bool force);
@@ -67,50 +67,50 @@ class moduleCwWw : public IModuleBase {
 		bool Debug();
 		bool Debug(bool debug);
 
-		String SetWW(uint8 ww);
-		String SetCW(uint8 cw);
+		String SetWW(uint8_t ww);
+		String SetCW(uint8_t cw);
 		String SetSleep(uint seconds);
-		String SetEffect(uint8 effect);
-		String SetEffectSpeed(uint8 speed);
+		String SetEffect(uint8_t effect);
+		String SetEffectSpeed(uint8_t speed);
 		String SetOn();
 		String SetOff();
-		String SetWwCwAuto(uint8 ww, uint8 cw, uint sleep);
-		String GetModeName(uint8 actualMode);
+		String SetWwCwAuto(uint8_t ww, uint8_t cw, uint sleep);
+		String GetModeName(uint8_t actualMode);
 	private:
-		uint8 PinWW;
-		uint8 PinCW;
-		uint8 AnalogOutWW = 0;
-		uint8 AnalogOutWWLast = 0;
+		uint8_t PinWW;
+		uint8_t PinCW;
+		uint8_t AnalogOutWW = 0;
+		uint8_t AnalogOutWWLast = 0;
 		unsigned long publishAnalogOutWWLast;
-		uint8 AnalogOutCW = 0;
-		uint8 AnalogOutCWLast = 0;
+		uint8_t AnalogOutCW = 0;
+		uint8_t AnalogOutCWLast = 0;
 		unsigned long publishAnalogOutCWLast;
 		bool manual;
 		bool manualLast;
 		unsigned long publishManualLast;
-		uint8 maxPercent;
-		uint8 maxPercentLast;
+		uint8_t maxPercent;
+		uint8_t maxPercentLast;
 		unsigned long publishMaxPercent;
-		uint8 modeCurrent;
-		uint8 modeCurrentLast;
+		uint8_t modeCurrent;
+		uint8_t modeCurrentLast;
 		unsigned long publishModeLast;
 		uint sleep;
 		uint sleepLast;
 		unsigned long publishSleepLast;
 		unsigned long sleepAt;
 
-		uint8 loopTime;
+		uint8_t loopTime;
 		unsigned long loopPrevious;
-		uint8 steps;
+		uint8_t steps;
 
 		void publishValue();
 		void calc();
 
-		uint8 targetWW;
-		uint8 targetCW;
+		uint8_t targetWW;
+		uint8_t targetCW;
 		float winkelWW;
 		float winkelCW;
-		uint8 effectSpeed;
+		uint8_t effectSpeed;
 
 		void calcDuration();
 		void BlenderEffect();
@@ -123,11 +123,11 @@ class moduleCwWw : public IModuleBase {
 		void SmoothEffect();
 		void WwSmoothEffect();
 		void CwSmoothEffect();
-		uint8 GetMaxPercent();
+		uint8_t GetMaxPercent();
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 267 $";
+		String SVNh = "$Rev: 269 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;
