@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 269 2025-07-01 19:25:14Z                 $ #
+//# File-ID      : $Id:: helperModules.h 270 2025-07-30 22:04:37Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -50,6 +50,7 @@ class helperModules {
 		bool useModuleWeight = false;
 		bool useModuleRFID = false;
 		bool useModuleClock = false;
+		bool useModuleSML = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -84,6 +85,7 @@ class helperModules {
 		String mqttTopicUseUnderfloor3;
 		String mqttTopicUseUnderfloor4;
 		String mqttTopicUseDS18B20;
+		String mqttTopicUseSML;
 		#endif
 		#if BUILDWITH == 4
 		String mqttTopicUseRFID;
@@ -135,6 +137,7 @@ class helperModules {
 		void changemoduleUnderfloor3(bool newValue);
 		void changemoduleUnderfloor4(bool newValue);
 		void changemoduleDS18B20(bool newValue);
+		void changemoduleSML(bool newValue);
 		#endif
 		#if BUILDWITH == 4
 		void changemoduleRFID(bool newValue);
@@ -147,7 +150,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
@@ -202,6 +205,8 @@ class helperModules {
 		unsigned long publishUseRFIDLast;
 		bool useClockLast;
 		unsigned long publishUseClockLast;
+		bool useSMLLast;
+		unsigned long publishUseSMLLast;
 		#if BUILDWITH == 1
 		#endif
 		#if BUILDWITH == 2

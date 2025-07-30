@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.h 269 2025-07-01 19:25:14Z               $ #
+//# File-ID      : $Id:: helperWebServer.h 270 2025-07-30 22:04:37Z               $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperWebServer_h
@@ -72,6 +72,7 @@ class helperWebServer {
 		const uint8_t cmdDebugRFID = 42;
 		const uint8_t cmdDebugClock = 43;
 		const uint8_t cmdDebugDS18B20 = 44;
+		const uint8_t cmdDebugSML = 45;
 		uint8_t doDebugChange;
 
 		const uint8_t cmdModuleDHT11 = 1;
@@ -90,17 +91,18 @@ class helperWebServer {
 		const uint8_t cmdModuleAnalogOut2 = 14;
 		const uint8_t cmdModuleNeoPixel = 15;
 		const uint8_t cmdModuleRpm = 16;
-		const uint8_t cmdmoduleImpulseCounter = 17;
-		const uint8_t cmdmoduleUnderfloor1 = 18;
-		const uint8_t cmdmoduleUnderfloor2 = 19;
-		const uint8_t cmdmoduleUnderfloor3 = 20;
-		const uint8_t cmdmoduleUnderfloor4 = 21;
+		const uint8_t cmdModuleImpulseCounter = 17;
+		const uint8_t cmdModuleUnderfloor1 = 18;
+		const uint8_t cmdModuleUnderfloor2 = 19;
+		const uint8_t cmdModuleUnderfloor3 = 20;
+		const uint8_t cmdModuleUnderfloor4 = 21;
 		const uint8_t cmdModuleWindow2 = 22;
 		const uint8_t cmdModuleWindow3 = 23;
 		const uint8_t cmdModuleWeight = 24;
 		const uint8_t cmdModuleRFID = 25;
 		const uint8_t cmdModuleClock = 26;
-		const uint8_t cmdmoduleDS18B20 = 27;
+		const uint8_t cmdModuleDS18B20 = 27;
+		const uint8_t cmdModuleSML = 28;
 		uint8_t doModuleChange;
 
 		uint8_t doBlink;
@@ -134,7 +136,7 @@ class helperWebServer {
 		String getChangeDebug(String id, String name, bool state);
 		String getChangeCmd(String id, String name, bool state);
 	private:
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 		bool DebugLast = false;
 		unsigned long publishDebugLast = 0;
 		String newName;

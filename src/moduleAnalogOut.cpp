@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 13.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleAnalogOut.cpp 269 2025-07-01 19:25:14Z             $ #
+//# File-ID      : $Id:: moduleAnalogOut.cpp 270 2025-07-30 22:04:37Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleAnalogOut.h>
@@ -483,7 +483,7 @@ void moduleAnalogOut::deactivateWartung() {
 // section to copy
 //###################################################################################
 uint16_t moduleAnalogOut::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

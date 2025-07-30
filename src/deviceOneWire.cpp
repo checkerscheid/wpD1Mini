@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: deviceOneWire.cpp 269 2025-07-01 19:25:14Z               $ #
+//# File-ID      : $Id:: deviceOneWire.cpp 270 2025-07-30 22:04:37Z               $ #
 //#                                                                                 #
 //###################################################################################
 #include <deviceOneWire.h>
@@ -139,7 +139,7 @@ void deviceOneWire::calc() {
 // section to copy
 //###################################################################################
 uint16_t deviceOneWire::getVersion() {
-	String SVN = "$Rev: 258 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

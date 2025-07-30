@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperMqtt.cpp 269 2025-07-01 19:25:14Z                  $ #
+//# File-ID      : $Id:: helperMqtt.cpp 270 2025-07-30 22:04:37Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperMqtt.h>
@@ -53,7 +53,7 @@ void helperMqtt::cycle() {
 }
 
 uint16_t helperMqtt::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -115,9 +115,9 @@ void helperMqtt::connectMqtt() {
 			String logmessage = "MQTT Connected";
 			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
 		} else {
-			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 5 seconds";
+			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 2 seconds";
 			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
-			//delay(5000); do this in main loop / cycle
+			delay(2000); //do this in main loop / cycle
 		}
 	}
 }

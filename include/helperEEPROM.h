@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 269 2025-07-01 19:25:14Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 270 2025-07-30 22:04:37Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -62,6 +62,7 @@ class helperEEPROM {
 		const uint8_t bitUseRFID = 0; // include in bitsModules3
 		const uint8_t bitUseClock = 1; // include in bitsModules3
 		const uint8_t bitUseDS18B20 = 2; // include in bitsModules3
+		const uint8_t bitUseSML = 3; // include in bitsModules3
 
 //###################################################################################
 
@@ -125,6 +126,7 @@ class helperEEPROM {
 		const uint16_t addrBitsDebugModules3 = 8;
 		byte bitsDebugModules3;
 		const uint8_t bitDebugDS18B20 = 0; // include in bitsDebugModules3
+		const uint8_t bitDebugSML = 1; // include in bitsDebugModules3
 
 //###################################################################################
 
@@ -244,6 +246,7 @@ class helperEEPROM {
 		const uint16_t byteClockColor5R = 113;
 		const uint16_t byteClockColor5G = 114;
 		const uint16_t byteClockColor5B = 115;
+		const uint16_t byteMeterType = 116;
 
 // ab hier 4 bytes
 		const uint16_t byteImpulseCounterKWh = 120;
@@ -298,7 +301,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16_t addrStartForString0 = 500;

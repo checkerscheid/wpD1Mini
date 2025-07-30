@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 269 2025-07-01 19:25:14Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 270 2025-07-30 22:04:37Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -50,8 +50,7 @@
 #include <moduleRFID.h>
 #include <moduleClock.h>
 #include <moduleDS18B20.h>
-
-
+#include <moduleSML.h>
 
 #define NTP_SERVER "172.17.1.1"
 #define TZ "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -70,6 +69,7 @@ class wpFreakaZone {
 		const uint32_t minute10  = 1000 * 60 * 10;
 		const uint32_t minute5 = 1000 * 60 * 5;
 		const uint32_t minute2 = 1000 * 60 * 2;
+		const uint32_t minute1 = 1000 * 60;
 		const uint32_t sekunde30 = 1000 * 30;
 		const uint32_t sekunde10 = 1000 * 10;
 		const unsigned long maxWorkingDays = 1000 * 60 * 60 * 24 * 14;
@@ -173,6 +173,7 @@ class wpFreakaZone {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 		bool CheckQoS(unsigned long lastSend);
+		bool CheckQoS(unsigned long lastSend, uint32_t qos);
 		bool sendRawRest(String target);
 		void InitBootCounter(uint8_t bc);
 		void BootCount();
@@ -196,7 +197,7 @@ class wpFreakaZone {
 		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
 		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
 
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;

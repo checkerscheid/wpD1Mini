@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 269 2025-07-01 19:25:14Z                        $ #
+//# File-ID      : $Id:: main.cpp 270 2025-07-30 22:04:37Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -18,7 +18,7 @@
 void setup() {
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, HIGH);
-	Serial.begin(9600);
+	Serial.begin(112500);
 	while(!Serial) {}
 	wpEEPROM.init();
 	wpFZ.init("BasisEmpty");
@@ -112,6 +112,9 @@ void setup() {
 	}
 	if(wpModules.useModuleDS18B20) {
 		wpDS18B20.init();
+	}
+	if(wpModules.useModuleSML) {
+		wpSML.init();
 	}
 	#endif
 	#if BUILDWITH == 4
@@ -217,6 +220,9 @@ void loop() {
 		if(wpModules.useModuleDS18B20) {
 			wpDS18B20.cycle();
 		}
+		if(wpModules.useModuleSML) {
+			wpSML.cycle();
+		}
 		#endif
 		#if BUILDWITH == 4
 		if(wpModules.useModuleRFID) {
@@ -231,7 +237,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -286,6 +292,7 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpDS18B20.getVersion());
 	buildChecker(v, wpRFID.getVersion());
 	buildChecker(v, wpClock.getVersion());
+	buildChecker(v, wpSML.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16_t moduleBuild) {

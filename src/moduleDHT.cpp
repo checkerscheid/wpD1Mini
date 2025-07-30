@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.cpp 269 2025-07-01 19:25:14Z                   $ #
+//# File-ID      : $Id:: moduleDHT.cpp 270 2025-07-30 22:04:37Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleDHT.h>
@@ -178,7 +178,7 @@ void moduleDHT::printCalcDebug(String name, int value, float raw) {
 // section to copy
 //###################################################################################
 uint16_t moduleDHT::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

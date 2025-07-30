@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleImpulseCounter.cpp 269 2025-07-01 19:25:14Z        $ #
+//# File-ID      : $Id:: moduleImpulseCounter.cpp 270 2025-07-30 22:04:37Z        $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleImpulseCounter.h>
@@ -153,7 +153,7 @@ void moduleImpulseCounter::calc() {
 // section to copy
 //###################################################################################
 uint16_t moduleImpulseCounter::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

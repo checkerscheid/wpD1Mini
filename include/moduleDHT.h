@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleDHT.h 269 2025-07-01 19:25:14Z                     $ #
+//# File-ID      : $Id:: moduleDHT.h 270 2025-07-30 22:04:37Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleDHT_h
@@ -72,7 +72,7 @@ class moduleDHT : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 };
 extern moduleDHT wpDHT;
 

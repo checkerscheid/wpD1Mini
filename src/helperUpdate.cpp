@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 269 2025-07-01 19:25:14Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 270 2025-07-30 22:04:37Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -76,7 +76,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 270 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -130,11 +130,11 @@ void helperUpdate::check() {
 	const String url = "http://" + String(wpFZ.updateServer);
 	http.begin(wifi, url);
 	int httpCode = http.GET();
-	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
+	//wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
 	String payload = http.getString();
 	deserializeJson(doc, payload);
 	payload.replace("\"", "'");
-	wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
+	// wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
 	newVersion = !(doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>() == installedVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Selected Chanel: " + jsonsub);
 	wpFZ.DebugWS(newVersion ? wpFZ.strWARN : wpFZ.strINFO, "UpdateCheck", "installed Version: " + installedVersion);

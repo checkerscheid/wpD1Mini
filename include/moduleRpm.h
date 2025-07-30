@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 270                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleRpm.h 269 2025-07-01 19:25:14Z                     $ #
+//# File-ID      : $Id:: moduleRpm.h 270 2025-07-30 22:04:37Z                     $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleRpm_h
@@ -66,7 +66,7 @@ class moduleRpm : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 270 $";
 };
 extern moduleRpm wpRpm;
 
