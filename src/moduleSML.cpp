@@ -307,7 +307,7 @@ void moduleSML::calc() {
 						if (SequenceIndex == 4) {
 							SequenceIndex = 0;
 							SequenceStep = 6;
-							currentZsSolar = (uint32_t)(((unsigned long)SmlZsSolar[0] << 24 | (unsigned long)SmlZsSolar[1] << 16 | (unsigned long)SmlZsSolar[2] << 8 | (unsigned long)SmlZsSolar[3]) / 10000);
+							currentZsSolar = (uint32_t)(((int8_t)SmlZsSolar[0] << 24 | (int16_t)SmlZsSolar[1] << 16 | (uint32_t)SmlZsSolar[2] << 8 | (int64_t)SmlZsSolar[3]) / 10000);
 							if(mb->debug) {
 								Serial.println();
 							}
@@ -338,7 +338,7 @@ void moduleSML::calc() {
 						if (SequenceIndex == 2) {
 							SequenceIndex = 0;
 							SequenceStep = 1;
-							currentPSolar = (int32_t)((int32_t)SmlPSolar[0] << 8 | (int32_t)SmlPSolar[1]) / 100;
+							currentPSolar = (int32_t)(((int8_t)SmlPSolar[0] << 8 | (int16_t)SmlPSolar[1]) / 100);
 							if(mb->debug) {
 								Serial.println();
 							}
@@ -350,7 +350,7 @@ void moduleSML::calc() {
 						if (SequenceIndex == 3) {
 							SequenceIndex = 0;
 							SequenceStep = 1;
-							currentPSolar = (int32_t)((int32_t)SmlPSolar[0] << 16 | (int32_t)SmlPSolar[1] << 8 | (int32_t)SmlPSolar[2]) / 100;
+							currentPSolar = (int32_t)(((int8_t)SmlPSolar[0] << 16 | (int16_t)SmlPSolar[1] << 8 | (int32_t)SmlPSolar[2]) / 100);
 							if(mb->debug) {
 								Serial.println();
 							}
