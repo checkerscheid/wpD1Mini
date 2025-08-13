@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.h 270 2025-07-30 22:04:37Z                  $ #
+//# File-ID      : $Id:: helperEEPROM.h 272 2025-08-13 18:45:43Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperEEPROM_h
@@ -63,6 +63,7 @@ class helperEEPROM {
 		const uint8_t bitUseClock = 1; // include in bitsModules3
 		const uint8_t bitUseDS18B20 = 2; // include in bitsModules3
 		const uint8_t bitUseSML = 3; // include in bitsModules3
+		const uint8_t bitUseModbus = 4; // include in bitsModules3
 
 //###################################################################################
 
@@ -127,6 +128,7 @@ class helperEEPROM {
 		byte bitsDebugModules3;
 		const uint8_t bitDebugDS18B20 = 0; // include in bitsDebugModules3
 		const uint8_t bitDebugSML = 1; // include in bitsDebugModules3
+		const uint8_t bitDebugModbus = 2; // include in bitsDebugModules3
 
 //###################################################################################
 
@@ -168,6 +170,7 @@ class helperEEPROM {
 		const uint8_t bitUnderfloor2Summer = 1; // include in bitsSettingsModules3
 		const uint8_t bitUnderfloor3Summer = 2; // include in bitsSettingsModules3
 		const uint8_t bitUnderfloor4Summer = 3; // include in bitsSettingsModules3
+		const uint8_t bitModbusIsMaster = 4; // include in bitsSettingsModules3
 		
 //###################################################################################
 /// byte values: byte 20 - 49
@@ -247,6 +250,7 @@ class helperEEPROM {
 		const uint16_t byteClockColor5G = 114;
 		const uint16_t byteClockColor5B = 115;
 		const uint16_t byteMeterType = 116;
+		const uint16_t byteModbusClientId = 117;
 
 // ab hier 4 bytes
 		const uint16_t byteImpulseCounterKWh = 120;
@@ -301,7 +305,7 @@ class helperEEPROM {
 		void setSubscribes();
 		void checkSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 270 $";
+		String SVNh = "$Rev: 272 $";
 		bool DebugLast;
 		unsigned long publishDebugLast;
 		const uint16_t addrStartForString0 = 500;

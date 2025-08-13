@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperEEPROM.cpp 270 2025-07-30 22:04:37Z                $ #
+//# File-ID      : $Id:: helperEEPROM.cpp 272 2025-08-13 18:45:43Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperEEPROM.h>
@@ -51,7 +51,7 @@ void helperEEPROM::cycle() {
 }
 
 uint16_t helperEEPROM::getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 272 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -248,9 +248,10 @@ void helperEEPROM::readVars() {
 	wpModules.useModuleUnderfloor3 = bitRead(bitsModules2, bitUseUnderfloor3);
 	wpModules.useModuleUnderfloor4 = bitRead(bitsModules2, bitUseUnderfloor4);
 	wpModules.useModuleDS18B20 = bitRead(bitsModules3, bitUseDS18B20);
-	wpModules.useModuleSML = bitRead(bitsModules3, bitUseSML);
 #endif
 #if BUILDWITH == 4
+	wpModules.useModuleSML = bitRead(bitsModules3, bitUseSML);
+	wpModules.useModuleModbus = bitRead(bitsModules3, bitUseModbus);
 	wpModules.useModuleRFID = bitRead(bitsModules3, bitUseRFID);
 #endif
 
@@ -305,9 +306,10 @@ void helperEEPROM::readVars() {
 	wpUnderfloor3.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor3));
 	wpUnderfloor4.Debug(bitRead(bitsDebugModules2, bitDebugUnderfloor4));
 	wpDS18B20.Debug(bitRead(bitsDebugModules3, bitDebugDS18B20));
-	wpSML.Debug(bitRead(bitsDebugModules3, bitDebugSML));
 #endif
 #if BUILDWITH == 4
+	wpSML.Debug(bitRead(bitsDebugModules3, bitDebugSML));
+	wpModbus.Debug(bitRead(bitsDebugModules3, bitDebugModbus));
 	wpRFID.Debug(bitRead(bitsDebugModules2, bitDebugRFID));
 #endif
 
@@ -351,6 +353,7 @@ void helperEEPROM::readVars() {
 	wpUnderfloor4.InitSummer(bitRead(bitsSettingsModules3, bitUnderfloor4Summer));
 #endif
 #if BUILDWITH == 4
+	wpModbus.InitIsMaster(bitRead(bitsSettingsModules3, bitModbusIsMaster));
 #endif
 
 //###################################################################################
@@ -417,10 +420,11 @@ void helperEEPROM::readVars() {
 		if(wpDS18B20.devices[i] != NULL)
 			wpDS18B20.devices[i]->correction = EEPROM.read(byteDS18B20Correction[i]);
 	}
-	wpSML.InitMeterType(EEPROM.read(byteMeterType));
 #endif
 #if BUILDWITH == 4
+	wpSML.InitMeterType(EEPROM.read(byteMeterType));
 	wpRFID.CalcCycle(EEPROM.read(byteCalcCycleRFID) * 100);
+	wpModbus.InitClientId(EEPROM.read(byteModbusClientId));
 #endif
 
 //###################################################################################

@@ -10,7 +10,7 @@ def post_program_action(source, target, env):
 	elif env.GetProjectOption("build_with") == "3":
 		build_with = "heating"
 	elif env.GetProjectOption("build_with") == "4":
-		build_with = "rfid"
+		build_with = "com"
 	else:
 		build_with = ""
 		

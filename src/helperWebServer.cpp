@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWebServer.cpp 270 2025-07-30 22:04:37Z             $ #
+//# File-ID      : $Id:: helperWebServer.cpp 272 2025-08-13 18:45:43Z             $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWebServer.h>
@@ -41,7 +41,7 @@ void helperWebServer::cycle() {
 }
 
 uint16_t helperWebServer::getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 272 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -214,11 +214,14 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDS18B20) {
 			message += wpDS18B20.GetJsonSettings() + F(",");
 		}
+		#endif
+		#if BUILDWITH == 4
 		if(wpModules.useModuleSML) {
 			message += wpSML.GetJsonSettings() + F(",");
 		}
-		#endif
-		#if BUILDWITH == 4
+		if(wpModules.useModuleModbus) {
+			message += wpModbus.GetJsonSettings() + F(",");
+		}
 		if(wpModules.useModuleRFID) {
 			message += wpRFID.GetJsonSettings() + F(",");
 		}
@@ -309,11 +312,14 @@ void helperWebServer::setupWebServer() {
 		if(wpModules.useModuleDS18B20) {
 			message += F(",") + wpFZ.JsonKeyValue(F("DS18B20"), wpDS18B20.Debug() ? "true" : "false");
 		}
+		#endif
+		#if BUILDWITH == 4
 		if(wpModules.useModuleSML) {
 			message += F(",") + wpFZ.JsonKeyValue(F("SML"), wpSML.Debug() ? "true" : "false");
 		}
-		#endif
-		#if BUILDWITH == 4
+		if(wpModules.useModuleModbus) {
+			message += F(",") + wpFZ.JsonKeyValue(F("Modbus"), wpModbus.Debug() ? "true" : "false");
+		}
 		if(wpModules.useModuleRFID) {
 			message += F(",") + wpFZ.JsonKeyValue(F("RFID"), wpRFID.Debug() ? "true" : "false");
 		}
@@ -349,6 +355,7 @@ void helperWebServer::setupWebServer() {
 			F(",") + wpFZ.JsonKeyValue(F("RFID"), wpModules.useModuleRFID ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("Clock"), wpModules.useModuleClock ? "true" : "false") +
 			F(",") + wpFZ.JsonKeyValue(F("SML"), wpModules.useModuleSML ? "true" : "false") +
+			F(",") + wpFZ.JsonKeyValue(F("Modbus"), wpModules.useModuleModbus ? "true" : "false") +
 			F("}}}");
 		request->send(200, F("application/json"), message.c_str());
 	});
@@ -469,12 +476,16 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useDS18B20"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleDS18B20);
 			}
+			#endif
+			#if BUILDWITH == 4
 			if(request->getParam(F("Module"))->value() == F("useSML")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useSML"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleSML);
 			}
-			#endif
-			#if BUILDWITH == 4
+			if(request->getParam(F("Module"))->value() == F("useModbus")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useModbus"));
+				wpWebServer.setModuleChange(wpWebServer.cmdModuleModbus);
+			}
 			if(request->getParam(F("Module"))->value() == F("useRFID")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found useRFID"));
 				wpWebServer.setModuleChange(wpWebServer.cmdModuleRFID);
@@ -625,12 +636,16 @@ void helperWebServer::setupWebServer() {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugDS18B20"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugDS18B20);
 			}
+			#endif
+			#if BUILDWITH == 4
 			if(request->getParam(F("Debug"))->value() == F("DebugSML")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugSML"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugSML);
 			}
-			#endif
-			#if BUILDWITH == 4
+			if(request->getParam(F("Debug"))->value() == F("DebugModbus")) {
+				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugModbus"));
+				wpWebServer.setDebugChange(wpWebServer.cmdDebugModbus);
+			}
 			if(request->getParam(F("Debug"))->value() == F("DebugRFID")) {
 				wpFZ.DebugWS(wpFZ.strINFO, F("AsyncWebServer"), F("Found DebugRFID"));
 				wpWebServer.setDebugChange(wpWebServer.cmdDebugRFID);
@@ -1124,6 +1139,8 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 	}
+	#endif
+	#if BUILDWITH == 4
 	if(wpModules.useModuleSML) {
 		webServer.on("/setSML", HTTP_GET, [](AsyncWebServerRequest *request) {
 			if(request->hasParam(F("meterType"))) {
@@ -1139,8 +1156,19 @@ void helperWebServer::setupWebServer() {
 			wpWebServer.setBlink();
 		});
 	}
-	#endif
-	#if BUILDWITH == 4
+	if(wpModules.useModuleModbus) {
+		webServer.on("/setModbus", HTTP_GET, [](AsyncWebServerRequest *request) {
+			if(request->hasParam(F("isMaster"))) {
+				bool isMaster = request->getParam(F("isMaster"))->value() == F("1");
+				request->send(200, F("application/json"), wpModbus.SetIsMaster(isMaster).c_str());
+			}
+			if(request->hasParam(F("clientId"))) {
+				uint8_t clientId = request->getParam(F("clientId"))->value().toInt();
+				request->send(200, F("application/json"), wpModbus.SetClientId(clientId).c_str());
+			}
+		});
+		wpWebServer.setBlink();
+	}
 	// if(wpModules.useModuleRFID) {
 	// 	webServer.on("/setRFID", HTTP_GET, [](AsyncWebServerRequest *request) {
 	// 		if(request->hasParam(F("hand"))) {
@@ -1249,9 +1277,10 @@ void helperWebServer::doTheModuleChange() {
 		if(doModuleChange == cmdModuleUnderfloor3) wpModules.changemoduleUnderfloor3(!wpModules.useModuleUnderfloor3);
 		if(doModuleChange == cmdModuleUnderfloor4) wpModules.changemoduleUnderfloor4(!wpModules.useModuleUnderfloor4);
 		if(doModuleChange == cmdModuleDS18B20) wpModules.changemoduleDS18B20(!wpModules.useModuleDS18B20);
-		if(doModuleChange == cmdModuleSML) wpModules.changemoduleSML(!wpModules.useModuleSML); 
 		#endif
 		#if BUILDWITH == 4
+		if(doModuleChange == cmdModuleSML) wpModules.changemoduleSML(!wpModules.useModuleSML); 
+		if(doModuleChange == cmdModuleModbus) wpModules.changemoduleModbus(!wpModules.useModuleModbus);
 		if(doModuleChange == cmdModuleRFID) wpModules.changemoduleRFID(!wpModules.useModuleRFID);
 		#endif
 		doModuleChange = cmdDoNothing;
@@ -1296,9 +1325,10 @@ void helperWebServer::doTheDebugChange() {
 		if(doDebugChange == cmdDebugUnderfloor3) wpUnderfloor3.changeDebug();
 		if(doDebugChange == cmdDebugUnderfloor4) wpUnderfloor4.changeDebug();
 		if(doDebugChange == cmdDebugDS18B20) wpDS18B20.changeDebug();
-		if(doDebugChange == cmdDebugSML) wpSML.changeDebug();
 		#endif
 		#if BUILDWITH == 4
+		if(doDebugChange == cmdDebugSML) wpSML.changeDebug();
+		if(doDebugChange == cmdDebugModbus) wpModbus.changeDebug();
 		if(doDebugChange == cmdDebugRFID) wpRFID.changeDebug();
 		#endif
 		doDebugChange = cmdDoNothing;
@@ -1394,11 +1424,12 @@ String processor(const String& var) {
 			wpWebServer.getchangeModule(F("useUnderfloor2"), F("wpUnderfloor2"), wpModules.useModuleUnderfloor2) +
 			wpWebServer.getchangeModule(F("useUnderfloor3"), F("wpUnderfloor3"), wpModules.useModuleUnderfloor3) +
 			wpWebServer.getchangeModule(F("useUnderfloor4"), F("wpUnderfloor4"), wpModules.useModuleUnderfloor4) +
-			wpWebServer.getchangeModule(F("useDS18B20"), F("wpDS18B20"), wpModules.useModuleDS18B20) +
-			wpWebServer.getchangeModule(F("useSML"), F("wpSML"), wpModules.useModuleSML);
+			wpWebServer.getchangeModule(F("useDS18B20"), F("wpDS18B20"), wpModules.useModuleDS18B20);
 		#endif
 		#if BUILDWITH == 4
 		returns +=
+			wpWebServer.getchangeModule(F("useSML"), F("wpSML"), wpModules.useModuleSML) +
+			wpWebServer.getchangeModule(F("useModbus"), F("wpModbus"), wpModules.useModuleModbus) +
 			wpWebServer.getchangeModule(F("useRFID"), F("wpRFID"), wpModules.useModuleRFID);
 		#endif
 		returns +=
@@ -1500,11 +1531,14 @@ String processor(const String& var) {
 		if(wpModules.useModuleDS18B20) {
 			returns += wpWebServer.getChangeDebug(F("DebugDS18B20"), F("DS18B20"), wpDS18B20.Debug());
 		}
+		#endif
+		#if BUILDWITH == 4
 		if(wpModules.useModuleSML) {
 			returns += wpWebServer.getChangeDebug(F("DebugSML"), F("SML"), wpSML.Debug());
 		}
-		#endif
-		#if BUILDWITH == 4
+		if(wpModules.useModuleModbus) {
+			returns += wpWebServer.getChangeDebug(F("DebugModbus"), F("Modbus"), wpModbus.Debug());
+		}
 		if(wpModules.useModuleRFID) {
 			returns += wpWebServer.getChangeDebug(F("DebugRFID"), F("RFID"), wpRFID.Debug());
 		}

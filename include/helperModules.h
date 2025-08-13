@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 01.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperModules.h 270 2025-07-30 22:04:37Z                 $ #
+//# File-ID      : $Id:: helperModules.h 272 2025-08-13 18:45:43Z                 $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef helperModules_h
@@ -51,6 +51,7 @@ class helperModules {
 		bool useModuleRFID = false;
 		bool useModuleClock = false;
 		bool useModuleSML = false;
+		bool useModuleModbus = false;
 		// commands
 		String mqttTopicDebug;
 		// settings
@@ -85,10 +86,11 @@ class helperModules {
 		String mqttTopicUseUnderfloor3;
 		String mqttTopicUseUnderfloor4;
 		String mqttTopicUseDS18B20;
-		String mqttTopicUseSML;
 		#endif
 		#if BUILDWITH == 4
 		String mqttTopicUseRFID;
+		String mqttTopicUseSML;
+		String mqttTopicUseModbus;
 		#endif
 
 		helperModules();
@@ -137,9 +139,10 @@ class helperModules {
 		void changemoduleUnderfloor3(bool newValue);
 		void changemoduleUnderfloor4(bool newValue);
 		void changemoduleDS18B20(bool newValue);
-		void changemoduleSML(bool newValue);
 		#endif
 		#if BUILDWITH == 4
+		void changemoduleSML(bool newValue);
+		void changemoduleModbus(bool newValue);
 		void changemoduleRFID(bool newValue);
 		#endif
 
@@ -150,7 +153,7 @@ class helperModules {
 		void setAllSubscribes();
 		void checkAllSubscribes(char* topic, String msg);
 	private:
-		String SVNh = "$Rev: 270 $";
+		String SVNh = "$Rev: 272 $";
 		bool useDHT11Last;
 		unsigned long publishUseDHT11Last;
 		bool useDHT22Last;
@@ -207,6 +210,8 @@ class helperModules {
 		unsigned long publishUseClockLast;
 		bool useSMLLast;
 		unsigned long publishUseSMLLast;
+		bool useModbusLast;
+		unsigned long publishUseModbusLast;
 		#if BUILDWITH == 1
 		#endif
 		#if BUILDWITH == 2

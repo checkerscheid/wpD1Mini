@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 270 2025-07-30 22:04:37Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 272 2025-08-13 18:45:43Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -57,9 +57,9 @@ void helperUpdate::init() {
 		jsonsub = "heating";
 	#endif
 	#if BUILDWITH == 4
-		file = F("firmwarerfid.bin");
+		file = F("firmwarecom.bin");
 		updateChanel = 4;
-		jsonsub = "rfid";
+		jsonsub = "com";
 	#endif
 	wpMqtt.mqttClient.publish(mqttTopicNewVersion.c_str(), String(newVersion).c_str()); // hide Alarm until check is done
 	installedVersion = "v" + String(wpFZ.MajorVersion) + "." + String(wpFZ.MinorVersion) + "-build" + String(wpFZ.Build);
@@ -76,7 +76,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 272 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -259,7 +259,7 @@ String helperUpdate::GetUpdateChanel() {
 			return F("heating");
 			break;
 		case 4:
-			return F("rfid");
+			return F("com");
 			break;
 		default:
 			return F("firmware");
@@ -285,8 +285,8 @@ void helperUpdate::SetUpdateChanel(uint8_t uc) {
 			updateChanel = 3;
 			break;
 		case 4:
-			file = F("firmwarerfid.bin");
-			updateChanel = 3;
+			file = F("firmwarecom.bin");
+			updateChanel = 4;
 			break;
 		default:
 			file = F("firmware.bin");

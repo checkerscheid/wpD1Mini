@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: main.cpp 270 2025-07-30 22:04:37Z                        $ #
+//# File-ID      : $Id:: main.cpp 272 2025-08-13 18:45:43Z                        $ #
 //#                                                                                 #
 //###################################################################################
 #include <main.h>
@@ -113,11 +113,14 @@ void setup() {
 	if(wpModules.useModuleDS18B20) {
 		wpDS18B20.init();
 	}
+	#endif
+	#if BUILDWITH == 4
 	if(wpModules.useModuleSML) {
 		wpSML.init();
 	}
-	#endif
-	#if BUILDWITH == 4
+	if(wpModules.useModuleModbus) {
+		wpModbus.init();
+	}
 	if(wpModules.useModuleRFID) {
 		wpRFID.init();
 	}
@@ -220,11 +223,14 @@ void loop() {
 		if(wpModules.useModuleDS18B20) {
 			wpDS18B20.cycle();
 		}
+		#endif
+		#if BUILDWITH == 4
 		if(wpModules.useModuleSML) {
 			wpSML.cycle();
 		}
-		#endif
-		#if BUILDWITH == 4
+		if(wpModules.useModuleModbus) {
+			wpModbus.cycle();
+		}
 		if(wpModules.useModuleRFID) {
 			wpRFID.cycle();
 		}
@@ -237,7 +243,7 @@ void loop() {
 // Allgemein
 //###################################################################################
 uint16_t getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 272 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -293,6 +299,7 @@ uint16_t getGlobalBuild() {
 	buildChecker(v, wpRFID.getVersion());
 	buildChecker(v, wpClock.getVersion());
 	buildChecker(v, wpSML.getVersion());
+	buildChecker(v, wpModbus.getVersion());
 	return v;
 }
 void buildChecker(uint16_t &v, uint16_t moduleBuild) {

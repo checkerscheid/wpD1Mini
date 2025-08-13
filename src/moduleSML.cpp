@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 02.06.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 271                                                     $ #
+//# Revision     : $Rev:: 272                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleSML.cpp 271 2025-07-30 22:05:20Z                   $ #
+//# File-ID      : $Id:: moduleSML.cpp 272 2025-08-13 18:45:43Z                   $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleSML.h>
@@ -33,7 +33,6 @@ moduleSML::moduleSML() {
 	ModuleName = "SML";
 	mb = new moduleBase(ModuleName);
 
-	
 }
 void moduleSML::init() {
 	// section for define
@@ -396,7 +395,7 @@ uint8_t moduleSML::SetError(uint8_t Step) {
 // section to copy
 //###################################################################################
 uint16_t moduleSML::getVersion() {
-	String SVN = "$Rev: 271 $";
+	String SVN = "$Rev: 272 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
