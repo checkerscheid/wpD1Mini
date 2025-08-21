@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 272                                                     $ #
+//# Revision     : $Rev:: 275                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperUpdate.cpp 272 2025-08-13 18:45:43Z                $ #
+//# File-ID      : $Id:: helperUpdate.cpp 275 2025-08-20 18:47:16Z                $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperUpdate.h>
@@ -76,7 +76,7 @@ void helperUpdate::cycle() {
 }
 
 uint16_t helperUpdate::getVersion() {
-	String SVN = "$Rev: 272 $";
+	String SVN = "$Rev: 275 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -130,11 +130,15 @@ void helperUpdate::check() {
 	const String url = "http://" + String(wpFZ.updateServer);
 	http.begin(wifi, url);
 	int httpCode = http.GET();
-	//wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
+	if(Debug) {
+		wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "http Code: " + String(httpCode));
+	}
 	String payload = http.getString();
 	deserializeJson(doc, payload);
 	payload.replace("\"", "'");
-	// wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
+	if(Debug) {
+		wpFZ.DebugWS(wpFZ.strDEBUG, "UpdateCheck", "payload: " + payload);
+	}
 	newVersion = !(doc["wpFreakaZone"][jsonsub]["VersionId"].as<String>() == installedVersion);
 	wpFZ.DebugWS(wpFZ.strINFO, "UpdateCheck", "Selected Chanel: " + jsonsub);
 	wpFZ.DebugWS(newVersion ? wpFZ.strWARN : wpFZ.strINFO, "UpdateCheck", "installed Version: " + installedVersion);
