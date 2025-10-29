@@ -60,8 +60,8 @@
 class wpFreakaZone {
 	public:
 
-		const char* ssid = "Mikrowellen";
-		const char* password = "Welc0me@wp-Scheid.com";
+		const char* ssid = "***";
+		const char* password = "***";
 
 		const char* mqttServer = "mqtt.freakazone.com";
 		const uint16_t mqttServerPort = 1883;
