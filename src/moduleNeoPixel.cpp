@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 276                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleNeoPixel.cpp 270 2025-07-30 22:04:37Z              $ #
+//# File-ID      : $Id:: moduleNeoPixel.cpp 276 2025-10-12 12:47:54Z              $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleNeoPixel.h>
@@ -457,7 +457,7 @@ String moduleNeoPixel::SetOn() {
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
-	String returns = "{" +
+	String returns = "\"values\":{" +
 		wpFZ.JsonKeyValue("R", String(targetR)) + "," +
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
@@ -485,7 +485,7 @@ String moduleNeoPixel::SetOff() {
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
-	String returns = "{" +
+	String returns = "\"values\":{" +
 		wpFZ.JsonKeyValue("R", String(targetR)) + "," +
 		wpFZ.JsonKeyValue("G", String(targetG)) + "," +
 		wpFZ.JsonKeyValue("B", String(targetB));
@@ -506,7 +506,7 @@ String moduleNeoPixel::SetWW(uint ww) {
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
-	return "{"
+	return "\"values\":{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
@@ -519,7 +519,7 @@ String moduleNeoPixel::SetCW(uint cw) {
 	demoMode = false;
 	modeCurrent = ModeBlender;
 	staticIsSet = false;
-	return "{"
+	return "\"values\":{"
 		+ wpFZ.JsonKeyValue("WW", String(targetWW)) + ","
 		+ wpFZ.JsonKeyValue("CW", String(targetCW)) + "}";
 }
@@ -1114,7 +1114,7 @@ uint8_t moduleNeoPixel::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16_t moduleNeoPixel::getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 276 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;

@@ -33,10 +33,10 @@ void helperOnlineToggler::cycle() {
 	publishValues();
 	if(wpFZ.loopStartedAt > lastContact + Minutes10) {
 		wpFZ.DebugWS(wpFZ.strWARN, "OnlineToggler", "last Contact is 10 Minutes ago, 'checkSubscribes' not fired, restart ...");
-		wpMqtt.connectMqtt();
-		lastContact = wpFZ.loopStartedAt; // give him time to connect
-		//wpFZ.SetRestartReason(wpFZ.restartReasonOnlineToggler);
-		//ESP.restart();
+		//wpMqtt.connectMqtt();
+		//lastContact = wpFZ.loopStartedAt; // give him time to connect
+		wpFZ.SetRestartReason(wpFZ.restartReasonOnlineToggler);
+		ESP.restart();
 	}
 }
 

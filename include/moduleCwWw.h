@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 277                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.h 269 2025-07-01 19:25:14Z                    $ #
+//# File-ID      : $Id:: moduleCwWw.h 277 2026-01-15 08:53:53Z                    $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef moduleCwWw_h
@@ -39,16 +39,16 @@ class moduleCwWw : public IModuleBase {
 		String mqttTopicCW;
 		String mqttTopicManual;
 		String mqttTopicMaxPercent;
-		String mqttTopicModeName;
 		String mqttTopicSleep;
-		String mqttTopicSpeed;
+		String mqttTopicModeName;
+		String mqttTopicEffectSpeed;
 		// settings
 		// commands
 		String mqttTopicSetWW;
 		String mqttTopicSetCW;
 		String mqttTopicSetMode;
 		String mqttTopicSetSleep;
-		String mqttTopicSetSpeed;
+		String mqttTopicSetEffectSpeed;
 
 		// section to copy
 		void init();
@@ -71,7 +71,7 @@ class moduleCwWw : public IModuleBase {
 		String SetCW(uint8_t cw);
 		String SetSleep(uint seconds);
 		String SetEffect(uint8_t effect);
-		String SetEffectSpeed(uint8_t speed);
+		String SetEffectSpeed(uint8_t effectSpeed);
 		String SetOn();
 		String SetOff();
 		String SetWwCwAuto(uint8_t ww, uint8_t cw, uint sleep);
@@ -91,12 +91,15 @@ class moduleCwWw : public IModuleBase {
 		uint8_t maxPercent;
 		uint8_t maxPercentLast;
 		unsigned long publishMaxPercent;
-		uint8_t modeCurrent;
-		uint8_t modeCurrentLast;
-		unsigned long publishModeLast;
 		uint sleep;
 		uint sleepLast;
 		unsigned long publishSleepLast;
+		uint8_t modeCurrent;
+		uint8_t modeCurrentLast;
+		unsigned long publishModeLast;
+		uint8_t effectSpeed;
+		uint8_t effectSpeedLast;
+		unsigned long publishEffectSpeedLast;
 		unsigned long sleepAt;
 
 		uint8_t loopTime;
@@ -110,7 +113,6 @@ class moduleCwWw : public IModuleBase {
 		uint8_t targetCW;
 		float winkelWW;
 		float winkelCW;
-		uint8_t effectSpeed;
 
 		void calcDuration();
 		void BlenderEffect();
@@ -127,7 +129,7 @@ class moduleCwWw : public IModuleBase {
 
 		// section to config and copy
 		String ModuleName;
-		String SVNh = "$Rev: 269 $";
+		String SVNh = "$Rev: 277 $";
 		const float pi = 3.14159267;
 };
 extern moduleCwWw wpCwWw;

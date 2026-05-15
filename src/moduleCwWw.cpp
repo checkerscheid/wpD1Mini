@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 22.07.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 270                                                     $ #
+//# Revision     : $Rev:: 277                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: moduleCwWw.cpp 270 2025-07-30 22:04:37Z                  $ #
+//# File-ID      : $Id:: moduleCwWw.cpp 277 2026-01-15 08:53:53Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <moduleCwWw.h>
@@ -36,7 +36,7 @@ moduleCwWw::moduleCwWw() {
 
 void moduleCwWw::init() {
 	sleep = 0;
-	effectSpeed = 1;
+	effectSpeed = 5;
 	modeCurrent = 0;       // Current Pattern Number
 
 	// values
@@ -46,14 +46,14 @@ void moduleCwWw::init() {
 	mqttTopicMaxPercent = wpFZ.DeviceName + "/" + ModuleName + "/MaxPercent";
 	mqttTopicSleep = wpFZ.DeviceName + "/" + ModuleName + "/Sleep";
 	mqttTopicModeName = wpFZ.DeviceName + "/" + ModuleName + "/ModeName";
-	mqttTopicSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
+	mqttTopicEffectSpeed = wpFZ.DeviceName + "/" + ModuleName + "/EffectSpeed";
 	// settings
 	// commands
 	mqttTopicSetWW = wpFZ.DeviceName + "/settings/" + ModuleName + "/WW";
 	mqttTopicSetCW = wpFZ.DeviceName + "/settings/" + ModuleName + "/CW";
-	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
 	mqttTopicSetSleep = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetSleep";
-	mqttTopicSetSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/EffectSpeed";
+	mqttTopicSetMode = wpFZ.DeviceName + "/settings/" + ModuleName + "/SetMode";
+	mqttTopicSetEffectSpeed = wpFZ.DeviceName + "/settings/" + ModuleName + "/EffectSpeed";
 
 	manual = false;
 	maxPercent = 0;
@@ -93,8 +93,10 @@ void moduleCwWw::publishValues(bool force) {
 		publishAnalogOutWWLast = 0;
 		publishAnalogOutCWLast = 0;
 		publishManualLast = 0;
-		publishModeLast = 0;
 		publishMaxPercent = 0;
+		publishSleepLast = 0;
+		publishModeLast = 0;
+		publishEffectSpeedLast = 0;
 	}
 	if(AnalogOutWWLast != AnalogOutWW || wpFZ.CheckQoS(publishAnalogOutWWLast)) {
 		AnalogOutWWLast = AnalogOutWW;
@@ -130,6 +132,14 @@ void moduleCwWw::publishValues(bool force) {
 		}
 		publishMaxPercent = wpFZ.loopStartedAt;
 	}
+	if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
+		sleepLast = sleep;
+		wpMqtt.mqttClient.publish(mqttTopicSleep.c_str(), String(sleep).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicSleep, String(sleep));
+		}
+		publishSleepLast = wpFZ.loopStartedAt;
+	}
 	if(modeCurrentLast != modeCurrent || wpFZ.CheckQoS(publishModeLast)) {
 		modeCurrentLast = modeCurrent;
 		wpMqtt.mqttClient.publish(mqttTopicModeName.c_str(), GetModeName(modeCurrent).c_str());
@@ -137,6 +147,14 @@ void moduleCwWw::publishValues(bool force) {
 			mb->printPublishValueDebug(mqttTopicModeName, GetModeName(modeCurrent));
 		}
 		publishModeLast = wpFZ.loopStartedAt;
+	}
+	if(effectSpeedLast != effectSpeed || wpFZ.CheckQoS(publishEffectSpeedLast)) {
+		effectSpeedLast = effectSpeed;
+		wpMqtt.mqttClient.publish(mqttTopicEffectSpeed.c_str(), String(effectSpeed).c_str());
+		if(wpMqtt.Debug) {
+			mb->printPublishValueDebug(mqttTopicEffectSpeed, String(effectSpeed));
+		}
+		publishEffectSpeedLast = wpFZ.loopStartedAt;
 	}
 	if(wpFZ.loopStartedAt > publishSleepLast + 1000) {
 		if(sleepLast != sleep || wpFZ.CheckQoS(publishSleepLast)) {
@@ -154,8 +172,9 @@ void moduleCwWw::publishValues(bool force) {
 void moduleCwWw::setSubscribes() {
 	wpMqtt.mqttClient.subscribe(mqttTopicSetWW.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetCW.c_str());
-	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
 	wpMqtt.mqttClient.subscribe(mqttTopicSetSleep.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetMode.c_str());
+	wpMqtt.mqttClient.subscribe(mqttTopicSetEffectSpeed.c_str());
 	mb->setSubscribes();
 }
 
@@ -174,6 +193,11 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetCW, String(targetCW));
 		}
 	}
+	if(strcmp(topic, mqttTopicSetSleep.c_str()) == 0) {
+		uint readSleep = msg.toInt();
+		SetSleep(readSleep);
+		wpFZ.DebugcheckSubscribes(mqttTopicSleep, String(readSleep));
+	}
 	if(strcmp(topic, mqttTopicSetMode.c_str()) == 0) {
 		uint readSetMode = msg.toInt();
 		if(modeCurrent != readSetMode) {
@@ -181,10 +205,12 @@ void moduleCwWw::checkSubscribes(char* topic, String msg) {
 			wpFZ.DebugcheckSubscribes(mqttTopicSetMode, String(modeCurrent));
 		}
 	}
-	if(strcmp(topic, mqttTopicSetSleep.c_str()) == 0) {
-		uint readSleep = msg.toInt();
-		SetSleep(readSleep);
-		wpFZ.DebugcheckSubscribes(mqttTopicSleep, String(readSleep));
+	if(strcmp(topic, mqttTopicSetEffectSpeed.c_str()) == 0) {
+		uint8_t readEffectSpeed = msg.toInt();
+		if(effectSpeed != readEffectSpeed) {
+			SetEffectSpeed(readEffectSpeed);
+			wpFZ.DebugcheckSubscribes(mqttTopicSetEffectSpeed, String(effectSpeed));
+		}
 	}
 	mb->checkSubscribes(topic, msg);
 }
@@ -228,11 +254,11 @@ String moduleCwWw::SetEffect(uint8_t effect) {
 	return wpFZ.JsonKeyString("effect", GetModeName(modeCurrent));
 }
 
-String moduleCwWw::SetEffectSpeed(uint8_t speed) {
-	if(speed < 1) speed = 1;
-	if(speed > 9) speed = 9;
-	effectSpeed = speed;
-	return wpFZ.JsonKeyValue("effectSpeed", String(effectSpeed));
+String moduleCwWw::SetEffectSpeed(uint8_t effectSpeed) {
+	if(effectSpeed < 1) effectSpeed = 1;
+	if(effectSpeed > 9) effectSpeed = 9;
+	this->effectSpeed = effectSpeed;
+	return wpFZ.JsonKeyValue("effectSpeed", String(this->effectSpeed));
 }
 
 String moduleCwWw::SetOn() {
@@ -531,7 +557,7 @@ uint8_t moduleCwWw::GetMaxPercent() {
 // section to copy
 //###################################################################################
 uint16_t moduleCwWw::getVersion() {
-	String SVN = "$Rev: 270 $";
+	String SVN = "$Rev: 277 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
