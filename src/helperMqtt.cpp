@@ -101,8 +101,7 @@ void helperMqtt::setSubscribes() {
 // private
 //###################################################################################
 void helperMqtt::connectMqtt() {
-	String logmessage = "Connecting MQTT Server: " + String(wpFZ.mqttServer) + ":" + String(wpFZ.mqttServerPort) + " as " + wpFZ.DeviceName;
-	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
+	wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", String("Connecting MQTT Server: ") + wpFZ.mqttServer + ":" + String(wpFZ.mqttServerPort) + String(" as ") + wpFZ.DeviceName);
 	mqttClient.disconnect();
 	while(!mqttClient.connected()) {
 		if(mqttClient.connect(wpFZ.DeviceName.c_str())) {
@@ -112,11 +111,9 @@ void helperMqtt::connectMqtt() {
 			wpModules.setAllSubscribes();
 			MqttSince = wpFZ.getDateTime();
 			mqttClient.publish(wpOnlineToggler.mqttTopicOnlineToggler.c_str(), String(1).c_str());
-			String logmessage = "MQTT Connected";
-			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", logmessage);
+			wpFZ.DebugWS(wpFZ.strINFO, "connectMqtt", "MQTT Connected");
 		} else {
-			String logmessage =  "failed, rc= " + String(mqttClient.state()) + ",  will try again in 2 seconds";
-			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", logmessage);
+			wpFZ.DebugWS(wpFZ.strERRROR, "connectMqtt", String("failed, rc= ") + String(mqttClient.state()) + ",  will try again in 2 seconds");
 			delay(2000); //do this in main loop / cycle
 		}
 	}

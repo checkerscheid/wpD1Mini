@@ -26,47 +26,57 @@ moduleUnderfloor::moduleUnderfloor(uint8_t n) {
 	mb = new moduleBase(ModuleName);
 }
 void moduleUnderfloor::init() {
-	switch(no) {
-		case 1:
-			Pin = D1;
-			bitDebug = wpEEPROM.bitDebugUnderfloor1;
-			bitHand = wpEEPROM.bitUnderfloor1Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor1HandValue;
-			bitSummer = wpEEPROM.bitUnderfloor1Summer;
-			byteSetpoint = wpEEPROM.byteUnderfloor1Setpoint;
-			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor1;
-			break;
-		case 2:
-			Pin = D2;
-			bitDebug = wpEEPROM.bitDebugUnderfloor2;
-			bitHand = wpEEPROM.bitUnderfloor2Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor2HandValue;
-			bitSummer = wpEEPROM.bitUnderfloor2Summer;
-			byteSetpoint = wpEEPROM.byteUnderfloor2Setpoint;
-			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor2;
-			break;
-		case 3:
-			Pin = D6;
-			bitDebug = wpEEPROM.bitDebugUnderfloor3;
-			bitHand = wpEEPROM.bitUnderfloor3Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor3HandValue;
-			bitSummer = wpEEPROM.bitUnderfloor3Summer;
-			byteSetpoint = wpEEPROM.byteUnderfloor3Setpoint;
-			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor3;
-			break;
-		case 4:
-			Pin = D7;
-			bitDebug = wpEEPROM.bitDebugUnderfloor4;
-			bitHand = wpEEPROM.bitUnderfloor4Hand;
-			bitHandValue = wpEEPROM.bitUnderfloor4HandValue;
-			bitSummer = wpEEPROM.bitUnderfloor4Summer;
-			byteSetpoint = wpEEPROM.byteUnderfloor4Setpoint;
-			byteCalcCycle = wpEEPROM.byteCalcCycleUnderfloor4;
-			break;
-		default:
-			wpFZ.DebugWS(wpFZ.strERRROR, F("Underfloor::init"), F("FatalError: unknown Underfloor no: ") + String(no));
-			break;
+	if(no < 1 || no > 4) {
+		wpFZ.DebugWS(wpFZ.strERRROR, F("Underfloor::init"), F("FatalError: unknown Underfloor no: ") + String(no));
+		return;
 	}
+
+	static const uint8_t pins[] = { D1, D2, D6, D7 };
+	static const uint8_t* bitDebugArr[] = {
+		&wpEEPROM.bitDebugUnderfloor1,
+		&wpEEPROM.bitDebugUnderfloor2,
+		&wpEEPROM.bitDebugUnderfloor3,
+		&wpEEPROM.bitDebugUnderfloor4
+	};
+	static const uint8_t* bitHandArr[] = {
+		&wpEEPROM.bitUnderfloor1Hand,
+		&wpEEPROM.bitUnderfloor2Hand,
+		&wpEEPROM.bitUnderfloor3Hand,
+		&wpEEPROM.bitUnderfloor4Hand
+	};
+	static const uint8_t* bitHandValueArr[] = {
+		&wpEEPROM.bitUnderfloor1HandValue,
+		&wpEEPROM.bitUnderfloor2HandValue,
+		&wpEEPROM.bitUnderfloor3HandValue,
+		&wpEEPROM.bitUnderfloor4HandValue
+	};
+	static const uint8_t* bitSummerArr[] = {
+		&wpEEPROM.bitUnderfloor1Summer,
+		&wpEEPROM.bitUnderfloor2Summer,
+		&wpEEPROM.bitUnderfloor3Summer,
+		&wpEEPROM.bitUnderfloor4Summer
+	};
+	static const uint16_t* byteSetpointArr[] = {
+		&wpEEPROM.byteUnderfloor1Setpoint,
+		&wpEEPROM.byteUnderfloor2Setpoint,
+		&wpEEPROM.byteUnderfloor3Setpoint,
+		&wpEEPROM.byteUnderfloor4Setpoint
+	};
+	static const uint16_t* byteCalcCycleArr[] = {
+		&wpEEPROM.byteCalcCycleUnderfloor1,
+		&wpEEPROM.byteCalcCycleUnderfloor2,
+		&wpEEPROM.byteCalcCycleUnderfloor3,
+		&wpEEPROM.byteCalcCycleUnderfloor4
+	};
+
+	uint8_t idx = no - 1;
+	Pin = pins[idx];
+	bitDebug = *bitDebugArr[idx];
+	bitHand = *bitHandArr[idx];
+	bitHandValue = *bitHandValueArr[idx];
+	bitSummer = *bitSummerArr[idx];
+	byteSetpoint = *byteSetpointArr[idx];
+	byteCalcCycle = *byteCalcCycleArr[idx];
 
 	pinMode(Pin, OUTPUT);
 	output = false;
@@ -112,7 +122,6 @@ void moduleUnderfloor::init() {
 	publishWartungActiveLast = 0;
 	summerLast = false;
 	publishSummerLast = 0;
-
 
 	// section to copy
 	mb->initDebug(wpEEPROM.addrBitsDebugModules2, wpEEPROM.bitsDebugModules2, bitDebug);
@@ -197,11 +206,7 @@ void moduleUnderfloor::publishValues(bool force) {
 	}
 	if(setPointLast != setPoint || wpFZ.CheckQoS(publishSetPointLast)) {
 		setPointLast = setPoint;
-		if(summer) {
-			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(SUMMERTEMP).c_str());
-		} else {
-			wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(setPoint / 10.0).c_str());
-		}
+		wpMqtt.mqttClient.publish(mqttTopicSetPoint.c_str(), String(summer ? SUMMERTEMP : setPoint / 10.0).c_str());
 		if(wpMqtt.Debug) {
 			mb->printPublishValueDebug(ModuleName + " setPoint", String(setPoint));
 		}
@@ -364,17 +369,10 @@ void moduleUnderfloor::calc() {
 	}
 	digitalWrite(Pin, !output);
 }
+
 void moduleUnderfloor::calcOutput() {
-	uint8_t aktSetPoint = setPoint;
-	if(summer) {
-		aktSetPoint = SUMMERTEMP * 10;
-	}
-	if(aktSetPoint < temp) {
-		autoValue = false;
-	}
-	if(aktSetPoint > temp) {
-		autoValue = true;
-	}
+	uint8_t aktSetPoint = summer ? SUMMERTEMP * 10 : setPoint;
+	autoValue = aktSetPoint > temp;
 }
 void moduleUnderfloor::deactivateWartung() {
 	int8_t minuten = 5;

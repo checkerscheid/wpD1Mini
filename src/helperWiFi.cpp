@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 29.05.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 269                                                     $ #
+//# Revision     : $Rev:: 278                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: helperWiFi.cpp 269 2025-07-01 19:25:14Z                  $ #
+//# File-ID      : $Id:: helperWiFi.cpp 278 2026-06-11 07:18:36Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #include <helperWiFi.h>
@@ -29,6 +29,7 @@ void helperWiFi::init() {
 	// commands
 	mqttTopicDebug = wpFZ.DeviceName + "/settings/Debug/WiFi";
 
+	isInited = false;
 	setupWiFi();
 	// because DateTime Only works with NTP Server
 	wpFZ.OnSince = wpFZ.getDateTime();
@@ -48,7 +49,7 @@ void helperWiFi::cycle() {
 }
 
 uint16_t helperWiFi::getVersion() {
-	String SVN = "$Rev: 269 $";
+	String SVN = "$Rev: 278 $";
 	uint16_t v = wpFZ.getBuild(SVN);
 	uint16_t vh = wpFZ.getBuild(SVNh);
 	return v > vh ? v : vh;
@@ -70,9 +71,17 @@ void helperWiFi::setupWiFi() {
 	Serial.println(wpFZ.ssid);
 	
 	WiFi.disconnect();
-	WiFi.setHostname(wpFZ.DeviceName.c_str());
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(wpFZ.ssid, wpFZ.password);
+	if(!isInited) {
+		WiFi.setSleepMode(WIFI_NONE_SLEEP);
+		WiFi.setAutoReconnect(true);
+		WiFi.persistent(true);
+		WiFi.setHostname(wpFZ.DeviceName.c_str());
+		WiFi.mode(WIFI_STA);
+		WiFi.begin(wpFZ.ssid, wpFZ.password);
+		isInited = true;
+	} else {
+		WiFi.reconnect();
+	}
 
 	Serial.print(wpFZ.getTime());
 	Serial.print(wpFZ.getOnlineTime());
