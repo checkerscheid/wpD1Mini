@@ -120,7 +120,8 @@ void helperMqtt::connectMqtt() {
 }
 
 void helperMqtt::callbackMqtt(char* topic, byte* payload, unsigned int length) {
-	String msg = "";
+	String msg;
+	msg.reserve(length);
 	for (unsigned int i = 0; i < length; i++) {
 		msg += (char)payload[i];
 	}

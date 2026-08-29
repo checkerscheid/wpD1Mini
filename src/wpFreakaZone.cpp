@@ -313,18 +313,31 @@ bool wpFreakaZone::sendRawRest(String target) {
 	bool returns = false;
 	WiFiClient client;
 	HTTPClient http;
-	String logmessage = "HTTP: '" + target + "'";
+	String logmessage;
+	logmessage.reserve(10 + target.length());
+	logmessage += F("HTTP: '");
+	logmessage += target;
+	logmessage += '\'';
 	wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
 	http.begin(client, target.c_str());
 	int httpResponseCode = http.GET();
 	if (httpResponseCode > 0) {
 		String payload = http.getString();
 		payload.replace("\"", "'");
-		String logmessage = "HTTP Response (" + String(httpResponseCode) + "): " + payload;
+		String logmessage;
+		logmessage.reserve(20 + payload.length());
+		logmessage += F("HTTP Response (");
+		logmessage += String(httpResponseCode);
+		logmessage += F("): ");
+		logmessage += payload;
 		wpFZ.DebugWS(wpFZ.strINFO, "sendRawRest", logmessage);
 		returns = true;
 	} else {
-		String logmessage = "HTTP Response (" + String(httpResponseCode) + ")";
+		String logmessage;
+		logmessage.reserve(20);
+		logmessage += F("HTTP Response (");
+		logmessage += String(httpResponseCode);
+		logmessage += F(")");
 		wpFZ.DebugWS(wpFZ.strERRROR, "sendRawRest", logmessage);
 	}
 	http.end();
@@ -393,7 +406,9 @@ void wpFreakaZone::pumpCycleFinished() {
 	wpWebServer.webSocket.textAll(F("{\"cmd\":\"pumpCycleFinished\"}"));
 }
 void wpFreakaZone::updateProgress(int percent) {
-	wpWebServer.webSocket.textAll("{\"cmd\":\"updateProgress\",\"percent\":\"" + String(percent) + " %\"}");
+	String payload = "{\"cmd\":\"updateProgress\",\"percent\":\"" + String(percent) + " %\"}";
+	Serial.println(payload);
+	wpWebServer.webSocket.textAll(payload);
 }
 void wpFreakaZone::DebugcheckSubscribes(String topic, String value) {
 	String logmessage =  "Setting change found on topic: '" + topic + "': " + value;

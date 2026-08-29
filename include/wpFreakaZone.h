@@ -8,9 +8,9 @@
 //# Author       : Christian Scheid                                                 #
 //# Date         : 08.03.2024                                                       #
 //#                                                                                 #
-//# Revision     : $Rev:: 272                                                     $ #
+//# Revision     : $Rev:: 278                                                     $ #
 //# Author       : $Author::                                                      $ #
-//# File-ID      : $Id:: wpFreakaZone.h 272 2025-08-13 18:45:43Z                  $ #
+//# File-ID      : $Id:: wpFreakaZone.h 278 2026-06-11 07:18:36Z                  $ #
 //#                                                                                 #
 //###################################################################################
 #ifndef wpFreakaZone_h
@@ -86,13 +86,13 @@ class wpFreakaZone {
 		String OnSince;
 		String OnDuration;
 
-		const String strDEBUG  = "[  DEBUG  ]";
-		const String strINFO   = "[- INFO  -]";
-		const String strWARN   = "[* WARN  *]";
-		const String strERRROR = "[! ERROR !]";
+const char* strDEBUG  = "[  DEBUG  ]";
+	const char* strINFO   = "[- INFO  -]";
+	const char* strWARN   = "[* WARN  *]";
+	const char* strERRROR = "[! ERROR !]";
 
-		const String jsonOK = "{\"erg\":\"S_OK\"}";
-		const String jsonERROR = "{\"erg\":\"S_ERROR\"}";
+	const char* jsonOK = "{\"erg\":\"S_OK\"}";
+	const char* jsonERROR = "{\"erg\":\"S_ERROR\"}";
 
 		const char* Pins[18] = {
 			"D3", "TX", "D4", "RX", "D2", "D1",
@@ -145,10 +145,10 @@ class wpFreakaZone {
 		long Map(long in, long inMin, long inMax, long outMin, long outMax, bool useMin, bool useMax);
 		long Map(long in, long inMin, long inMax, long outMin, long outMax);
 
-		static String JsonKeyValue(String name, String value);
-		static String JsonKeyString(String name, String value);
+	static String JsonKeyValue(String name, String value);
+	static String JsonKeyString(String name, String value);
 
-		void DebugWS(String typ, String func, String msg);
+	void DebugWS(String typ, String func, String msg);
 		//void SendWS(String msg);
 		void SendWSModule(String htmlId, bool value);
 		void SendWSDebug(String htmlId, bool value);
@@ -192,13 +192,13 @@ class wpFreakaZone {
 		const uint16_t maxWorkingDelay = 1000;
 		
 		uint8_t _restartReason = 0;
-		const String restartReasonStringCmd = "Cmd";
-		const String restartReasonStringMaxWorking = "Max Working Counter occurd";
-		const String restartReasonStringUpdate = "Update";
-		const String restartReasonStringWiFi = "WiFi after Timeout not connected";
-		const String restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
+const char* restartReasonStringCmd = "Cmd";
+	const char* restartReasonStringMaxWorking = "Max Working Counter occurd";
+	const char* restartReasonStringUpdate = "Update";
+	const char* restartReasonStringWiFi = "WiFi after Timeout not connected";
+	const char* restartReasonStringOnlineToggler = "Server Online question after Timeout not recieved";
 
-		String SVNh = "$Rev: 272 $";
+		String SVNh = "$Rev: 278 $";
 		unsigned long publishOnDurationLast;
 		bool calcValuesLast;
 		unsigned long publishCalcValuesLast;
